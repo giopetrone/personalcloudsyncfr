@@ -1,0 +1,106 @@
+/* 
+    Document   : AppsUsersEvents
+    Created on : Jun 23, 2009, 1:07:14 PM
+    Author     : marino
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+/* 
+   TODO customize this sample style
+   Syntax recommendation http://www.w3.org/TR/REC-CSS2/
+*/
+
+root { 
+    display: block;
+}
+
+.gwt-Tree {
+    width:300px;
+    border: 10px solid;
+    border-color: white;
+}
+
+.calendari {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10px;
+ }
+
+.tabellaMessaggi {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+ }
+
+.quoteLabel {
+    color: white;
+    display: block;
+    /*    width: 450px; */
+    padding: 2px 4px;
+    text-decoration: none;
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    border: 1px solid;
+    border-color: black;
+    background-color: #00F0F0;
+    text-decoration: none;
+}
+
+.event {
+    color: white;
+    display: block;
+    /*    width: 450px; */
+    padding: 2px 4px;
+    text-decoration: none;
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    border: 1px solid;
+    border-color: black;
+    background-color: #80F080;
+    text-decoration: none;
+}
+.condition {
+    color: white;
+    display: block;
+    /*    width: 450px; */
+    padding: 2px 4px;
+    text-decoration: none;
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    border: 1px solid;
+    border-color: black;
+    background-color: #F0F000;
+    text-decoration: none;
+}
+
+.myevent {
+    color: white;
+    display: block;
+    /*    width: 450px; */
+    padding: 2px 4px;
+    text-decoration: none;
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    border: 1px solid;
+    border-color: black;
+    background-color: #8F88A0;
+    text-decoration: none;
+}
+
+.disabled {
+    color: gray;
+    display: block;
+    /*    width: 450px; */
+    padding: 2px 4px;
+    text-decoration: none;
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    border: 1px solid;
+    border-color: black;
+    background-color: #0F08A0;
+    text-decoration: none;
+}
