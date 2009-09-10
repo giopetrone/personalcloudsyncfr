@@ -1,0 +1,85 @@
+May 11, 2009 11:27:32 AM
+WARNING [net.jini.discovery.LookupLocatorDiscovery]: Exception occured during unicast discovery to localhost:4162 with constraints InvocationConstraints[reqs: {}, prefs: {}]. Please verify the unicast locators hostname and port are set properly.
+Caused by: java.net.ConnectException: Connection refused
+May 11, 2009 11:27:37 AM
+WARNING [net.jini.discovery.LookupLocatorDiscovery]: Exception occured during unicast discovery to localhost:4162 with constraints InvocationConstraints[reqs: {}, prefs: {}]. Please verify the unicast locators hostname and port are set properly.
+Caused by: java.net.ConnectException: Connection refused
+May 11, 2009 11:27:47 AM
+WARNING [net.jini.discovery.LookupLocatorDiscovery]: Exception occured during unicast discovery to localhost:4162 with constraints InvocationConstraints[reqs: {}, prefs: {}]. Please verify the unicast locators hostname and port are set properly.
+Caused by: java.net.ConnectException: Connection refused
+May 11, 2009 11:33:48 AM
+WARNING [net.jini.discovery.LookupLocatorDiscovery]: Exception occured during unicast discovery to localhost:4162 with constraints InvocationConstraints[reqs: {}, prefs: {}]. Please verify the unicast locators hostname and port are set properly.
+Caused by: java.net.ConnectException: Connection refused
+May 11, 2009 11:33:53 AM
+WARNING [net.jini.discovery.LookupLocatorDiscovery]: Exception occured during unicast discovery to localhost:4162 with constraints InvocationConstraints[reqs: {}, prefs: {}]. Please verify the unicast locators hostname and port are set properly.
+Caused by: java.net.ConnectException: Connection refused
+May 13, 2009 8:57:47 AM
+INFO [net.jini.lookup.ServiceDiscoveryManager]: Exception occurred during query, discarding reggie [com.sun.jini.reggie.RegistrarProxy[registrar=0930c5de-5a84-4a35-9181-466160dd7d1e DynamicSmartStub [ImplObjClass: com.sun.jini.reggie.GigaRegistrar, ConnectionURL: NIO:///127.0.1.1:48462/1539478198702_0, MaxConnPool: 1024 ]]]
+Caused by: java.rmi.ConnectException: Connect Failed; nested exception is: 
+	java.net.ConnectException: Connection refused
+May 13, 2009 10:45:07 AM
+WARNING [net.jini.discovery.LookupLocatorDiscovery]: Exception occured during unicast discovery to localhost:4162 with constraints InvocationConstraints[reqs: {}, prefs: {}]. Please verify the unicast locators hostname and port are set properly.
+Caused by: java.net.ConnectException: Connection refused
+May 13, 2009 10:45:09 AM
+INFO [net.jini.lookup.ServiceDiscoveryManager]: Exception occurred during query, discarding reggie [com.sun.jini.reggie.RegistrarProxy[registrar=0930c5de-5a84-4a35-9181-466160dd7d1e DynamicSmartStub [ImplObjClass: com.sun.jini.reggie.GigaRegistrar, ConnectionURL: NIO:///127.0.1.1:48462/1539478198702_0, MaxConnPool: 1024 ]]]
+Caused by: java.rmi.ConnectException: Connect Failed; nested exception is: 
+	java.net.ConnectException: Connection refused
+May 13, 2009 10:45:12 AM
+INFO [net.jini.lookup.ServiceDiscoveryManager]: Exception occurred during query, discarding reggie [com.sun.jini.reggie.RegistrarProxy[registrar=0930c5de-5a84-4a35-9181-466160dd7d1e DynamicSmartStub [ImplObjClass: com.sun.jini.reggie.GigaRegistrar, ConnectionURL: NIO:///127.0.1.1:48462/1539478198702_0, MaxConnPool: 1024 ]]]
+Caused by: java.rmi.ConnectException: Connect Failed; nested exception is: 
+	java.net.ConnectException: Connection refused
+May 13, 2009 10:45:12 AM
+WARNING [net.jini.discovery.LookupLocatorDiscovery]: Exception occured during unicast discovery to localhost:4162 with constraints InvocationConstraints[reqs: {}, prefs: {}]. Please verify the unicast locators hostname and port are set properly.
+Caused by: java.net.ConnectException: Connection refused
+May 13, 2009 10:45:17 AM
+INFO [net.jini.lookup.ServiceDiscoveryManager]: Exception occurred during query, discarding reggie [com.sun.jini.reggie.RegistrarProxy[registrar=0930c5de-5a84-4a35-9181-466160dd7d1e DynamicSmartStub [ImplObjClass: com.sun.jini.reggie.GigaRegistrar, ConnectionURL: NIO:///127.0.1.1:48462/1539478198702_0, MaxConnPool: 1024 ]]]
+Caused by: java.rmi.ConnectException: Connect Failed; nested exception is: 
+	java.net.ConnectException: Connection refused
+May 13, 2009 10:45:22 AM
+INFO [net.jini.lookup.ServiceDiscoveryManager]: Exception occurred during query, discarding reggie [com.sun.jini.reggie.RegistrarProxy[registrar=0930c5de-5a84-4a35-9181-466160dd7d1e DynamicSmartStub [ImplObjClass: com.sun.jini.reggie.GigaRegistrar, ConnectionURL: NIO:///127.0.1.1:48462/1539478198702_0, MaxConnPool: 1024 ]]]
+Caused by: java.rmi.ConnectException: Connect Failed; nested exception is: 
+	java.net.ConnectException: Connection refused
+May 13, 2009 10:45:22 AM
+WARNING [net.jini.discovery.LookupLocatorDiscovery]: Exception occured during unicast discovery to localhost:4162 with constraints InvocationConstraints[reqs: {}, prefs: {}]. Please verify the unicast locators hostname and port are set properly.
+Caused by: java.net.ConnectException: Connection refused
+May 13, 2009 10:45:42 AM
+WARNING [net.jini.discovery.LookupLocatorDiscovery]: Exception occured during unicast discovery to localhost:4162 with constraints InvocationConstraints[reqs: {}, prefs: {}]. Please verify the unicast locators hostname and port are set properly.
+Caused by: java.net.ConnectException: Connection refused
+May 13, 2009 10:46:03 AM
+INFO [net.jini.discovery.LookupDiscovery]: exception occurred during unicast discovery to 127.0.1.1:4162 with constraints InvocationConstraints[reqs: {}, prefs: {}]
+Caused by: java.net.ConnectException: Connection refused
+May 13, 2009 10:46:12 AM
+WARNING [net.jini.discovery.LookupLocatorDiscovery]: Exception occured during unicast discovery to localhost:4162 with constraints InvocationConstraints[reqs: {}, prefs: {}]. Please verify the unicast locators hostname and port are set properly.
+Caused by: java.net.ConnectException: Connection refused
+May 13, 2009 10:47:12 AM
+WARNING [net.jini.discovery.LookupLocatorDiscovery]: Exception occured during unicast discovery to localhost:4162 with constraints InvocationConstraints[reqs: {}, prefs: {}]. Please verify the unicast locators hostname and port are set properly.
+Caused by: java.net.ConnectException: Connection refused
+May 13, 2009 10:48:03 AM
+INFO [net.jini.discovery.LookupDiscovery]: exception occurred during unicast discovery to 127.0.1.1:4162 with constraints InvocationConstraints[reqs: {}, prefs: {}]
+Caused by: java.net.ConnectException: Connection refused
+May 13, 2009 10:49:12 AM
+WARNING [net.jini.discovery.LookupLocatorDiscovery]: Exception occured during unicast discovery to localhost:4162 with constraints InvocationConstraints[reqs: {}, prefs: {}]. Please verify the unicast locators hostname and port are set properly.
+Caused by: java.net.ConnectException: Connection refused
+May 13, 2009 10:50:03 AM
+INFO [net.jini.discovery.LookupDiscovery]: exception occurred during unicast discovery to 127.0.1.1:4162 with constraints InvocationConstraints[reqs: {}, prefs: {}]
+Caused by: java.net.ConnectException: Connection refused
+May 13, 2009 10:52:03 AM
+INFO [net.jini.discovery.LookupDiscovery]: exception occurred during unicast discovery to 127.0.1.1:4162 with constraints InvocationConstraints[reqs: {}, prefs: {}]
+Caused by: java.net.ConnectException: Connection refused
+May 13, 2009 10:53:12 AM
+WARNING [net.jini.discovery.LookupLocatorDiscovery]: Exception occured during unicast discovery to localhost:4162 with constraints InvocationConstraints[reqs: {}, prefs: {}]. Please verify the unicast locators hostname and port are set properly.
+Caused by: java.net.ConnectException: Connection refused
+May 13, 2009 10:54:03 AM
+INFO [net.jini.discovery.LookupDiscovery]: exception occurred during unicast discovery to 127.0.1.1:4162 with constraints InvocationConstraints[reqs: {}, prefs: {}]
+Caused by: java.net.ConnectException: Connection refused
+May 13, 2009 10:56:03 AM
+INFO [net.jini.discovery.LookupDiscovery]: exception occurred during unicast discovery to 127.0.1.1:4162 with constraints InvocationConstraints[reqs: {}, prefs: {}]
+Caused by: java.net.ConnectException: Connection refused
+Jun 22, 2009 11:49:25 AM
+INFO [net.jini.lookup.ServiceDiscoveryManager]: Exception occurred during query, discarding reggie [com.sun.jini.reggie.RegistrarProxy[registrar=5ea5fb68-9857-47f9-8ea7-3cf3f36b1973 DynamicSmartStub [ImplObjClass: com.sun.jini.reggie.GigaRegistrar, ConnectionURL: NIO:///127.0.1.1:60373/196429726911_0, MaxConnPool: 1024 ]]]
+Caused by: java.rmi.ConnectException: Connect Failed; nested exception is: 
+	java.net.ConnectException: Connection refused
+Jul 1, 2009 3:33:24 PM
+INFO [net.jini.lookup.ServiceDiscoveryManager]: Exception occurred during query, discarding reggie [com.sun.jini.reggie.RegistrarProxy[registrar=fd2a998d-e934-4a23-8f27-1bba5e4a4fb3 DynamicSmartStub [ImplObjClass: com.sun.jini.reggie.GigaRegistrar, ConnectionURL: NIO:///127.0.1.1:33118/24888203943756_0, MaxConnPool: 1024 ]]]
+Caused by: java.rmi.ConnectException: Connect Failed; nested exception is: 
+	java.net.ConnectException: Connection refused
