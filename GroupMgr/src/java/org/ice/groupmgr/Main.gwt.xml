@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module>
+	<inherits name="com.google.gwt.user.User"/>
+ <inherits name="appsusersevents.appsusersevents"/>
+
+    <!-- GWTExt -->
+    <inherits name='com.extjs.gxt.ui.GXT'/>
+
+    <!-- Stylesheets di Google -->
+    <inherits name="com.google.gwt.user.theme.standard.Standard"/>
+      <!-- Stylesheet di GWTExt
+       <stylesheet src="css/gxt-all.css" /> -->
+   
+	<entry-point class="org.ice.groupmgr.client.MainEntryPoint"/>
+	<!-- Do not define servlets here, use web.xml -->
+</module>
