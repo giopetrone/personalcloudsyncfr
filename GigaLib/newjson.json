@@ -1,0 +1,18 @@
+/* 
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+{"app1": {
+  "appName": "Calendario",
+  "activities": [
+      {"activityName": "InsertAppt",
+      "events": ["completed"]},
+   {"activityName": "DeleteAppt",
+      "events": ["completed"]},
+   {"activityName": "UpdateAppt",
+      "events": ["completed"]},
+
+    ]
+
+}}
