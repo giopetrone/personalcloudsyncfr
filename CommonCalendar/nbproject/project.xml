@@ -69,7 +69,7 @@
                     <path-in-war>/</path-in-war>
                 </library>
                 <library>
-                    <file>${file.reference.NetBeansProjects-images}</file>
+                    <file>${file.reference.AppsUsersEvents-images}</file>
                     <path-in-war>/</path-in-war>
                 </library>
             </web-module-additional-libraries>

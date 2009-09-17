@@ -557,7 +557,7 @@ exists or setup the property manually. For example like this:
         <copyfiles files="${file.reference.gwt-servlet.jar}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.file.reference.gwt-servlet.jar" todir="${dist.ear.dir}"/>
         <copyfiles files="${libs.GOOGLECOLLECT.classpath}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.libs.GOOGLECOLLECT.classpath" todir="${dist.ear.dir}"/>
         <copyfiles files="${file.reference.gxt-2.0.1-resources}" todir="${build.web.dir}//"/>
-        <copyfiles files="${file.reference.NetBeansProjects-images}" todir="${build.web.dir}//"/>
+        <copyfiles files="${file.reference.AppsUsersEvents-images}" todir="${build.web.dir}//"/>
         <mkdir dir="${build.web.dir}/META-INF"/>
         <manifest file="${build.web.dir}/META-INF/MANIFEST.MF" mode="update">
             <attribute name="Class-Path" value="${manifest.libs.GWT1.7.0.classpath} ${manifest.reference.GigaLib.jar} ${manifest.libs.GWT1.7.0.classpath} ${manifest.reference.CalendApi.jar} ${manifest.libs.XSTREAM.classpath} ${manifest.reference.GoogleContacts.jar} ${manifest.reference.AppsUsersEvents.jar} ${manifest.libs.GDATA.classpath} ${manifest.libs.MAIL.classpath} ${manifest.libs.GIGA.classpath} ${manifest.libs.GXT.classpath} ${manifest.file.reference.gwt-dev-linux.jar} ${manifest.file.reference.gwt-servlet.jar} ${manifest.libs.GOOGLECOLLECT.classpath} "/>
@@ -579,7 +579,7 @@ exists or setup the property manually. For example like this:
         <copyfiles files="${file.reference.gwt-servlet.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${libs.GOOGLECOLLECT.classpath}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${file.reference.gxt-2.0.1-resources}" todir="${build.web.dir}//"/>
-        <copyfiles files="${file.reference.NetBeansProjects-images}" todir="${build.web.dir}//"/>
+        <copyfiles files="${file.reference.AppsUsersEvents-images}" todir="${build.web.dir}//"/>
     </target>
     <target depends="init,compile,compile-jsps,-pre-dist,library-inclusion-in-manifest" if="do.tmp.war.package" name="do-ear-dist">
         <dirname file="${dist.ear.war}" property="dist.jar.dir"/>
