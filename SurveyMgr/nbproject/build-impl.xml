@@ -547,11 +547,12 @@ exists or setup the property manually. For example like this:
         <copyfiles files="${reference.GoogleContacts.jar}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.reference.GoogleContacts.jar" todir="${dist.ear.dir}"/>
         <copyfiles files="${libs.GIGA.classpath}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.libs.GIGA.classpath" todir="${dist.ear.dir}"/>
         <copyfiles files="${libs.GOOGLECOLLECT.classpath}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.libs.GOOGLECOLLECT.classpath" todir="${dist.ear.dir}"/>
+        <copyfiles files="${libs.OPENID.classpath}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.libs.OPENID.classpath" todir="${dist.ear.dir}"/>
         <copyfiles files="${file.reference.gxt-2.0.1-resources}" todir="${build.web.dir}//"/>
         <copyfiles files="${file.reference.NetBeansProjects-images}" todir="${build.web.dir}//"/>
         <mkdir dir="${build.web.dir}/META-INF"/>
         <manifest file="${build.web.dir}/META-INF/MANIFEST.MF" mode="update">
-            <attribute name="Class-Path" value="${manifest.libs.GWT1.7.0.classpath} ${manifest.libs.GDATA.classpath} ${manifest.file.reference.gwt-dev-linux.jar} ${manifest.file.reference.gwt-servlet.jar} ${manifest.reference.AppsUsersEvents.jar} ${manifest.reference.GigaLib.jar} ${manifest.libs.XSTREAM.classpath} ${manifest.libs.GXT.classpath} ${manifest.reference.GoogleContacts.jar} ${manifest.libs.GIGA.classpath} ${manifest.libs.GOOGLECOLLECT.classpath} "/>
+            <attribute name="Class-Path" value="${manifest.libs.GWT1.7.0.classpath} ${manifest.libs.GDATA.classpath} ${manifest.file.reference.gwt-dev-linux.jar} ${manifest.file.reference.gwt-servlet.jar} ${manifest.reference.AppsUsersEvents.jar} ${manifest.reference.GigaLib.jar} ${manifest.libs.XSTREAM.classpath} ${manifest.libs.GXT.classpath} ${manifest.reference.GoogleContacts.jar} ${manifest.libs.GIGA.classpath} ${manifest.libs.GOOGLECOLLECT.classpath} ${manifest.libs.OPENID.classpath} "/>
         </manifest>
     </target>
     <target depends="init" name="library-inclusion-in-archive" unless="dist.ear.dir">
@@ -566,6 +567,7 @@ exists or setup the property manually. For example like this:
         <copyfiles files="${reference.GoogleContacts.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${libs.GIGA.classpath}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${libs.GOOGLECOLLECT.classpath}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copyfiles files="${libs.OPENID.classpath}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${file.reference.gxt-2.0.1-resources}" todir="${build.web.dir}//"/>
         <copyfiles files="${file.reference.NetBeansProjects-images}" todir="${build.web.dir}//"/>
     </target>
