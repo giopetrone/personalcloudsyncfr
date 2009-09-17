@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.notificationMgr.client.GWTService;
 
@@ -92,10 +93,31 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
         return this.getThreadLocalRequest().getSession();
     }
 
+       private String getParameter(String paramname) {
+        // Get the current request and then return its session
+         String paramValue ="";
+
+         HttpServletRequest req = this.getThreadLocalRequest();
+
+         System.out.println("@@@@@@@@@@@@ queryString " + req.getQueryString());
+          System.out.println("@@@@@@@@@@@@ queryRequestUrl " + req.getRequestURL());
+
+         System.out.println("@@@@@@@@@@@@ method " + req.getMethod());
+         paramValue = req.getParameter(paramname);
+          System.out.println("@@@@@@@@@@@@ parameter name " + paramname);
+            System.out.println("@@@@@@@@@@@@ parameter " + paramValue);
+         return paramValue;
+
+    }
+
     public EventDescription[] getEvents(String userName) {
+               //TEMP !!!! x prova parametri servlet !!!!
+        System.out.println("******NotificationMgr dopo getParameter " + this.getParameter("p"));
+        // FINE TEMP
         EventDescription[] tmp = null;
         if (userName != null) {
             //           System.out.println("SONO IN getTEVENTS subsc MeetingP e username =  " + userName);
+
             if (!alreadySubscr(userName)) {
                 Set<String> apps = eventSubscrData.keySet();
                 Iterator<String> iter = apps.iterator();
