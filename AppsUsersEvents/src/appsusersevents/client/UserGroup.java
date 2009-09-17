@@ -36,7 +36,6 @@ public class UserGroup extends TreeNode {
     }
 
     public static HashMap<String, SingleUser> getUserMap(ArrayList<TreeElement> destinationUsers) {
-
         // return selected single users avoiding duplicates
         Iterator<TreeElement> it = destinationUsers.iterator();
         HashMap<String, SingleUser> allUsers = new HashMap();
@@ -55,6 +54,34 @@ public class UserGroup extends TreeNode {
             }
         }
         return allUsers;
+    }
+
+    public static ArrayList<String> getSingleUsers(ArrayList<TreeElement> destinationUsers) {
+        // return all selected single users
+        Iterator<TreeElement> it = destinationUsers.iterator();
+        ArrayList<String> retUsers = new ArrayList();
+        while (it.hasNext()) {
+            TreeElement item = it.next();
+            Class cl = item.getClass();
+            if (cl == appsusersevents.client.SingleUser.class) {
+               retUsers.add(item.getName());
+            }
+        }
+        return retUsers;
+    }
+
+    public static ArrayList<String> getGroups(ArrayList<TreeElement> destinationUsers) {
+        // return selected user groups avoiding duplicates
+        Iterator<TreeElement> it = destinationUsers.iterator();
+        ArrayList<String> retUsers = new ArrayList();
+        while (it.hasNext()) {
+            TreeElement item = it.next();
+            Class cl = item.getClass();
+            if (!(cl == appsusersevents.client.SingleUser.class)) { // must be a group
+                retUsers.add(item.getName());
+            }
+        }
+        return retUsers;
     }
 
     /**

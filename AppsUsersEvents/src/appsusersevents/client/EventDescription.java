@@ -34,6 +34,11 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
             new EventDescription();
     private static String any = "*";
     private static long EventNumber = 0;
+    private String explicitEvent = "true";  // da gui o no?
+    private String tab = "";  // attivita utente
+    private String estimatedSphere = "";  // calcolata dallo user agent
+    private ArrayList<String> spheres = new ArrayList(); // sfere dell'utente
+    private ArrayList<String> involvedUsers = new ArrayList(); // utenti coinvolti se non sono indicati come gruppi(emails)
 
     /**
      * @return the anyDescription
@@ -69,6 +74,8 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
         time = any;
         destinatario = any;
         filRouge = any;
+        tab = any;
+        estimatedSphere = any;
         eventId = "" + EventNumber;
         EventNumber++;
     }
@@ -173,7 +180,7 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
                 System.err.println("ERRORE: troopo evento" + ch.getName());
             }
         }
-    //     StockWatcher.debug("DUE");
+        //     StockWatcher.debug("DUE");
     }
 
     public String getDescription() {
@@ -189,12 +196,33 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
                 getReceiver() + "." +
                 getSessionId() + "." +
                 getCorrelationId() + "." +
-                getTime();
+                getTime() + "." +
+                explicitEvent + "." +
+                tab + "." +
+                estimatedSphere;
         ret += ".{";
         int sz = parameters.size();
 
         for (int i = 0; i < sz; i++) {
             ret += parameters.get(i);
+            if (i < sz - 1) {
+                ret += ",";
+            }
+        }
+        ret += "}.{";
+        sz = involvedUsers.size();
+
+        for (int i = 0; i < sz; i++) {
+            ret += involvedUsers.get(i);
+            if (i < sz - 1) {
+                ret += ",";
+            }
+        }
+        ret += "}.{";
+        sz = spheres.size();
+
+        for (int i = 0; i < sz; i++) {
+            ret += spheres.get(i);
             if (i < sz - 1) {
                 ret += ",";
             }
@@ -336,9 +364,9 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
     /*
     @Override
     public String getName() {
-        return getDescription();
+    return getDescription();
     }
-*/
+     */
     /**
      * @return the sessionId
      */
@@ -444,5 +472,75 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
      */
     public void setFilRouge(String filRouge) {
         this.filRouge = filRouge;
+    }
+
+    /**
+     * @return the explicitEvent
+     */
+    public String getExplicitEvent() {
+        return explicitEvent;
+    }
+
+    /**
+     * @param explicitEvent the explicitEvent to set
+     */
+    public void setExplicitEvent(String explicitEvent) {
+        this.explicitEvent = explicitEvent;
+    }
+
+    /**
+     * @return the tab
+     */
+    public String getTab() {
+        return tab;
+    }
+
+    /**
+     * @param tab the tab to set
+     */
+    public void setTab(String tab) {
+        this.tab = tab;
+    }
+
+    /**
+     * @return the estimatedSphere
+     */
+    public String getEstimatedSphere() {
+        return estimatedSphere;
+    }
+
+    /**
+     * @param estimatedSphere the estimatedSphere to set
+     */
+    public void setEstimatedSphere(String estimatedSphere) {
+        this.estimatedSphere = estimatedSphere;
+    }
+
+    /**
+     * @return the spheres
+     */
+    public ArrayList<String> getSpheres() {
+        return spheres;
+    }
+
+    /**
+     * @param spheres the spheres to set
+     */
+    public void setSpheres(ArrayList<String> spheres) {
+        this.spheres = spheres;
+    }
+
+    /**
+     * @return the involvedUsers
+     */
+    public ArrayList<String> getInvolvedUsers() {
+        return involvedUsers;
+    }
+
+    /**
+     * @param involvedUsers the involvedUsers to set
+     */
+    public void setInvolvedUsers(ArrayList<String> involvedUsers) {
+        this.involvedUsers = involvedUsers;
     }
 }
