@@ -11,6 +11,7 @@ import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.Html;
+import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.button.Button;
 
 import com.extjs.gxt.ui.client.widget.form.DateField;
@@ -101,6 +102,7 @@ public class CommonCalendar implements EntryPoint {
     private Panel panel;
     private FormPanel loginPanel;
     ToolBar buttonBar;
+    MeetingSession session;
     //FINE AVRIABILI DI ANNA E GIO
 
     public CommonCalendar() {
@@ -198,6 +200,7 @@ public class CommonCalendar implements EntryPoint {
         selectionPanel.setPadding(5);
         selectionPanel.setWidth(620);
         selectionPanel.setLabelWidth(105);
+
 
         setTimers();
 
@@ -423,6 +426,7 @@ public class CommonCalendar implements EntryPoint {
         updateSelection(getRigaWidget(j), getColonnaWidget(j));
     }
 
+
     private int getColonnaWidget(int i) {
         return 8 * (i / 42) + (i % 42) % 7;
     }
@@ -512,6 +516,7 @@ public class CommonCalendar implements EntryPoint {
         // can be completed
         //   CommonCalendar.debug("show45");
         EventDescription[] eve = (EventDescription[]) qwr;
+        EventDescription eD = null;
         for (int i = 0; i < eve.length; i++) {
             if (eve[i] == null) {
                 return;
@@ -525,6 +530,7 @@ public class CommonCalendar implements EntryPoint {
                 if (sessio.addRisposta(eve[i])) {
                     debug("showevents ricevo risposta!!! ");
                     sessio.setConfirmedColor(eve[i]);
+                    eD=eve[i];
                     break;
                 }
             }
@@ -552,7 +558,9 @@ public class CommonCalendar implements EntryPoint {
                 getService().updateCalendars(v.getUserCalendars(), v.getIndexDataMeeting(), callback33);
                 //    debug("showevents 3");
                 waitingSessions.remove(j);
-                Window.alert("event confirmed: " + v.getEventDescription());
+              //  Window.alert("event confirmed: " + v.getEventDescription());
+                String date = eD.getParameter("Date");
+                MessageBox.alert("Meeting confirmed: " , date, null);
             }
         }
     }
@@ -594,15 +602,62 @@ public class CommonCalendar implements EntryPoint {
             // UserGroup.getUserMap(getDestinationUsers());
             template.setInvolvedUsers(UserGroup.getSingleUsers(getDestinationUsers()));
             template.setSpheres(UserGroup.getGroups(getDestinationUsers()));
-            MeetingSession session = new MeetingSession(this, template, selectedUsers, start, end, "Meeting proposal");
+            //MeetingSession session = new MeetingSession(this, template, selectedUsers, start, end, "Meeting proposal");
+            session = new MeetingSession(this, template, selectedUsers, start, end, "Meeting proposal");
             waitingSessions.add(session);
             //        panel2.add(session);  MARINO
             selectionPanel.setVisible(false);
             panel.add(session);
             session.setVisible(true);
+            panel.add(backPanel());
         } else {
             Window.alert("no users selected!!!");
         }
+    }
+
+    private FormPanel backPanel() {
+
+        final FormPanel bPanel = new FormPanel();
+        bPanel.setFrame(true);
+
+        bPanel.setBorders(false);
+        bPanel.setPadding(5);
+       // bPanel.setWidth(620);
+       // bPanel.setLabelWidth(105);
+         bPanel.setHeaderVisible(false);
+        // aggiungo il pulsante "Back" per rtornare indieteo
+        Button btnBack = new Button("Back");
+        bPanel.add(space);
+        bPanel.add(btnBack);
+
+        bPanel.setVisible(true);
+
+        final AsyncCallback callbackBack = new AsyncCallback() {
+
+            public void onSuccess(Object result) {
+                // lblServerReply.setText((String)result);
+            }
+
+            public void onFailure(Throwable caught) {
+                //  lblServerReply.setText("Communication failed di RMI");
+            }
+        };
+
+        btnBack.addSelectionListener(new SelectionListener<ButtonEvent>() {
+
+            @Override
+            public void componentSelected(ButtonEvent ce) {
+                // Make remote call. Control flow will continue immediately and later
+                // 'callback' will be invoked when the RPC completes.
+
+                panel.remove(session);
+                panel.remove(bPanel);
+                selectionPanel.setVisible(true);
+             
+
+            }
+        });
+        return bPanel;
     }
 
     // per albero utenti da convocare
@@ -625,6 +680,7 @@ public class CommonCalendar implements EntryPoint {
         UserGroup[] appe = (UserGroup[]) qwr;
         // create single root
         UserGroup roo = new UserGroup("gruppi", "");
+
 
         for (int i = 0; i < appe.length; i++) {
             roo.addChild(appe[i]);
@@ -735,7 +791,7 @@ public class CommonCalendar implements EntryPoint {
             }
         }));
 */
-      
+
 
         // aggiungo il pulsante "Invia" per inviare i dati di autenticazione
         // al server
@@ -783,6 +839,3 @@ public class CommonCalendar implements EntryPoint {
         return panel;
     }
 }
-
-
-

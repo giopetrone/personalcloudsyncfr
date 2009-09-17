@@ -1,0 +1,35 @@
+<list>
+  <src.com.google.gwt.sample.commoncalendar.client.UserGroup>
+    <groupName>seta</groupName>
+    <users>
+      <src.com.google.gwt.sample.commoncalendar.client.SingleUser>
+        <userName>mar</userName>
+      </src.com.google.gwt.sample.commoncalendar.client.SingleUser>
+      <src.com.google.gwt.sample.commoncalendar.client.SingleUser>
+        <userName>gio</userName>
+      </src.com.google.gwt.sample.commoncalendar.client.SingleUser>
+    </users>
+  </src.com.google.gwt.sample.commoncalendar.client.UserGroup>
+  <src.com.google.gwt.sample.commoncalendar.client.UserGroup>
+    <groupName>diamo</groupName>
+    <users>
+      <src.com.google.gwt.sample.commoncalendar.client.SingleUser>
+        <userName>luca</userName>
+      </src.com.google.gwt.sample.commoncalendar.client.SingleUser>
+      <src.com.google.gwt.sample.commoncalendar.client.SingleUser>
+        <userName>anna</userName>
+      </src.com.google.gwt.sample.commoncalendar.client.SingleUser>
+    </users>
+  </src.com.google.gwt.sample.commoncalendar.client.UserGroup>
+  <src.com.google.gwt.sample.commoncalendar.client.UserGroup>
+    <groupName>prin</groupName>
+    <users>
+      <src.com.google.gwt.sample.commoncalendar.client.SingleUser>
+        <userName>claud</userName>
+      </src.com.google.gwt.sample.commoncalendar.client.SingleUser>
+      <src.com.google.gwt.sample.commoncalendar.client.SingleUser>
+        <userName>furn</userName>
+      </src.com.google.gwt.sample.commoncalendar.client.SingleUser>
+    </users>
+  </src.com.google.gwt.sample.commoncalendar.client.UserGroup>
+</list>

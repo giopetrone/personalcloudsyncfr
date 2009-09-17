@@ -13,12 +13,12 @@ import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.Html;
 
+import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.extjs.gxt.ui.client.widget.form.Radio;
 import com.extjs.gxt.ui.client.widget.form.RadioGroup;
 import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 //import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.ClickListener;
@@ -202,6 +202,7 @@ public class MeetingSession extends VerticalPanel {
         int rows = calendarTable.getRowCount();
         int cols = calendarTable.getCellCount(0);
 
+
         final int[] sceglibili = new int[appointments];
         for (int i = 1, j = 0; i < rows && j < appointments; i++) {
             Widget w = calendarTable.getWidget(i, cols);
@@ -298,6 +299,7 @@ public class MeetingSession extends VerticalPanel {
 
         template.setParameter("Date", messageParam);
         originator.sendEvents(getProposal());
+         MessageBox.alert("Proposed meeting date",  "", null);
     }
 
     public void setConfirmedColor(EventDescription eve) {
@@ -393,15 +395,16 @@ public class MeetingSession extends VerticalPanel {
                 // Make remote call. Control flow will continue immediately and later
                 // 'callback' will be invoked when the RPC completes.
                String risp = "";
-              
-              risp = ((Radio)radioG.getValue()).getFieldLabel();         
-             
+
+              risp = ((Radio)radioG.getValue()).getFieldLabel();
+
                 //per mandare evento a giga
-                int appIndex = (new Integer(risp)).intValue();               
+                int appIndex = (new Integer(risp)).intValue();
                 createClickCall(appIndex, trovaGiorno(appIndex) + ";" + ore[appIndex]);
 
             }
         });
+
 
     }
 }
