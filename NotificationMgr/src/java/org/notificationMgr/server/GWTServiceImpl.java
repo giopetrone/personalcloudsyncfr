@@ -8,7 +8,9 @@
  */
 package org.notificationMgr.server;
 
+import appsusersevents.client.CloudUsers;
 import appsusersevents.client.EventDescription;
+import appsusersevents.client.SingleUser;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import giga.GigaListener;
 import giga.Subscription;
@@ -38,6 +40,7 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
     HashMap<String, ArrayList<String>> eventSubscrData = new HashMap();  // chiave = applicazione e value = lista di eventi a cui sottoscriversi
     ChatClient chClient = new ChatClient();
     HashMap<String, String> logPasswdData = new HashMap();
+       CloudUsers cloudUsers = new CloudUsers();
 
     @Override
     public void init() {
@@ -401,5 +404,16 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
         System.out.print("sono in SURVEY validate = " + val);
 
         return val;
+    }
+    
+
+    public String authenticate(String s) {
+        String userEmail = "";
+        SingleUser sU = cloudUsers.getUser(s);
+     //src=   System.out.println("AUTHENTICATE " + s);
+        if (sU != null)
+         userEmail = sU.getMailAddress();
+        else System.out.println("singleUSer NULL");
+        return userEmail;
     }
 }

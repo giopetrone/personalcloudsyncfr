@@ -29,6 +29,7 @@ public interface GWTServiceAsync {
     public void putEvents(EventDescription[] events, String userName, AsyncCallback callback);
 
     public void validateUser(String name, String pwd, AsyncCallback callback);
+       public void authenticate(String s, AsyncCallback callback);
 
     
 }

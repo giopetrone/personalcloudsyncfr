@@ -28,6 +28,7 @@ import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -173,18 +174,48 @@ public class MainEntryPoint implements EntryPoint {
                 userName.reset();
             }
         }));
+
+                // gestione login nuova 1-10-09
+        String googleId = Window.Location.getParameter("gId");
+        // String em = Window.Location.getParameter("openid.ext1.value.email");
+        // MessageBox.alert("p = ", p, null);
+        // MessageBox.alert("email = ", em, null);
+        final AsyncCallback callbackLoginGoogle = new AsyncCallback() {
+
+            public void onSuccess(Object result) {
+
+                me = (String) result;
+                whoAreYou.setText("Welcome " + me);
+                // userPwd.setVisible(false);
+                // userName.setVisible(false);
+                // buttonBar.setVisible(false);
+                html.setVisible(true);
+                cp.setVisible(true);
+
+            }
+
+            public void onFailure(Throwable caught) {
+                //  lblServerReply.setText("Communication failed di RMI");
+                MessageBox.alert("Validate user and passwd", "FAIL", null);
+                whoAreYou.setText("INVALID USER");
+            }
+        };
+        getService().authenticate(googleId, callbackLoginGoogle);
+
+        // fine login nuova
+
         html = new Html("<br/><b style='color:#15428B;'>Notifications: </b><br/><br/>");
 
-        formPanel.add(userName);
-        if (!alreadyLoggedIn) {
-            formPanel.add(userPwd);
-        } else {
-            userPwd.setVisible(false);
-        }
-        formPanel.add(whoAreYou);
-        formPanel.add(buttonBar);       
-        cp.setVisible(false);
-        html.setVisible(false);
+     //   formPanel.add(userName);
+     //   if (!alreadyLoggedIn) {
+      //      formPanel.add(userPwd);
+    //    } else {
+     //       userPwd.setVisible(false);
+     //   }
+         formPanel.add(whoAreYou);
+     //   formPanel.add(buttonBar);
+     //   cp.setVisible(false);
+     //   html.setVisible(false);
          formPanel.add(html);
         formPanel.add(cp);
         panel.add(formPanel);
