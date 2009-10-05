@@ -8,8 +8,10 @@
  */
 package org.ice.survey.server;
 
+import appsusersevents.client.CloudUsers;
 import appsusersevents.client.EventDescription;
 
+import appsusersevents.client.SingleUser;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import giga.GigaListener;
 import giga.Subscription;
@@ -32,6 +34,7 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
     ArrayList addedFilterList = new ArrayList(); // lista di utenti gia' sottoscritti
     HashMap<String, ArrayList<EventDescription>> usersData = new HashMap();  // chiave = destinatario e value = lista di eventi (domande) che i filtri fanno passare (per quello user)
     HashMap<String, ArrayList<String>> eventSubscrData = new HashMap();  // chiave = applicazione e value = lista di eventi a cui sottoscriversi
+    CloudUsers cloudUsers = new CloudUsers();
 
     @Override
     public void init() {
@@ -48,6 +51,9 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
         ArrayList aL2 = new ArrayList();
         aL2.add("MembershipProposal");
         eventSubscrData.put("GroupMgr", aL2);
+
+        // caricare utenti
+
     }
     // occorre aggiungere i metodi di get con pattern matching
 
@@ -68,6 +74,7 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
     }
 
     public EventDescription[] getEvents(String userName) {
+      
         EventDescription[] tmp = null;
         if (userName != null) {
             if (!alreadySubscr(userName)) {
@@ -93,7 +100,7 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
             if (tmp == null) {
                 System.out.println("SURVEYMGR getEvents tmp NULL");
             } else if (tmp.length == 0) {
-                System.out.println("SURVEYMGR getEvents tmp size 0");
+               // System.out.println("SURVEYMGR getEvents tmp size 0");
             } else {
                 System.out.println("!!!!!!!!!!!!!!!!!!!!!!SURVEY  getEvents tmp SIZE e = " + tmp.length);
                 // TEMP indice 0 : assumiamo che tutti gli eventi che arrivano con getEvents(), abbiano lo stesso destinataio (plausibile per come sono costruiti i filtri)
@@ -105,7 +112,7 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
                     System.out.println("!!!!!!!!!!!!!!!!!!!!!! SURVEY getEvents tmp eventId = " + tmp[i].getEventId());
                     (usersData.get(dest)).add(tmp[i]);    // si aggiunge un evento, ovvero in questo caso si assume una domanda alla lista delle domande per dest
                 }
-            //printUsersData();
+                //printUsersData();
             }
         }
         return tmp;
@@ -279,11 +286,30 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
         return res;
     }
 
-     public Boolean validateUser(String name, String pwd) {
-      //    return new ServerToClient().validateUser(name,pwd);
-         ContactCall cC=new ContactCall(name, pwd);
-         boolean val=cC.validate(name, pwd);
-         System.out.print("sono in SURVEY validateUser = " + val);
-         return new Boolean(val);
-      }
+    public Boolean validateUser(String name, String pwd) {
+        //    return new ServerToClient().validateUser(name,pwd);
+        ContactCall cC = new ContactCall(name, pwd);
+        boolean val = cC.validate(name, pwd);
+        System.out.print("sono in SURVEY validateUser = " + val);
+        return new Boolean(val);
+    }
+
+    //------------------------------ login openId methods
+    private void getInfo() {
+
+        System.out.println("GETINFO attr names" + getSession().getAttributeNames().toString());
+
+
+    }
+
+    public String authenticate(String s) {
+        String userEmail = "";
+        SingleUser sU = cloudUsers.getUser(s);
+     //src=   System.out.println("AUTHENTICATE " + s);
+        if (sU != null)
+         userEmail = sU.getMailAddress();
+        else System.out.println("singleUSer NULL");
+        return userEmail;
+    }
+    //------------------------------
 }

@@ -30,6 +30,7 @@ import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -40,6 +41,8 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -80,7 +83,7 @@ public class MainEntryPoint implements EntryPoint {
      */
     public void onModuleLoad() {
 
-        RootPanel.get().add(notif());
+        RootPanel.get().add(survey());
 
 
         if (debugOn) {
@@ -98,7 +101,7 @@ public class MainEntryPoint implements EntryPoint {
 
     }
 
-    private Panel notif() {
+    private Panel survey() {
         panel = new VerticalPanel();
         FormPanel formPanel = new FormPanel();
         formPanel.setFrame(true);
@@ -107,6 +110,7 @@ public class MainEntryPoint implements EntryPoint {
         formPanel.setPadding(5);
         formPanel.setWidth(620);
         formPanel.setLabelWidth(105);
+        //login
         userName = new TextField<String>();
         userName.setAllowBlank(false);
         userName.setFieldLabel("Who Are You?");
@@ -114,6 +118,7 @@ public class MainEntryPoint implements EntryPoint {
         userPwd.setAllowBlank(false);
         userPwd.setFieldLabel("Password");
         userPwd.setPassword(true);
+        //end login fields
         cp = new ContentPanel();
         cp.setHeading("Survey Manager");
         cp.setHeaderVisible(false);
@@ -191,17 +196,45 @@ public class MainEntryPoint implements EntryPoint {
             }
         }));
 
+        // gestione login nuova 1-10-09
+        String googleId = Window.Location.getParameter("gId");
+        // String em = Window.Location.getParameter("openid.ext1.value.email");
+        // MessageBox.alert("p = ", p, null);
+        // MessageBox.alert("email = ", em, null);
+        final AsyncCallback callbackLoginGoogle = new AsyncCallback() {
+
+            public void onSuccess(Object result) {
+
+                me = (String) result;
+                whoAreYou.setText("Welcome " + me);
+                // userPwd.setVisible(false);
+                // userName.setVisible(false);
+                // buttonBar.setVisible(false);
+                html.setVisible(true);
+                cp.setVisible(true);
+
+            }
+
+            public void onFailure(Throwable caught) {
+                //  lblServerReply.setText("Communication failed di RMI");
+                MessageBox.alert("Validate user and passwd", "FAIL", null);
+                whoAreYou.setText("INVALID USER");
+            }
+        };
+        getService().authenticate(googleId, callbackLoginGoogle);
+
+        // fine login nuova
         html =
                 new Html(
                 "<br/><b style='color:#15428B;'>Please answer: </b><br/><br/>");
-
-        formPanel.add(userName);
-        formPanel.add(userPwd);
+// gestione login, sostituito da openId
+//        formPanel.add(userName);
+//        formPanel.add(userPwd);
         formPanel.add(whoAreYou);
-        formPanel.add(buttonBar);
-        //   formPanel.setButtonBar(buttonBar);
-        html.setVisible(false);
-        cp.setVisible(false);
+//        formPanel.add(buttonBar);
+
+        //    html.setVisible(false);
+        //    cp.setVisible(false);
         formPanel.add(html);
         formPanel.add(cp);
         panel.add(formPanel);
