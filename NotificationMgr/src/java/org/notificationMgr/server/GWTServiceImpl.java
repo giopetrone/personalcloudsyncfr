@@ -102,13 +102,13 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
 
          HttpServletRequest req = this.getThreadLocalRequest();
 
-         System.out.println("@@@@@@@@@@@@ queryString " + req.getQueryString());
-          System.out.println("@@@@@@@@@@@@ queryRequestUrl " + req.getRequestURL());
+//         System.out.println("@@@@@@@@@@@@ queryString " + req.getQueryString());
+//          System.out.println("@@@@@@@@@@@@ queryRequestUrl " + req.getRequestURL());
 
-         System.out.println("@@@@@@@@@@@@ method " + req.getMethod());
+//         System.out.println("@@@@@@@@@@@@ method " + req.getMethod());
          paramValue = req.getParameter(paramname);
-          System.out.println("@@@@@@@@@@@@ parameter name " + paramname);
-            System.out.println("@@@@@@@@@@@@ parameter " + paramValue);
+//          System.out.println("@@@@@@@@@@@@ parameter name " + paramname);
+//            System.out.println("@@@@@@@@@@@@ parameter " + paramValue);
          return paramValue;
 
     }
@@ -157,11 +157,13 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
                         String msg = evName;
                         if (tmp[i].getEventName().equals("MeetingProposal")) {
                             msg = " to participate  : " + tmp[i].getParameter("Date");
-                            msg = msg + "  Please connect to  http://localhost:8080/SurveyMgr/";
+                           // msg = msg + "  Please connect to  http://localhost:8080/SurveyMgr/";
+                             msg = msg ;
                         } else if (tmp[i].getEventName().equals("MembershipProposal")) {
                             //     System.out.println("++++NOtification getEvents evName del IM = " + evName);
                             msg = " to join  : " + tmp[i].getParameter("groupName");
-                            msg = msg + "  Please connect to  http://localhost:8080/SurveyMgr/";
+                           // msg = msg + "  Please connect to  http://localhost:8080/SurveyMgr/";
+                             msg = msg ;
                         } else if (tmp[i].getEventName().equals("GroupCreated")) {
                             msg = "created : " + tmp[i].getParameter("groupName");
                         } else if (tmp[i].getEventName().equals("GroupModified")) {

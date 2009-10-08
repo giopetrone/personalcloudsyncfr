@@ -11,6 +11,7 @@ package org.notificationMgr.client;
 import appsusersevents.client.EventDescription;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.Orientation;
+import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.util.Margins;
@@ -87,8 +88,8 @@ public class MainEntryPoint implements EntryPoint {
         formPanel.setFrame(true);
         formPanel.setHeading("NotificationMgr");
         formPanel.setBorders(false);
-        formPanel.setPadding(5);
-        formPanel.setWidth(620);
+        formPanel.setPadding(5); 
+        formPanel.setWidth(280);
         formPanel.setLabelWidth(105);
         userName = new TextField<String>();
         userName.setAllowBlank(false);
@@ -103,7 +104,10 @@ public class MainEntryPoint implements EntryPoint {
 
         //    msgTable.setBorderWidth(1);
         cp.add(msgTable);
-        cp.setSize(600, 225);
+//        cp.setWidth(240);
+//        cp.setHeight(100);
+        cp.setSize(260, 200);
+        cp.setScrollMode(Scroll.AUTO);
         cp.setFrame(true);
         cp.setBorders(false);
         cp.setLayout(new RowLayout(Orientation.HORIZONTAL));
@@ -116,14 +120,14 @@ public class MainEntryPoint implements EntryPoint {
         //   buttonBar.setCellSpacing(20);
        /* buttonBar.add(new Button("Close", new SelectionListener<ButtonEvent>() {
 
-            @Override
-            public void componentSelected(ButtonEvent ce) {
-                RootPanel.get().remove(panel);
+        @Override
+        public void componentSelected(ButtonEvent ce) {
+        RootPanel.get().remove(panel);
 
-            }
+        }
         })); */
 
-       
+
 
         // aggiungo il pulsante "Invia" per inviare i dati di autenticazione
         // al server
@@ -165,8 +169,8 @@ public class MainEntryPoint implements EntryPoint {
                 }
             }
         }));
-        
-         // aggiungo il pulsante "Cancella" per resettare il form
+
+        // aggiungo il pulsante "Cancella" per resettare il form
         buttonBar.add(new Button("Cancel", new SelectionListener<ButtonEvent>() {
 
             @Override
@@ -175,7 +179,7 @@ public class MainEntryPoint implements EntryPoint {
             }
         }));
 
-                // gestione login nuova 1-10-09
+        // gestione login nuova 1-10-09
         String googleId = Window.Location.getParameter("gId");
         // String em = Window.Location.getParameter("openid.ext1.value.email");
         // MessageBox.alert("p = ", p, null);
@@ -206,17 +210,17 @@ public class MainEntryPoint implements EntryPoint {
 
         html = new Html("<br/><b style='color:#15428B;'>Notifications: </b><br/><br/>");
 
-     //   formPanel.add(userName);
-     //   if (!alreadyLoggedIn) {
-      //      formPanel.add(userPwd);
-    //    } else {
-     //       userPwd.setVisible(false);
-     //   }
-         formPanel.add(whoAreYou);
-     //   formPanel.add(buttonBar);
-     //   cp.setVisible(false);
-     //   html.setVisible(false);
-         formPanel.add(html);
+        //   formPanel.add(userName);
+        //   if (!alreadyLoggedIn) {
+        //      formPanel.add(userPwd);
+        //    } else {
+        //       userPwd.setVisible(false);
+        //   }
+        formPanel.add(whoAreYou);
+        //   formPanel.add(buttonBar);
+        //   cp.setVisible(false);
+        //   html.setVisible(false);
+        formPanel.add(html);
         formPanel.add(cp);
         panel.add(formPanel);
         return panel;
@@ -227,7 +231,8 @@ public class MainEntryPoint implements EntryPoint {
         //    final String quest = msg;
         final String evId = eventId;
         int row = msgTable.getRowCount();
-        msgTable.setWidth("550px");
+        // msgTable.setWidth("550px");
+        (msgTable.getFlexCellFormatter()).setWidth(row, 0, "120");
         //    msgTable.setText(row, 0, msg);
         //  msgTable.setText(row, 0, msg.substring(0, 200));
         msgTable.setHTML(row, 0, msg);
@@ -262,7 +267,8 @@ public class MainEntryPoint implements EntryPoint {
                 // fine tentativo
             }
         });
-        msgTable.setWidget(row, 3, btnDelete);
+        (msgTable.getFlexCellFormatter()).setWidth(row, 1, "30");
+        msgTable.setWidget(row, 1, btnDelete);
 
     }
     /* forse da cancellare
@@ -291,20 +297,23 @@ public class MainEntryPoint implements EntryPoint {
             String linkSurvey = "<a href='http://localhost:8080/SurveyMgr/' target='_blank'>SurveyMgr</a>";
             if (eve[i].getDestinatario().equals(me)) {
                 if ((eve[i].getEventName().equals("MeetingProposal"))) {
-                    addMsgRow(eve[i].getEventName() + "  " + eve[i].getParameter("Date") + "<br />Please connect to: " + linkSurvey + "<br />", eve[i].getEventId());
+                    //addMsgRow(eve[i].getEventName() + "  " + eve[i].getParameter("Date") + "<br />Please connect to: " + linkSurvey + "<br />", eve[i].getEventId());
+                    addMsgRow(eve[i].getEventName() + "  " + eve[i].getParameter("Date") + "<br />", eve[i].getEventId());
                 }
                 if ((eve[i].getEventName().equals("MeetingConfirmation"))) {
                     addMsgRow(eve[i].getEventName() + "  " + eve[i].getParameter("Date") + "<br />", eve[i].getEventId());
                 }
                 if ((eve[i].getEventName().equals("MembershipProposal"))) {
-                    addMsgRow(eve[i].getEventName() + "  group: " + eve[i].getParameter("groupName") + "<br />Please connect to: " + linkSurvey + "<br />", eve[i].getEventId());
-                }
-                if ((eve[i].getEventName().equals("GroupCreated")) || (eve[i].getEventName().equals("GroupModified")) ||  (eve[i].getEventName().equals("GroupDeleted"))) {
+                    // addMsgRow(eve[i].getEventName() + "  group: " + eve[i].getParameter("groupName") + "<br />Please connect to: " + linkSurvey + "<br />", eve[i].getEventId());
                     addMsgRow(eve[i].getEventName() + "  group: " + eve[i].getParameter("groupName") + "<br />", eve[i].getEventId());
                 }
-                
+                if ((eve[i].getEventName().equals("GroupCreated")) || (eve[i].getEventName().equals("GroupModified")) || (eve[i].getEventName().equals("GroupDeleted"))) {
+                    addMsgRow(eve[i].getEventName() + "  group: " + eve[i].getParameter("groupName") + "<br />", eve[i].getEventId());
+                }
+
                 if ((eve[i].getEventName().equals("DocCreated")) || (eve[i].getEventName().equals("DocUpdated")) || (eve[i].getEventName().equals("DocRemoved"))) {
                     String linkDoc = "<a href='" + eve[i].getParameter("docLink") + "' target='_blank'>Document</a>";
+                    //  addMsgRow(eve[i].getEventName() + " doc:  " + eve[i].getParameter("docName") + "  " + eve[i].getParameter("date") + "<br />Please connect to: " + linkDoc, eve[i].getEventId());
                     addMsgRow(eve[i].getEventName() + " doc:  " + eve[i].getParameter("docName") + "  " + eve[i].getParameter("date") + "<br />Please connect to: " + linkDoc, eve[i].getEventId());
                 }
 
