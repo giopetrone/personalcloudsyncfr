@@ -45,4 +45,5 @@ public interface ICommonCalendar extends RemoteService {
     public MyDate  cheGiornoOggi();
 
     public String[] calendario6Mesi();
+    public SingleUser authenticate(String s);
 }

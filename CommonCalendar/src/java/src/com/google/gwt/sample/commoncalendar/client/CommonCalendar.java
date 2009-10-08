@@ -103,7 +103,7 @@ public class CommonCalendar implements EntryPoint {
     private FormPanel loginPanel;
     ToolBar buttonBar;
     MeetingSession session;
-    //FINE AVRIABILI DI ANNA E GIO
+    //FINE VARIABILI DI ANNA E GIO
 
     public CommonCalendar() {
     }
@@ -172,7 +172,7 @@ public class CommonCalendar implements EntryPoint {
             }
         });
 
-     //   startDate = new DatePicker();
+        //   startDate = new DatePicker();
         startDate = new DateField();
         startDate.setFieldLabel("from...");
         endDate = new DateField();
@@ -211,7 +211,7 @@ public class CommonCalendar implements EntryPoint {
 
             public void run() {
                 refreshMsgList();
-            //    debug("in timer, me =" + me);
+                //    debug("in timer, me =" + me);
             }
         };
         msgTimer.scheduleRepeating(MSG_INTERVAL);
@@ -386,7 +386,7 @@ public class CommonCalendar implements EntryPoint {
             for (int j = 0; j < 8; j++) {
                 aTable.setText(1, i * 8 + j, sigleGiorni[j]);
             }
-        //   aTable.getCellFormatter().setWidth(0, i * 8 + 7, "40");
+            //   aTable.getCellFormatter().setWidth(0, i * 8 + 7, "40");
         }
         // tabella da mesiMostrati mesi in fila, a 7 colonne a mese
         //settimaneInTabella settimane a mese su righe successive
@@ -425,7 +425,6 @@ public class CommonCalendar implements EntryPoint {
         //  debug("dueupd "+j);
         updateSelection(getRigaWidget(j), getColonnaWidget(j));
     }
-
 
     private int getColonnaWidget(int i) {
         return 8 * (i / 42) + (i % 42) % 7;
@@ -530,7 +529,7 @@ public class CommonCalendar implements EntryPoint {
                 if (sessio.addRisposta(eve[i])) {
                     debug("showevents ricevo risposta!!! ");
                     sessio.setConfirmedColor(eve[i]);
-                    eD=eve[i];
+                    eD = eve[i];
                     break;
                 }
             }
@@ -558,9 +557,9 @@ public class CommonCalendar implements EntryPoint {
                 getService().updateCalendars(v.getUserCalendars(), v.getIndexDataMeeting(), callback33);
                 //    debug("showevents 3");
                 waitingSessions.remove(j);
-              //  Window.alert("event confirmed: " + v.getEventDescription());
+                //  Window.alert("event confirmed: " + v.getEventDescription());
                 String date = eD.getParameter("Date");
-                MessageBox.alert("Meeting confirmed: " , date, null);
+                MessageBox.alert("Meeting confirmed: ", date, null);
             }
         }
     }
@@ -622,9 +621,9 @@ public class CommonCalendar implements EntryPoint {
 
         bPanel.setBorders(false);
         bPanel.setPadding(5);
-       // bPanel.setWidth(620);
-       // bPanel.setLabelWidth(105);
-         bPanel.setHeaderVisible(false);
+        // bPanel.setWidth(620);
+        // bPanel.setLabelWidth(105);
+        bPanel.setHeaderVisible(false);
         // aggiungo il pulsante "Back" per rtornare indieteo
         Button btnBack = new Button("Back");
         bPanel.add(space);
@@ -653,7 +652,7 @@ public class CommonCalendar implements EntryPoint {
                 panel.remove(session);
                 panel.remove(bPanel);
                 selectionPanel.setVisible(true);
-             
+
 
             }
         });
@@ -694,20 +693,20 @@ public class CommonCalendar implements EntryPoint {
     private void welcomeUser(Object qwr) {
         if (qwr != null) {
             me = (SingleUser) qwr;
-            whoAreYou.setHtml("<br/><b style='color:#15428B;'>Welcome" + me.getMailAddress() + "</b><br/><br/>");
+            whoAreYou.setHtml("<br/><b style='color:#15428B;'>Welcome " + me.getMailAddress() + "</b><br/><br/>");
             buildUserTree();
             //    loginPanel.setVisible(false);// ANNA E GIO
             panel.remove(loginPanel);
             panel.add(selectionPanel);
             selectionPanel.setVisible(true);// ANNA E GIO
-        // rendere visibile  canvasPanel o vertPanel1
+            // rendere visibile  canvasPanel o vertPanel1
 
         } else {
             //      userName.setText("INVALID USER");
             whoAreYou.setHtml("<br/><b style='color:#15428B;'>INVALID USER</b><br/><br/>");
-            userPwd.setVisible(true);
-            userName.setVisible(true);
-            buttonBar.setVisible(true);
+            //   userPwd.setVisible(true);
+            //  userName.setVisible(true);
+            //  buttonBar.setVisible(true);
         }
     }
 
@@ -721,7 +720,7 @@ public class CommonCalendar implements EntryPoint {
                     //  Class cl = ((Object) t).getClass();
                     // if (cl == SingleUser.class) {
                     return (SingleUser) t;
-                //  }
+                    //  }
                 }
             }
         }
@@ -780,17 +779,17 @@ public class CommonCalendar implements EntryPoint {
         // creo la barra dei pulsanti del form
         buttonBar = new ToolBar();
         buttonBar.setAlignment(HorizontalAlignment.LEFT);
-      //  buttonBar.setCellSpacing(20);
+        //  buttonBar.setCellSpacing(20);
         /*
         buttonBar.add(new Button("Close", new SelectionListener<ButtonEvent>() {
 
-            @Override
-            public void componentSelected(ButtonEvent ce) {
-                RootPanel.get().remove(panel);
+        @Override
+        public void componentSelected(ButtonEvent ce) {
+        RootPanel.get().remove(panel);
 
-            }
+        }
         }));
-*/
+         */
 
 
         // aggiungo il pulsante "Invia" per inviare i dati di autenticazione
@@ -817,7 +816,7 @@ public class CommonCalendar implements EntryPoint {
             }
         }));
 
-          // aggiungo il pulsante "Cancella" per resettare il form
+        // aggiungo il pulsante "Cancella" per resettare il form
         buttonBar.add(new Button("Cancel", new SelectionListener<ButtonEvent>() {
 
             @Override
@@ -825,14 +824,38 @@ public class CommonCalendar implements EntryPoint {
                 userName.reset();
             }
         }));
+        // gestione login nuova 1-10-09
+        String googleId = Window.Location.getParameter("gId");
+        // String em = Window.Location.getParameter("openid.ext1.value.email");
+        // MessageBox.alert("p = ", p, null);
+        // MessageBox.alert("email = ", em, null);
+        final AsyncCallback callbackLoginGoogle = new AsyncCallback() {
 
+            public void onSuccess(Object result) {
+                me = (SingleUser) result;
+                whoAreYou.setHtml("<br/><b style='color:#15428B;'>Welcome " + me.getMailAddress() + "</b><br/><br/>");
+                welcomeUser(result);
+                // userPwd.setVisible(false);
+                // userName.setVisible(false);
+                // buttonBar.setVisible(false);
+
+            }
+
+            public void onFailure(Throwable caught) {
+                //  lblServerReply.setText("Communication failed di RMI");
+                MessageBox.alert("Validate user and passwd", "FAIL", null);
+            }
+        };
+        getService().authenticate(googleId, callbackLoginGoogle);
+
+        // fine login nuova
         Html html =
                 new Html(
                 "<br/><b style='color:#15428B;'>Please choose: </b><br/><br/>");
 
-        loginPanel.add(userName);
-        loginPanel.add(userPwd);
-        loginPanel.add(buttonBar);
+        //  loginPanel.add(userName);
+        //  loginPanel.add(userPwd);
+        //  loginPanel.add(buttonBar);
 
 
         panel.add(loginPanel);

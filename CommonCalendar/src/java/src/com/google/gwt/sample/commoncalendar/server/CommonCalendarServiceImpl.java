@@ -14,6 +14,7 @@ import appsusersevents.client.ApplicationDescription;
 import appsusersevents.client.EventDescription;
 import appsusersevents.client.UserGroup;
 import appsusersevents.client.CalendarOwner;
+import appsusersevents.client.CloudUsers;
 import appsusersevents.client.MyDate;
 import appsusersevents.client.SingleUser;
 
@@ -26,8 +27,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import javax.servlet.http.HttpSession;
 
@@ -38,12 +37,10 @@ import javax.servlet.http.HttpSession;
 public class CommonCalendarServiceImpl extends RemoteServiceServlet implements
         ICommonCalendar {
 
-
-
-
     //  GigaListener listener = new GigaListener(false);
     // One gigalistener for each session
     HashMap<String, GigaListener> sessionListeners = new HashMap();
+    CloudUsers cloudUsers = new CloudUsers();
     //   boolean doneFilters = false;
 
     /*
@@ -69,11 +66,11 @@ public class CommonCalendarServiceImpl extends RemoteServiceServlet implements
 
     private String readAppsold(String xmlFile) {
 
-           InputStream is = getClass().getResourceAsStream(xmlFile);
-            if (is == null) {
-                return "";
-            }
-     //   System.out.println("in readapps, is == " + is);
+        InputStream is = getClass().getResourceAsStream(xmlFile);
+        if (is == null) {
+            return "";
+        }
+        //   System.out.println("in readapps, is == " + is);
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         StringBuilder sb = new StringBuilder();
 
@@ -96,7 +93,7 @@ public class CommonCalendarServiceImpl extends RemoteServiceServlet implements
 
 
     }
- 
+
     /*
     public String myMethod(String s) {
     // Do something interesting with 's' here on the server.
@@ -113,7 +110,6 @@ public class CommonCalendarServiceImpl extends RemoteServiceServlet implements
     return re;
     }
      */
-
     public ApplicationDescription[] getApplicationTree() {
 
 
@@ -130,14 +126,14 @@ public class CommonCalendarServiceImpl extends RemoteServiceServlet implements
         //   return ServerToClient.buildGroupTree(readApps("userList.xml"));
         //  InputStream is = getClass().getResourceAsStream("userList.xml");
         // return ServerToClient.buildGroupTree(readApps(is));
-    //    return new ServerToClient().buildGroupTree(null);
-         return new ServerToClient().buildGoogleGroupTree(me);
+        //    return new ServerToClient().buildGroupTree(null);
+        return new ServerToClient().buildGoogleGroupTree(me);
 
     }
 
     public EventDescription[] getEvents() {
-      //  return new EventDescription[0];
-      return getListener().getEvents();
+        //  return new EventDescription[0];
+        return getListener().getEvents();
     }
 
     public void putEvents(EventDescription[] events) {
@@ -183,7 +179,7 @@ public class CommonCalendarServiceImpl extends RemoteServiceServlet implements
             sessionListeners.put(sId, ret);
             setFilters(ret);
         }
-     //   System.out.println("retlistener  " + ret);
+        //   System.out.println("retlistener  " + ret);
         return ret;
     }
 
@@ -204,8 +200,16 @@ public class CommonCalendarServiceImpl extends RemoteServiceServlet implements
         return this.getThreadLocalRequest().getSession();
     }
 
-      public SingleUser validateUser(String name, String pwd) {
-          System.out.println("Commoncal impl Client in ValidateUSer pwd+ " + pwd);
-          return new ServerToClient().validateUser(name,pwd);
-      }
+    public SingleUser validateUser(String name, String pwd) {
+        System.out.println("Commoncal impl Client in ValidateUSer pwd+ " + pwd);
+        return new ServerToClient().validateUser(name, pwd);
+    }
+
+    public SingleUser authenticate(String s) {
+        System.out.println("@@@@@@@@@@ AUTHENTICATE: s= " + s);
+        SingleUser sU = cloudUsers.getUser(s);
+        if (sU == null)
+        System.out.println("@@@@@@@@@@ AUTHENTICATE: sU NULL!!!");
+        return sU;
+    }
 }
