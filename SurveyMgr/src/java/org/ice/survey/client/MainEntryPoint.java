@@ -11,6 +11,7 @@ package org.ice.survey.client;
 import appsusersevents.client.EventDescription;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.Orientation;
+import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.util.Margins;
@@ -41,8 +42,6 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  *
@@ -108,7 +107,7 @@ public class MainEntryPoint implements EntryPoint {
         formPanel.setHeading("SurveyMgr");
         formPanel.setBorders(false);
         formPanel.setPadding(5);
-        formPanel.setWidth(620);
+        formPanel.setWidth(280);
         formPanel.setLabelWidth(105);
         //login
         userName = new TextField<String>();
@@ -124,7 +123,8 @@ public class MainEntryPoint implements EntryPoint {
         cp.setHeaderVisible(false);
         //    msgTable.setBorderWidth(1);
         cp.add(msgTable);
-        cp.setSize(600, 225);
+        cp.setSize(260, 200);
+        cp.setScrollMode(Scroll.AUTO);
         cp.setFrame(true);
         cp.setBorders(false);
         cp.setLayout(new RowLayout(Orientation.HORIZONTAL));
@@ -204,7 +204,6 @@ public class MainEntryPoint implements EntryPoint {
         final AsyncCallback callbackLoginGoogle = new AsyncCallback() {
 
             public void onSuccess(Object result) {
-
                 me = (String) result;
                 whoAreYou.setText("Welcome " + me);
                 // userPwd.setVisible(false);
@@ -212,7 +211,6 @@ public class MainEntryPoint implements EntryPoint {
                 // buttonBar.setVisible(false);
                 html.setVisible(true);
                 cp.setVisible(true);
-
             }
 
             public void onFailure(Throwable caught) {
@@ -246,7 +244,8 @@ public class MainEntryPoint implements EntryPoint {
         //    final String quest = msg;
         final String evId = eventId;
         int row = msgTable.getRowCount();
-        msgTable.setWidth("550px");
+//        msgTable.setWidth("550px");
+        (msgTable.getFlexCellFormatter()).setWidth(row, 0, "80");
         msgTable.setHTML(row, 0, msg);
         //     msgTable.setText(row, 0, msg.substring(0, 25));
         final String[] answers = new String[2];
@@ -267,7 +266,7 @@ public class MainEntryPoint implements EntryPoint {
         radioButton1.setName(answers[1]);
         radioButton1.setValue(false);
 
-        final Button btnSendAnswer = new Button("Send Answer");
+        final Button btnSendAnswer = new Button("Answer");
         rimozioni.add(btnSendAnswer);
         //fine gestione radiobuttons
         final AsyncCallback callback = new AsyncCallback() {
@@ -313,9 +312,9 @@ public class MainEntryPoint implements EntryPoint {
                 // fine rimozione
             }
         });
-
-
-
+        (msgTable.getFlexCellFormatter()).setWidth(row, 1, "30");
+        (msgTable.getFlexCellFormatter()).setWidth(row, 2, "30");
+        (msgTable.getFlexCellFormatter()).setWidth(row, 3, "40");
         msgTable.setWidget(row, 1, radioButton0);
         msgTable.setWidget(row, 2, radioButton1);
         msgTable.setWidget(row, 3, btnSendAnswer);
@@ -347,7 +346,7 @@ public class MainEntryPoint implements EntryPoint {
             //      debug("SURVEY: sono in showtEvents prima di addMsgROW " + eve[i].getEventName() + " dest = " + eve[i].getDestinatario() + " eventId =  " + eve[i].getEventId());
             if (eve[i].getDestinatario().equals(me)) {
                 if (eve[i].getEventName().equals("MeetingProposal")) {
-                    addMsgRow(eve[i].getEventName() + "  " + eve[i].getParameter("Date"), eve[i].getEventId());
+                    addMsgRow(eve[i].getEventName() + "  " + eve[i].getParameter("Date") + "<br />", eve[i].getEventId());
                 }
                 if ((eve[i].getEventName().equals("MembershipProposal"))) {
                     addMsgRow(eve[i].getEventName() + "  group: " + eve[i].getParameter("groupName") + "<br />", eve[i].getEventId());
