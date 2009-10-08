@@ -5,6 +5,8 @@
 package appsusersevents.client;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  *
@@ -40,6 +42,24 @@ public class CloudUsers {
 
     public void setCloudUsers(HashMap<String, SingleUser> cloudUsers) {
         this.cloudUsers = cloudUsers;
+    }
+
+    public SingleUser getUserByEmail(String mail) {
+        SingleUser sU = null;
+        boolean trovato = false;
+        Set<String> ids = cloudUsers.keySet();
+        Iterator<String> iter = ids.iterator();
+        while (iter.hasNext() && !trovato) {
+            String id = iter.next();
+            sU = cloudUsers.get(id);
+            if (mail.equals(sU.getMailAddress())) {
+                trovato = true;
+            }
+        }
+        if (!trovato) {
+            sU = null;
+        }
+        return sU;
     }
 
     private void tempInit() {
