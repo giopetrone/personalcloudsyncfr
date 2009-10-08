@@ -8,8 +8,10 @@
  */
 package org.ice.groupmgr.server;
 
+import appsusersevents.client.CloudUsers;
 import appsusersevents.client.EventDescription;
 
+import appsusersevents.client.SingleUser;
 import com.google.gdata.data.contacts.ContactEntry;
 import com.google.gdata.data.contacts.ContactGroupEntry;
 import com.google.gdata.data.contacts.GroupMembershipInfo;
@@ -55,15 +57,16 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
     String iceMgrPasswd = "sync09fr";
     String groupMakerLogin = "";
     String groupMakerPasswd = "";
-    HashMap<String, String> logPasswdData = new HashMap();
+    // HashMap<String, String> logPasswdData = new HashMap();
     // per gestire risposte
     HashMap<String, GroupInProgress> groupsInProgress = new HashMap();
     private boolean gruppoConfermato = false;
+    CloudUsers cloudUsers = new CloudUsers();
 
     public void init() {
 
-        logPasswdData.put("gio.petrone@gmail.com", "mer20ia05");
-        logPasswdData.put("annamaria.goy@gmail.com", "tex_willer");
+        //    logPasswdData.put("gio.petrone@gmail.com", "mer20ia05");
+        //    logPasswdData.put("annamaria.goy@gmail.com", "tex_willer");
         // inizializzazione di userData, in futuro leggere gli utenti da users.xml
         usersData.put("gio.petrone@gmail.com", new ArrayList());
         usersData.put("sgnmrn@gmail.com", new ArrayList());
@@ -93,27 +96,12 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
 
     }
 
-     public String getParameter(String paramname) {
-        // Get the current request and then return its session
-         String paramValue ="";
-
-         HttpServletRequest req = this.getThreadLocalRequest();
-
-         System.out.println("@@@@@@@@@@@@ queryString " + req.getQueryString());
-          System.out.println("@@@@@@@@@@@@ queryRequestUrl " + req.getRequestURL());
-       
-         System.out.println("@@@@@@@@@@@@ method " + req.getMethod());
-         paramValue = req.getParameter(paramname);
-          System.out.println("@@@@@@@@@@@@ parameter name " + paramname);
-            System.out.println("@@@@@@@@@@@@ parameter " + paramValue);
-         return paramValue;
-
-    }
+    
 
     public EventDescription[] getEvents(String userName) {
         System.out.println("******GroupMgr getEvents  all'inizio");
         //TEMP !!!! x prova parametri servlet !!!!
-    //    System.out.println("******GroupMgr dopo getParameter " + this.getParameter("p"));
+        //    System.out.println("******GroupMgr dopo getParameter " + this.getParameter("p"));
         // FINE TEMP
         EventDescription[] tmp = null;
         if (userName != null) {
@@ -442,9 +430,13 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
             // valutare se questo modo automatico va sostituito con un pulsante nella UI, non si sfrutta il for precedente per futura invocazioen dalle singole UI
             for (ContattoModelData cmd : contatti) {
                 String mail = cmd.getMail();
-                String pwd = logPasswdData.get(mail);
-                if (!mail.equals(groupMakerLogin)) {
-                    esportaGruppo(nome, contatti, mail, pwd);  // per ogni membro del gruppo
+                // String pwd = logPasswdData.get(mail);
+                SingleUser sU = cloudUsers.getUserByEmail(mail);
+                if (sU != null) {
+                    String pwd = sU.getPwd();
+                    if (!mail.equals(groupMakerLogin)) {
+                        esportaGruppo(nome, contatti, mail, pwd);  // per ogni membro del gruppo
+                    }
                 }
             }
         } // else
@@ -619,8 +611,15 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
             // valutare se questo modo automatico va sostituito con un pulsante nella UI, non si sfrutta il for precedente per futura invocazioen dalle singole UI
             for (ContactEntry cmd : membri) {
                 String mail = getEmailAddress(cmd);
-                String pwd = logPasswdData.get(mail);
-                esportaCancellazioneGruppo(nomeGruppo, mail, pwd);  // per ogni membro del gruppo
+                //   String pwd = logPasswdData.get(mail);
+                SingleUser sU = cloudUsers.getUserByEmail(mail);
+                if (sU != null) {
+                    String pwd = sU.getPwd();
+                    if (!mail.equals(groupMakerLogin)) {
+                        esportaCancellazioneGruppo(nomeGruppo, mail, pwd);  // per ogni membro del gruppo
+                    }
+                }
+
             }
 
         } // else
@@ -701,5 +700,35 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
         return val;
     }
 
-    
+    public String authenticate(String s) {
+        String userEmail = "";
+        String pwd = "";
+        SingleUser sU = cloudUsers.getUser(s);
+        //src=   System.out.println("AUTHENTICATE " + s);
+        if (sU != null) {
+            userEmail = sU.getMailAddress();
+            pwd = sU.getPwd();
+        } else {
+            System.out.println("singleUSer NULL");
+        }
+
+        ContactCall cC = new ContactCall(userEmail, pwd);
+        boolean val = cC.validate(userEmail, pwd);
+        System.out.print("sono in GroupMgr validate = " + val);
+        groupMakerLogin = userEmail;
+        groupMakerPasswd = pwd;
+        try {
+
+            //     String[] myArg = {"--username=annamaria.goy@gmail.com", "--password=tex_willer", "-contactfeed", "--action=list"};  // OK
+            String[] myArg = {"--username=" + groupMakerLogin, "--password=" + groupMakerPasswd, "-contactfeed", "--action=update"};  // OK
+            ContactsExampleParameters parameters = new ContactsExampleParameters(myArg); // X USAGE
+            cCall = new ContactCall(parameters);
+            //   groupMakerLogin = "annamaria.goy@gmail.com";
+            //  groupMakerPasswd = "tex_willer";
+            //FINE NUOVO
+        } catch (Exception e) {
+            System.out.println("error");
+        }
+        return userEmail;
+    }
 }

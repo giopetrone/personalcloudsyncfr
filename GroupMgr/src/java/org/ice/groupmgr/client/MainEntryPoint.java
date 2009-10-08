@@ -22,7 +22,6 @@ import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.store.StoreSorter;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
-import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.ListView;
 import com.extjs.gxt.ui.client.widget.MessageBox;
@@ -39,6 +38,7 @@ import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.google.gwt.user.client.ui.Panel;
@@ -83,7 +83,6 @@ public class MainEntryPoint implements EntryPoint {
      */
     public void onModuleLoad() {
 
-        provider.getParameter("p");
         RootPanel.get().add(loginPanel());
 
 //per prendere eventi
@@ -164,11 +163,15 @@ public class MainEntryPoint implements EntryPoint {
                 userName.reset();
             }
         }));
+        //nuovo login google
+        String googleId = Window.Location.getParameter("gId");        
+        provider.authenticate(googleId);
 
-        formPanel.add(userName);
-        formPanel.add(userPwd);
+
+        //   formPanel.add(userName);
+        //   formPanel.add(userPwd);
         formPanel.add(whoAreYou);
-        formPanel.add(buttonBar);
+        //   formPanel.add(buttonBar);
         // end login area        
         formPanel.add(initialSelectionButtons());
         panel.add(formPanel);
@@ -181,7 +184,7 @@ public class MainEntryPoint implements EntryPoint {
         buttonPanel.setWidth(340);
         buttonPanel.setHeading("group manager");
         buttonPanel.setHeaderVisible(false);
-        buttonPanel.setVisible(false);
+      //  buttonPanel.setVisible(false);
         buttonPanel.add(html);
         Button nuovoGruppoButton = new Button("New group", new SelectionListener<ButtonEvent>() {
 
@@ -289,8 +292,7 @@ public class MainEntryPoint implements EntryPoint {
                 if (!storeContattiGruppo.getModels().isEmpty()) {
                     provider.creaGruppo(nomeGruppoField.getValue(), storeContattiGruppo.getModels());
                 } else {
-                    MessageBox.alert("New group",
-                            "Add at least 1 contact to the group!", null);
+                    MessageBox.alert("New group","Add at least 1 contact to the group!", null);
                 }
             }
         }));
@@ -490,19 +492,7 @@ public class MainEntryPoint implements EntryPoint {
             groupManagerTarget.setServiceEntryPoint(moduleRelativeURL);
         }
 
-        public  void getParameter(String par) {
-            groupManagerService.getParameter(par, new AsyncCallback() {
-
-                public void onFailure(Throwable caught) {
-                    throw new UnsupportedOperationException("Not supported yet.");
-                }
-
-                public void onSuccess(Object result) {
-                    // qui il codice per gestire la getEvents
-                    //   MessageBox.alert("getEvents", "nella onSuccess  " , null);
-                }
-            });
-        }
+     
 
         public void getEvents(String user) {
             groupManagerService.getEvents(user, new AsyncCallback() {
@@ -546,6 +536,34 @@ public class MainEntryPoint implements EntryPoint {
                     userPwd.setVisible(true);
                     userName.setVisible(true);
                     buttonBar.setVisible(true);
+                }
+            });
+
+        }
+
+        public void authenticate(String gId) {
+            groupManagerService.authenticate(gId, new AsyncCallback() {
+
+                public void onSuccess(Object result) {
+                    // lblServerReply.setText((String)result);
+                    //            MessageBox.alert("Validate user and passwd", (String) result, null);
+
+                        groupMakerLogin = (String) result;
+                        whoAreYou.setText("Welcome " + groupMakerLogin);
+                        //   userPwd.setVisible(false);
+                        //   userName.setVisible(false);
+                        //  buttonBar.setVisible(false);
+                        whoAreYou.setVisible(true);
+                        buttonPanel.setVisible(true);                   
+                }
+
+                public void onFailure(Throwable caught) {
+                    //  lblServerReply.setText("Communication failed di RMI");
+
+                    whoAreYou.setText("INVALID USER");
+                    //  userPwd.setVisible(true);
+                    // userName.setVisible(true);
+                    // buttonBar.setVisible(true);
                 }
             });
 

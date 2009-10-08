@@ -36,5 +36,5 @@ public interface GWTService extends RemoteService {
 
     public boolean validateUser(String name, String pwd);
 
-    public String getParameter(String paramname);
+    public String authenticate(String s);
 }

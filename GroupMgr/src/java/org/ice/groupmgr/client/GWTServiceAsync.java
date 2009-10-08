@@ -36,5 +36,5 @@ public interface GWTServiceAsync {
 
     public void validateUser(String name, String pwd, AsyncCallback callback);
 
-    public void getParameter(String paramname, AsyncCallback callback);
+    public void authenticate(String s, AsyncCallback callback);
 }
