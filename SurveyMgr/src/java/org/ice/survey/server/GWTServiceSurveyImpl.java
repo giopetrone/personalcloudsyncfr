@@ -165,9 +165,9 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
 //
     public String sendEventToGiga(String questionId, String answer, String user) {
         GigaListener listener = getListener();
-        System.out.println("SURVEYMGR sendEventToGiga INIZIO @@@@@@@@@@@@  ");
+     //   System.out.println("SURVEYMGR sendEventToGiga INIZIO @@@@@@@@@@@@  ");
         ArrayList<EventDescription> questions = usersData.get(user);  //il parametro user e' lo user corrente (il "me" della UI)
-        System.out.println("SURVEYMGR sendEventToGiga questions size =  @@@@@@@@@@@@  " + questions.size());
+     //   System.out.println("SURVEYMGR sendEventToGiga questions size =  @@@@@@@@@@@@  " + questions.size());
         if (listener != null) {
             boolean found = false;
             if (questions == null) {
@@ -197,21 +197,22 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
                 }
                 events[0].setApplication("SurveyMgr");
                 String userTmp = events[0].getUser();
-                System.out.println("SURVEYMGR: SendEveTOGIga: event name = " + events[0].getEventName());
-                System.out.println("SURVEYMGR: SendEveTOGIga: user (prima)  = " + events[0].getUser());
+               // System.out.println("SURVEYMGR: SendEveTOGIga: event name = " + events[0].getEventName());
+               // System.out.println("SURVEYMGR: SendEveTOGIga: user (prima)  = " + events[0].getUser());
                 //  events[0].setUser(events[0].getDestinatario());
                 events[0].setUser(user);
-                System.out.println("SURVEYMGR: SendEveTOGIga: user (dopo)  = " + events[0].getUser());
+               // System.out.println("SURVEYMGR: SendEveTOGIga: user (dopo)  = " + events[0].getUser());
                 System.out.println("SURVEYMGR: SendEveTOGIga: destinatario  (prima) = " + events[0].getDestinatario());
-                events[0].setDestinatario(userTmp);
+                events[0].setDestinatario(userTmp); // TO DELETE
+                events[0].addDestinatario(userTmp);  // NUOVO x lista dest 12-10-09
                 System.out.println("SURVEYMGR: SendEveTOGIga: destinatario  (dopo) = " + events[0].getDestinatario());
-                System.out.println("SURVEYMGR: SendEveTOGIga: application = " + events[0].getApplication());
+            //    System.out.println("SURVEYMGR: SendEveTOGIga: application = " + events[0].getApplication());
                 //   events[0].getParameters().add(0, answer);  // DA CANCELLRE con sotto
                 events[0].setParameter("answer", answer);  //da modificare dopo il nuovo EventDescrip
-                System.out.println("SURVEYMGR: SendEveTOGIga: parameters = " + events[0].getParameters());
+              //  System.out.println("SURVEYMGR: SendEveTOGIga: parameters = " + events[0].getParameters());
                 removeEvent(questions.get(ind).getEventId(), questions);
                 //  printUsersData();
-                System.out.println("SURVEYMGR: SendEveTOGIga: size di events  = " + events.length);
+              //  System.out.println("SURVEYMGR: SendEveTOGIga: size di events  = " + events.length);
                 listener.putEvents(events);
             }
         }
