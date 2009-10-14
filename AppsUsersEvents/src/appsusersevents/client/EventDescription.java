@@ -21,7 +21,8 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
     private String eventName = any;     // X es. MeetingProposal
     private String userGroup = any;     //   finora x marino significava alias di un insieme di contatti, potrebbe la sfera
     private String user = any;         // utente che ha generato l'evento
-    private String destinatario = any;   // uertnte  a cui e' destinato l'evento che potrebbe essere un gruppo o un singolo utente
+    private String destinatario = any;   // utente  a cui e' destinato l'evento che potrebbe essere un gruppo o un singolo utente
+    private ArrayList<String> destinatari = new ArrayList(); // lista dei destinatari di un evento
     private String dataId = any;  //NON utilizzato fino a 6-2009
     private String sender = any;     // NON utilizzato fino a 6-2009
     private String receiver = any;   //NON utilizzato fino a 6-2009
@@ -542,5 +543,17 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
      */
     public void setInvolvedUsers(ArrayList<String> involvedUsers) {
         this.involvedUsers = involvedUsers;
+    }
+
+     public ArrayList<String> getDestinatari() {
+        return destinatari;
+    }
+
+    public void setDestinatari(ArrayList<String> destinatari) {
+        this.destinatari = destinatari;
+    }
+
+    public void addDestinatario(String destName) {
+        destinatari.add(destName);
     }
 }
