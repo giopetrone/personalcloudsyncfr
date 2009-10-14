@@ -135,7 +135,8 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
         newEvD.setEventName(this.getEventName());
         newEvD.setUserGroup(this.getUserGroup());
         newEvD.setUser(this.getUser());
-        newEvD.setDestinatario(this.getDestinatario());
+       // newEvD.setDestinatario(this.getDestinatario());
+        newEvD.setDestinatari(this.getDestinatari());
         // NON SI DEVE COPIARE eventId che deve essere nuovo
         eventId = "" + EventNumber;
         EventNumber++;
@@ -555,5 +556,10 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
 
     public void addDestinatario(String destName) {
         destinatari.add(destName);
+    }
+
+
+    public void removeDestinatario(String destName) {
+        destinatari.remove(destName);
     }
 }
