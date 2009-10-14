@@ -165,13 +165,13 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
                            // msg = msg + "  Please connect to  http://localhost:8080/SurveyMgr/";
                              msg = msg ;
                         } else if (tmp[i].getEventName().equals("GroupCreated")) {
-                            msg = "created : " + tmp[i].getParameter("groupName");
+                            msg = ": " + tmp[i].getParameter("groupName");
                         } else if (tmp[i].getEventName().equals("GroupModified")) {
-                            msg = "modified : " + tmp[i].getParameter("groupName");
+                            msg = ": " + tmp[i].getParameter("groupName");
                         } else if ((tmp[i].getEventName().equals("GroupDeleted"))) {
-                            msg = " deleted  : " + tmp[i].getParameter("groupName");
+                            msg = ": " + tmp[i].getParameter("groupName");
                         } else if ((tmp[i].getEventName().equals("MeetingConfirmation"))) {
-                            msg = "  meeting  : " + tmp[i].getParameter("Date");
+                            msg = ": " + tmp[i].getParameter("Date");
                         } else if ((tmp[i].getEventName().equals("DocCreated"))) {
                             msg = tmp[i].getParameter("docName") + " created  : " + tmp[i].getParameter("Date") + " document available at : " + tmp[i].getParameter("docLink");
                         } else if ((tmp[i].getEventName().equals("DocUpdated"))) {

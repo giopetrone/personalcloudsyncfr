@@ -308,13 +308,13 @@ public class MainEntryPoint implements EntryPoint {
                     addMsgRow(eve[i].getEventName() + "  group: " + eve[i].getParameter("groupName") + "<br />", eve[i].getEventId());
                 }
                 if ((eve[i].getEventName().equals("GroupCreated")) || (eve[i].getEventName().equals("GroupModified")) || (eve[i].getEventName().equals("GroupDeleted"))) {
-                    addMsgRow(eve[i].getEventName() + "  group: " + eve[i].getParameter("groupName") + "<br />", eve[i].getEventId());
+                    addMsgRow(eve[i].getEventName() + ": " + eve[i].getParameter("groupName") + "<br />", eve[i].getEventId());
                 }
 
                 if ((eve[i].getEventName().equals("DocCreated")) || (eve[i].getEventName().equals("DocUpdated")) || (eve[i].getEventName().equals("DocRemoved"))) {
-                    String linkDoc = "<a href='" + eve[i].getParameter("docLink") + "' target='_blank'>Document</a>";
+                    String linkDoc = "<a href='" + eve[i].getParameter("docLink") + "' target='_blank'>"+eve[i].getParameter("docName")+"</a>";
                     //  addMsgRow(eve[i].getEventName() + " doc:  " + eve[i].getParameter("docName") + "  " + eve[i].getParameter("date") + "<br />Please connect to: " + linkDoc, eve[i].getEventId());
-                    addMsgRow(eve[i].getEventName() + " doc:  " + eve[i].getParameter("docName") + "  " + eve[i].getParameter("date") + "<br />Please connect to: " + linkDoc, eve[i].getEventId());
+                    addMsgRow(eve[i].getEventName() + ":  " + linkDoc + "<br />" + eve[i].getParameter("date") + "<br />", eve[i].getEventId());
                 }
 
             }
