@@ -36,11 +36,15 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
     //GigaListener listener = new GigaListener();
     //   boolean addedFilter = false;
     ArrayList addedFilterList = new ArrayList(); // lista di utenti gia' sottoscritti
-    HashMap<String, ArrayList<EventDescription>> usersData = new HashMap();  // chiave = destinatario e value = lista di eventi che i filtri fanno passare (per quello user)
     HashMap<String, ArrayList<String>> eventSubscrData = new HashMap();  // chiave = applicazione e value = lista di eventi a cui sottoscriversi
     ChatClient chClient = new ChatClient();
     HashMap<String, String> logPasswdData = new HashMap();
-       CloudUsers cloudUsers = new CloudUsers();
+    CloudUsers cloudUsers = new CloudUsers();
+    //vecchia versione 14-10-09
+    //   HashMap<String, ArrayList<EventDescription>> usersData = new HashMap();  // chiave = destinatario e value = lista di eventi che i filtri fanno passare (per quello user)
+// nuova versione
+    String me = "";
+    ArrayList<EventDescription> notifiche = new ArrayList();
 
     @Override
     public void init() {
@@ -48,12 +52,12 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
         logPasswdData.put("gio.petrone@gmail.com", "mer20ia05");
         logPasswdData.put("annamaria.goy@gmail.com", "tex_willer");
         // inizializzazione di userData, in futuro leggere gli utenti da users.xml
-        usersData.put("gio.petrone@gmail.com", new ArrayList());
-        usersData.put("sgnmrn@gmail.com", new ArrayList());
-        usersData.put("marino@di.unito.it", new ArrayList());
-        usersData.put("lg.petrone@gmail.com", new ArrayList());
-        usersData.put("annamaria.goy@gmail.com", new ArrayList());
-        usersData.put("fabrizio.torretta@gmail.com", new ArrayList());
+//        usersData.put("gio.petrone@gmail.com", new ArrayList());
+//        usersData.put("sgnmrn@gmail.com", new ArrayList());
+//        usersData.put("marino@di.unito.it", new ArrayList());
+//        usersData.put("lg.petrone@gmail.com", new ArrayList());
+//        usersData.put("annamaria.goy@gmail.com", new ArrayList());
+//        usersData.put("fabrizio.torretta@gmail.com", new ArrayList());
         ArrayList aL = new ArrayList();
         aL.add("MeetingProposal");
         aL.add("MeetingConfirmation");
@@ -96,25 +100,25 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
         return this.getThreadLocalRequest().getSession();
     }
 
-       private String getParameter(String paramname) {
+    private String getParameter(String paramname) {
         // Get the current request and then return its session
-         String paramValue ="";
+        String paramValue = "";
 
-         HttpServletRequest req = this.getThreadLocalRequest();
+        HttpServletRequest req = this.getThreadLocalRequest();
 
 //         System.out.println("@@@@@@@@@@@@ queryString " + req.getQueryString());
 //          System.out.println("@@@@@@@@@@@@ queryRequestUrl " + req.getRequestURL());
 
 //         System.out.println("@@@@@@@@@@@@ method " + req.getMethod());
-         paramValue = req.getParameter(paramname);
+        paramValue = req.getParameter(paramname);
 //          System.out.println("@@@@@@@@@@@@ parameter name " + paramname);
 //            System.out.println("@@@@@@@@@@@@ parameter " + paramValue);
-         return paramValue;
+        return paramValue;
 
     }
 
     public EventDescription[] getEvents(String userName) {
-               //TEMP !!!! x prova parametri servlet !!!!
+        //TEMP !!!! x prova parametri servlet !!!!
         System.out.println("******NotificationMgr dopo getParameter " + this.getParameter("p"));
         // FINE TEMP
         EventDescription[] tmp = null;
@@ -143,27 +147,27 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
                 System.out.println(" NOTIF getEvents tmp size 0");
             } else {
                 // TEMP indice 0 : assumiamo che tutti gli eventi che arrivano con getEvents(), abbiano lo stesso destinataio (plausibile per come sono costruiti i filtri)
-                String dest = tmp[0].getDestinatario();
-                ArrayList aL = usersData.get(dest);  // eventi da mostrare all'utente
+                //    String dest = tmp[0].getDestinatario();
+                //  ArrayList aL = usersData.get(dest);  // eventi da mostrare all'utente
                 for (int i = 0; i < tmp.length; i++) {
                     // generalizzare controlli/nome degli eventi
                     if (tmp[i].getEventName().equals("MeetingAnswer") || tmp[i].getEventName().equals("MembershipSurveyAnswer")) {
-                        removeEvent(tmp[i].getCorrelationId(), aL);
+                        removeEvent(tmp[i].getCorrelationId(), notifiche);
                         removeEvent(tmp[i].getCorrelationId(), tmp);
                     } else { // per costruire messagio x GTalk
-                        aL.add(tmp[i]);
+                        notifiche.add(tmp[i]);
                         String evName = tmp[i].getEventName();
-                        String destName = tmp[i].getDestinatario();
+                        //  String destName = tmp[i].getDestinatario();
                         String msg = evName;
                         if (tmp[i].getEventName().equals("MeetingProposal")) {
                             msg = " to participate  : " + tmp[i].getParameter("Date");
-                           // msg = msg + "  Please connect to  http://localhost:8080/SurveyMgr/";
-                             msg = msg ;
+                            // msg = msg + "  Please connect to  http://localhost:8080/SurveyMgr/";
+                            msg = msg;
                         } else if (tmp[i].getEventName().equals("MembershipProposal")) {
                             //     System.out.println("++++NOtification getEvents evName del IM = " + evName);
                             msg = " to join  : " + tmp[i].getParameter("groupName");
-                           // msg = msg + "  Please connect to  http://localhost:8080/SurveyMgr/";
-                             msg = msg ;
+                            // msg = msg + "  Please connect to  http://localhost:8080/SurveyMgr/";
+                            msg = msg;
                         } else if (tmp[i].getEventName().equals("GroupCreated")) {
                             msg = ": " + tmp[i].getParameter("groupName");
                         } else if (tmp[i].getEventName().equals("GroupModified")) {
@@ -185,8 +189,8 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
                             //  chClient.sendGTalkMsg(destName, userName, logPasswdData.get(userName), msg, false);
                             // VALE PER TUTTE LE NOTIFICHE DA DIVERSE APPS ?
                             System.out.println("++++NOtification getEvents evName del IM  msg = " + msg);
-                            System.out.println("++++NOtification getEvents destName del IM = " + destName);
-                            chClient.sendGTalkMsg(destName, tmp[i].getUser(), logPasswdData.get(tmp[i].getUser()), msg, false);
+                            //System.out.println("++++NOtification getEvents destName del IM = " + destName);
+                            chClient.sendGTalkMsg(me, tmp[i].getUser(), logPasswdData.get(tmp[i].getUser()), msg, false);
                         } catch (Exception e) {
                             System.out.println("ECCEZIONE chat");
                         }
@@ -254,19 +258,18 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
 //
     public String sendEventToGiga(String questionId, String answer, String user) {
         GigaListener listener = getListener();
-        ArrayList<EventDescription> questions = usersData.get(user);  //il parametro user e' lo user corrente (il "me" della UI)
+        //   ArrayList<EventDescription> questions = usersData.get(user);  //il parametro user e' lo user corrente (il "me" della UI)
         if (listener != null) {
             boolean found = false;
-            if (questions == null) {
+            if (notifiche == null) {
                 System.out.println("sendEventToGiga : questions is NULL ");
-            } else if (questions.size() == 0) {
+            } else if (notifiche.size() == 0) {
                 System.out.println("sendEventToGiga : questions  lungh 0");
             } else {
                 int i = 0;
                 int ind = 0;
-                while (!found && i < questions.size()) {
-                    System.out.println("sendEventToGiga : questions  eventId e questionId  = " + (questions.get(i)).getEventId() + " " + questionId);
-                    if ((questions.get(i)).getEventId().equals(questionId)) {
+                while (!found && i < notifiche.size()) {
+                    if ((notifiche.get(i)).getEventId().equals(questionId)) {
                         found = true;
                         ind =
                                 i;
@@ -276,23 +279,20 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
                 }
 
                 EventDescription[] events = new EventDescription[1];
-                events[0] = (questions.get(ind)).copyEd();   // copia oggetto EventDescription
+                events[0] = (notifiche.get(ind)).copyEd();   // copia oggetto EventDescription
                 events[0].setEventName("MeetingAnswer");
-
                 events[0].setApplication("SurveyMgr");
                 String userTmp = events[0].getUser();
-                System.out.println("SendEveTOGIga: user (prima)  = " + events[0].getUser());
-                events[0].setUser(events[0].getDestinatario());
-                System.out.println("SendEveTOGIga: user (dopo)  = " + events[0].getUser());
-                System.out.println("SendEveTOGIga: destinatario  (prima) = " + events[0].getDestinatario());
-                events[0].setDestinatario(userTmp);
-                System.out.println("SendEveTOGIga: destinatario  (dopo) = " + events[0].getDestinatario());
+                // events[0].setUser(events[0].getDestinatario());
+                events[0].setUser(me);
+                events[0].removeDestinatario(me);
+                events[0].addDestinatario(userTmp);
                 events[0].setParameter("answer", answer);
                 //     events[0].getParameters().add(0, answer);
                 System.out.println("SendEveTOGIga: parameters = " + events[0].getParameters());
                 System.out.println("SendEveTOGIga: size di events  = " + events.length);
-                removeEvent(questions.get(ind).getEventId(), questions);
-                printUsersData();
+                removeEvent(notifiche.get(ind).getEventId(), notifiche);
+                //    printUsersData();
 
                 listener.putEvents(events);
 
@@ -340,24 +340,23 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
         return trovato;
     }
 
-    private void printUsersData() {
-        System.out.println("-------- stampa usersData in NOTIFICATION : ----");
-        Set<String> users = usersData.keySet();
-        Iterator<String> iter = users.iterator();
-        while (iter.hasNext()) {
-            String user = iter.next();
-            ArrayList<EventDescription> arL = usersData.get(user);
-            System.out.println("user = " + user + " data = ");
-            for (int i = 0; i <
-                    arL.size(); i++) {
-                System.out.println(arL.get(i).getDescription() + "  ---  ");
-            }
-
-        }
-        System.out.println("-------- fine stampa usersData in NOTIFICATION : ----");
-    }
+//    private void printUsersData() {
+//        System.out.println("-------- stampa usersData in NOTIFICATION : ----");
+//        Set<String> users = usersData.keySet();
+//        Iterator<String> iter = users.iterator();
+//        while (iter.hasNext()) {
+//            String user = iter.next();
+//            ArrayList<EventDescription> arL = usersData.get(user);
+//            System.out.println("user = " + user + " data = ");
+//            for (int i = 0; i <
+//                    arL.size(); i++) {
+//                System.out.println(arL.get(i).getDescription() + "  ---  ");
+//            }
+//
+//        }
+//        System.out.println("-------- fine stampa usersData in NOTIFICATION : ----");
+//    }
 // modificare con : evento (s) a cui ci si sottoscrive + sottoscrittore, per esempio "GigaMgrUI"
-
     private String subscribeTo(String evName, String user) {
         // invia a Giga il nome dell'evento a cui l'utente si vuole sottoscrivere
         Subscription f = new Subscription();
@@ -407,15 +406,17 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
 
         return val;
     }
-    
 
     public String authenticate(String s) {
         String userEmail = "";
         SingleUser sU = cloudUsers.getUser(s);
-     //src=   System.out.println("AUTHENTICATE " + s);
-        if (sU != null)
-         userEmail = sU.getMailAddress();
-        else System.out.println("singleUSer NULL");
+        //src=   System.out.println("AUTHENTICATE " + s);
+        if (sU != null) {
+            userEmail = sU.getMailAddress();
+            me = userEmail;
+        } else {
+            System.out.println("singleUSer NULL");
+        }
         return userEmail;
     }
 }
