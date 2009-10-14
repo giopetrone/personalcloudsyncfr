@@ -31,20 +31,26 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
         GWTServiceSurvey {
 
     HashMap<String, GigaListener> sessionListeners = new HashMap();
-    ArrayList addedFilterList = new ArrayList(); // lista di utenti gia' sottoscritti
-    HashMap<String, ArrayList<EventDescription>> usersData = new HashMap();  // chiave = destinatario e value = lista di eventi (domande) che i filtri fanno passare (per quello user)
+    ArrayList addedFilterList = new ArrayList(); // lista di utenti gia' sottoscritti   
     HashMap<String, ArrayList<String>> eventSubscrData = new HashMap();  // chiave = applicazione e value = lista di eventi a cui sottoscriversi
     CloudUsers cloudUsers = new CloudUsers();
+    //vecchia versione
+   // HashMap<String, ArrayList<EventDescription>> usersData = new HashMap();  // chiave = destinatario e value = lista di eventi (domande) che i filtri fanno passare (per quello user)
+// nuova versione
+    String me = "";
+    ArrayList<EventDescription> domande = new ArrayList();
+
 
     @Override
     public void init() {
         // inizializzazione di userData, in futuro leggere gli utenti da users.xml,
         // l'arrayList conterra' la lista delle domande per l'utente
-        usersData.put("gio.petrone@gmail.com", new ArrayList());
-        usersData.put("sgnmrn@gmail.com", new ArrayList());
-        usersData.put("marino@di.unito.it", new ArrayList());
-        usersData.put("lg.petrone@gmail.com", new ArrayList());
-        usersData.put("annamaria.goy@gmail.com", new ArrayList());
+        //OLD 14-10-09
+//        usersData.put("gio.petrone@gmail.com", new ArrayList());
+//        usersData.put("sgnmrn@gmail.com", new ArrayList());
+//        usersData.put("marino@di.unito.it", new ArrayList());
+//        usersData.put("lg.petrone@gmail.com", new ArrayList());
+//        usersData.put("annamaria.goy@gmail.com", new ArrayList());
         ArrayList aL1 = new ArrayList();
         aL1.add("MeetingProposal");
         eventSubscrData.put("CommonCalendar", aL1);
@@ -74,7 +80,7 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
     }
 
     public EventDescription[] getEvents(String userName) {
-      
+
         EventDescription[] tmp = null;
         if (userName != null) {
             if (!alreadySubscr(userName)) {
@@ -100,17 +106,17 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
             if (tmp == null) {
                 System.out.println("SURVEYMGR getEvents tmp NULL");
             } else if (tmp.length == 0) {
-               // System.out.println("SURVEYMGR getEvents tmp size 0");
+                // System.out.println("SURVEYMGR getEvents tmp size 0");
             } else {
                 System.out.println("!!!!!!!!!!!!!!!!!!!!!!SURVEY  getEvents tmp SIZE e = " + tmp.length);
                 // TEMP indice 0 : assumiamo che tutti gli eventi che arrivano con getEvents(), abbiano lo stesso destinataio (plausibile per come sono costruiti i filtri)
-                String dest = tmp[0].getDestinatario();
+            //    String dest = tmp[0].getDestinatario();
                 for (int i = 0; i < tmp.length; i++) {
                     System.out.println("!!!!!!!!!!!!!!!!!!!!!!SURVEY  getEvents tmp eventName = " + tmp[i].getEventName());
-                    System.out.println("!!!!!!!!!!!!!!!!!!!!!! SURVEY getEvents tmp user = " + tmp[i].getUser());
-                    System.out.println("!!!!!!!!!!!!!!!!!!!!!! SURVEY getEvents tmp destinatario = " + tmp[i].getDestinatario());
+                    System.out.println("!!!!!!!!!!!!!!!!!!!!!! SURVEY getEvents tmp user = " + tmp[i].getUser());               
                     System.out.println("!!!!!!!!!!!!!!!!!!!!!! SURVEY getEvents tmp eventId = " + tmp[i].getEventId());
-                    (usersData.get(dest)).add(tmp[i]);    // si aggiunge un evento, ovvero in questo caso si assume una domanda alla lista delle domande per dest
+                   // (usersData.get(dest)).add(tmp[i]);    // si aggiunge un evento, ovvero in questo caso si assume una domanda alla lista delle domande per dest
+                  domande.add(tmp[i]);
                 }
                 //printUsersData();
             }
@@ -165,28 +171,28 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
 //
     public String sendEventToGiga(String questionId, String answer, String user) {
         GigaListener listener = getListener();
-     //   System.out.println("SURVEYMGR sendEventToGiga INIZIO @@@@@@@@@@@@  ");
-        ArrayList<EventDescription> questions = usersData.get(user);  //il parametro user e' lo user corrente (il "me" della UI)
-     //   System.out.println("SURVEYMGR sendEventToGiga questions size =  @@@@@@@@@@@@  " + questions.size());
+        //   System.out.println("SURVEYMGR sendEventToGiga INIZIO @@@@@@@@@@@@  ");
+     //   ArrayList<EventDescription> questions = usersData.get(user);  //il parametro user e' lo user corrente (il "me" della UI)
+        //   System.out.println("SURVEYMGR sendEventToGiga questions size =  @@@@@@@@@@@@  " + questions.size());
         if (listener != null) {
             boolean found = false;
-            if (questions == null) {
+            if (domande == null) {
                 System.out.println("SURVEYMGR sendEventToGiga : questions is NULL ");
-            } else if (questions.size() == 0) {
+            } else if (domande.size() == 0) {
                 System.out.println("SURVEYMGR  sendEventToGiga : questions  lungh 0");
             } else {
                 int i = 0;
                 int ind = 0;
-                while (!found && i < questions.size()) {
+                while (!found && i < domande.size()) {
                     //       System.out.println("sendEventToGiga : questions  eventId e questionId  = " + (questions.get(i)).getEventId() + " " + questionId);
-                    if ((questions.get(i)).getEventId().equals(questionId)) {
+                    if ((domande.get(i)).getEventId().equals(questionId)) {
                         found = true;
                         ind = i;
                     }
                     i++;
                 }
                 EventDescription[] events = new EventDescription[1];
-                events[0] = (questions.get(ind)).copyEd();   // copia oggetto EventDescription
+                events[0] = (domande.get(ind)).copyEd();   // copia oggetto EventDescription
                 // correlazione tra Proposal e Answer: da parametrizzare ulteriormente
                 String evReceived = events[0].getEventName();
                 if (evReceived.equals("MeetingProposal")) {
@@ -197,22 +203,20 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
                 }
                 events[0].setApplication("SurveyMgr");
                 String userTmp = events[0].getUser();
-               // System.out.println("SURVEYMGR: SendEveTOGIga: event name = " + events[0].getEventName());
-               // System.out.println("SURVEYMGR: SendEveTOGIga: user (prima)  = " + events[0].getUser());
+                // System.out.println("SURVEYMGR: SendEveTOGIga: event name = " + events[0].getEventName());
+                // System.out.println("SURVEYMGR: SendEveTOGIga: user (prima)  = " + events[0].getUser());
                 //  events[0].setUser(events[0].getDestinatario());
                 events[0].setUser(user);
-               // System.out.println("SURVEYMGR: SendEveTOGIga: user (dopo)  = " + events[0].getUser());
-                System.out.println("SURVEYMGR: SendEveTOGIga: destinatario  (prima) = " + events[0].getDestinatario());
+                // System.out.println("SURVEYMGR: SendEveTOGIga: user (dopo)  = " + events[0].getUser());                
                 events[0].setDestinatario(userTmp); // TO DELETE
                 events[0].addDestinatario(userTmp);  // NUOVO x lista dest 12-10-09
-                System.out.println("SURVEYMGR: SendEveTOGIga: destinatario  (dopo) = " + events[0].getDestinatario());
-            //    System.out.println("SURVEYMGR: SendEveTOGIga: application = " + events[0].getApplication());
+                //    System.out.println("SURVEYMGR: SendEveTOGIga: application = " + events[0].getApplication());
                 //   events[0].getParameters().add(0, answer);  // DA CANCELLRE con sotto
                 events[0].setParameter("answer", answer);  //da modificare dopo il nuovo EventDescrip
-              //  System.out.println("SURVEYMGR: SendEveTOGIga: parameters = " + events[0].getParameters());
-                removeEvent(questions.get(ind).getEventId(), questions);
+                //  System.out.println("SURVEYMGR: SendEveTOGIga: parameters = " + events[0].getParameters());
+                removeEvent(domande.get(ind).getEventId(), domande);
                 //  printUsersData();
-              //  System.out.println("SURVEYMGR: SendEveTOGIga: size di events  = " + events.length);
+                //  System.out.println("SURVEYMGR: SendEveTOGIga: size di events  = " + events.length);
                 listener.putEvents(events);
             }
         }
@@ -234,20 +238,20 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
         return trovato;
     }
 
-    private void printUsersData() {
-        System.out.println("-------- stampa usersData : ----");
-        Set<String> users = usersData.keySet();
-        Iterator<String> iter = users.iterator();
-        while (iter.hasNext()) {
-            String user = iter.next();
-            ArrayList<EventDescription> arL = usersData.get(user);
-            System.out.println("user = " + user + " data = ");
-            for (int i = 0; i < arL.size(); i++) {
-                System.out.println(arL.get(i).getDescription() + "  ---  ");
-            }
-        }
-        System.out.println("-------- fine stampa usersData : ----");
-    }
+//    private void printUsersData() {
+//        System.out.println("-------- stampa usersData : ----");
+//        Set<String> users = usersData.keySet();
+//        Iterator<String> iter = users.iterator();
+//        while (iter.hasNext()) {
+//            String user = iter.next();
+//            ArrayList<EventDescription> arL = usersData.get(user);
+//            System.out.println("user = " + user + " data = ");
+//            for (int i = 0; i < arL.size(); i++) {
+//                System.out.println(arL.get(i).getDescription() + "  ---  ");
+//            }
+//        }
+//        System.out.println("-------- fine stampa usersData : ----");
+//    }
 // modificare con : evento (s) a cui ci si sottoscrive + sottoscrittore, per esempio "GigaMgrUI"
 
     private String subscribeTo(String evName, String user) {
@@ -306,10 +310,13 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
     public String authenticate(String s) {
         String userEmail = "";
         SingleUser sU = cloudUsers.getUser(s);
-     //src=   System.out.println("AUTHENTICATE " + s);
-        if (sU != null)
-         userEmail = sU.getMailAddress();
-        else System.out.println("singleUSer NULL");
+        //src=   System.out.println("AUTHENTICATE " + s);
+        if (sU != null) {
+            userEmail = sU.getMailAddress();
+            me= userEmail;
+        } else {
+            System.out.println("singleUSer NULL");
+        }
         return userEmail;
     }
     //------------------------------
