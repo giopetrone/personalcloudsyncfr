@@ -49,7 +49,7 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
     // per Giga
     HashMap<String, GigaListener> sessionListeners = new HashMap();
     ArrayList addedFilterList = new ArrayList(); // lista di utenti gia' sottoscritti
-    HashMap<String, ArrayList<EventDescription>> usersData = new HashMap();  // chiave = destinatario e value = lista di eventi (domande) che i filtri fanno passare (per quello user)
+  //  HashMap<String, ArrayList<EventDescription>> usersData = new HashMap();  // chiave = destinatario e value = lista di eventi (domande) che i filtri fanno passare (per quello user)
     HashMap<String, ArrayList<String>> eventSubscrData = new HashMap();  // chiave = applicazione e value = lista di eventi a cui sottoscriversi
     HttpSession session = null;
     // fine Giga
@@ -68,11 +68,11 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
         //    logPasswdData.put("gio.petrone@gmail.com", "mer20ia05");
         //    logPasswdData.put("annamaria.goy@gmail.com", "tex_willer");
         // inizializzazione di userData, in futuro leggere gli utenti da users.xml
-        usersData.put("gio.petrone@gmail.com", new ArrayList());
-        usersData.put("sgnmrn@gmail.com", new ArrayList());
-        usersData.put("marino@di.unito.it", new ArrayList());
-        usersData.put("lg.petrone@gmail.com", new ArrayList());
-        usersData.put("annamaria.goy@gmail.com", new ArrayList());
+     //   usersData.put("gio.petrone@gmail.com", new ArrayList());
+//        usersData.put("sgnmrn@gmail.com", new ArrayList());
+//        usersData.put("marino@di.unito.it", new ArrayList());
+//        usersData.put("lg.petrone@gmail.com", new ArrayList());
+//        usersData.put("annamaria.goy@gmail.com", new ArrayList());
         ArrayList aL = new ArrayList();
         aL.add("MembershipSurveyAnswer");
         eventSubscrData.put("SurveyMgr", aL);
@@ -95,8 +95,6 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
         return this.getThreadLocalRequest().getSession();
 
     }
-
-    
 
     public EventDescription[] getEvents(String userName) {
         System.out.println("******GroupMgr getEvents  all'inizio");
@@ -191,7 +189,8 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
     }
 
 //  public String sendEventToGiga(String groupName, String eventName, String user, String dest) {
-    private String sendEventToGiga(EventDescription eventDesc, String user) {
+    //  private String sendEventToGiga(EventDescription eventDesc, String user) {
+    private String sendEventToGiga(EventDescription eventDesc) {
 
         EventDescription[] events = new EventDescription[1];
         System.out.println("GROUPMGR SendEveTOGIga I :  " + eventDesc.getEventName());
@@ -215,20 +214,20 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
         return trovato;
     }
 
-    private void printUsersData() {
-        System.out.println("-------- stampa usersData : ----");
-        Set<String> users = usersData.keySet();
-        Iterator<String> iter = users.iterator();
-        while (iter.hasNext()) {
-            String user = iter.next();
-            ArrayList<EventDescription> arL = usersData.get(user);
-            System.out.println("user = " + user + " data = ");
-            for (int i = 0; i < arL.size(); i++) {
-                System.out.println(arL.get(i).getDescription() + "  ---  ");
-            }
-        }
-        System.out.println("-------- fine stampa usersData : ----");
-    }
+//    private void printUsersData() {
+//        System.out.println("-------- stampa usersData : ----");
+//        Set<String> users = usersData.keySet();
+//        Iterator<String> iter = users.iterator();
+//        while (iter.hasNext()) {
+//            String user = iter.next();
+//            ArrayList<EventDescription> arL = usersData.get(user);
+//            System.out.println("user = " + user + " data = ");
+//            for (int i = 0; i < arL.size(); i++) {
+//                System.out.println(arL.get(i).getDescription() + "  ---  ");
+//            }
+//        }
+//        System.out.println("-------- fine stampa usersData : ----");
+//    }
     // fine metodi per Giga
     //*************************************************************************
     //*************************************************************************
@@ -353,22 +352,41 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
         boolean ret = true;
         //crea evento di MembershipProposal per ogni membro del gruppo
         GroupInProgress gP = new GroupInProgress(contatti);
+        // old version : un evento x ogni dest
+//        for (ContattoModelData c : contatti) {
+//            EventDescription eventDesc = new EventDescription();
+//            eventDesc.setCorrelationId(eventDesc.getEventId());  // CHIEDERE a MARINO
+//            eventDesc.setApplication("GroupMgr");
+//            eventDesc.setDestinatario(c.getMail());
+//            System.out.println("sono in GROUPMGR in creaGruppo dest = " + c.getMail());
+//            eventDesc.setParameter("groupName", nome);
+//            // MembershipProposal
+//            eventDesc.setEventName("MembershipProposal");
+//            eventDesc.setUser(groupMakerLogin);  // TEMP fino a che solo lil groupMakerr puo' creare gruppi
+//            //per gestione risposte
+//            gP.addRequest(c.getMail());
+//            groupsInProgress.put(nome, gP);
+//            //fine gestione risposte
+//            sendEventToGiga(eventDesc, c.getMail());
+//        }
+        // nuova versione
+        EventDescription eventDesc = new EventDescription();
+        eventDesc.setCorrelationId(eventDesc.getEventId());  // CHIEDERE a MARINO
+        eventDesc.setApplication("GroupMgr");
+        eventDesc.setParameter("groupName", nome);
+        // MembershipProposal
+        eventDesc.setEventName("MembershipProposal");
+        eventDesc.setUser(groupMakerLogin);
         for (ContattoModelData c : contatti) {
-            EventDescription eventDesc = new EventDescription();
-            eventDesc.setCorrelationId(eventDesc.getEventId());  // CHIEDERE a MARINO
-            eventDesc.setApplication("GroupMgr");
-            eventDesc.setDestinatario(c.getMail());
-            System.out.println("sono in GROUPMGR in creaGruppo dest = " + c.getMail());
-            eventDesc.setParameter("groupName", nome);
-            // MembershipProposal
-            eventDesc.setEventName("MembershipProposal");
-            eventDesc.setUser(groupMakerLogin);  // TEMP fino a che solo lil groupMakerr puo' creare gruppi
+            eventDesc.setDestinatario(c.getMail()); //da elimimare in futuro
+            eventDesc.addDestinatario(c.getMail());
             //per gestione risposte
             gP.addRequest(c.getMail());
             groupsInProgress.put(nome, gP);
             //fine gestione risposte
-            sendEventToGiga(eventDesc, c.getMail());
+            // sendEventToGiga(eventDesc, c.getMail());
         }
+        sendEventToGiga(eventDesc);
 
 
         return ret;
@@ -377,7 +395,6 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
     private boolean confermaGruppo(String nome, List<ContattoModelData> contatti, boolean crea) {
         List<ContactEntry> listaContatti = new ArrayList<ContactEntry>();  // conterra' i membri del nuovo gruppo
         List<ContactEntry> allContatti = cCall.getUserContacts();   //tutti i contatti dell'ICE
-        System.out.println("sono in confermaGruppo");
         boolean ret = true;
         String groupId = "";
         // crea gruppo
@@ -390,7 +407,16 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
             ContactGroupEntry cGroupE = cCall.creaGruppo(nome, " ", additionalInfo);  //crea gruppo in Contacts
             //  fine crea gruppo
             groupId = cGroupE.getId();
-            System.out.println("***** confermaGruppo : gruppo id = " + groupId);
+            EventDescription eventDesc = new EventDescription();
+            if (crea) {
+                eventDesc.setEventName("GroupCreated");
+            } else {
+                eventDesc.setEventName("GroupModified");
+            }
+            // eventDesc.setCorrelationId(eventDesc.getEventId());  // CHIEDERE a MARINO ????
+            eventDesc.setApplication("GroupMgr");
+            eventDesc.setParameter("groupName", nome);
+            eventDesc.setUser(groupMakerLogin);
             for (ContattoModelData cmd : contatti) {
                 boolean trovato = false;
                 Iterator<ContactEntry> it = allContatti.iterator();
@@ -398,33 +424,19 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
                     ContactEntry cE = it.next();
                     String mail = getEmailAddress(cE);
                     if (cmd.getMail().equals(mail)) {
-                        System.out.println("***** confermaGruppo : in contattoModelData id = " + cmd.getMail() + " in contactEntry id = " + mail);
                         trovato = true;
                         // GIO :aggiungi idGruppo al contatto
                         try {
                             cCall.setGroupMembership(cE.getId(), groupId);
-                            // mandare a Giga evento createdGroup per ogni utente
-                            EventDescription eventDesc = new EventDescription();
-                            if (crea) {
-                                eventDesc.setEventName("GroupCreated");
-                            } else {
-                                eventDesc.setEventName("GroupModified");
-                            }
-                            // eventDesc.setCorrelationId(eventDesc.getEventId());  // CHIEDERE a MARINO ????
-                            eventDesc.setApplication("GroupMgr");
-                            eventDesc.setDestinatario(cmd.getMail());
-                            System.out.println("sono in GROUPMGR in confermaGruppo dest = " + cmd.getMail());
-                            eventDesc.setParameter("groupName", nome);
-                            eventDesc.setUser(groupMakerLogin);  // TEMP fino a che solo l'il groupMakerpuo' creare gruppi
-                            sendEventToGiga(eventDesc, cmd.getMail());
-                            // esportaGruppo(nome, contatti);  // per ICE mgr vecchia versione
-
+                            eventDesc.setDestinatario(cmd.getMail()); // da eliminare mandare a Giga evento createdGroup per ogni utente
+                            eventDesc.addDestinatario(cmd.getMail());
                         } catch (Exception e) {
                             System.out.println("GroupMgr ERRORE creaGruppo");
                         }
                     }
                 }//while
-            } // for                               
+            } // for   
+            sendEventToGiga(eventDesc);
             esportaGruppo(nome, contatti, iceMgrLogin, iceMgrPasswd);  // per ICE mgr
             // ciclo su tutti i membri del gruppo (contatti) per aggiornare i loro gruppi (nei loro contatti Google)
             // valutare se questo modo automatico va sostituito con un pulsante nella UI, non si sfrutta il for precedente per futura invocazioen dalle singole UI
@@ -580,30 +592,42 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
         if (cCall == null) {
             System.out.println("cCall NULL");
         } else {
-            Iterator<ContactEntry> it = membri.iterator();
-            while (it.hasNext()) {
-                ContactEntry cE = it.next();
-                String mail = getEmailAddress(cE);
-                //DA UTILIZZARE SOLO IN modifica gruppo
+            if (elimina) {
+                EventDescription eventDesc = new EventDescription();
+                eventDesc.setEventName("GroupDeleted");
+                // serve settare correlationId ???
+                eventDesc.setApplication("GroupMgr");
+                eventDesc.setParameter("groupName", nomeGruppo);
+                eventDesc.setUser(groupMakerLogin);
+                Iterator<ContactEntry> it = membri.iterator();
+                while (it.hasNext()) {
+                    ContactEntry cE = it.next();
+                    String mail = getEmailAddress(cE);
+                    eventDesc.addDestinatario(mail);
+                    eventDesc.setDestinatario(mail); // da elimianre TEMP
+                    //DA UTILIZZARE SOLO IN modifica gruppo
          /*       try {
-                cancellato = cCall.removeGroupMembership(cE.getId(), idGruppo);
-                } catch (Exception e) {
-                System.out.println("GROUPMGR  deleteGruppo ERRORE");
-                }
-                 */
-                // mandare a Giga evento createdGroup per ogni utente
-                if (elimina) {
-                    EventDescription eventDesc = new EventDescription();
-                    eventDesc.setEventName("GroupDeleted");
+                    cancellato = cCall.removeGroupMembership(cE.getId(), idGruppo);
+                    } catch (Exception e) {
+                    System.out.println("GROUPMGR  deleteGruppo ERRORE");
+                    }
+                     */
+                    // mandare a Giga evento createdGroup per ogni utente
+                    // if (elimina) {
+                    // EventDescription eventDesc = new EventDescription();
+                    // eventDesc.setEventName("GroupDeleted");
                     // serve settare correlationId ???
-                    eventDesc.setApplication("GroupMgr");
-                    eventDesc.setDestinatario(mail);
-                    System.out.println("sono in GROUPMGR in eliminaGruppo dest = " + mail);
-                    eventDesc.setParameter("groupName", nomeGruppo);
-                    eventDesc.setUser(groupMakerLogin);
-                    sendEventToGiga(eventDesc, mail);
-                }
-            }//while
+                    //  eventDesc.setApplication("GroupMgr");
+                    // eventDesc.setDestinatario(mail);
+                    // eventDesc.setParameter("groupName", nomeGruppo);
+                    // eventDesc.setUser(groupMakerLogin);
+                    //     sendEventToGiga(eventDesc, mail);
+                    //    sendEventToGiga(eventDesc);
+                    //  }
+                }//while
+
+                sendEventToGiga(eventDesc);
+            }
             cCall.deleteGroup(idGruppo);  //elimina  gruppo in Contact
             // invocare la deleteGroup su ogni contatto del gruppo e sul iceMgr  DA FARE
             esportaCancellazioneGruppo(nomeGruppo, iceMgrLogin, iceMgrPasswd);  // per ICE mgr
