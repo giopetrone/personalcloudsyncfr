@@ -128,8 +128,14 @@ public class MeetingSession extends VerticalPanel {
 
     public EventDescription[] getProposal() {
         // at startup, create list of events
-        publishedEvents = new EventDescription[receivers.length];
-        for (int k = 0; k < receivers.length; k++) {
+        // new version; only a single event is published
+        // and the destinatari arraylist
+        // contains the string of all the users and groups
+        // to wich the proposal is sent
+     //   publishedEvents = new EventDescription[receivers.length];
+        publishedEvents = new EventDescription[1]; // NUOVO, MAR
+     //   for (int k = 0; k < receivers.length; k++) {
+        for (int k = 0; k < 1; k++) { // NUOVO, MAR
             SingleUser tr = receivers[k];
             EventDescription des = new EventDescription("*");
             publishedEvents[k] = des;
@@ -137,6 +143,7 @@ public class MeetingSession extends VerticalPanel {
             des.setEventName("MeetingProposal");
             des.setUser(template.getUser());
             des.setApplication(template.getApplication());
+            des.setDestinatari(template.getDestinatari());// NUOVO, MAR
             des.setSessionId(sessionId);
             //    des.setCorrelationId("*");
             des.setParameters(template.getParameters());

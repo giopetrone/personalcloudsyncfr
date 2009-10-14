@@ -596,6 +596,7 @@ public class CommonCalendar implements EntryPoint {
         if (selectedUsers.length > 0) {
             EventDescription template = new EventDescription("*");
             template.setUser(me.getMailAddress());
+            template.setDestinatari(getDestinatari());
             template.setApplication(thisApplication);
             // set shperes (alias groups and usrs in the event
             // UserGroup.getUserMap(getDestinationUsers());
@@ -743,6 +744,15 @@ public class CommonCalendar implements EntryPoint {
             }
         }
         return ar;
+    }
+
+    private ArrayList<String> getDestinatari(){
+        ArrayList <String> ret = new ArrayList();
+        ArrayList<TreeElement> ppp = getDestinationUsers();
+        for (TreeElement t : ppp) {
+            ret.add(t.getName());
+        }
+        return ret;
     }
 
     private SingleUser[] getSelectedUsers() {
