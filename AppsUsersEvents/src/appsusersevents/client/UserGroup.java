@@ -56,6 +56,20 @@ public class UserGroup extends TreeNode {
         return allUsers;
     }
 
+    public static ArrayList<String> getUserAndGroups(ArrayList<TreeElement> destinationUsers) {
+        // return selected single users avoiding duplicates
+        ArrayList<String> ret = new ArrayList();
+        for (TreeElement item : destinationUsers) {
+            Class cl = item.getClass();
+            if (cl == appsusersevents.client.SingleUser.class) {
+                ret.add(((SingleUser) item).getMailAddress());
+            } else {
+                ret.add(item.getName());
+            }
+        }
+        return ret;
+    }
+
     public static ArrayList<String> getSingleUsers(ArrayList<TreeElement> destinationUsers) {
         // return all selected single users
         Iterator<TreeElement> it = destinationUsers.iterator();
@@ -64,7 +78,7 @@ public class UserGroup extends TreeNode {
             TreeElement item = it.next();
             Class cl = item.getClass();
             if (cl == appsusersevents.client.SingleUser.class) {
-               retUsers.add(item.getName());
+                retUsers.add(item.getName());
             }
         }
         return retUsers;
