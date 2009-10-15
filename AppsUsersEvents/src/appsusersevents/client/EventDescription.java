@@ -37,9 +37,12 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
     private static long EventNumber = 0;
     private String explicitEvent = "true";  // da gui o no?
     private String tab = "";  // attivita utente
-    private String estimatedSphere = "";  // calcolata dallo user agent
+    // private String estimatedSphere = "";  // calcolata dallo user agent
     private ArrayList<String> spheres = new ArrayList(); // sfere dell'utente
     private ArrayList<String> involvedUsers = new ArrayList(); // utenti coinvolti se non sono indicati come gruppi(emails)
+    //lili
+    private String processed; // event has been processed for disambiguation
+    private ArrayList<String> relevantSpheres; // relevant spheres identified by context
 
     /**
      * @return the anyDescription
@@ -56,6 +59,26 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
     }
 
     public EventDescription() {
+        application = any;
+        activity = any;
+        eventName = any;
+        userGroup = any;
+        user = any;
+        sessionId = any;
+        correlationId = any;
+        dataId = any;
+        sender = any;
+        receiver = any;
+        time = any;
+        destinatario = any;
+        filRouge = any;
+        explicitEvent = "true";
+        processed = "no";
+        destinatari = new ArrayList();
+        spheres = new ArrayList();
+        relevantSpheres = new ArrayList();
+        tab = "unknown";
+        parameters = new ArrayList();
         eventId = "" + EventNumber;
         EventNumber++;
     }
@@ -75,16 +98,50 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
         time = any;
         destinatario = any;
         filRouge = any;
-        tab = any;
-        estimatedSphere = any;
+        explicitEvent = "true";
+        processed = "no";
+        destinatari = new ArrayList();
+        spheres = new ArrayList();
+        relevantSpheres = new ArrayList();
+        tab = "unknown";
+        parameters = new ArrayList();
         eventId = "" + EventNumber;
         EventNumber++;
     }
 
+    public EventDescription(String app, String explicit, String proc,
+            String evName, String u,
+            ArrayList<String> dest,
+            ArrayList<String> sph, String tab, String time,
+            ArrayList<String> params) {
+        application = app;
+        explicitEvent = explicit;
+        processed = proc;
+        eventName = evName;
+        user = u;
+        spheres = sph;
+        relevantSpheres = new ArrayList();
+        this.tab = tab;
+        this.time = time;
+        parameters = params;
+//        parameterNames = new ArrayList();
+//        for (int i=0; i<parameters.size(); i +=2)
+//            parameterNames.add(parameters.get(i));
+
+        // variabili aggiunte per far funzionare compatibleWith()
+        activity = any;
+        userGroup = any;
+        dataId = any;
+        sender = any;
+        destinatari = dest;
+        correlationId = any;
+        sessionId = any;
+    }
     //
     //  -1 if no match;
     //   0 exact match
     //  in future add more sofisticated rules
+
     private boolean fieldMatch(String first, String second) {
         return first.compareTo(second) == 0;
     }
@@ -93,7 +150,7 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
         if (second.equals("*")) {
             return true;
         } else {
-            return first.compareTo(second) == 0;
+            return first.equalsIgnoreCase(second);
         }
     }
 
@@ -117,6 +174,7 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
         return fieldCompatible(application, template.application) &&
                 fieldCompatible(activity, template.activity) &&
                 fieldCompatible(eventName, template.eventName) &&
+                fieldCompatible(processed, template.processed) &&
                 fieldCompatible(userGroup, template.userGroup) &&
                 fieldCompatible(user, template.user) &&
                 //   fieldCompatible(eventId, template.eventId) &&
@@ -126,16 +184,25 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
                 fieldCompatible(time, template.time) &&
                 fieldCompatible(correlationId, template.correlationId) &&
                 fieldCompatible(sessionId, template.sessionId) &&
-                fieldCompatible(destinatario, template.destinatario);
+                destinatariCompatible(template) &&
+                spheresCompatible(template) &&
+                relevantSpheresCompatible(template) &&
+                parametersCompatible(template);
     }
 
     public EventDescription copyEd() {
         EventDescription newEvD = new EventDescription();
+        newEvD.setApplication(this.getApplication());
+        newEvD.setExplicitEvent(this.getExplicitEvent());
+        newEvD.setProcessed(this.getProcessed());
         newEvD.setActivity(this.getActivity());
         newEvD.setEventName(this.getEventName());
         newEvD.setUserGroup(this.getUserGroup());
         newEvD.setUser(this.getUser());
-       // newEvD.setDestinatario(this.getDestinatario());
+        newEvD.setSpheres(this.getSpheres());
+        newEvD.setRelevantSpheres(this.getRelevantSpheres());
+        newEvD.setTab(this.getTab());
+        // newEvD.setDestinatario(this.getDestinatario());
         newEvD.setDestinatari(this.getDestinatari());
         // NON SI DEVE COPIARE eventId che deve essere nuovo
         eventId = "" + EventNumber;
@@ -200,8 +267,7 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
                 getCorrelationId() + "." +
                 getTime() + "." +
                 explicitEvent + "." +
-                tab + "." +
-                estimatedSphere;
+                tab + ".";
         ret += ".{";
         int sz = parameters.size();
 
@@ -411,7 +477,7 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
     public void setParameter(String name, String value) {
         for (int i = 0; i < parameters.size(); i += 2) {
             String parName = parameters.get(i);
-            if (parName.equals(name.toLowerCase())) {
+            if (parName.equalsIgnoreCase(name.toLowerCase())) {
                 //   System.err.println("EventDescription replacing parameter already set: " + name);
                 parameters.set(i + 1, value);
                 return;
@@ -438,7 +504,7 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
         String ret = null;
         for (int i = 0; i < parameters.size(); i += 2) {
             String parName = parameters.get(i);
-            if (parName.equals(name.toLowerCase())) { // found
+            if (parName.equalsIgnoreCase(name.toLowerCase())) { // found
                 i++;
                 if (i < parameters.size()) {
                     ret = parameters.get(i);
@@ -505,20 +571,6 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
     }
 
     /**
-     * @return the estimatedSphere
-     */
-    public String getEstimatedSphere() {
-        return estimatedSphere;
-    }
-
-    /**
-     * @param estimatedSphere the estimatedSphere to set
-     */
-    public void setEstimatedSphere(String estimatedSphere) {
-        this.estimatedSphere = estimatedSphere;
-    }
-
-    /**
      * @return the spheres
      */
     public ArrayList<String> getSpheres() {
@@ -546,7 +598,7 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
         this.involvedUsers = involvedUsers;
     }
 
-     public ArrayList<String> getDestinatari() {
+    public ArrayList<String> getDestinatari() {
         return destinatari;
     }
 
@@ -558,8 +610,156 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
         destinatari.add(destName);
     }
 
-
     public void removeDestinatario(String destName) {
         destinatari.remove(destName);
+    }
+
+    public String getProcessed() {
+        return processed;
+    }
+
+    public void setProcessed(String processed) {
+        this.processed = processed;
+    }
+
+    public ArrayList<String> getRelevantSpheres() {
+        return relevantSpheres;
+    }
+
+    public void setRelevantSpheres(ArrayList<String> relevantSpheres) {
+        this.relevantSpheres = relevantSpheres;
+    }
+
+    // returns the names of all the parameters of "this"
+    public ArrayList<String> getParameterNames() {
+        ArrayList<String> parameterNames = new ArrayList();
+        for (int i = 0; i < parameters.size(); i += 2) {
+            parameterNames.add(parameters.get(i));
+        }
+        return parameterNames;
+    }
+
+    public String toString() {
+        return //"app: " + application +
+                //"; evName:" +
+                eventName +
+                "; usr: " + user +
+                "; dest: " + destinatari.toString() +
+                "; processed: " + processed +
+                //"; spheres: " + spheres.toString() +
+                "; relevant spheres: " + relevantSpheres.toString() +
+                //" est.sph: " + estimatedSphere +
+                //"; tab: " + tab +
+                //"; timetag: " + time +
+                getParameterString();
+    }
+
+    public boolean parametersCompatible(EventDescription template) {
+        boolean out = true;
+        for (int i = 0; i < parameters.size(); i += 2) {
+            String name = parameters.get(i);
+            String value = parameters.get(i + 1);
+            if (!fieldCompatible(value, template.getParameter(name))) {
+                out = false;
+                break;
+            }
+        }
+        return out;
+    }
+
+    // checks compatibility of field "spheres"
+    public boolean spheresCompatible(EventDescription template) {
+        return check(spheres, template.getSpheres());
+    }
+
+    // checks compatibility of field "relevantSpheres"
+    public boolean relevantSpheresCompatible(EventDescription template) {
+        return check(relevantSpheres, template.getRelevantSpheres());
+    }
+
+    // if the template has the list of spheres empty, the spheres are
+    // irrelevant for the compatibility check or the event has an empty sphere list.
+    // In the other cases, the method returns true if the first list of spheres
+    // has an intersection with the list of spheres of template (perfect mach is meaningless
+    // because cyclic events could be disambiguated along time)
+    private boolean check(ArrayList<String> sphs, ArrayList<String> templSpheres) {
+        boolean out = false;
+        if (templSpheres.size() == 0) // * case or empty sphere field
+        {
+            out = true;
+        } else {
+            out = EventUtilities.intersects(sphs, templSpheres);
+        }
+        return out;
+    }
+
+    // returns true if the destinatari field of the template is empty
+    // or if it has the same list of destinatary users (leaving order of occurrence apart)
+    public boolean destinatariCompatible(EventDescription template) {
+        boolean out = true;
+        ArrayList<String> dest = template.getDestinatari();
+        if (dest.size() != 0) { // if size==0 --> * case
+            if (dest.size() != destinatari.size()) // not the same list of users
+            {
+                out = false;
+            } else {
+                for (int i = 0; i < destinatari.size(); i++) {
+                    if (!dest.contains(destinatari.get(i))) {
+                        out = false;
+                        break;
+                    }
+                }
+            }
+        }
+        return out;
+    }
+     // creates a template with the same structure as this, where
+    // only some fields are instantiated, and the others are set to "*" or []
+    // NB: the template must be used in read-only mode, as its complex fields
+    // (e.g., spheres) are not cloned from those of the source event
+    public EventDescription createtemplate(boolean application, boolean explicitEvent,
+                        boolean processed, boolean eventName, boolean user,
+                        boolean spheres, boolean relevantSpheres,
+                        boolean tab, boolean time, boolean eventId, boolean activity,
+                        boolean userGroup, boolean dataId, boolean sender, boolean receiver,
+                        boolean correlationId, boolean sessionId,
+                        boolean destinatari, ArrayList<String> parNames) {
+        EventDescription ev = copyEd(); // clones the event "this"
+        if (!application) ev.setApplication("*"); // sets all irrelevant fields to "*"
+        if (!explicitEvent) ev.setExplicitEvent("*");
+        if (!processed) ev.setProcessed("*");
+        if (!eventName) ev.setEventName("*");
+        if (!user) ev.setUser("*");
+        if (!spheres) ev.setSpheres(new ArrayList());
+        if (!relevantSpheres) ev.setRelevantSpheres(new ArrayList());
+        if(!tab) ev.setTab("*");
+        if (!time) ev.setTime("*");
+        // eventId??
+        if (!activity) ev.setActivity("*");
+        if (!userGroup) ev.setUserGroup("*");
+        if (!dataId) ev.setDataId("*");
+        if (!sender) ev.setSender("*");
+        if (!receiver) ev.setReceiver("*");
+        if (!correlationId) ev.setCorrelationId("*");
+        if (!sessionId) ev.setSessionId("*");
+        if (!destinatari) ev.setDestinatari(new ArrayList());
+                // sets all the parameters not occurring in "parameterNames" to "*"
+        for (int i=0; i<parameters.size(); i +=2) {
+            String name = parameters.get(i);
+            if (!parNames.contains(name))
+                ev.setParameter(name, "*");
+            }
+        return ev;
+    }
+
+    // returns the list of parameter names associated to "this"
+    // in the match table
+    public ArrayList<String> getMatchParameters() {
+        return EventUtilities.getEventMatchTable().get(application).get(eventName);
+    }
+
+
+    public void addSphere(String sphere) {
+        spheres.add(sphere);
     }
 }
