@@ -158,8 +158,9 @@ public class GigaListener implements RemoteEventListener {
 
     public void putEvents(EventDescription[] events) {
         for (int i = 0; i < events.length; i++) {
-            putEvent(events[i]);
+            if (events[i] != null) {
+                putEvent(events[i]);
+            }
         }
     }
-
 }
