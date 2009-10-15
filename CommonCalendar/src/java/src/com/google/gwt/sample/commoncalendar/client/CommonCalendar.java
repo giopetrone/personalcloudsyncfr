@@ -746,13 +746,11 @@ public class CommonCalendar implements EntryPoint {
         return ar;
     }
 
-    private ArrayList<String> getDestinatari(){
-        ArrayList <String> ret = new ArrayList();
+    private ArrayList<String> getDestinatari() {
+        // return a list of email for singleusers
+        // name for groups
         ArrayList<TreeElement> ppp = getDestinationUsers();
-        for (TreeElement t : ppp) {
-            ret.add(t.getName());
-        }
-        return ret;
+        return UserGroup.getUserAndGroups(ppp);
     }
 
     private SingleUser[] getSelectedUsers() {
