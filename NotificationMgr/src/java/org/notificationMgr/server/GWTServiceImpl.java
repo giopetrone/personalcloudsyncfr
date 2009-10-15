@@ -262,9 +262,9 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
         if (listener != null) {
             boolean found = false;
             if (notifiche == null) {
-                System.out.println("sendEventToGiga : questions is NULL ");
+                System.out.println("NofiMgr sendEventToGiga : questions is NULL ");
             } else if (notifiche.size() == 0) {
-                System.out.println("sendEventToGiga : questions  lungh 0");
+                System.out.println("NotifMgr sendEventToGiga : questions  lungh 0");
             } else {
                 int i = 0;
                 int ind = 0;
@@ -285,15 +285,14 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
                 String userTmp = events[0].getUser();
                 // events[0].setUser(events[0].getDestinatario());
                 events[0].setUser(me);
-                events[0].removeDestinatario(me);
+                events[0].removeDestinatario(me);   
                 events[0].addDestinatario(userTmp);
                 events[0].setParameter("answer", answer);
                 //     events[0].getParameters().add(0, answer);
-                System.out.println("SendEveTOGIga: parameters = " + events[0].getParameters());
-                System.out.println("SendEveTOGIga: size di events  = " + events.length);
+               // System.out.println("NotifMgr SendEveTOGIga: parameters = " + events[0].getParameters());
+               // System.out.println("NotifMgr SendEveTOGIga: size di events  = " + events.length);
                 removeEvent(notifiche.get(ind).getEventId(), notifiche);
                 //    printUsersData();
-
                 listener.putEvents(events);
 
             }
@@ -381,7 +380,8 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
         System.out.println("evName = " + evName + "  dest = " + dest + " app = " + app);
         EventDescription evDescr = new EventDescription(evName);
         evDescr.setEventName(evName);
-        evDescr.setDestinatario(dest);
+  //      evDescr.setDestinatario(dest);
+        evDescr.addDestinatario(dest);
         evDescr.setApplication(app);
         f.setDesc(evDescr);
         getListener().addFilter(f);
