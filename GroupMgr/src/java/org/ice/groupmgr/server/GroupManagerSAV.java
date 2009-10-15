@@ -115,7 +115,7 @@ public class GroupManagerSAV {
         //    System.out.println("evName = " + evName + "  dest = " + dest + " app = " + app);
         EventDescription evDescr = new EventDescription(evName);
         evDescr.setEventName(evName);
-        evDescr.setDestinatario(dest);
+      //  evDescr.setDestinatario(dest);
         evDescr.setApplication(app);
         f.setDesc(evDescr);
         getListener().addFilter(f);

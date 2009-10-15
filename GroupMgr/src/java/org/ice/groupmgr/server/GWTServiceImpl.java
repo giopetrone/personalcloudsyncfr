@@ -126,7 +126,7 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
             } else {
                 System.out.println("************GroupMgr  getEvents tmp SIZE = " + tmp.length);
                 // TEMP indice 0 : assumiamo che tutti gli eventi che arrivano con getEvents(), abbiano lo stesso destinataio (plausibile per come sono costruiti i filtri)
-                String dest = tmp[0].getDestinatario();
+          //      String dest = tmp[0].getDestinatario();
                 for (int i = 0; i < tmp.length; i++) {
 
                     System.out.println("!!!!!!!!!!!!!!!!!!!!!!GroupMgr  getEvents tmp eventName = " + tmp[i].getEventName());
@@ -175,7 +175,8 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
         System.out.println(" ho fatto la new di Subscription in GROUPMGR  grande evName = " + evName + "  dest = " + dest + " app = " + app);
         EventDescription evDescr = new EventDescription(evName);
         evDescr.setEventName(evName);
-        evDescr.setDestinatario(dest);
+   //     evDescr.setDestinatario(dest);
+        evDescr.addDestinatario(dest);
         evDescr.setApplication(app);
         f.setDesc(evDescr);
         getListener().addFilter(f);
@@ -378,7 +379,7 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
         eventDesc.setEventName("MembershipProposal");
         eventDesc.setUser(groupMakerLogin);
         for (ContattoModelData c : contatti) {
-            eventDesc.setDestinatario(c.getMail()); //da elimimare in futuro
+           // eventDesc.setDestinatario(c.getMail()); //da elimimare in futuro
             eventDesc.addDestinatario(c.getMail());
             //per gestione risposte
             gP.addRequest(c.getMail());
@@ -428,7 +429,7 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
                         // GIO :aggiungi idGruppo al contatto
                         try {
                             cCall.setGroupMembership(cE.getId(), groupId);
-                            eventDesc.setDestinatario(cmd.getMail()); // da eliminare mandare a Giga evento createdGroup per ogni utente
+                  //          eventDesc.setDestinatario(cmd.getMail()); // da eliminare mandare a Giga evento createdGroup per ogni utente
                             eventDesc.addDestinatario(cmd.getMail());
                         } catch (Exception e) {
                             System.out.println("GroupMgr ERRORE creaGruppo");
@@ -604,7 +605,7 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
                     ContactEntry cE = it.next();
                     String mail = getEmailAddress(cE);
                     eventDesc.addDestinatario(mail);
-                    eventDesc.setDestinatario(mail); // da elimianre TEMP
+                 //   eventDesc.setDestinatario(mail); // da elimianre TEMP
                     //DA UTILIZZARE SOLO IN modifica gruppo
          /*       try {
                     cancellato = cCall.removeGroupMembership(cE.getId(), idGruppo);
@@ -671,8 +672,7 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
 // metodi per gestire le risposte dal Suvey per ogni invitato
     public boolean addRisposta(EventDescription evt) {
         // remove a recipient each time a confirmation is received
-        boolean eliminato = false;
-        System.out.println("in GROUPMGR.addrisposta: dest  " + evt.getDestinatario()); //l'iniziatore del gruppo
+        boolean eliminato = false;      
         System.out.println("in GROUPMGR.addrisposta: user  " + evt.getUser());  //chi risponde
 
         // if the destination is this user AND the answer
