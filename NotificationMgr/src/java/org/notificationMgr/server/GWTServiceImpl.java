@@ -10,6 +10,7 @@ package org.notificationMgr.server;
 
 import appsusersevents.client.CloudUsers;
 import appsusersevents.client.EventDescription;
+import appsusersevents.client.EventUtilities;
 import appsusersevents.client.SingleUser;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import giga.GigaListener;
@@ -45,19 +46,29 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
 // nuova versione
     String me = "";
     ArrayList<EventDescription> notifiche = new ArrayList();
+    //lili
+    private String currentTab; // active user tab (in focus)
+    private ArrayList<EventDescription> eventList; //list of events to be delivered to the user
+    int count; // counter used for disambiguating the eventList cyclically;
+    final int CYCLE = 5; // threashold for eventList maintenance
+    //  spheres  of the individual user
+    ArrayList<String> userSpheres = new ArrayList();
+    private HashMap<String, ArrayList<EventDescription>> notificationLists = new HashMap();
+    // notification lists for each sphere the user is involved in
+    // presTable: specification of the parameters for presentation on browser/minibrowser
+    private HashMap<String, HashMap<String, ArrayList<String>>> presentationTable = new HashMap();
 
+// end lili
     @Override
     public void init() {
         System.out.println("SONO IN init ");
         logPasswdData.put("gio.petrone@gmail.com", "mer20ia05");
         logPasswdData.put("annamaria.goy@gmail.com", "tex_willer");
-        // inizializzazione di userData, in futuro leggere gli utenti da users.xml
-//        usersData.put("gio.petrone@gmail.com", new ArrayList());
-//        usersData.put("sgnmrn@gmail.com", new ArrayList());
-//        usersData.put("marino@di.unito.it", new ArrayList());
-//        usersData.put("lg.petrone@gmail.com", new ArrayList());
-//        usersData.put("annamaria.goy@gmail.com", new ArrayList());
-//        usersData.put("fabrizio.torretta@gmail.com", new ArrayList());
+        presentationTable = setPresentationTable();
+        userSpheres.add("unknown");
+        notificationLists.put("unknown", new ArrayList()); //add notification list for ambiguous notifications
+
+        EventUtilities.setEventMatchTable();//sets the match table for identifying redundant events
         ArrayList aL = new ArrayList();
         aL.add("MeetingProposal");
         aL.add("MeetingConfirmation");
@@ -285,12 +296,12 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
                 String userTmp = events[0].getUser();
                 // events[0].setUser(events[0].getDestinatario());
                 events[0].setUser(me);
-                events[0].removeDestinatario(me);   
+                events[0].removeDestinatario(me);
                 events[0].addDestinatario(userTmp);
                 events[0].setParameter("answer", answer);
                 //     events[0].getParameters().add(0, answer);
-               // System.out.println("NotifMgr SendEveTOGIga: parameters = " + events[0].getParameters());
-               // System.out.println("NotifMgr SendEveTOGIga: size di events  = " + events.length);
+                // System.out.println("NotifMgr SendEveTOGIga: parameters = " + events[0].getParameters());
+                // System.out.println("NotifMgr SendEveTOGIga: size di events  = " + events.length);
                 removeEvent(notifiche.get(ind).getEventId(), notifiche);
                 //    printUsersData();
                 listener.putEvents(events);
@@ -380,7 +391,7 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
         System.out.println("evName = " + evName + "  dest = " + dest + " app = " + app);
         EventDescription evDescr = new EventDescription(evName);
         evDescr.setEventName(evName);
-  //      evDescr.setDestinatario(dest);
+        //      evDescr.setDestinatario(dest);
         evDescr.addDestinatario(dest);
         evDescr.setApplication(app);
         f.setDesc(evDescr);
@@ -419,4 +430,128 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
         }
         return userEmail;
     }
+    // lili methods
+    //for each application, for each event type, it specifies the relevant parameters to be checked
+// forse va nel client
+
+    private static HashMap<String, HashMap<String, ArrayList<String>>> setPresentationTable() {
+        HashMap<String, HashMap<String, ArrayList<String>>> table = new HashMap();
+        HashMap<String, ArrayList<String>> commonCalendar = new HashMap();
+        ArrayList date = new ArrayList();
+        date.add("date");
+        commonCalendar.put("MeetingProposal", date);
+        commonCalendar.put("MeetingConfirmation", date);
+
+        HashMap<String, ArrayList<String>> groupMgr = new HashMap();
+        ArrayList<String> groupName = new ArrayList();
+        groupName.add("groupName");
+        groupMgr.put("MembershipProposal", groupName);
+        groupMgr.put("GroupCreated", groupName);
+        groupMgr.put("GroupDeleted", groupName);
+
+        HashMap<String, ArrayList<String>> surveyMgr = new HashMap();
+        ArrayList<String> noParameters = new ArrayList();
+        surveyMgr.put("MeetingAnswer", noParameters);
+        surveyMgr.put("MembershipAnswer", noParameters);
+
+        HashMap<String, ArrayList<String>> googleDocs = new HashMap();
+        ArrayList<String> docFields = new ArrayList();
+        docFields.add("docName");
+        docFields.add("docLink");
+        docFields.add("date");
+        googleDocs.put("DocCreated", docFields);
+        googleDocs.put("DocUpdated", docFields);
+        ArrayList<String> docFields0 = new ArrayList();
+        docFields0.add("docName");
+        docFields0.add("date");
+        googleDocs.put("DocRemoved", docFields0);
+
+        table.put("CommonCalendar", commonCalendar);
+        table.put("GroupMgr", groupMgr);
+        table.put("SurveyMgr", surveyMgr);
+        table.put("GoogleDocs", googleDocs);
+        return table;
+    }
+
+    // che farsene di processEvents ?  ex addEvents
+    private void processEvents() {
+        EventDescription[] procEvents = getListener().getEvents();
+        EventDescription ev = null;
+        for (int i = 0; i < procEvents.length; i++) {
+            ev = procEvents[i];
+            if (ev.getProcessed().equalsIgnoreCase("byContext")) { // event processed by EventAnalyzer
+                eventList.add(ev);
+                if (count >= CYCLE) {
+                    EventUtilities.disambiguateEventList(eventList);
+                    count = 0;
+                }
+            } else if (ev.getProcessed().equalsIgnoreCase("byUserAgt")) {
+                EventUtilities.modifyEvent(ev, eventList);
+                EventUtilities.disambiguateEventList(eventList);
+            }
+        }
+
+    }
+
+    // ex refreshNotificationLists  DA MODIFICARE
+    public HashMap<String, ArrayList<EventDescription>> getProcessedEvents(String userName) {
+        EventDescription[] procEvents = null;
+        // DA FARE
+        EventUtilities.cleanEventList(eventList);//cleans the eventList from redundant events
+        for (int i = 0; i < userSpheres.size(); i++) {
+            String sphere = userSpheres.get(i);
+            ArrayList<EventDescription> notifList = notificationLists.get(sphere);
+            if (notifList != null) {
+                notifList.clear(); //resets the notification list
+            }
+        }
+        for (int i = 0; i < eventList.size(); i++) {
+            EventDescription ev = eventList.get(i);
+            ArrayList<String> lists = assignEventToNotificationLists(ev, currentTab);
+            for (int j = 0; j < lists.size(); j++) { // add event to all relevant notification lists
+                String listName = lists.get(j);
+                ArrayList<EventDescription> notifList = notificationLists.get(listName);
+                if (notifList != null) {
+                    notifList.add(ev);
+                } else {
+                    System.out.println("NotificationMgr " +
+                            ": unexpected event - sphere: " + listName + "; EV: " + ev);
+                    notifList = notificationLists.get("unknown");
+                    notifList.add(ev);
+                }
+            }
+        }
+        return notificationLists;
+    }
+
+    // returns the notification list(s) where the event should be displayed:
+    // either one specific list, or all the spheres, or all the relevantSpheres,
+    // depending on the spheres/relevantSpheres fields, and on the current tab
+    private ArrayList<String> assignEventToNotificationLists(EventDescription ev, String tab) {
+        ArrayList<String> lists = new ArrayList();
+        ArrayList<String> spheres = ev.getSpheres();
+        ArrayList<String> relevantSpheres = ev.getRelevantSpheres();
+        if (spheres.size() >= 1) // non ambiguous event --> notify in all specified lists
+        {
+            for (int i = 0; i < spheres.size(); i++) {
+                lists.add(spheres.get(i)); // all event spheres
+            }
+        }
+        if (spheres.size() == 0 && relevantSpheres.size() > 0) { // ambiguous event but
+            if (relevantSpheres.contains(tab)) // there are estimated relevant spheres
+            {
+                lists.add(tab);     // put in relevantSphere corresponding to current tab
+            } else {
+                for (int i = 0; i < relevantSpheres.size(); i++) {
+                    lists.add(relevantSpheres.get(i)); // all relevant spheres
+                }
+            }
+        }
+        if (lists.size() == 0) // the event has not been assigned to any notification list
+        {
+            lists.add("unknown"); // catch all
+        }
+        return lists;
+    }
+    // end lili
 }

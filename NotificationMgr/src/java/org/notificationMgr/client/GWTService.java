@@ -10,6 +10,8 @@ package org.notificationMgr.client;
 
 import appsusersevents.client.EventDescription;
 import com.google.gwt.user.client.rpc.RemoteService;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  *
@@ -29,7 +31,8 @@ public interface GWTService extends RemoteService {
     public void putEvents(EventDescription[] events, String userName);
 
     public boolean validateUser(String name, String pwd);
-     public String authenticate(String s);
 
-    
+    public String authenticate(String s);
+
+    public HashMap<String, ArrayList<EventDescription>> getProcessedEvents(String userName);
 }
