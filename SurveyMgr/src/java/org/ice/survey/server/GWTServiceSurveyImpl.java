@@ -208,7 +208,8 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
                 //  events[0].setUser(events[0].getDestinatario());
                 events[0].setUser(user);
                 // System.out.println("SURVEYMGR: SendEveTOGIga: user (dopo)  = " + events[0].getUser());                
-                events[0].setDestinatario(userTmp); // TO DELETE
+             //   events[0].setDestinatario(userTmp); // TO DELETE
+                events[0].removeDestinatario(me);
                 events[0].addDestinatario(userTmp);  // NUOVO x lista dest 12-10-09
                 //    System.out.println("SURVEYMGR: SendEveTOGIga: application = " + events[0].getApplication());
                 //   events[0].getParameters().add(0, answer);  // DA CANCELLRE con sotto
@@ -277,7 +278,8 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
         System.out.println("evName = " + evName + "  dest = " + dest + " app = " + app);
         EventDescription evDescr = new EventDescription(evName);
         evDescr.setEventName(evName);
-        evDescr.setDestinatario(dest);
+      //  evDescr.setDestinatario(dest);
+        evDescr.addDestinatario(dest);
         evDescr.setApplication(app);
         f.setDesc(evDescr);
         getListener().addFilter(f);
