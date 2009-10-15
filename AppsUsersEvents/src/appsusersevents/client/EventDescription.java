@@ -21,7 +21,7 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
     private String eventName = any;     // X es. MeetingProposal
     private String userGroup = any;     //   finora x marino significava alias di un insieme di contatti, potrebbe la sfera
     private String user = any;         // utente che ha generato l'evento
-    private String destinatario = any;   // utente  a cui e' destinato l'evento che potrebbe essere un gruppo o un singolo utente
+   // private String destinatario = any;   // utente  a cui e' destinato l'evento che potrebbe essere un gruppo o un singolo utente
     private ArrayList<String> destinatari = new ArrayList(); // lista dei destinatari di un evento
     private String dataId = any;  //NON utilizzato fino a 6-2009
     private String sender = any;     // NON utilizzato fino a 6-2009
@@ -59,7 +59,7 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
     }
 
     public EventDescription() {
-        application = any;
+         application = any;
         activity = any;
         eventName = any;
         userGroup = any;
@@ -70,7 +70,6 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
         sender = any;
         receiver = any;
         time = any;
-        destinatario = any;
         filRouge = any;
         explicitEvent = "true";
         processed = "no";
@@ -78,7 +77,7 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
         spheres = new ArrayList();
         relevantSpheres = new ArrayList();
         tab = "unknown";
-        parameters = new ArrayList();
+        parameters = new ArrayList(); 
         eventId = "" + EventNumber;
         EventNumber++;
     }
@@ -96,7 +95,7 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
         sender = any;
         receiver = any;
         time = any;
-        destinatario = any;
+  //      destinatario = any;
         filRouge = any;
         explicitEvent = "true";
         processed = "no";
@@ -166,8 +165,8 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
                 fieldMatch(receiver, template.receiver) &&
                 fieldMatch(time, template.time) &&
                 fieldMatch(correlationId, template.correlationId) &&
-                fieldMatch(sessionId, template.sessionId) &&
-                fieldMatch(destinatario, template.destinatario);
+                fieldMatch(sessionId, template.sessionId) ;
+       //         fieldMatch(destinatario, template.destinatario);
     }
 
     public boolean compatibleWith(EventDescription template) {
@@ -258,7 +257,7 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
                 getEventName() + "." +
                 getUserGroup() + "." +
                 getUser() + "." +
-                getDestinatario() + "." +
+             //   getDestinatario() + "." +
                 getEventId() + "." +
                 getDataId() + "." +
                 getSender() + "." +
@@ -449,16 +448,16 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
         this.sessionId = sessionId;
     }
 
-    public String getDestinatario() {
-        return destinatario;
-    }
-
-    /**
-     * @param correlationId the correlationId to set
-     */
-    public void setDestinatario(String destinatario) {
-        this.destinatario = destinatario;
-    }
+//    public String getDestinatario() {
+//        return destinatario;
+//    }
+//
+//    /**
+//     * @param correlationId the correlationId to set
+//     */
+//    public void setDestinatario(String destinatario) {
+//        this.destinatario = destinatario;
+//    }
 
     /**
      * @return the correlationId
