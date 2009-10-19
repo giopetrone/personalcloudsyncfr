@@ -86,11 +86,11 @@ public class MeetingSession extends VerticalPanel {
         // template contains this user!!!
 
         CommonCalendar.debug("in meetingsession.addrisposta:");
-        CommonCalendar.debug("\t" + evt.getDestinatario() + " " + template.getUser());
+        //   CommonCalendar.debug("\t" + evt.getDestinatario() + " " + template.getUser());
         CommonCalendar.debug("\t" + evt.getSessionId() + " " + sessionId);
         // if the destination is this user AND the answer
         // relates to this meeting proposal, check if answe == yes
-        if (evt.getDestinatario().equals(template.getUser()) &&
+        if (evt.getDestinatari().contains(template.getUser()) &&
                 evt.getSessionId().equals(sessionId)) {
             ArrayList params = evt.getParameters();
             if (!params.isEmpty()) {
@@ -132,18 +132,20 @@ public class MeetingSession extends VerticalPanel {
         // and the destinatari arraylist
         // contains the string of all the users and groups
         // to wich the proposal is sent
-     //   publishedEvents = new EventDescription[receivers.length];
+        //   publishedEvents = new EventDescription[receivers.length];
         publishedEvents = new EventDescription[1]; // NUOVO, MAR
-     //   for (int k = 0; k < receivers.length; k++) {
+        //   for (int k = 0; k < receivers.length; k++) {
         for (int k = 0; k < 1; k++) { // NUOVO, MAR
             SingleUser tr = receivers[k];
             EventDescription des = new EventDescription("*");
             publishedEvents[k] = des;
-            des.setDestinatario(tr.getMailAddress());
+            // des.setDestinatario(tr.getMailAddress()); GIO
+
             des.setEventName("MeetingProposal");
             des.setUser(template.getUser());
             des.setApplication(template.getApplication());
             des.setDestinatari(template.getDestinatari());// NUOVO, MAR
+            des.addDestinatario(tr.getMailAddress()); //??? GIO
             des.setSessionId(sessionId);
             //    des.setCorrelationId("*");
             des.setParameters(template.getParameters());
@@ -306,7 +308,7 @@ public class MeetingSession extends VerticalPanel {
 
         template.setParameter("Date", messageParam);
         originator.sendEvents(getProposal());
-         MessageBox.alert("Proposed meeting date",  "", null);
+        MessageBox.alert("Proposed meeting date", "", null);
     }
 
     public void setConfirmedColor(EventDescription eve) {
@@ -368,7 +370,7 @@ public class MeetingSession extends VerticalPanel {
         for (int i = 0; i < numberOfDates; i++) {
             buttonsArray[i] = new Radio();
             buttonsArray[i].setFieldLabel((new Integer(i)).toString());
-          //       buttonsArray[i].setFieldLabel("opzione " + (i + 1));
+            //       buttonsArray[i].setFieldLabel("opzione " + (i + 1));
             buttonsArray[i].setName((new Integer(i)).toString());
             buttonsArray[i].setBoxLabel(espressione.getItemText(i));
             buttonsArray[i].setValue(false);
@@ -401,9 +403,9 @@ public class MeetingSession extends VerticalPanel {
             public void componentSelected(ButtonEvent ce) {
                 // Make remote call. Control flow will continue immediately and later
                 // 'callback' will be invoked when the RPC completes.
-               String risp = "";
+                String risp = "";
 
-              risp = ((Radio)radioG.getValue()).getFieldLabel();
+                risp = ((Radio) radioG.getValue()).getFieldLabel();
 
                 //per mandare evento a giga
                 int appIndex = (new Integer(risp)).intValue();
