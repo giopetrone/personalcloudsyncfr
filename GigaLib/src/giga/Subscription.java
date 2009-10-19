@@ -19,10 +19,11 @@ public class Subscription extends Filter {
       // modificata da ANNA+GIO
     public boolean checkEvent(EventDescription des) {
 
-        System.out.println("siamo in SUBSCRIPTION: desc  eventName (evento sottoscritto)  = " + desc.getEventName() + "  Destinatario = " + desc.getDestinatario() );
-        System.out.println("siamo in SUBSCRIPTION: des  eventName (evento corrente)  = " + des.getEventName()+ "  Destinatario = " + des.getDestinatario());
+    //    System.out.println("siamo in SUBSCRIPTION: desc  eventName (evento sottoscritto)  = " + desc.getEventName() + "  Destinatario = " + desc.getDestinatario() );
+    //    System.out.println("siamo in SUBSCRIPTION: des  eventName (evento corrente)  = " + des.getEventName()+ "  Destinatario = " + des.getDestinatario());
       //   if ((des.getEventName().equals(desc.getEventName())) && (des.getApplication().equals(desc.getApplication())) && (des.getDestinatario().equals(desc.getDestinatario()))) {
-        if ((des.getEventName().equals(desc.getEventName())) && (des.getApplication().equals(desc.getApplication())) && (des.getDestinatari().contains(desc.getDestinatario()))) {
+        String de = (desc.getDestinatari()).get(0);
+        if ((des.getEventName().equals(desc.getEventName())) && (des.getApplication().equals(desc.getApplication())) && (des.getDestinatari().contains(de))) {
             return true;
         }
         /*
