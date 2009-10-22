@@ -23,7 +23,7 @@ public class Subscription extends Filter {
     //    System.out.println("siamo in SUBSCRIPTION: des  eventName (evento corrente)  = " + des.getEventName()+ "  Destinatario = " + des.getDestinatario());
       //   if ((des.getEventName().equals(desc.getEventName())) && (des.getApplication().equals(desc.getApplication())) && (des.getDestinatario().equals(desc.getDestinatario()))) {
         String de = (desc.getDestinatari()).get(0);
-        if ((des.getEventName().equals(desc.getEventName())) && (des.getApplication().equals(desc.getApplication())) && (des.getDestinatari().contains(de))) {
+       if ((des.getEventName().equals(desc.getEventName())) && (des.getApplication().equals(desc.getApplication())) && (des.getDestinatari().contains(de))) {
             return true;
         }
         /*
