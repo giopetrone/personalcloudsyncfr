@@ -61,6 +61,7 @@ public class EventUtilities {
         groupMgr.put("MembershipProposal", groupName);
         groupMgr.put("GroupCreated", groupName);
         groupMgr.put("GroupDeleted", groupName);
+         groupMgr.put("GroupModified", groupName);
                                             // SurveyMgr
         HashMap<String, ArrayList<String>> surveyMgr = new HashMap();
         ArrayList<String>noParameters = new ArrayList();
