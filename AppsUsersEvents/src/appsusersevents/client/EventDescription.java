@@ -645,7 +645,7 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
                 "; usr: " + user +
                 "; dest: " + destinatari.toString() +
                 "; processed: " + processed +
-                //"; spheres: " + spheres.toString() +
+                 "; spheres: " + spheres.toString() +
                 "; relevant spheres: " + relevantSpheres.toString() +
                 //" est.sph: " + estimatedSphere +
                 //"; tab: " + tab +
