@@ -77,7 +77,7 @@ public class GigaListener implements RemoteEventListener {
 
     public EventRegistration addEvent(EventDescription desc) {
         Filter f = new Filter();
-        f.setDesc(desc);
+        f.addDesc(desc);
         return addFilter(f);
     }
 

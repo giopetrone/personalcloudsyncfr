@@ -10,6 +10,7 @@ import net.jini.core.entry.UnusableEntryException;
 import com.j_spaces.core.IJSpace;
 import com.j_spaces.core.client.EntryArrivedRemoteEvent;
 import com.j_spaces.core.client.INotifyDelegatorFilter;
+import java.util.ArrayList;
 
 /**
  *
@@ -18,7 +19,7 @@ import com.j_spaces.core.client.INotifyDelegatorFilter;
 public class Filter implements INotifyDelegatorFilter {
 
     private String user;
-    protected EventDescription desc;
+    protected ArrayList <EventDescription> descList;
 
     public void init(IJSpace space, Object entry) {
         System.out.println(" ->> Init called - Registration Template:" + entry);
@@ -55,7 +56,11 @@ public class Filter implements INotifyDelegatorFilter {
     public boolean checkEvent(EventDescription evt) {
 
          System.out.println("sono in filter.checkEvent");
-         return evt.compatibleWith(desc);
+         for (EventDescription curr: descList) {
+             if (evt.compatibleWith(curr))
+                 return true;
+         }
+         return false;
     //   return desc.match(evt) == 0;
     // return true;
     }
@@ -77,15 +82,15 @@ public class Filter implements INotifyDelegatorFilter {
     /**
      * @return the desc
      */
-    public EventDescription getDesc() {
-        return desc;
+    public ArrayList <EventDescription> getDescList() {
+        return descList;
     }
 
     /**
      * @param desc the desc to set
      */
-    public void setDesc(EventDescription desc) {
-        this.desc = desc;
+    public void addDesc(EventDescription desc) {
+        this.descList.add(desc);
     }
 }
 
