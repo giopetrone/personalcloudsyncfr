@@ -117,7 +117,7 @@ public class GroupManagerSAV {
         evDescr.setEventName(evName);
       //  evDescr.setDestinatario(dest);
         evDescr.setApplication(app);
-        f.setDesc(evDescr);
+       // f.setDesc(evDescr);
         getListener().addFilter(f);
         return "inviato evento a cui ci si sottoscrivere a GIGA " + evName;
     }

@@ -21,7 +21,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 
 import giga.GigaListener;
-import giga.Subscription;
+//import giga.Subscription;
 import googlecontacts.ContactCall;
 import googlecontacts.ContactsExampleParameters;
 import java.util.ArrayList;
@@ -171,15 +171,21 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
 
     private String subscribeTo(String evName, String dest, String app) {
         // invia a Giga il nome dell'evento a cui l'utente si vuole sottoscrivere
-        Subscription f = new Subscription();
-        System.out.println(" ho fatto la new di Subscription in GROUPMGR  grande evName = " + evName + "  dest = " + dest + " app = " + app);
-        EventDescription evDescr = new EventDescription(evName);
-        evDescr.setEventName(evName);
-   //     evDescr.setDestinatario(dest);
-        evDescr.addDestinatario(dest);
-        evDescr.setApplication(app);
-        f.setDesc(evDescr);
-        getListener().addFilter(f);
+         EventDescription template = new EventDescription("*");
+        template.setEventName(evName);
+        template.setApplication(app);
+        template.addDestinatario(dest);
+        getListener().addEvent(template);
+
+//        Subscription f = new Subscription();
+//        System.out.println(" ho fatto la new di Subscription in GROUPMGR  grande evName = " + evName + "  dest = " + dest + " app = " + app);
+//        EventDescription evDescr = new EventDescription(evName);
+//        evDescr.setEventName(evName);
+//   //     evDescr.setDestinatario(dest);
+//        evDescr.addDestinatario(dest);
+//        evDescr.setApplication(app);
+//        f.setDesc(evDescr);
+//        getListener().addFilter(f);
         return "inviato evento a cui ci si sottoscrivere a GIGA " + evName;
     }
 
