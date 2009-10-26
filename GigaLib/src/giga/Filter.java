@@ -19,7 +19,7 @@ import java.util.ArrayList;
 public class Filter implements INotifyDelegatorFilter {
 
     private String user;
-    protected ArrayList <EventDescription> descList;
+    protected ArrayList <EventDescription> descList = new ArrayList();
 
     public void init(IJSpace space, Object entry) {
         System.out.println(" ->> Init called - Registration Template:" + entry);
