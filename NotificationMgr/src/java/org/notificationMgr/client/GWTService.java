@@ -34,5 +34,6 @@ public interface GWTService extends RemoteService {
 
     public String authenticate(String s);
 
-    public HashMap<String, ArrayList<EventDescription>> getProcessedEvents(String userName);
+   // public HashMap<String, ArrayList<EventDescription>> processEvents(String userName);
+    public HashMap<String, ArrayList<EventDescription>> addEvents(String userName);
 }

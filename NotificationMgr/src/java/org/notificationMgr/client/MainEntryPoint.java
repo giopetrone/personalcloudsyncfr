@@ -40,6 +40,9 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  *
@@ -60,6 +63,11 @@ public class MainEntryPoint implements EntryPoint {
     private boolean alreadyLoggedIn = false;
     private ContentPanel cp;
     private Html html;
+    // lili
+    private boolean filterNotification = true;  // variabile per switch on/off la filter notif
+// notification lists for each sphere the user is involved in
+    // presTable: specification of the parameters for presentation on browser/minibrowser
+    private HashMap<String, HashMap<String, ArrayList<String>>> presentationTable = new HashMap();
 
     /** Creates a new instance of MainEntryPoint */
     public MainEntryPoint() {
@@ -71,6 +79,7 @@ public class MainEntryPoint implements EntryPoint {
      */
     public void onModuleLoad() {
 
+        presentationTable = setPresentationTable();
         RootPanel.get().add(notif());
 //per prendere eventi
         Timer msgTimer = new Timer() {
@@ -88,7 +97,7 @@ public class MainEntryPoint implements EntryPoint {
         formPanel.setFrame(true);
         formPanel.setHeading("NotificationMgr");
         formPanel.setBorders(false);
-        formPanel.setPadding(5); 
+        formPanel.setPadding(5);
         formPanel.setWidth(280);
         formPanel.setLabelWidth(105);
         userName = new TextField<String>();
@@ -231,6 +240,7 @@ public class MainEntryPoint implements EntryPoint {
         //    final String quest = msg;
         final String evId = eventId;
         int row = msgTable.getRowCount();
+
         // msgTable.setWidth("550px");
         (msgTable.getFlexCellFormatter()).setWidth(row, 0, "120");
         //    msgTable.setText(row, 0, msg);
@@ -312,7 +322,7 @@ public class MainEntryPoint implements EntryPoint {
                 }
 
                 if ((eve[i].getEventName().equals("DocCreated")) || (eve[i].getEventName().equals("DocUpdated")) || (eve[i].getEventName().equals("DocRemoved"))) {
-                    String linkDoc = "<a href='" + eve[i].getParameter("docLink") + "' target='_blank'>"+eve[i].getParameter("docName")+"</a>";
+                    String linkDoc = "<a href='" + eve[i].getParameter("docLink") + "' target='_blank'>" + eve[i].getParameter("docName") + "</a>";
                     //  addMsgRow(eve[i].getEventName() + " doc:  " + eve[i].getParameter("docName") + "  " + eve[i].getParameter("date") + "<br />Please connect to: " + linkDoc, eve[i].getEventId());
                     addMsgRow(eve[i].getEventName() + ":  " + linkDoc + "<br />" + eve[i].getParameter("date") + "<br />", eve[i].getEventId());
                 }
@@ -322,11 +332,58 @@ public class MainEntryPoint implements EntryPoint {
 
     }
 
+    private void showNotif(Object qwr) {
+
+        HashMap<String, ArrayList<EventDescription>> notificationLists = (HashMap<String, ArrayList<EventDescription>>) qwr;
+
+        Set<String> apps = notificationLists.keySet();
+        Iterator<String> iter = apps.iterator();
+        msgTable.clear();
+        while (iter.hasNext()) {
+            String app = iter.next();
+            ArrayList<EventDescription> eve = notificationLists.get(app);
+            addMsgRow(" " + app + ": <br />", "");  // evId e' vuoto, ok ma occorre eliminare il bottone di delete => no sendEvToGiga
+            for (int i = 0; i < eve.size(); i++) {
+                if (eve.get(i) == null) {
+                    return;
+                }
+                String linkSurvey = "<a href='http://localhost:8080/SurveyMgr/' target='_blank'>SurveyMgr</a>";
+                if (eve.get(i).getDestinatari().contains(me)) {
+                    if ((eve.get(i).getEventName().equals("MeetingProposal"))) {
+                        addMsgRow(eve.get(i).getEventName() + "  " + eve.get(i).getParameter("Date") + "<br />", eve.get(i).getEventId());
+                    }
+                    if ((eve.get(i).getEventName().equals("MeetingConfirmation"))) {
+                        addMsgRow(eve.get(i).getEventName() + "  " + eve.get(i).getParameter("Date") + "<br />", eve.get(i).getEventId());
+                    }
+                    if ((eve.get(i).getEventName().equals("MembershipProposal"))) {
+                        // addMsgRow(eve[i].getEventName() + "  group: " + eve[i].getParameter("groupName") + "<br />Please connect to: " + linkSurvey + "<br />", eve[i].getEventId());
+                        addMsgRow(eve.get(i).getEventName() + "  group: " + eve.get(i).getParameter("groupName") + "<br />", eve.get(i).getEventId());
+                    }
+                    if ((eve.get(i).getEventName().equals("GroupCreated")) || (eve.get(i).getEventName().equals("GroupModified")) || (eve.get(i).getEventName().equals("GroupDeleted"))) {
+                        addMsgRow(eve.get(i).getEventName() + ": " + eve.get(i).getParameter("groupName") + "<br />", eve.get(i).getEventId());
+                    }
+//
+                    if ((eve.get(i).getEventName().equals("DocCreated")) || (eve.get(i).getEventName().equals("DocUpdated")) || (eve.get(i).getEventName().equals("DocRemoved"))) {
+                        String linkDoc = "<a href='" + eve.get(i).getParameter("docLink") + "' target='_blank'>" + eve.get(i).getParameter("docName") + "</a>";
+                        addMsgRow(eve.get(i).getEventName() + " doc:  " + eve.get(i).getParameter("docName") + "  " + eve.get(i).getParameter("date") + "<br />Please connect to: " + linkDoc, eve.get(i).getEventId());
+                        addMsgRow(eve.get(i).getEventName() + ":  " + linkDoc + "<br />" + eve.get(i).getParameter("date") + "<br />", eve.get(i).getEventId());
+                    }
+
+                }
+            }
+        }
+    }
+
     private void refreshMsgList() {
         final AsyncCallback callback4 = new AsyncCallback() {
 
             public void onSuccess(Object result) {
-                showEvents(result);
+                if (filterNotification) {
+                    showNotif(result);
+                } else {
+                    showEvents(result);
+                }
+
             }
 
             public void onFailure(Throwable caught) {
@@ -335,7 +392,13 @@ public class MainEntryPoint implements EntryPoint {
         };
 
         //   MessageBox.confirm("refreshMsgList ", "prima di getEvents , me = " + me, null);
-        getService().getEvents(me, callback4);
+
+        if (filterNotification) {
+            getService().addEvents(me, callback4);
+        } else {
+            getService().getEvents(me, callback4);
+        }
+
     }
 
     public static GWTServiceAsync getService() {
@@ -357,5 +420,46 @@ public class MainEntryPoint implements EntryPoint {
 
         endpoint.setServiceEntryPoint(moduleRelativeURL);
         return service;
+    }
+
+    //for each application, for each event type, it specifies the relevant parameters to be checked
+// forse va nel client
+    private static HashMap<String, HashMap<String, ArrayList<String>>> setPresentationTable() {
+        HashMap<String, HashMap<String, ArrayList<String>>> table = new HashMap();
+        HashMap<String, ArrayList<String>> commonCalendar = new HashMap();
+        ArrayList date = new ArrayList();
+        date.add("date");
+        commonCalendar.put("MeetingProposal", date);
+        commonCalendar.put("MeetingConfirmation", date);
+
+        HashMap<String, ArrayList<String>> groupMgr = new HashMap();
+        ArrayList<String> groupName = new ArrayList();
+        groupName.add("groupName");
+        groupMgr.put("MembershipProposal", groupName);
+        groupMgr.put("GroupCreated", groupName);
+        groupMgr.put("GroupDeleted", groupName);
+
+        HashMap<String, ArrayList<String>> surveyMgr = new HashMap();
+        ArrayList<String> noParameters = new ArrayList();
+        surveyMgr.put("MeetingAnswer", noParameters);
+        surveyMgr.put("MembershipAnswer", noParameters);
+
+        HashMap<String, ArrayList<String>> googleDocs = new HashMap();
+        ArrayList<String> docFields = new ArrayList();
+        docFields.add("docName");
+        docFields.add("docLink");
+        docFields.add("date");
+        googleDocs.put("DocCreated", docFields);
+        googleDocs.put("DocUpdated", docFields);
+        ArrayList<String> docFields0 = new ArrayList();
+        docFields0.add("docName");
+        docFields0.add("date");
+        googleDocs.put("DocRemoved", docFields0);
+
+        table.put("CommonCalendar", commonCalendar);
+        table.put("GroupMgr", groupMgr);
+        table.put("SurveyMgr", surveyMgr);
+        table.put("GoogleDocs", googleDocs);
+        return table;
     }
 }

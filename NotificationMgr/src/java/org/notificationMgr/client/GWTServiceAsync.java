@@ -32,5 +32,5 @@ public interface GWTServiceAsync {
 
     public void authenticate(String s, AsyncCallback callback);
 
-    public void getProcessedEvents(String userName, AsyncCallback callback);
+    public void addEvents(String userName, AsyncCallback callback);
 }

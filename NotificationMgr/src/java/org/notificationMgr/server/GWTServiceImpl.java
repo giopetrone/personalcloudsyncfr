@@ -47,16 +47,14 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
     String me = "";
     ArrayList<EventDescription> notifiche = new ArrayList();
     //lili
+    private boolean filterNotification = true;  // variabile per switch on/off la filter notif
     private String currentTab; // active user tab (in focus)
-    private ArrayList<EventDescription> eventList; //list of events to be delivered to the user
+    private ArrayList<EventDescription> eventList = new ArrayList(); //list of events to be delivered to the user
     int count; // counter used for disambiguating the eventList cyclically;
-    final int CYCLE = 5; // threashold for eventList maintenance
+    final int CYCLE = 50; // threashold for eventList maintenance
     //  spheres  of the individual user
     ArrayList<String> userSpheres = new ArrayList();
     private HashMap<String, ArrayList<EventDescription>> notificationLists = new HashMap();
-    // notification lists for each sphere the user is involved in
-    // presTable: specification of the parameters for presentation on browser/minibrowser
-    private HashMap<String, HashMap<String, ArrayList<String>>> presentationTable = new HashMap();
 
 // end lili
     @Override
@@ -64,15 +62,23 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
         System.out.println("SONO IN init ");
         logPasswdData.put("gio.petrone@gmail.com", "mer20ia05");
         logPasswdData.put("annamaria.goy@gmail.com", "tex_willer");
-        presentationTable = setPresentationTable();
+        //lili
+
         userSpheres.add("unknown");
         notificationLists.put("unknown", new ArrayList()); //add notification list for ambiguous notifications
-
+//TEMP qui al posto di questo recuperare i gruppi esistenti da gContacts
+        userSpheres.add("itapro");
+        notificationLists.put("itapro", new ArrayList());
+        userSpheres.add("provaGroup");
+        notificationLists.put("provaGroup", new ArrayList());
+//END TEMP
+        // end lili
         EventUtilities.setEventMatchTable();//sets the match table for identifying redundant events
         ArrayList aL = new ArrayList();
         aL.add("MeetingProposal");
         aL.add("MeetingConfirmation");
         eventSubscrData.put("CommonCalendar", aL);
+        
         ArrayList aL2 = new ArrayList();
         aL2.add("MeetingAnswer");
         eventSubscrData.put("SurveyMgr", aL2);
@@ -129,9 +135,6 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
     }
 
     public EventDescription[] getEvents(String userName) {
-        //TEMP !!!! x prova parametri servlet !!!!
-        System.out.println("******NotificationMgr dopo getParameter " + this.getParameter("p"));
-        // FINE TEMP
         EventDescription[] tmp = null;
         if (userName != null) {
             //           System.out.println("SONO IN getTEVENTS subsc MeetingP e username =  " + userName);
@@ -200,8 +203,9 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
                             //  chClient.sendGTalkMsg(destName, userName, logPasswdData.get(userName), msg, false);
                             // VALE PER TUTTE LE NOTIFICHE DA DIVERSE APPS ?
                             System.out.println("++++NOtification getEvents evName del IM  msg = " + msg);
-                            //System.out.println("++++NOtification getEvents destName del IM = " + destName);
-                            chClient.sendGTalkMsg(me, tmp[i].getUser(), logPasswdData.get(tmp[i].getUser()), msg, false);
+
+                            // per il momento per causa problemi di Smack, commento invio msg a gTalk
+                            // chClient.sendGTalkMsg(me, tmp[i].getUser(), logPasswdData.get(tmp[i].getUser()), msg, false);
                         } catch (Exception e) {
                             System.out.println("ECCEZIONE chat");
                         }
@@ -367,40 +371,81 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
 //        System.out.println("-------- fine stampa usersData in NOTIFICATION : ----");
 //    }
 // modificare con : evento (s) a cui ci si sottoscrive + sottoscrittore, per esempio "GigaMgrUI"
-    private String subscribeTo(String evName, String user) {
-        // invia a Giga il nome dell'evento a cui l'utente si vuole sottoscrivere
-        Subscription f = new Subscription();
-        System.out.println("ho fatto la new di Subscription piccola");
-        GigaListener listener = getListener();
-        if (listener != null) {
-            EventDescription evDescr = new EventDescription(evName);
-            evDescr.setEventName(evName);
-            // evDescr.setUser(user);
-            f.setDesc(evDescr);
-            listener.addFilter(f);
-        }
-
-        return "inviato evento a cui ci si sottoscrivere a GIGA " + evName;
-    }
-
-// vera
+//private String subscribeTo(String evName, String user) {
+//// invia a Giga il nome dell'evento a cui l'utente si vuole sottoscrivere
+//Subscription f = new Subscription();
+//System.out.println("ho fatto la new di Subscription piccola");
+//GigaListener listener = getListener();
+//if (listener != null) {
+//EventDescription evDescr = new EventDescription(evName);
+//evDescr.setEventName(evName);
+//// evDescr.setUser(user);
+//f.addDesc(evDescr);
+//listener.addFilter(f);
+//}
+//
+//return "inviato evento a cui ci si sottoscrivere a GIGA " + evName;
+//}
+// vera versione no filterNotif prima di 26-10-09
     private String subscribeTo(String evName, String dest, String app) {
         // invia a Giga il nome dell'evento a cui l'utente si vuole sottoscrivere
-        Subscription f = new Subscription();
-        System.out.println("ho fatto la new di Subscription grande");
-        System.out.println("evName = " + evName + "  dest = " + dest + " app = " + app);
-        EventDescription evDescr = new EventDescription(evName);
-        evDescr.setEventName(evName);
-        //      evDescr.setDestinatario(dest);
-        evDescr.addDestinatario(dest);
-        evDescr.setApplication(app);
-        f.setDesc(evDescr);
-        getListener().addFilter(f);
+        EventDescription template = new EventDescription("*");
+        template.setEventName(evName); // ? OR se sono dest oppure se appartengo ad un sfera
+        template.setApplication(app); // ?
+        template.addDestinatario(dest);
+        // LILI poi agiungere by UserAgt solo se processato da EventAnaliz
+        if (filterNotification) {
+            template.setProcessed("byContext"); // sottoscriversi anche a  userAgent
+        }
+        getListener().addEvent(template);
+        //END lili
+//        Subscription f = new Subscription();
+//        System.out.println("ho fatto la new di Subscription grande");
+//        System.out.println("evName = " + evName + "  dest = " + dest + " app = " + app);
+//        EventDescription evDescr = new EventDescription(evName);
+//        evDescr.setEventName(evName);
+//        evDescr.addDestinatario(dest);
+//        evDescr.setApplication(app);
+//        f.setDesc(evDescr);
+//        getListener().addFilter(f);
 
         return "inviato evento a cui ci si sottoscrivere a GIGA " + evName;
     }
-// DA SOSTITUIRE CON persistanza DB
 
+    //nuova 26-10-09
+    private String subscribeTo(String dest, String app) {
+        // invia a Giga il nome dell'evento a cui l'utente si vuole sottoscrivere
+        EventDescription template = new EventDescription("*");
+        template.setApplication(app);
+        template.addDestinatario(dest);
+        template.setProcessed("byContext");
+        getListener().addEvent(template);
+
+        EventDescription template2 = new EventDescription("*");
+        template2.setApplication(app);
+        template2.addDestinatario(dest);
+        template2.setProcessed("byUserAgt");
+        getListener().addEvent(template2);
+
+        //sfere ma in termini di groupsId
+        EventDescription template3 = new EventDescription("*");
+        template3.setApplication(app);
+        template3.setSpheres(userSpheres);
+        template3.setProcessed("byContext");
+        getListener().addEvent(template3);
+
+        EventDescription template4 = new EventDescription("*");
+        template4.setApplication(app);
+        template3.setSpheres(userSpheres);
+        template4.setProcessed("byUserAgt");
+        getListener().addEvent(template4);
+
+        //END lili
+//
+        return "inviato evento a cui ci si sottoscrivere a GIGA ";
+    }
+
+// DA SOSTITUIRE CON persistanza DB
     private boolean alreadySubscr(String userName) {
         boolean res = false;
         res =
@@ -431,70 +476,66 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
         return userEmail;
     }
     // lili methods
-    //for each application, for each event type, it specifies the relevant parameters to be checked
-// forse va nel client
 
-    private static HashMap<String, HashMap<String, ArrayList<String>>> setPresentationTable() {
-        HashMap<String, HashMap<String, ArrayList<String>>> table = new HashMap();
-        HashMap<String, ArrayList<String>> commonCalendar = new HashMap();
-        ArrayList date = new ArrayList();
-        date.add("date");
-        commonCalendar.put("MeetingProposal", date);
-        commonCalendar.put("MeetingConfirmation", date);
-
-        HashMap<String, ArrayList<String>> groupMgr = new HashMap();
-        ArrayList<String> groupName = new ArrayList();
-        groupName.add("groupName");
-        groupMgr.put("MembershipProposal", groupName);
-        groupMgr.put("GroupCreated", groupName);
-        groupMgr.put("GroupDeleted", groupName);
-
-        HashMap<String, ArrayList<String>> surveyMgr = new HashMap();
-        ArrayList<String> noParameters = new ArrayList();
-        surveyMgr.put("MeetingAnswer", noParameters);
-        surveyMgr.put("MembershipAnswer", noParameters);
-
-        HashMap<String, ArrayList<String>> googleDocs = new HashMap();
-        ArrayList<String> docFields = new ArrayList();
-        docFields.add("docName");
-        docFields.add("docLink");
-        docFields.add("date");
-        googleDocs.put("DocCreated", docFields);
-        googleDocs.put("DocUpdated", docFields);
-        ArrayList<String> docFields0 = new ArrayList();
-        docFields0.add("docName");
-        docFields0.add("date");
-        googleDocs.put("DocRemoved", docFields0);
-
-        table.put("CommonCalendar", commonCalendar);
-        table.put("GroupMgr", groupMgr);
-        table.put("SurveyMgr", surveyMgr);
-        table.put("GoogleDocs", googleDocs);
-        return table;
+    // che farsene di processEvents ?  ex addEvent
+    // adds a sequence of events to the userEventList and cyclically disambiguates the list by context
+    /*
+    public HashMap<String, ArrayList<EventDescription>> processEvents(String userName) {
+    if (userName != null) {
+    if (!alreadySubscr(userName)) {
+    Set<String> apps = eventSubscrData.keySet();
+    Iterator<String> iter = apps.iterator();
+    System.out.println("NOTIF SONO in processEvents  subscrA "    );
+    while (iter.hasNext()) {
+    String app = iter.next();
+    ArrayList<String> events = eventSubscrData.get(app);
+    for (String ev : events) {
+    System.out.println("NOTIF SONO in processEvents  subscrA " + ev  );
+    subscribeTo(ev, userName, app); // user arrivera' dal Gadget+iGooglepage
+    }
+    }
+    // stampe di debug per multiple session
+    //    HttpSession sess = this.getThreadLocalRequest().getSession();
+    //     System.out.println("SESSIONE id = : " + sess.getId());
+    addedFilterList.add(userName);
     }
 
-    // che farsene di processEvents ?  ex addEvents
-    private void processEvents() {
-        EventDescription[] procEvents = getListener().getEvents();
-        EventDescription ev = null;
-        for (int i = 0; i < procEvents.length; i++) {
-            ev = procEvents[i];
-            if (ev.getProcessed().equalsIgnoreCase("byContext")) { // event processed by EventAnalyzer
-                eventList.add(ev);
-                if (count >= CYCLE) {
-                    EventUtilities.disambiguateEventList(eventList);
-                    count = 0;
-                }
-            } else if (ev.getProcessed().equalsIgnoreCase("byUserAgt")) {
-                EventUtilities.modifyEvent(ev, eventList);
-                EventUtilities.disambiguateEventList(eventList);
-            }
-        }
+    EventDescription[] procEvents = getListener().getEvents();
+    if (procEvents == null) {
+    System.out.println("NOTIF in processEvents  procEvents  NULL");
+    } else if (procEvents.length == 0) {
+    System.out.println(" NOTIF in processEvents  procEvents size 0");
+    } else {
+
+    EventDescription ev = null;
+    System.out.println("NOTIF SONO in processEvents  da GIGA" + procEvents.length);
+    for (int i = 0; i < procEvents.length; i++) {
+    ev = procEvents[i];
+    if (ev.getProcessed().equalsIgnoreCase("byContext")) { // event processed by EventAnalyzer
+    eventList.add(ev);
+    if (count >= CYCLE) {
+    EventUtilities.disambiguateEventList(eventList);
+    count = 0;
+    }
+    } else if (ev.getProcessed().equalsIgnoreCase("byUserAgt")) {
+    EventUtilities.modifyEvent(ev, eventList);
+    EventUtilities.disambiguateEventList(eventList);
+    }
+    }
+    System.out.println("NOTIF SONO in processEvents eventList " + eventList.size());
+    }
+
+    }
+    }
+    // return refreshNotificationLists();
+    return notificationLists;
 
     }
 
-    // ex refreshNotificationLists  DA MODIFICARE
-    public HashMap<String, ArrayList<EventDescription>> getProcessedEvents(String userName) {
+     */
+    // prepares the notification lists for presenting the
+    // events stored in eventList
+    private HashMap<String, ArrayList<EventDescription>> refreshNotificationLists() {
         EventDescription[] procEvents = null;
         // DA FARE
         EventUtilities.cleanEventList(eventList);//cleans the eventList from redundant events
@@ -552,6 +593,58 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
             lists.add("unknown"); // catch all
         }
         return lists;
+    }
+
+    public HashMap<String, ArrayList<EventDescription>> addEvents(String userName) {
+        filterNotification = true;
+        EventDescription[] procEvents = null;
+        if (userName != null) {
+
+
+            if (!alreadySubscr(userName)) {
+                Set<String> apps = eventSubscrData.keySet();
+                Iterator<String> iter = apps.iterator();
+                while (iter.hasNext()) {
+                    String app = iter.next();
+                    ArrayList<String> events = eventSubscrData.get(app);
+                    for (String ev : events) {
+                        subscribeTo(ev, userName, app); // user arrivera' dal Gadget+iGooglepage
+                    }
+                }
+                // stampe di debug per multiple session
+                //    HttpSession sess = this.getThreadLocalRequest().getSession();
+                //     System.out.println("SESSIONE id = : " + sess.getId());
+                addedFilterList.add(userName);
+            }
+            procEvents = getListener().getEvents();
+            System.out.println("SONO IN addEVENTS procEvents size  =  " + procEvents.length);
+            if (procEvents == null) {
+                System.out.println("NOTIF addEVENTS tmp NULL");
+            } else if (procEvents.length == 0) {
+                System.out.println(" NOTIF addEVENTS tmp size 0");
+            } else {
+                // TEMP indice 0 : assumiamo che tutti gli eventi che arrivano con getEvents(), abbiano lo stesso destinataio (plausibile per come sono costruiti i filtri)
+                //    String dest = tmp[0].getDestinatario();
+                //  ArrayList aL = usersData.get(dest);  // eventi da mostrare all'utente
+                EventDescription ev = null;
+                for (int i = 0; i < procEvents.length; i++) {
+                    ev = procEvents[i];
+                    //  if (ev.getProcessed().equalsIgnoreCase("byContext")) { // event processed by EventAnalyzer
+                    eventList.add(ev);
+                    if (count >= CYCLE) {
+                        EventUtilities.disambiguateEventList(eventList);
+                        count = 0;
+                    }
+//                    } else if (ev.getProcessed().equalsIgnoreCase("byUserAgt")) {
+//                        EventUtilities.modifyEvent(ev, eventList);
+//                        EventUtilities.disambiguateEventList(eventList);
+//                    }
+                }
+            }
+        }
+
+        return refreshNotificationLists();
+
     }
     // end lili
 }
