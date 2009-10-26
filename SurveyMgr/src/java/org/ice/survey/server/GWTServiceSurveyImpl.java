@@ -14,7 +14,7 @@ import appsusersevents.client.EventDescription;
 import appsusersevents.client.SingleUser;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import giga.GigaListener;
-import giga.Subscription;
+//import giga.Subscription;
 import googlecontacts.ContactCall;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,11 +35,10 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
     HashMap<String, ArrayList<String>> eventSubscrData = new HashMap();  // chiave = applicazione e value = lista di eventi a cui sottoscriversi
     CloudUsers cloudUsers = new CloudUsers();
     //vecchia versione
-   // HashMap<String, ArrayList<EventDescription>> usersData = new HashMap();  // chiave = destinatario e value = lista di eventi (domande) che i filtri fanno passare (per quello user)
+    // HashMap<String, ArrayList<EventDescription>> usersData = new HashMap();  // chiave = destinatario e value = lista di eventi (domande) che i filtri fanno passare (per quello user)
 // nuova versione
     String me = "";
     ArrayList<EventDescription> domande = new ArrayList();
-
 
     @Override
     public void init() {
@@ -110,13 +109,13 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
             } else {
                 System.out.println("!!!!!!!!!!!!!!!!!!!!!!SURVEY  getEvents tmp SIZE e = " + tmp.length);
                 // TEMP indice 0 : assumiamo che tutti gli eventi che arrivano con getEvents(), abbiano lo stesso destinataio (plausibile per come sono costruiti i filtri)
-            //    String dest = tmp[0].getDestinatario();
+                //    String dest = tmp[0].getDestinatario();
                 for (int i = 0; i < tmp.length; i++) {
                     System.out.println("!!!!!!!!!!!!!!!!!!!!!!SURVEY  getEvents tmp eventName = " + tmp[i].getEventName());
-                    System.out.println("!!!!!!!!!!!!!!!!!!!!!! SURVEY getEvents tmp user = " + tmp[i].getUser());               
+                    System.out.println("!!!!!!!!!!!!!!!!!!!!!! SURVEY getEvents tmp user = " + tmp[i].getUser());
                     System.out.println("!!!!!!!!!!!!!!!!!!!!!! SURVEY getEvents tmp eventId = " + tmp[i].getEventId());
-                   // (usersData.get(dest)).add(tmp[i]);    // si aggiunge un evento, ovvero in questo caso si assume una domanda alla lista delle domande per dest
-                  domande.add(tmp[i]);
+                    // (usersData.get(dest)).add(tmp[i]);    // si aggiunge un evento, ovvero in questo caso si assume una domanda alla lista delle domande per dest
+                    domande.add(tmp[i]);
                 }
                 //printUsersData();
             }
@@ -172,7 +171,7 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
     public String sendEventToGiga(String questionId, String answer, String user) {
         GigaListener listener = getListener();
         //   System.out.println("SURVEYMGR sendEventToGiga INIZIO @@@@@@@@@@@@  ");
-     //   ArrayList<EventDescription> questions = usersData.get(user);  //il parametro user e' lo user corrente (il "me" della UI)
+        //   ArrayList<EventDescription> questions = usersData.get(user);  //il parametro user e' lo user corrente (il "me" della UI)
         //   System.out.println("SURVEYMGR sendEventToGiga questions size =  @@@@@@@@@@@@  " + questions.size());
         if (listener != null) {
             boolean found = false;
@@ -208,7 +207,7 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
                 //  events[0].setUser(events[0].getDestinatario());
                 events[0].setUser(user);
                 // System.out.println("SURVEYMGR: SendEveTOGIga: user (dopo)  = " + events[0].getUser());                
-             //   events[0].setDestinatario(userTmp); // TO DELETE
+                //   events[0].setDestinatario(userTmp); // TO DELETE
                 events[0].removeDestinatario(me);
                 events[0].addDestinatario(userTmp);  // NUOVO x lista dest 12-10-09
                 //    System.out.println("SURVEYMGR: SendEveTOGIga: application = " + events[0].getApplication());
@@ -254,35 +253,42 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
 //        System.out.println("-------- fine stampa usersData : ----");
 //    }
 // modificare con : evento (s) a cui ci si sottoscrive + sottoscrittore, per esempio "GigaMgrUI"
-
-    private String subscribeTo(String evName, String user) {
-        // invia a Giga il nome dell'evento a cui l'utente si vuole sottoscrivere
-        Subscription f = new Subscription();
-        System.out.println("ho fatto la new di Subscription piccola");
-        GigaListener listener = getListener();
-        if (listener != null) {
-            EventDescription evDescr = new EventDescription(evName);
-            evDescr.setEventName(evName);
-            // evDescr.setUser(user);
-            f.setDesc(evDescr);
-            listener.addFilter(f);
-        }
-        return "inviato evento a cui ci si sottoscrivere a GIGA " + evName;
-    }
-
+//    private String subscribeTo(String evName, String user) {
+//        // invia a Giga il nome dell'evento a cui l'utente si vuole sottoscrivere
+//        Subscription f = new Subscription();
+//        System.out.println("ho fatto la new di Subscription piccola");
+//        GigaListener listener = getListener();
+//        if (listener != null) {
+//            EventDescription evDescr = new EventDescription(evName);
+//            evDescr.setEventName(evName);
+//            // evDescr.setUser(user);
+//            f.setDesc(evDescr);
+//            listener.addFilter(f);
+//        }
+//        return "inviato evento a cui ci si sottoscrivere a GIGA " + evName;
+//    }
 // vera
     private String subscribeTo(String evName, String dest, String app) {
         // invia a Giga il nome dell'evento a cui l'utente si vuole sottoscrivere
-        Subscription f = new Subscription();
-        System.out.println("ho fatto la new di Subscription di SURVEY grande");
-        System.out.println("evName = " + evName + "  dest = " + dest + " app = " + app);
-        EventDescription evDescr = new EventDescription(evName);
-        evDescr.setEventName(evName);
-      //  evDescr.setDestinatario(dest);
-        evDescr.addDestinatario(dest);
-        evDescr.setApplication(app);
-        f.setDesc(evDescr);
-        getListener().addFilter(f);
+        EventDescription template = new EventDescription("*");
+        template.setEventName(evName);
+        template.setApplication(app);
+        template.addDestinatario(dest);
+        getListener().addEvent(template);
+        //LILI
+        template.setProcessed("byContext");
+
+
+//        Subscription f = new Subscription();
+//        System.out.println("ho fatto la new di Subscription di SURVEY grande");
+//        System.out.println("evName = " + evName + "  dest = " + dest + " app = " + app);
+//        EventDescription evDescr = new EventDescription(evName);
+//        evDescr.setEventName(evName);
+//      //  evDescr.setDestinatario(dest);
+//        evDescr.addDestinatario(dest);
+//        evDescr.setApplication(app);
+//        f.setDesc(evDescr);
+//        getListener().addFilter(f);
         return "inviato evento a cui ci si sottoscrivere a GIGA " + evName;
     }
 // DA SOSTITUIRE CON persistanza DB
@@ -315,7 +321,7 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
         //src=   System.out.println("AUTHENTICATE " + s);
         if (sU != null) {
             userEmail = sU.getMailAddress();
-            me= userEmail;
+            me = userEmail;
         } else {
             System.out.println("singleUSer NULL");
         }
