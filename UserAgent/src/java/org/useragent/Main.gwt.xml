@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module>
+	<inherits name="com.google.gwt.user.User"/>
+
+
+    <!-- GWTExt -->
+    <inherits name='com.extjs.gxt.ui.GXT'/>
+    <!--
+ <inherits name='com.allen_sauer.gwt.dnd.gwt-dnd'/>  -->
+    <!-- Stylesheets di Google -->
+    <inherits name="com.google.gwt.user.theme.standard.Standard"/>
+      <!-- Stylesheet di GWTExt
+       <stylesheet src="css/ext-all.css" /> -->
+	<entry-point class="org.useragent.client.MainEntryPoint"/>
+	<!-- Do not define servlets here, use web.xml -->
+</module>
