@@ -121,6 +121,7 @@ public class MeetingSession extends VerticalPanel {
 
     public EventDescription[] getConfirmation() {
         for (int k = 0; k < publishedEvents.length; k++) {
+            MessageBox.alert("MEETING CONFIRMATION", "", null);
             publishedEvents[k].setEventName("MeetingConfirmation");
         }
         return publishedEvents;
@@ -144,7 +145,8 @@ public class MeetingSession extends VerticalPanel {
             des.setEventName("MeetingProposal");
             des.setUser(template.getUser());
             des.setApplication(template.getApplication());
-            des.setDestinatari(template.getDestinatari());// NUOVO, MAR
+            //commentato da gio
+         //   des.setDestinatari(template.getDestinatari());// NUOVO, MAR
             des.addDestinatario(tr.getMailAddress()); //??? GIO
             des.setSessionId(sessionId);
             //    des.setCorrelationId("*");

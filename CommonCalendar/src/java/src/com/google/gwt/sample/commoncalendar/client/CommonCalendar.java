@@ -600,8 +600,8 @@ public class CommonCalendar implements EntryPoint {
             template.setApplication(thisApplication);
             // set shperes (alias groups and usrs in the event
             // UserGroup.getUserMap(getDestinationUsers());
-            template.setInvolvedUsers(UserGroup.getSingleUsers(getDestinationUsers()));
-            template.setSpheres(UserGroup.getGroups(getDestinationUsers()));
+            template.setInvolvedUsers(UserGroup.getSingleUsers(getDestinationUsers()));            
+           template.setSpheres(UserGroup.getGroups(getDestinationUsers()));
             //MeetingSession session = new MeetingSession(this, template, selectedUsers, start, end, "Meeting proposal");
             session = new MeetingSession(this, template, selectedUsers, start, end, "Meeting proposal");
             waitingSessions.add(session);

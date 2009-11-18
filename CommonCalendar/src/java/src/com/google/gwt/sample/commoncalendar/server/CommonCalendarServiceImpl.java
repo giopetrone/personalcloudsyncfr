@@ -185,7 +185,8 @@ public class CommonCalendarServiceImpl extends RemoteServiceServlet implements
 
     private void setFilters(GigaListener listener) {
         EventDescription desc = new EventDescription("*");
-        desc.setApplication("SurveyMgr");
+        // Commentato da GIO
+       // desc.setApplication("SurveyMgr");
         desc.setEventName("MeetingAnswer");
         listener.addEvent(desc);
     }

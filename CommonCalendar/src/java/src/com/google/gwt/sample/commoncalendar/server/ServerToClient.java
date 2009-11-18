@@ -244,7 +244,7 @@ public class ServerToClient {
         //     System.out.println("modifico calendario google: "+ absTime);
         for (int i = 0; i < calendars.length; i++) {
             CalendarOwner co = calendars[i];
-            //       System.out.println("modifico calendario google: " + co.getEmail());
+                  System.out.println("modifico calendario google: " + co.getMailAddress());
             new CalendarCall(co.getMailAddress(), co.getPwd()).insertEvent(absTime);
         }
     }
