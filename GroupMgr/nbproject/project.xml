@@ -23,11 +23,11 @@
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library>
-                    <file>${reference.AppsUsersEvents.jar}</file>
+                    <file>${reference.GoogleContacts.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library>
-                    <file>${reference.GoogleContacts.jar}</file>
+                    <file>${reference.AppsUsersEvents.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library>

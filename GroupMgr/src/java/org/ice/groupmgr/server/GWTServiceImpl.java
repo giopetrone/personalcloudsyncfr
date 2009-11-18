@@ -116,7 +116,7 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
                 // stampe di debug per multiple session
                 //   HttpSession sess = this.getThreadLocalRequest().getSession();
                 //  System.out.println("SESSIONE id = : " + sess.getId());
-                addedFilterList.add(userName);
+                //addedFilterList.add(userName); GIO 18-11-09
             }
             tmp = getListener().getEvents();
             if (tmp == null) {
@@ -163,7 +163,7 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
                         subscribeTo(ev, userName, app); // user arrivera' dal Gadget+iGooglepage
                     }
                 }
-                addedFilterList.add(userName);
+              //  addedFilterList.add(userName); GIO 18-11-09
             }
         }
         getListener().putEvents(events);
@@ -173,10 +173,11 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
         // invia a Giga il nome dell'evento a cui l'utente si vuole sottoscrivere
          EventDescription template = new EventDescription("*");
         template.setEventName(evName);
-        template.setApplication(app);
+     //   template.setApplication(app);
         template.addDestinatario(dest);
+        addedFilterList.add(dest);
         getListener().addEvent(template);
-
+System.out.println(" ho fatto la new di Subscription in GROUPMGR  grande evName = " + evName + "  dest = " + dest + " app = " + app);
 //        Subscription f = new Subscription();
 //        System.out.println(" ho fatto la new di Subscription in GROUPMGR  grande evName = " + evName + "  dest = " + dest + " app = " + app);
 //        EventDescription evDescr = new EventDescription(evName);
@@ -255,6 +256,7 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
         return listaRis;
     }
 
+    // ATTENZIONE 4-11-09 invocare getEmailAddress  su cCall ed eliminare questo metodo
     private String getEmailAddress(ContactEntry c) {
         String email = "";
         for (Email e : c.getEmailAddresses()) {
@@ -377,7 +379,7 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
 //            sendEventToGiga(eventDesc, c.getMail());
 //        }
         // nuova versione
-        EventDescription eventDesc = new EventDescription();
+        EventDescription eventDesc = new EventDescription("*");
         eventDesc.setCorrelationId(eventDesc.getEventId());  // CHIEDERE a MARINO
         eventDesc.setApplication("GroupMgr");
         eventDesc.setParameter("groupName", nome);
@@ -414,7 +416,7 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
             ContactGroupEntry cGroupE = cCall.creaGruppo(nome, " ", additionalInfo);  //crea gruppo in Contacts
             //  fine crea gruppo
             groupId = cGroupE.getId();
-            EventDescription eventDesc = new EventDescription();
+            EventDescription eventDesc = new EventDescription("*");
             if (crea) {
                 eventDesc.setEventName("GroupCreated");
             } else {
@@ -444,6 +446,7 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
                 }//while
             } // for   
             sendEventToGiga(eventDesc);
+            System.out.println("***** GROUP conferma gruppo " + eventDesc.toString());
             esportaGruppo(nome, contatti, iceMgrLogin, iceMgrPasswd);  // per ICE mgr
             // ciclo su tutti i membri del gruppo (contatti) per aggiornare i loro gruppi (nei loro contatti Google)
             // valutare se questo modo automatico va sostituito con un pulsante nella UI, non si sfrutta il for precedente per futura invocazioen dalle singole UI
@@ -600,7 +603,7 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
             System.out.println("cCall NULL");
         } else {
             if (elimina) {
-                EventDescription eventDesc = new EventDescription();
+                EventDescription eventDesc = new EventDescription("*");
                 eventDesc.setEventName("GroupDeleted");
                 // serve settare correlationId ???
                 eventDesc.setApplication("GroupMgr");

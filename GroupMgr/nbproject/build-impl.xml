@@ -540,8 +540,8 @@ exists or setup the property manually. For example like this:
         <copyfiles files="${file.reference.gwt-servlet.jar}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.file.reference.gwt-servlet.jar" todir="${dist.ear.dir}"/>
         <copyfiles files="${libs.GWT1.7.0.classpath}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.libs.GWT1.7.0.classpath" todir="${dist.ear.dir}"/>
         <copyfiles files="${libs.GDATA.classpath}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.libs.GDATA.classpath" todir="${dist.ear.dir}"/>
-        <copyfiles files="${reference.AppsUsersEvents.jar}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.reference.AppsUsersEvents.jar" todir="${dist.ear.dir}"/>
         <copyfiles files="${reference.GoogleContacts.jar}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.reference.GoogleContacts.jar" todir="${dist.ear.dir}"/>
+        <copyfiles files="${reference.AppsUsersEvents.jar}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.reference.AppsUsersEvents.jar" todir="${dist.ear.dir}"/>
         <copyfiles files="${libs.GXT.classpath}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.libs.GXT.classpath" todir="${dist.ear.dir}"/>
         <copyfiles files="${reference.GigaLib.jar}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.reference.GigaLib.jar" todir="${dist.ear.dir}"/>
         <copyfiles files="${libs.GIGA.classpath}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.libs.GIGA.classpath" todir="${dist.ear.dir}"/>
@@ -551,7 +551,7 @@ exists or setup the property manually. For example like this:
         <copyfiles files="${file.reference.AppsUsersEvents-images}" todir="${build.web.dir}//"/>
         <mkdir dir="${build.web.dir}/META-INF"/>
         <manifest file="${build.web.dir}/META-INF/MANIFEST.MF" mode="update">
-            <attribute name="Class-Path" value="${manifest.file.reference.gwt-dev-linux.jar} ${manifest.file.reference.gwt-servlet.jar} ${manifest.libs.GWT1.7.0.classpath} ${manifest.libs.GDATA.classpath} ${manifest.reference.AppsUsersEvents.jar} ${manifest.reference.GoogleContacts.jar} ${manifest.libs.GXT.classpath} ${manifest.reference.GigaLib.jar} ${manifest.libs.GIGA.classpath} ${manifest.libs.XSTREAM.classpath} ${manifest.libs.GOOGLECOLLECT.classpath} "/>
+            <attribute name="Class-Path" value="${manifest.file.reference.gwt-dev-linux.jar} ${manifest.file.reference.gwt-servlet.jar} ${manifest.libs.GWT1.7.0.classpath} ${manifest.libs.GDATA.classpath} ${manifest.reference.GoogleContacts.jar} ${manifest.reference.AppsUsersEvents.jar} ${manifest.libs.GXT.classpath} ${manifest.reference.GigaLib.jar} ${manifest.libs.GIGA.classpath} ${manifest.libs.XSTREAM.classpath} ${manifest.libs.GOOGLECOLLECT.classpath} "/>
         </manifest>
     </target>
     <target depends="init" name="library-inclusion-in-archive" unless="dist.ear.dir">
@@ -559,8 +559,8 @@ exists or setup the property manually. For example like this:
         <copyfiles files="${file.reference.gwt-servlet.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${libs.GWT1.7.0.classpath}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${libs.GDATA.classpath}" todir="${build.web.dir}/WEB-INF/lib"/>
-        <copyfiles files="${reference.AppsUsersEvents.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${reference.GoogleContacts.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copyfiles files="${reference.AppsUsersEvents.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${libs.GXT.classpath}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${reference.GigaLib.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${libs.GIGA.classpath}" todir="${build.web.dir}/WEB-INF/lib"/>
