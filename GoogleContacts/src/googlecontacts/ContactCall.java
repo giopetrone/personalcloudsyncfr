@@ -38,6 +38,7 @@ import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.ConsoleHandler;
@@ -61,7 +62,6 @@ public class ContactCall {
     private static final String REL = "rel:";
     private static final String EXT_PROPERTY_FILE = "file:";
     private static final String EXT_PROPERTY_TEXT = "text:";
-
     //---------------------------------- GIO
     String googleContactFeed = "http://www.google.com/m8/feeds/contacts/";
     String googleGroupFeed = "http://www.google.com/m8/feeds/groups/";
@@ -438,12 +438,12 @@ public class ContactCall {
             if (contact.hasExtendedProperties()) {
                 extendedProperties.addAll(contact.getExtendedProperties());
             }
-        //           System.out.println("in UPDATE stampa canonicalContact : ");
+            //           System.out.println("in UPDATE stampa canonicalContact : ");
 //printContact(canonicalContact);
-        //     System.out.println("in UPDATE stampa contact : ");
+            //     System.out.println("in UPDATE stampa contact : ");
 //printContact(contact);
-        //     canonicalContact.update();
-        //    printContact(canonicalContact.update());
+            //     canonicalContact.update();
+            //    printContact(canonicalContact.update());
         }
     }
 //prova anna gio
@@ -1180,6 +1180,33 @@ public class ContactCall {
         }
 
         return trovato;
+    }
+
+    public ArrayList<String> getGroupMembers(String userLogin, String userPwd, String groupId) {
+        ArrayList<String> members = new ArrayList();
+        List<ContactEntry> allContatti = getUserContacts();   //tutti i contatti dell'ICE
+        Iterator<ContactEntry> it = allContatti.iterator();
+        while (it.hasNext()) {
+            ContactEntry cE = it.next();
+            String mail = getEmailAddress(cE);
+            for (GroupMembershipInfo gmi : cE.getGroupMembershipInfos()) {
+                if ((gmi.getHref()).equals(groupId)) {
+                    members.add(mail);
+                }
+            }
+        }//while
+        return members;
+
+    }
+
+    public String getEmailAddress(ContactEntry c) {
+        String email = "";
+        for (Email e : c.getEmailAddresses()) {
+            if (e.getPrimary()) {
+                email = e.getAddress();
+            }
+        }
+        return email;
     }
 
     public ContactGroupEntry createContactGroup(ContactsService service,
