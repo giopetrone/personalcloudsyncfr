@@ -30,7 +30,7 @@ public interface GWTService extends RemoteService {
 
     public void putEvents(EventDescription[] events, String userName);
 
-    public boolean validateUser(String name, String pwd);
+//    public boolean validateUser(String name, String pwd);
 
     public String authenticate(String s);
 

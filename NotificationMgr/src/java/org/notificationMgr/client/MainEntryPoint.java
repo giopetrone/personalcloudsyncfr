@@ -64,7 +64,7 @@ public class MainEntryPoint implements EntryPoint {
     private ContentPanel cp;
     private Html html;
     // lili
-    private boolean filterNotification = true;  // variabile per switch on/off la filter notif
+    private boolean filterNotification = false;  // variabile per switch on/off la filter notif
 // notification lists for each sphere the user is involved in
     // presTable: specification of the parameters for presentation on browser/minibrowser
     private HashMap<String, HashMap<String, ArrayList<String>>> presentationTable = new HashMap();
@@ -172,7 +172,7 @@ public class MainEntryPoint implements EntryPoint {
                             whoAreYou.setText("INVALID USER");
                         }
                     };
-                    getService().validateUser(me, mePasswd, callback222);
+//                    getService().validateUser(me, mePasswd, callback222);
                 } else {
                     whoAreYou.setText("INVALID USER");
                 }
@@ -338,37 +338,39 @@ public class MainEntryPoint implements EntryPoint {
 
         Set<String> apps = notificationLists.keySet();
         Iterator<String> iter = apps.iterator();
-        msgTable.clear();
+       // msgTable.clear();
         while (iter.hasNext()) {
-            String app = iter.next();
-            ArrayList<EventDescription> eve = notificationLists.get(app);
-            addMsgRow(" " + app + ": <br />", "");  // evId e' vuoto, ok ma occorre eliminare il bottone di delete => no sendEvToGiga
-            for (int i = 0; i < eve.size(); i++) {
-                if (eve.get(i) == null) {
-                    return;
-                }
-                String linkSurvey = "<a href='http://localhost:8080/SurveyMgr/' target='_blank'>SurveyMgr</a>";
-                if (eve.get(i).getDestinatari().contains(me)) {
-                    if ((eve.get(i).getEventName().equals("MeetingProposal"))) {
-                        addMsgRow(eve.get(i).getEventName() + "  " + eve.get(i).getParameter("Date") + "<br />", eve.get(i).getEventId());
+            String sfera = iter.next();
+            ArrayList<EventDescription> eve = notificationLists.get(sfera);
+            if (eve != null && !eve.isEmpty()) {
+               // addMsgRow(" " + sfera + ": <br />", "");  // evId e' vuoto, ok ma occorre eliminare il bottone di delete => no sendEvToGiga
+                for (int i = 0; i < eve.size(); i++) {
+                    if (eve.get(i) == null) {
+                        return;
                     }
-                    if ((eve.get(i).getEventName().equals("MeetingConfirmation"))) {
-                        addMsgRow(eve.get(i).getEventName() + "  " + eve.get(i).getParameter("Date") + "<br />", eve.get(i).getEventId());
-                    }
-                    if ((eve.get(i).getEventName().equals("MembershipProposal"))) {
-                        // addMsgRow(eve[i].getEventName() + "  group: " + eve[i].getParameter("groupName") + "<br />Please connect to: " + linkSurvey + "<br />", eve[i].getEventId());
-                        addMsgRow(eve.get(i).getEventName() + "  group: " + eve.get(i).getParameter("groupName") + "<br />", eve.get(i).getEventId());
-                    }
-                    if ((eve.get(i).getEventName().equals("GroupCreated")) || (eve.get(i).getEventName().equals("GroupModified")) || (eve.get(i).getEventName().equals("GroupDeleted"))) {
-                        addMsgRow(eve.get(i).getEventName() + ": " + eve.get(i).getParameter("groupName") + "<br />", eve.get(i).getEventId());
-                    }
+                    String linkSurvey = "<a href='http://localhost:8080/SurveyMgr/' target='_blank'>SurveyMgr</a>";
+                    if (eve.get(i).getDestinatari().contains(me)) {
+                        if ((eve.get(i).getEventName().equals("MeetingProposal"))) {
+                            addMsgRow(sfera + ": " + eve.get(i).getEventName() + "  " + eve.get(i).getParameter("Date") + "<br />", eve.get(i).getEventId());
+                        }
+                        if ((eve.get(i).getEventName().equals("MeetingConfirmation"))) {
+                            addMsgRow(sfera + ": " + eve.get(i).getEventName() + "  " + eve.get(i).getParameter("Date") + "<br />", eve.get(i).getEventId());
+                        }
+                        if ((eve.get(i).getEventName().equals("MembershipProposal"))) {
+                            // addMsgRow(eve[i].getEventName() + "  group: " + eve[i].getParameter("groupName") + "<br />Please connect to: " + linkSurvey + "<br />", eve[i].getEventId());
+                            addMsgRow(sfera + ": " + eve.get(i).getEventName() + "  group: " + eve.get(i).getParameter("groupName") + "<br />", eve.get(i).getEventId());
+                        }
+                        if ((eve.get(i).getEventName().equals("GroupCreated")) || (eve.get(i).getEventName().equals("GroupModified")) || (eve.get(i).getEventName().equals("GroupDeleted"))) {
+                            addMsgRow(sfera + ": " + eve.get(i).getEventName() + ": " + eve.get(i).getParameter("groupName") + "<br />", eve.get(i).getEventId());
+                        }
 //
-                    if ((eve.get(i).getEventName().equals("DocCreated")) || (eve.get(i).getEventName().equals("DocUpdated")) || (eve.get(i).getEventName().equals("DocRemoved"))) {
-                        String linkDoc = "<a href='" + eve.get(i).getParameter("docLink") + "' target='_blank'>" + eve.get(i).getParameter("docName") + "</a>";
-                        addMsgRow(eve.get(i).getEventName() + " doc:  " + eve.get(i).getParameter("docName") + "  " + eve.get(i).getParameter("date") + "<br />Please connect to: " + linkDoc, eve.get(i).getEventId());
-                        addMsgRow(eve.get(i).getEventName() + ":  " + linkDoc + "<br />" + eve.get(i).getParameter("date") + "<br />", eve.get(i).getEventId());
-                    }
+                        if ((eve.get(i).getEventName().equals("DocCreated")) || (eve.get(i).getEventName().equals("DocUpdated")) || (eve.get(i).getEventName().equals("DocRemoved"))) {
+                            String linkDoc = "<a href='" + eve.get(i).getParameter("docLink") + "' target='_blank'>" + eve.get(i).getParameter("docName") + "</a>";
+                            addMsgRow(sfera + ": " + eve.get(i).getEventName() + " doc:  " + eve.get(i).getParameter("docName") + "  " + eve.get(i).getParameter("date") + "<br />Please connect to: " + linkDoc, eve.get(i).getEventId());
+                            addMsgRow(sfera + ": " + eve.get(i).getEventName() + ":  " + linkDoc + "<br />" + eve.get(i).getParameter("date") + "<br />", eve.get(i).getEventId());
+                        }
 
+                    }
                 }
             }
         }

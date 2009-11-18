@@ -12,14 +12,16 @@ import appsusersevents.client.CloudUsers;
 import appsusersevents.client.EventDescription;
 import appsusersevents.client.EventUtilities;
 import appsusersevents.client.SingleUser;
+import com.google.gdata.data.contacts.ContactGroupEntry;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import giga.GigaListener;
-import giga.Subscription;
 import googlecontacts.ContactCall;
+import googlecontacts.ContactsExampleParameters;
 import googletalkclient.ChatClient;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -39,15 +41,16 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
     ArrayList addedFilterList = new ArrayList(); // lista di utenti gia' sottoscritti
     HashMap<String, ArrayList<String>> eventSubscrData = new HashMap();  // chiave = applicazione e value = lista di eventi a cui sottoscriversi
     ChatClient chClient = new ChatClient();
-    HashMap<String, String> logPasswdData = new HashMap();
+//    HashMap<String, String> logPasswdData = new HashMap();
     CloudUsers cloudUsers = new CloudUsers();
+    ContactCall cC = null;
     //vecchia versione 14-10-09
     //   HashMap<String, ArrayList<EventDescription>> usersData = new HashMap();  // chiave = destinatario e value = lista di eventi che i filtri fanno passare (per quello user)
 // nuova versione
     String me = "";
     ArrayList<EventDescription> notifiche = new ArrayList();
     //lili
-    private boolean filterNotification = true;  // variabile per switch on/off la filter notif
+    private boolean filterNotification = false;  // variabile per switch on/off la filter notif
     private String currentTab; // active user tab (in focus)
     private ArrayList<EventDescription> eventList = new ArrayList(); //list of events to be delivered to the user
     int count; // counter used for disambiguating the eventList cyclically;
@@ -60,17 +63,18 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
     @Override
     public void init() {
         System.out.println("SONO IN init ");
-        logPasswdData.put("gio.petrone@gmail.com", "mer20ia05");
-        logPasswdData.put("annamaria.goy@gmail.com", "tex_willer");
+//        logPasswdData.put("gio.petrone@gmail.com", "mer20ia05");
+//        logPasswdData.put("annamaria.goy@gmail.com", "tex_willer");
         //lili
 
         userSpheres.add("unknown");
         notificationLists.put("unknown", new ArrayList()); //add notification list for ambiguous notifications
-//TEMP qui al posto di questo recuperare i gruppi esistenti da gContacts
-        userSpheres.add("itapro");
-        notificationLists.put("itapro", new ArrayList());
-        userSpheres.add("provaGroup");
-        notificationLists.put("provaGroup", new ArrayList());
+
+        //TEMP qui al posto di questo recuperare i gruppi esistenti da gContacts
+//        userSpheres.add("itapro");
+//        notificationLists.put("itapro", new ArrayList());
+//        userSpheres.add("provaGroup");
+//        notificationLists.put("provaGroup", new ArrayList());
 //END TEMP
         // end lili
         EventUtilities.setEventMatchTable();//sets the match table for identifying redundant events
@@ -78,7 +82,7 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
         aL.add("MeetingProposal");
         aL.add("MeetingConfirmation");
         eventSubscrData.put("CommonCalendar", aL);
-        
+
         ArrayList aL2 = new ArrayList();
         aL2.add("MeetingAnswer");
         eventSubscrData.put("SurveyMgr", aL2);
@@ -98,6 +102,58 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
         eventSubscrData.put("GoogleDocs", aL4);
     }
     // occorre aggiungere i metodi di get con pattern matching
+
+    private boolean contiene(List<ContactGroupEntry> iceGroups, ContactGroupEntry item) {
+        boolean ris = false;
+        for (ContactGroupEntry gr : iceGroups) {
+            //    if (gr.getId().equals(item.getId()))
+            if ((gr.getTitle().getPlainText()).equals(item.getTitle().getPlainText())) {
+                ris = true;
+            }
+        }
+        return ris;
+    }
+
+    //inizializza userSpheres
+    private void setUserSpheres() {
+        ArrayList<String> lis = null;
+        if (cC == null) {
+            System.out.println("NOTIF setUserSpheres cC NULL");
+        } else {
+            List<ContactGroupEntry> userGroups = cC.getUserGroups();
+            ContactCall iceCC = connectContact("iceMgr09@gmail.com", "sync09fr");
+            if (iceCC == null) {
+                System.out.println("NOTIF setUserSpheres iceCC NULL");
+            } else {
+                List<ContactGroupEntry> iceGroups = iceCC.getUserGroups();
+                if (userGroups.size() != 0 && iceGroups.size() != 0) {
+                    for (int i = 0; i < userGroups.size(); i++) {
+                        ContactGroupEntry item = userGroups.get(i);
+                        if (contiene(iceGroups, item)) {
+                            userSpheres.add(item.getTitle().getPlainText());
+                            notificationLists.put(item.getTitle().getPlainText(), new ArrayList());
+                        }
+                    }
+                    System.out.println("****sono in NOTIFMGR setUserSpheres   :  " + userSpheres);
+                }
+            }
+        }
+    }
+
+    private ContactCall connectContact(String userMail, String psswd) {
+        ContactCall cCallTmp = null;
+        try {
+            String[] myArg = {"--username=" + userMail, "--password=" + psswd, "-contactfeed", "--action=update"};  // OK
+            //   String[] myArg = {"--username=annamaria.goy@gmail.com", "--password=tex_willer", "-contactfeed", "--action=update"};  // OK
+            //String[] myArg = {"--username=" + iceMgrLogin, "--password=" + iceMgrPasswd, "-contactfeed", "--action=update"};  // OK
+            ContactsExampleParameters parameters = new ContactsExampleParameters(myArg); // X USAGE
+            cCallTmp = new ContactCall(parameters);
+            //FINE NUOVO
+        } catch (Exception e) {
+            System.out.println("error");
+        }
+        return cCallTmp;
+    }
 
     private GigaListener getListener() {
         String sId = getSession().getId();
@@ -389,16 +445,17 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
 // vera versione no filterNotif prima di 26-10-09
     private String subscribeTo(String evName, String dest, String app) {
         // invia a Giga il nome dell'evento a cui l'utente si vuole sottoscrivere
-        EventDescription template = new EventDescription("*");
-        template.setEventName(evName); // ? OR se sono dest oppure se appartengo ad un sfera
-        template.setApplication(app); // ?
+         EventDescription template = new EventDescription("*");
+        template.setEventName(evName);
+       // template.setApplication(app);
         template.addDestinatario(dest);
-        // LILI poi agiungere by UserAgt solo se processato da EventAnaliz
-        if (filterNotification) {
-            template.setProcessed("byContext"); // sottoscriversi anche a  userAgent
-        }
-        getListener().addEvent(template);
+        //LILI  
+     //   template.setProcessed("byContext");       
+       
         //END lili
+        getListener().addEvent(template);
+
+
 //        Subscription f = new Subscription();
 //        System.out.println("ho fatto la new di Subscription grande");
 //        System.out.println("evName = " + evName + "  dest = " + dest + " app = " + app);
@@ -413,37 +470,37 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
     }
 
     //nuova 26-10-09
-    private String subscribeTo(String dest, String app) {
-        // invia a Giga il nome dell'evento a cui l'utente si vuole sottoscrivere
-        EventDescription template = new EventDescription("*");
-        template.setApplication(app);
-        template.addDestinatario(dest);
-        template.setProcessed("byContext");
-        getListener().addEvent(template);
-
-        EventDescription template2 = new EventDescription("*");
-        template2.setApplication(app);
-        template2.addDestinatario(dest);
-        template2.setProcessed("byUserAgt");
-        getListener().addEvent(template2);
-
-        //sfere ma in termini di groupsId
-        EventDescription template3 = new EventDescription("*");
-        template3.setApplication(app);
-        template3.setSpheres(userSpheres);
-        template3.setProcessed("byContext");
-        getListener().addEvent(template3);
-
-        EventDescription template4 = new EventDescription("*");
-        template4.setApplication(app);
-        template3.setSpheres(userSpheres);
-        template4.setProcessed("byUserAgt");
-        getListener().addEvent(template4);
-
-        //END lili
+//    private String subscribeTo(String dest, String app) {
+//        // invia a Giga il nome dell'evento a cui l'utente si vuole sottoscrivere
+//        EventDescription template = new EventDescription("*");
+//         template.setApplication(app);
+//        template.addDestinatario(dest);
+//        template.setProcessed("byContext");
+//        getListener().addEvent(template);
 //
-        return "inviato evento a cui ci si sottoscrivere a GIGA ";
-    }
+//        EventDescription template2 = new EventDescription("*");
+//        template2.setApplication(app);
+//        template2.addDestinatario(dest);
+//        template2.setProcessed("byUserAgt");
+//        getListener().addEvent(template2);
+//
+//        //sfere ma in termini di groupsId
+//        EventDescription template3 = new EventDescription("*");
+//        template3.setApplication(app);
+//        template3.setSpheres(userSpheres);
+//        template3.setProcessed("byContext");
+//        getListener().addEvent(template3);
+//
+//        EventDescription template4 = new EventDescription("*");
+//        template4.setApplication(app);
+//        template3.setSpheres(userSpheres);
+//        template4.setProcessed("byUserAgt");
+//        getListener().addEvent(template4);
+//
+//        //END lili
+////
+//        return "inviato evento a cui ci si sottoscrivere a GIGA ";
+//    }
 
 // DA SOSTITUIRE CON persistanza DB
     private boolean alreadySubscr(String userName) {
@@ -453,16 +510,15 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
         return res;
     }
 
-    public boolean validateUser(String name, String pwd) {
-        //    return new ServerToClient().validateUser(name,pwd);
-
-        ContactCall cC = new ContactCall(name, pwd);
-        boolean val = cC.validate(name, pwd);
-        System.out.print("sono in SURVEY validate = " + val);
-
-        return val;
-    }
-
+//    public boolean validateUser(String name, String pwd) {
+//        //    return new ServerToClient().validateUser(name,pwd);
+//
+//        cC = new ContactCall(name, pwd);
+//        boolean val = cC.validate(name, pwd);
+//        System.out.print("sono in SURVEY validate = " + val);
+//
+//        return val;
+//    }
     public String authenticate(String s) {
         String userEmail = "";
         SingleUser sU = cloudUsers.getUser(s);
@@ -470,6 +526,8 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
         if (sU != null) {
             userEmail = sU.getMailAddress();
             me = userEmail;
+            cC = connectContact(userEmail, sU.getPwd());
+            setUserSpheres();
         } else {
             System.out.println("singleUSer NULL");
         }
@@ -598,9 +656,8 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
     public HashMap<String, ArrayList<EventDescription>> addEvents(String userName) {
         filterNotification = true;
         EventDescription[] procEvents = null;
+        HashMap<String, ArrayList<EventDescription>> ret = new HashMap();
         if (userName != null) {
-
-
             if (!alreadySubscr(userName)) {
                 Set<String> apps = eventSubscrData.keySet();
                 Iterator<String> iter = apps.iterator();
@@ -627,6 +684,9 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
                 //    String dest = tmp[0].getDestinatario();
                 //  ArrayList aL = usersData.get(dest);  // eventi da mostrare all'utente
                 EventDescription ev = null;
+
+                eventList = new ArrayList();
+
                 for (int i = 0; i < procEvents.length; i++) {
                     ev = procEvents[i];
                     //  if (ev.getProcessed().equalsIgnoreCase("byContext")) { // event processed by EventAnalyzer
@@ -640,10 +700,11 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
 //                        EventUtilities.disambiguateEventList(eventList);
 //                    }
                 }
+                ret = refreshNotificationLists();
             }
         }
 
-        return refreshNotificationLists();
+        return ret;
 
     }
     // end lili
