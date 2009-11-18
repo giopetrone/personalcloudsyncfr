@@ -21,7 +21,7 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
     private String eventName = any;     // X es. MeetingProposal
     private String userGroup = any;     //   finora x marino significava alias di un insieme di contatti, potrebbe la sfera
     private String user = any;         // utente che ha generato l'evento
-   // private String destinatario = any;   // utente  a cui e' destinato l'evento che potrebbe essere un gruppo o un singolo utente
+    // private String destinatario = any;   // utente  a cui e' destinato l'evento che potrebbe essere un gruppo o un singolo utente
     private ArrayList<String> destinatari = new ArrayList(); // lista dei destinatari di un evento
     private String dataId = any;  //NON utilizzato fino a 6-2009
     private String sender = any;     // NON utilizzato fino a 6-2009
@@ -59,7 +59,7 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
     }
 
     public EventDescription() {
-         application = any;
+        application = any;
         activity = any;
         eventName = any;
         userGroup = any;
@@ -77,7 +77,7 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
         spheres = new ArrayList();
         relevantSpheres = new ArrayList();
         tab = "unknown";
-        parameters = new ArrayList(); 
+        parameters = new ArrayList();
         eventId = "" + EventNumber;
         EventNumber++;
     }
@@ -95,7 +95,7 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
         sender = any;
         receiver = any;
         time = any;
-  //      destinatario = any;
+        //      destinatario = any;
         filRouge = any;
         explicitEvent = "true";
         processed = "no";
@@ -165,8 +165,8 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
                 fieldMatch(receiver, template.receiver) &&
                 fieldMatch(time, template.time) &&
                 fieldMatch(correlationId, template.correlationId) &&
-                fieldMatch(sessionId, template.sessionId) ;
-       //         fieldMatch(destinatario, template.destinatario);
+                fieldMatch(sessionId, template.sessionId);
+        //         fieldMatch(destinatario, template.destinatario);
     }
 
     public boolean compatibleWith(EventDescription template) {
@@ -257,7 +257,7 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
                 getEventName() + "." +
                 getUserGroup() + "." +
                 getUser() + "." +
-             //   getDestinatario() + "." +
+                //   getDestinatario() + "." +
                 getEventId() + "." +
                 getDataId() + "." +
                 getSender() + "." +
@@ -458,7 +458,6 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
 //    public void setDestinatario(String destinatario) {
 //        this.destinatario = destinatario;
 //    }
-
     /**
      * @return the correlationId
      */
@@ -645,7 +644,7 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
                 "; usr: " + user +
                 "; dest: " + destinatari.toString() +
                 "; processed: " + processed +
-                 "; spheres: " + spheres.toString() +
+                "; spheres: " + spheres.toString() +
                 "; relevant spheres: " + relevantSpheres.toString() +
                 //" est.sph: " + estimatedSphere +
                 //"; tab: " + tab +
@@ -712,51 +711,88 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
         }
         return out;
     }
-     // creates a template with the same structure as this, where
+    // creates a template with the same structure as this, where
     // only some fields are instantiated, and the others are set to "*" or []
     // NB: the template must be used in read-only mode, as its complex fields
     // (e.g., spheres) are not cloned from those of the source event
+
     public EventDescription createtemplate(boolean application, boolean explicitEvent,
-                        boolean processed, boolean eventName, boolean user,
-                        boolean spheres, boolean relevantSpheres,
-                        boolean tab, boolean time, boolean eventId, boolean activity,
-                        boolean userGroup, boolean dataId, boolean sender, boolean receiver,
-                        boolean correlationId, boolean sessionId,
-                        boolean destinatari, ArrayList<String> parNames) {
+            boolean processed, boolean eventName, boolean user,
+            boolean spheres, boolean relevantSpheres,
+            boolean tab, boolean time, boolean eventId, boolean activity,
+            boolean userGroup, boolean dataId, boolean sender, boolean receiver,
+            boolean correlationId, boolean sessionId,
+            boolean destinatari, ArrayList<String> parNames) {
         EventDescription ev = copyEd(); // clones the event "this"
-        if (!application) ev.setApplication("*"); // sets all irrelevant fields to "*"
-        if (!explicitEvent) ev.setExplicitEvent("*");
-        if (!processed) ev.setProcessed("*");
-        if (!eventName) ev.setEventName("*");
-        if (!user) ev.setUser("*");
-        if (!spheres) ev.setSpheres(new ArrayList());
-        if (!relevantSpheres) ev.setRelevantSpheres(new ArrayList());
-        if(!tab) ev.setTab("*");
-        if (!time) ev.setTime("*");
+        if (!application) {
+            ev.setApplication("*"); // sets all irrelevant fields to "*"
+        }
+        if (!explicitEvent) {
+            ev.setExplicitEvent("*");
+        }
+        if (!processed) {
+            ev.setProcessed("*");
+        }
+        if (!eventName) {
+            ev.setEventName("*");
+        }
+        if (!user) {
+            ev.setUser("*");
+        }
+        if (!spheres) {
+            ev.setSpheres(new ArrayList());
+        }
+        if (!relevantSpheres) {
+            ev.setRelevantSpheres(new ArrayList());
+        }
+        if (!tab) {
+            ev.setTab("*");
+        }
+        if (!time) {
+            ev.setTime("*");
+        }
         // eventId??
-        if (!activity) ev.setActivity("*");
-        if (!userGroup) ev.setUserGroup("*");
-        if (!dataId) ev.setDataId("*");
-        if (!sender) ev.setSender("*");
-        if (!receiver) ev.setReceiver("*");
-        if (!correlationId) ev.setCorrelationId("*");
-        if (!sessionId) ev.setSessionId("*");
-        if (!destinatari) ev.setDestinatari(new ArrayList());
-                // sets all the parameters not occurring in "parameterNames" to "*"
-        for (int i=0; i<parameters.size(); i +=2) {
+        if (!activity) {
+            ev.setActivity("*");
+        }
+        if (!userGroup) {
+            ev.setUserGroup("*");
+        }
+        if (!dataId) {
+            ev.setDataId("*");
+        }
+        if (!sender) {
+            ev.setSender("*");
+        }
+        if (!receiver) {
+            ev.setReceiver("*");
+        }
+        if (!correlationId) {
+            ev.setCorrelationId("*");
+        }
+        if (!sessionId) {
+            ev.setSessionId("*");
+        }
+        if (!destinatari) {
+            ev.setDestinatari(new ArrayList());
+        }
+        // sets all the parameters not occurring in "parameterNames" to "*"
+        for (int i = 0; i < parameters.size(); i += 2) {
             String name = parameters.get(i);
-            if (!parNames.contains(name))
-                ev.setParameter(name, "*");
+            if (parNames != null) {
+                if (!parNames.contains(name)) {
+                    ev.setParameter(name, "*");
+                }
             }
+        }
         return ev;
     }
 
     // returns the list of parameter names associated to "this"
     // in the match table
     public ArrayList<String> getMatchParameters() {
-        return EventUtilities.getEventMatchTable().get(application).get(eventName);
+        return (EventUtilities.getEventMatchTable()).get(application).get(eventName);
     }
-
 
     public void addSphere(String sphere) {
         spheres.add(sphere);

@@ -64,7 +64,7 @@ public class EventUtilities {
          groupMgr.put("GroupModified", groupName);
                                             // SurveyMgr
         HashMap<String, ArrayList<String>> surveyMgr = new HashMap();
-        ArrayList<String>noParameters = new ArrayList();
+        ArrayList<String> noParameters = new ArrayList();
         surveyMgr.put("MeetingAnswer", noParameters);
         surveyMgr.put("MembershipAnswer", noParameters);
                                             // GoogleDocs
@@ -273,7 +273,7 @@ public class EventUtilities {
         else System.out.println("EventUtilities: " + gName + "- attempt to delete a non existing group from the group table!");
     }
 
-    private static boolean addUserSphere(String userID, String sph,
+    public static boolean addUserSphere(String userID, String sph,
                                          HashMap<String, ArrayList<String>> userSpheresTable) {
         ArrayList<String> spheres = null;
         if (!userSpheresTable.containsKey(userID)) { // adds user to groups table, if does not exist
