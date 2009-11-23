@@ -146,8 +146,8 @@ public class MeetingSession extends VerticalPanel {
             des.setUser(template.getUser());
             des.setApplication(template.getApplication());
             //commentato da gio
-         //   des.setDestinatari(template.getDestinatari());// NUOVO, MAR
-            des.addDestinatario(tr.getMailAddress()); //??? GIO
+            des.setDestinatari(template.getDestinatari());// NUOVO, MAR
+            // des.addDestinatario(tr.getMailAddress()); //??? GIO
             des.setSessionId(sessionId);
             //    des.setCorrelationId("*");
             des.setParameters(template.getParameters());
