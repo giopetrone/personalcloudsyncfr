@@ -261,7 +261,7 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
                             System.out.println("++++NOtification getEvents evName del IM  msg = " + msg);
 
                             // per il momento per causa problemi di Smack, commento invio msg a gTalk
-                            // chClient.sendGTalkMsg(me, tmp[i].getUser(), logPasswdData.get(tmp[i].getUser()), msg, false);
+                            chClient.sendGTalkMsg(me, cloudUsers.getUserByEmail(tmp[i].getUser()).getMailAddress(), cloudUsers.getUserByEmail(tmp[i].getUser()).getPwd(),  msg, false);
                         } catch (Exception e) {
                             System.out.println("ECCEZIONE chat");
                         }
