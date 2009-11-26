@@ -68,12 +68,10 @@ public class ChatClient implements MessageListener {
         this.login(sender, passwdSender);
         this.displayBuddyList();
         this.sendMessage(mess, receiver);
-        System.out.println("------------------------------- in sendGTalkMsg, dopo la send");
+        System.out.println("------------------------------- in sendGTalkMsg, dopo la send " + receiver);
         if (test) {
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-            System.out.println("-----");
-            System.out.println("Enter your message in the console.");
-            System.out.println("All messages will be sent to annamaria.goy");
+            System.out.println("-----");                   
             System.out.println("-----\n");
             while (!(msg = br.readLine()).equals("bye")) {
                 // your buddy's gmail address goes here
