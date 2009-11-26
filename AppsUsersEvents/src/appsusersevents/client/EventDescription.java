@@ -696,17 +696,20 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
     public boolean destinatariCompatible(EventDescription template) {
         boolean out = true;
         ArrayList<String> dest = template.getDestinatari();
+        System.out.println("%%%%%%EVENT DESCR destinatari: " + destinatari);
+        System.out.println("%%%%%%EVENT DESCR dest: " + dest);
         if (dest.size() != 0) { // if size==0 --> * case
-            if (dest.size() != destinatari.size()) // not the same list of users
-            {
-                out = false;
-            } else {
-                for (int i = 0; i < destinatari.size(); i++) {
-                    if (!dest.contains(destinatari.get(i))) {
-                        out = false;
-                        break;
-                    }
+//            if (dest.size() != destinatari.size()) // not the same list of users
+//            {
+//                out = false;
+//            } else {
+            for (int i = 0; i < destinatari.size(); i++) {
+               // if (!dest.contains(destinatari.get(i))) {
+                     if (!destinatari.contains(dest.get(i))) {
+                    out = false;
+                    break;
                 }
+                // }
             }
         }
         return out;
