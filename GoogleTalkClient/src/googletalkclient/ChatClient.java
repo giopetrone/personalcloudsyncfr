@@ -66,12 +66,13 @@ public class ChatClient implements MessageListener {
         // provide your login information here
         // c.login("gio.petrone@gmail.com", "mer20ia05");
         this.login(sender, passwdSender);
-        this.displayBuddyList();
+        //this.displayBuddyList();
         this.sendMessage(mess, receiver);
         System.out.println("------------------------------- in sendGTalkMsg, dopo la send " + receiver);
         if (test) {
+            this.displayBuddyList();
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-            System.out.println("-----");                   
+            System.out.println("-----");
             System.out.println("-----\n");
             while (!(msg = br.readLine()).equals("bye")) {
                 // your buddy's gmail address goes here
@@ -83,7 +84,7 @@ public class ChatClient implements MessageListener {
         }
 
         this.disconnect();
-    //System.exit(0);
+        //System.exit(0);
     }
 
     public static void main(String args[]) throws XMPPException, IOException {
