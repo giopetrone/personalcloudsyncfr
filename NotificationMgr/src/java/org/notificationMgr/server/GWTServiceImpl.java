@@ -230,22 +230,22 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
                         //  String destName = tmp[i].getDestinatario();
                         String msg = evName;
                         if (tmp[i].getEventName().equals("MeetingProposal")) {
-                            msg = " to participate  : " + tmp[i].getParameter("Date");
+                            msg = msg + " to participate  : " + tmp[i].getParameter("Date");
                             // msg = msg + "  Please connect to  http://localhost:8080/SurveyMgr/";
-                            msg = msg;
+
                         } else if (tmp[i].getEventName().equals("MembershipProposal")) {
                             //     System.out.println("++++NOtification getEvents evName del IM = " + evName);
-                            msg = " to join  : " + tmp[i].getParameter("groupName");
+                            msg = msg + " to join  : " + tmp[i].getParameter("groupName");
                             // msg = msg + "  Please connect to  http://localhost:8080/SurveyMgr/";
-                            msg = msg;
+
                         } else if (tmp[i].getEventName().equals("GroupCreated")) {
-                            msg = ": " + tmp[i].getParameter("groupName");
+                            msg = msg + ": " + tmp[i].getParameter("groupName");
                         } else if (tmp[i].getEventName().equals("GroupModified")) {
-                            msg = ": " + tmp[i].getParameter("groupName");
+                            msg = msg + ": " + tmp[i].getParameter("groupName");
                         } else if ((tmp[i].getEventName().equals("GroupDeleted"))) {
-                            msg = ": " + tmp[i].getParameter("groupName");
+                            msg = msg + ": " + tmp[i].getParameter("groupName");
                         } else if ((tmp[i].getEventName().equals("MeetingConfirmation"))) {
-                            msg = ": " + tmp[i].getParameter("Date");
+                            msg = msg + ": " + tmp[i].getParameter("Date");
                         } else if ((tmp[i].getEventName().equals("DocCreated"))) {
                             msg = tmp[i].getParameter("docName") + " created  : " + tmp[i].getParameter("Date") + " document available at : " + tmp[i].getParameter("docLink");
                         } else if ((tmp[i].getEventName().equals("DocUpdated"))) {
@@ -261,7 +261,10 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
                             System.out.println("++++NOtification getEvents evName del IM  msg = " + msg);
 
                             // per il momento per causa problemi di Smack, commento invio msg a gTalk
-                            chClient.sendGTalkMsg(me, cloudUsers.getUserByEmail(tmp[i].getUser()).getMailAddress(), cloudUsers.getUserByEmail(tmp[i].getUser()).getPwd(),  msg, false);
+                            String senderMail = cloudUsers.getUserByEmail(tmp[i].getUser()).getMailAddress();
+                            if (!me.equals(senderMail)) {
+                                chClient.sendGTalkMsg(me, senderMail, cloudUsers.getUserByEmail(tmp[i].getUser()).getPwd(), msg, false);
+                            }
                         } catch (Exception e) {
                             System.out.println("ECCEZIONE chat");
                         }
@@ -445,13 +448,13 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
 // vera versione no filterNotif prima di 26-10-09
     private String subscribeTo(String evName, String dest, String app) {
         // invia a Giga il nome dell'evento a cui l'utente si vuole sottoscrivere
-         EventDescription template = new EventDescription("*");
+        EventDescription template = new EventDescription("*");
         template.setEventName(evName);
-       // template.setApplication(app);
+        // template.setApplication(app);
         template.addDestinatario(dest);
         //LILI  
-     //   template.setProcessed("byContext");       
-       
+        //   template.setProcessed("byContext");
+
         //END lili
         getListener().addEvent(template);
 
@@ -501,7 +504,6 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
 ////
 //        return "inviato evento a cui ci si sottoscrivere a GIGA ";
 //    }
-
 // DA SOSTITUIRE CON persistanza DB
     private boolean alreadySubscr(String userName) {
         boolean res = false;
