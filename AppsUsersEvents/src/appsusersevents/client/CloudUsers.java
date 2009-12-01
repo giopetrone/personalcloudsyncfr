@@ -66,5 +66,9 @@ public class CloudUsers {
         //aggiungere altri utenti
         cloudUsers.put("113562596126755969974", new SingleUser("Giovanna", "gio.petrone@gmail.com", "mer20ia05", "113562596126755969974", ""));
         cloudUsers.put("105431105185369856275", new SingleUser("Anna", "annamaria.goy@gmail.com", "tex_willer", "105431105185369856275", ""));
+        cloudUsers.put("117045399709249522734", new SingleUser("Marino", "sgnmrn@gmail.com", "micio11", "117045399709249522734", ""));
+        cloudUsers.put("105588383970476786723", new SingleUser("utntest1", "utntest1@gmail.com", "passtest", "105588383970476786723", ""));
+        cloudUsers.put("106599813745807651946", new SingleUser("utntest2", "utntest2@gmail.com", "passtest", "106599813745807651946", ""));
+        cloudUsers.put("109389007736899610246", new SingleUser("utntest3", "utntest3@gmail.com", "passtest", "109389007736899610246", ""));
     }
 }
