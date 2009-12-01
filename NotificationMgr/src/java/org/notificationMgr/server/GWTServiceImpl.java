@@ -254,17 +254,15 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
                             msg = tmp[i].getParameter("docName") + " removed  : " + tmp[i].getParameter("date");
                         }
                         try {
-                            // al post della login ricavare la login di destName
-                            //    chClient.sendGTalkMsg("annamaria.goy@gmail.com", iceMgrLogin, iceMgrPasswd, msg, false);
                             //  chClient.sendGTalkMsg(destName, userName, logPasswdData.get(userName), msg, false);
                             // VALE PER TUTTE LE NOTIFICHE DA DIVERSE APPS ?
                             System.out.println("++++NOtification getEvents evName del IM  msg = " + msg);
 
                             // per il momento per causa problemi di Smack, commento invio msg a gTalk
                             String senderMail = cloudUsers.getUserByEmail(tmp[i].getUser()).getMailAddress();
-                            if (!me.equals(senderMail)) {
+                          //  if (!me.equals(senderMail)) {
                                 chClient.sendGTalkMsg(me, senderMail, cloudUsers.getUserByEmail(tmp[i].getUser()).getPwd(), msg, false);
-                            }
+                          //  }
                         } catch (Exception e) {
                             System.out.println("ECCEZIONE chat");
                         }
