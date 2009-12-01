@@ -40,7 +40,7 @@ public interface ICommonCalendar extends RemoteService {
 
     public CalendarOwner[] getCalendars(SingleUser sU, SingleUser[] users, MyDate startDate,  MyDate endDate);
 
-    public void updateCalendars(CalendarOwner [] calends, int rowIndex);
+    public void updateCalendars(CalendarOwner [] calends, int rowIndex, SingleUser me);
 
     public MyDate  cheGiornoOggi();
 

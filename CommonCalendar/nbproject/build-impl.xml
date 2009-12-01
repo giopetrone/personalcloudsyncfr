@@ -544,7 +544,6 @@ exists or setup the property manually. For example like this:
     <target depends="init" if="dist.ear.dir" name="library-inclusion-in-manifest">
         <copyfiles files="${libs.GWT1.7.0.classpath}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.libs.GWT1.7.0.classpath" todir="${dist.ear.dir}"/>
         <copyfiles files="${reference.GigaLib.jar}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.reference.GigaLib.jar" todir="${dist.ear.dir}"/>
-        <copyfiles files="${libs.GWT1.7.0.classpath}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.libs.GWT1.7.0.classpath" todir="${dist.ear.dir}"/>
         <copyfiles files="${reference.CalendApi.jar}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.reference.CalendApi.jar" todir="${dist.ear.dir}"/>
         <copyfiles files="${libs.XSTREAM.classpath}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.libs.XSTREAM.classpath" todir="${dist.ear.dir}"/>
         <copyfiles files="${reference.GoogleContacts.jar}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.reference.GoogleContacts.jar" todir="${dist.ear.dir}"/>
@@ -561,13 +560,12 @@ exists or setup the property manually. For example like this:
         <copyfiles files="${file.reference.AppsUsersEvents-images}" todir="${build.web.dir}//"/>
         <mkdir dir="${build.web.dir}/META-INF"/>
         <manifest file="${build.web.dir}/META-INF/MANIFEST.MF" mode="update">
-            <attribute name="Class-Path" value="${manifest.libs.GWT1.7.0.classpath} ${manifest.reference.GigaLib.jar} ${manifest.libs.GWT1.7.0.classpath} ${manifest.reference.CalendApi.jar} ${manifest.libs.XSTREAM.classpath} ${manifest.reference.GoogleContacts.jar} ${manifest.reference.AppsUsersEvents.jar} ${manifest.libs.GDATA.classpath} ${manifest.libs.MAIL.classpath} ${manifest.libs.GIGA.classpath} ${manifest.libs.GXT.classpath} ${manifest.file.reference.gwt-dev-linux.jar} ${manifest.file.reference.gwt-servlet.jar} ${manifest.libs.GOOGLECOLLECT.classpath} ${manifest.libs.OPENID.classpath} "/>
+            <attribute name="Class-Path" value="${manifest.libs.GWT1.7.0.classpath} ${manifest.reference.GigaLib.jar} ${manifest.reference.CalendApi.jar} ${manifest.libs.XSTREAM.classpath} ${manifest.reference.GoogleContacts.jar} ${manifest.reference.AppsUsersEvents.jar} ${manifest.libs.GDATA.classpath} ${manifest.libs.MAIL.classpath} ${manifest.libs.GIGA.classpath} ${manifest.libs.GXT.classpath} ${manifest.file.reference.gwt-dev-linux.jar} ${manifest.file.reference.gwt-servlet.jar} ${manifest.libs.GOOGLECOLLECT.classpath} ${manifest.libs.OPENID.classpath} "/>
         </manifest>
     </target>
     <target depends="init" name="library-inclusion-in-archive" unless="dist.ear.dir">
         <copyfiles files="${libs.GWT1.7.0.classpath}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${reference.GigaLib.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
-        <copyfiles files="${libs.GWT1.7.0.classpath}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${reference.CalendApi.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${libs.XSTREAM.classpath}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${reference.GoogleContacts.jar}" todir="${build.web.dir}/WEB-INF/lib"/>

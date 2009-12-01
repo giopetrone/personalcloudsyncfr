@@ -554,7 +554,7 @@ public class CommonCalendar implements EntryPoint {
                     }
                 };
                 //    debug("showevents 2");
-                getService().updateCalendars(v.getUserCalendars(), v.getIndexDataMeeting(), callback33);
+                getService().updateCalendars(v.getUserCalendars(), v.getIndexDataMeeting(), me, callback33);
                 //    debug("showevents 3");
                 waitingSessions.remove(j);
                 //  Window.alert("event confirmed: " + v.getEventDescription());

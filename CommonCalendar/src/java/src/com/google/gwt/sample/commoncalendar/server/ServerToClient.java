@@ -15,6 +15,7 @@ import appsusersevents.client.SingleUser;
 import appsusersevents.client.UserGroup;
 import appsusersevents.client.Appointment;
 import appsusersevents.client.CalendarOwner;
+import appsusersevents.client.CloudUsers;
 import appsusersevents.client.MyDate;
 import appsusersevents.client.TreeElement;
 import appsusersevents.client.TreeNode;
@@ -47,6 +48,7 @@ public class ServerToClient {
 
     //  static GigaListener listener = null;
     GigaListener listener = new GigaListener();
+    CloudUsers cloudUsers = new CloudUsers();
 
     public ApplicationDescription[] buildAppTree(String str) {
         ArrayList applications = new ArrayList();
@@ -238,14 +240,27 @@ public class ServerToClient {
         return orcond;
     }
 
-    public void updateCalendars(CalendarOwner[] calendars, int rowIndex) {
+    public void updateCalendarsOLD(CalendarOwner[] calendars, int rowIndex) {
         //    System.out.println("modifico calendario google: "+ rowIndex + " "+ calendars.length);
         long absTime = calendars[0].absoluteApptTime(rowIndex);
         //     System.out.println("modifico calendario google: "+ absTime);
         for (int i = 0; i < calendars.length; i++) {
             CalendarOwner co = calendars[i];
-                  System.out.println("modifico calendario google: " + co.getMailAddress());
-            new CalendarCall(co.getMailAddress(), co.getPwd()).insertEvent(absTime);
+            System.out.println("modifico calendario google: " + co.getMailAddress() + " " + co.getPwd());
+           new CalendarCall(co.getMailAddress(), co.getPwd()).insertEvent(absTime);
+        }
+    }
+
+    public void updateCalendars(CalendarOwner[] calendars, int rowIndex, SingleUser me) {
+        //    System.out.println("modifico calendario google: "+ rowIndex + " "+ calendars.length);
+        long absTime = calendars[0].absoluteApptTime(rowIndex);
+        //     System.out.println("modifico calendario google: "+ absTime);
+        String pwdMeetingProposeUser = (cloudUsers.getUserByEmail(me.getMailAddress())).getPwd();
+        for (int i = 0; i < calendars.length; i++) {
+            CalendarOwner co = calendars[i];
+            System.out.println("modifico calendario google: " + co.getMailAddress() + " " + co.getPwd());
+
+            new CalendarCall(co.getMailAddress(), pwdMeetingProposeUser).insertEvent(absTime);
         }
     }
 
