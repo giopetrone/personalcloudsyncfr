@@ -19,10 +19,16 @@ public class MyDate implements Serializable, IsSerializable {
     private int daysOfYear; // 365 || 366
     private int dayOfMonth; //si
     private int dayOfWeek;  //si
+    private long time;
 
-    public MyDate() {}
+    public MyDate() {
+    }
 
-    public MyDate(MyDate startDate, int daysFromNow){
+    public MyDate(long time) {
+        this.time = time;
+    }
+
+    public MyDate(MyDate startDate, int daysFromNow) {
 
         // un po' una schifezza, da migliorare
         if (daysFromNow > 28) {
@@ -34,42 +40,45 @@ public class MyDate implements Serializable, IsSerializable {
         dayOfYear = (startDate.dayOfYear + daysFromNow) % daysOfYear;
         dayOfMonth = (startDate.dayOfMonth + daysFromNow);
         month = startDate.month;
-         year = startDate.year;
+        year = startDate.year;
         int max = daysOfMonth();
         if (dayOfMonth > max) {
-                 month++;
-                 dayOfMonth -= max;
-                 if (month > 12) {
-                     year++;
-                     month = 1;
-                 }
+            month++;
+            dayOfMonth -= max;
+            if (month > 12) {
+                year++;
+                month = 1;
+            }
         }
     }
 
-public String stampina() {
-    return "" + dayOfMonth + "/"+ month +"/" + year;
-}
-        private int daysOfMonth() {
-            int ret = 31;
-            switch (month) {
-                case 2: ret = bises() ? 29:28;
-                        break;
-                case 4:
-                case 6:
-                case 9:
-                case 11: ret = 30;
-                        break;
-              //  deafult: break;
-            }
-            return ret;
-        }
+    public String stampina() {
+        return "" + dayOfMonth + "/" + (month + 1)+ "/" + year;
+    }
 
-    private  boolean bises() {
+    private int daysOfMonth() {
+        int ret = 31;
+        switch (month) {
+            case 2:
+                ret = bises() ? 29 : 28;
+                break;
+            case 4:
+            case 6:
+            case 9:
+            case 11:
+                ret = 30;
+                break;
+            //  deafult: break;
+            }
+        return ret;
+    }
+
+    private boolean bises() {
         return daysOfYear == 366;
     }
 
     public String getDescription() {
-        return ("" + year +"."+ month +"."+ dayOfMonth);
+        return ("" + year + "." + month + "." + dayOfMonth);
     }
 
     public int compareTo(MyDate date) {
@@ -84,17 +93,18 @@ public String stampina() {
         }
         return 0;
     }
-    
-    public int daysTo(MyDate date)    {
+
+    public int daysTo(MyDate date) {
         // errore non conto bissetile
         if (this.year == date.year) {
-            return date.dayOfYear -this.dayOfYear;
+            return date.dayOfYear - this.dayOfYear;
         } else {
-           // per ora approssimato
+            // per ora approssimato
             return date.dayOfYear + (date.daysOfYear - this.dayOfYear);
         }
-        
+
     }
+
     /**
      * @return the month
      */
@@ -180,5 +190,19 @@ public String stampina() {
      */
     public void setDaysOfYear(int daysOfYear) {
         this.daysOfYear = daysOfYear;
+    }
+
+    /**
+     * @return the time
+     */
+    public long getTime() {
+        return time;
+    }
+
+    /**
+     * @param time the time to set
+     */
+    public void setTime(long time) {
+        this.time = time;
     }
 }

@@ -178,7 +178,7 @@ public class CalendarOwner implements Serializable, IsSerializable  {
     public String[] creaMat() {
         String[] ret = new String[getTotalSlots()];
         for (int j = 0; j < ret.length; j++) {
-            ret[j] = " ";
+            ret[j] = "";
         }
 
         for (int j = 0; j < getImpegni().size(); j++) {
