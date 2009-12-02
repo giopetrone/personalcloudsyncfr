@@ -6,6 +6,7 @@ package calendar;
 
 import com.google.gdata.client.*;
 import com.google.gdata.client.Query.CategoryFilter;
+import com.google.gdata.client.calendar.CalendarQuery;
 import com.google.gdata.client.calendar.CalendarService;
 import com.google.gdata.data.*;
 import com.google.gdata.data.calendar.CalendarEntry;
@@ -28,6 +29,7 @@ public class CalendarCall {
     String googleCalFeed = "http://www.google.com/calendar/feeds/";
     CalendarService myService = null;
     String googleUserMail;
+    String guestEmail;
     String ownedCalendarsFeed = "default/owncalendars/full";
     String allCalendarsFeed = "/allcalendars/full";
     //   String allCalendarsFeed = "default";
@@ -45,19 +47,19 @@ public class CalendarCall {
         return TheCall;
     }
 
-     public CalendarCall() {
-         myService = new CalendarService("di.unito.it.sharedCalendar");
-     }
+    public CalendarCall() {
+        myService = new CalendarService("di.unito.it.sharedCalendar");
+    }
 
-     public CalendarCall validate (String googleUserMail, String pwd) {
-          try {
+    public CalendarCall validate(String googleUserMail, String pwd) {
+        try {
             myService.setUserCredentials(googleUserMail, pwd);
         } catch (Exception ex) {
             // ex.printStackTrace();
             return null;
         }
         return this;
-     }
+    }
 
     public CalendarCall(String googleUserMail, String pwd) {
         System.out.println("Calendar Call : mail,pwd " + googleUserMail + "," + pwd);
@@ -71,6 +73,22 @@ public class CalendarCall {
 
             //  allUrl = new URL(googleCalFeed + googleUserMail + allCalendarsFeed);
             allUrl = new URL(googleCalFeed + allCalendarsFeed);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public CalendarCall(String googleUserMail, String pwd, String guestEmail) {
+
+        this.googleUserMail = googleUserMail;
+        this.guestEmail = guestEmail;
+        myService = new CalendarService("di.unito.it.sharedCalendar");
+        try {
+            myService.setUserCredentials(googleUserMail, pwd);
+
+            ownedUrl = new URL(googleCalFeed + ownedCalendarsFeed);
+            System.out.println("Calendar Call : mail,pwd,guest " + googleUserMail + "," + pwd + "," + guestEmail);
+            System.out.println("URL: " + googleCalFeed + ownedCalendarsFeed);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -111,7 +129,7 @@ public class CalendarCall {
         return retList;
     }
 
-    public List getCalendarEvents() { //(String googleUserMail, String pwd) {
+    public List getCalendarEventsOLD() { //(String googleUserMail, String pwd) {
         List retList = new ArrayList();
         try {
             CalendarEventFeed unFeed = myService.getFeed(privateUrl, CalendarEventFeed.class);
@@ -122,12 +140,65 @@ public class CalendarCall {
         return retList;
     }
 
+    public List getCalendarEvents() { //(String googleUserMail, String pwd) {
+        List retList = new ArrayList();
+        try {
+            CalendarFeed resultFeed = myService.getFeed(ownedUrl, CalendarFeed.class);
+            System.out.println("Calendars you own:");
+            System.out.println();
+            for (int i = 0; i < resultFeed.getEntries().size(); i++) {
+                CalendarEntry entry = resultFeed.getEntries().get(i);
+                System.out.println("\t" + entry.getTitle().getPlainText());
+                System.out.println("edit link: [" + entry.getLink(Link.Rel.ALTERNATE, Link.Type.ATOM).getHref() + "]");
+       final URL feedURL = new URL(entry.getLink(Link.Rel.ALTERNATE, Link.Type.ATOM).getHref());
+
+           //     final URL feedURL = new URL(entry.getLink(Link.Rel.FEED, Link.Type.ATOM).getHref());
+
+                 CalendarEventFeed unFeed = myService.getFeed(feedURL, CalendarEventFeed.class);
+            retList = unFeed.getEntries();/* final CalendarEventEntry entry1 = new CalendarEventEntry();
+                entry1.setTitle(TextConstruct.plainText("Entry for my new calendar"));
+                entry1.setContent(TextConstruct.plainText("Sample content."));
+                final When event = new When();
+                event.setStartTime(DateTime.now());
+                entry1.addTime(event);
+                myService.insert(postURL, entry);*/
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        return retList;
+    }
+
     public void insertEvent(long absTime) {
         try {
             EventEntry myEntry = new EventEntry();
             myEntry.setTitle(new PlainTextConstruct("riuniuone SETA"));
             myEntry.setContent(new PlainTextConstruct("Meet for a quick discussion."));
             Person author = new Person("Marino Segnan", null, googleUserMail);
+            myEntry.getAuthors().add(author);
+            //    DateTime startTime = DateTime.parseDateTime("2006-04-17T15:00:00-08:00");
+            //     DateTime endTime = DateTime.parseDateTime("2006-04-17T17:00:00-08:00");
+            DateTime startTime = new DateTime(absTime);
+            DateTime endTime = new DateTime(absTime + 3600 * 1000);
+            When eventTimes = new When();
+            eventTimes.setStartTime(startTime);
+            eventTimes.setEndTime(endTime);
+            myEntry.addTime(eventTimes);
+// Send the request and receive the response:
+            EventEntry insertedEntry = myService.insert(privateUrl, myEntry);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        System.out.println("inserApt fatta");
+    }
+     public void insertEvent(long absTime, String title, String content) {
+        try {  // DA COMPLETARE!!!!!
+            EventEntry myEntry = new EventEntry();
+            myEntry.setTitle(new PlainTextConstruct("riuniuone SETA"));
+            myEntry.setContent(new PlainTextConstruct("Meet for a quick discussion."));
+         //   Person author = new Person("Marino Segnan", null, googleUserMail);
+            Person author = new Person(googleUserMail, null, googleUserMail);
             myEntry.getAuthors().add(author);
             //    DateTime startTime = DateTime.parseDateTime("2006-04-17T15:00:00-08:00");
             //     DateTime endTime = DateTime.parseDateTime("2006-04-17T17:00:00-08:00");
@@ -207,13 +278,13 @@ public class CalendarCall {
                 }
             }
 
-          /* NON VA READONLY !!!! */  EventEntry myEntry = new EventEntry();
+            /* NON VA READONLY !!!! */ EventEntry myEntry = new EventEntry();
             myEntry.setTitle(new PlainTextConstruct("prova"));
             myEntry.setContent(new PlainTextConstruct("Meet for a quick discussion."));
             Person author = new Person("Marino Segnan", null, googleUserMail);
             myEntry.getAuthors().add(author);
-                DateTime startTime = DateTime.parseDateTime("2009-06-17T15:00:00-08:00");
-                DateTime endTime = DateTime.parseDateTime("2009-06-17T17:00:00-08:00");
+            DateTime startTime = DateTime.parseDateTime("2009-06-17T15:00:00-08:00");
+            DateTime endTime = DateTime.parseDateTime("2009-06-17T17:00:00-08:00");
 
             When eventTimes = new When();
             eventTimes.setStartTime(startTime);
@@ -221,7 +292,7 @@ public class CalendarCall {
             myEntry.addTime(eventTimes);
 // Send the request and receive the response:
             EventEntry insertedEntry = myService.insert(feedUrl, myEntry);
-           /* */
+            /* */
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -367,7 +438,7 @@ public class CalendarCall {
 
 // Deleting an item
             URL deleteUrl = new URL(updatedEntry.getEditLink().getHref());
-        // NON CANCELLO   myService.delete(deleteUrl);
+            // NON CANCELLO   myService.delete(deleteUrl);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -378,26 +449,26 @@ public class CalendarCall {
     public static void main(String[] args) {
         CalendarCall c = getCalendarCall("sgnmrn@gmail.com", "micio11");
         c.leggiCalGio("sgnmrn@gmail.com", "micio11");
-      /*  while (true) {
-            List le = c.getCalendarEventsBoh("sgnmrn@gmail.com", "micio11");
-            if (le.size() == 0) {
-                break;
-            }
+        /*  while (true) {
+        List le = c.getCalendarEventsBoh("sgnmrn@gmail.com", "micio11");
+        if (le.size() == 0) {
+        break;
+        }
 
-            Iterator it = le.iterator();
+        Iterator it = le.iterator();
 
-            while (it.hasNext()) {
-                CalendarEventEntry en = (CalendarEventEntry) it.next();
-                List<When> lw = en.getTimes();
-                //    MyCalendarEventEntry mc = new MyCalendarEventEntry(en);
-                //    session.writeXMLObject(mc);//   session.writeObject(en);
-                System.out.println("evento titolo = " + en.getTitle().getPlainText());
-                if (lw.size() > 0) {
-                    When wh = lw.get(0);
-                    System.out.println(" " + wh.getStartTime().toString() + "  " + wh.getEndTime().toString());
-                }
+        while (it.hasNext()) {
+        CalendarEventEntry en = (CalendarEventEntry) it.next();
+        List<When> lw = en.getTimes();
+        //    MyCalendarEventEntry mc = new MyCalendarEventEntry(en);
+        //    session.writeXMLObject(mc);//   session.writeObject(en);
+        System.out.println("evento titolo = " + en.getTitle().getPlainText());
+        if (lw.size() > 0) {
+        When wh = lw.get(0);
+        System.out.println(" " + wh.getStartTime().toString() + "  " + wh.getEndTime().toString());
+        }
 
-            }
+        }
         }*/
     }
 }
