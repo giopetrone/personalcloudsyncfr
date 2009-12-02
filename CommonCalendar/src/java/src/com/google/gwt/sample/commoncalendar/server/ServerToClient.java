@@ -277,6 +277,7 @@ public class ServerToClient {
         System.err.println("torno da server");
         return cw;
     }
+
     /*
     public CalendarOwner[] getCalendarsFissiPerProvaOLD(SingleUser[] users) {
     CalendarOwner[] cw = new CalendarOwner[3];
@@ -309,6 +310,91 @@ public class ServerToClient {
     // from whatever library we have
 
     void loadAppts(SingleUser sU, CalendarOwner co, boolean special) {
+
+        /*  if (special) {
+        return;
+
+        }*/
+        int oraInizioGiornata = CalendarOwner.getStartHour();
+        int oraFineGiornata = CalendarOwner.getEndHour();
+        MyDate startDate = co.getStartDate();
+        MyDate endDate = co.getEndDate();
+        //    Calendar calNow = Calendar.getInstance();
+
+
+        //  co.setToday(oggi * 24 * 3600 * 1000);
+        //     int giornoSett = calNow.get(Calendar.DAY_OF_WEEK);
+        Calendar calS = Calendar.getInstance();
+        Calendar calE = Calendar.getInstance();
+
+        Calendar calNight = Calendar.getInstance();
+        updateMidnight(calNight, startDate);
+        long partenza = startDate.getTime(); //calNight.getTimeInMillis();
+        co.setTodayMidNight(partenza);
+        Calendar calFine = Calendar.getInstance();
+        updateMidnight(calFine, endDate);
+        long fine = endDate.getTime(); //calFine.getTimeInMillis();
+        int offsetFromStart = calNight.get(Calendar.DAY_OF_YEAR);
+        List appts = null;
+        if (special) {
+            appts = new ArrayList();
+        } else {
+            // remote call to googgle calendar !!!
+          //  appts = new CalendarCall(sU.getMailAddress(), sU.getPwd()).getCalendarEvents();
+   // CloudUsers cloud = new CloudUsers();
+   // SingleUser uss = cloud.getUserByEmail(co.getMailAddress());
+            
+         //   appts = new CalendarCall(co.getMailAddress(), uss.getPwd()).getCalendarEvents();
+             appts = new CalendarCall(sU.getMailAddress(), sU.getPwd(),co.getMailAddress()).getCalendarEvents();
+        }
+        Iterator it = appts.iterator();
+
+        while (it.hasNext()) {
+            //       MyCalendarEventEntry en = new MyCalendarEventEntry((CalendarEventEntry) it.next());
+            CalendarEventEntry en = (CalendarEventEntry) it.next();
+            List<When> lw = en.getTimes();
+            DateTime s = null;
+            DateTime e = null;
+            System.err.println("CAL1");
+            if (lw.size() > 0) {
+                When wh = lw.get(0);
+                s = wh.getStartTime();
+                e = wh.getEndTime();
+            }
+            //  System.err.println("CAL112");
+            if (s == null | e == null) {
+                System.err.println("Appointment with no time:" + en.getTitle().getPlainText());
+                continue;
+            }
+            //    System.err.println("CAL113");
+            // if appt yesterday or later than shown  days continue
+            if (e.getValue() < partenza || s.getValue() > fine) {
+                continue;
+            }
+            //   System.err.println("CAL11");
+            calS.setTimeInMillis(s.getValue());
+            calE.setTimeInMillis(e.getValue());
+            int giornoApp = calS.get(Calendar.DAY_OF_YEAR) - offsetFromStart;
+            int oraInizio = calS.get(Calendar.HOUR_OF_DAY);
+            int oraFine = calE.get(Calendar.HOUR_OF_DAY);
+            //   System.err.println("CAL2");
+            if (oraInizio == oraFine) {
+                oraFine++;
+            }
+            if (oraInizio >= oraFineGiornata || oraFine <= oraInizioGiornata) {
+                continue;
+            }
+            //  System.err.println("calendario, ora inizio fine e giorno" + giornoApp + " " +
+            //          oraInizio + " " + oraFine);
+            //   System.err.println("CAL3: " + giornoApp);
+            String tit = en.getTitle().getPlainText();
+            Appointment appol = new Appointment(tit, giornoApp, oraInizio, oraFine);
+            co.addImpegno(appol);
+            System.err.println("fine carico CALENDARIO!!!");
+        }
+    }
+
+ void loadApptsSAVE(SingleUser sU, CalendarOwner co, boolean special) {
 
         /*  if (special) {
         return;
@@ -382,6 +468,8 @@ public class ServerToClient {
             //          oraInizio + " " + oraFine);
             //   System.err.println("CAL3: " + giornoApp);
             String tit = en.getTitle().getPlainText();
+             System.err.println("creo app giornoorainorafin" +
+                     giornoApp + "/" + oraInizio + "/" +oraFine);
             Appointment appol = new Appointment(tit, giornoApp, oraInizio, oraFine);
             co.addImpegno(appol);
             System.err.println("fine carico CALENDARIO!!!");

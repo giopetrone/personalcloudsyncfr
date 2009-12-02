@@ -76,6 +76,7 @@ public class MeetingSession extends VerticalPanel {
     private MyDate endDate = null;
     private String[] settimane = null;
     private String[] ore = null;
+    private String[] freeTimes = null;
     private CommonCalendar originator;
     private String title;
     private SingleUser organizerUser;
@@ -162,7 +163,7 @@ public class MeetingSession extends VerticalPanel {
 
     private void initialize(Object qwr) {
         this.setCalendari((CalendarOwner[]) qwr);
-        createCalendarTable();
+        createFreeTimes();
         createPossibleList(5);
         showCompleteButton.addClickListener(new ClickListener() {
 
@@ -208,8 +209,21 @@ public class MeetingSession extends VerticalPanel {
         };
         CommonCalendar.getService().getCalendars(organizerUser, selectedUsers, startDate, endDate, callback77);
     }
-
     private void createPossibleList(int appointments) {
+
+        final int[] sceglibili = new int[appointments];
+        for (int i = 0, j=0; i < freeTimes.length ; i++) {
+
+            if (freeTimes[i].equals("")) {
+                // can be chosen as possible meeting date
+                espressione.addItem(trovaGiorno(i) + ";" + ore[i]);
+                sceglibili[j] = i;
+                j++;
+            }
+        }
+
+    }
+    private void createPossibleListOLD(int appointments) {
         int rows = calendarTable.getRowCount();
         int cols = calendarTable.getCellCount(0);
 
@@ -237,7 +251,28 @@ public class MeetingSession extends VerticalPanel {
         espressione.setVisibleItemCount(appointments);
     }
 
-    private void createCalendarTable() {
+    private void createFreeTimes() {
+      
+        
+   freeTimes = new String[settimane.length];
+        for (int j = 0; j < freeTimes.length; j++) {
+            freeTimes[j] = "";
+        }
+        
+        for (int i = 0; i < getCalendari().length - 1; i++) {
+            CalendarOwner co = getCalendari()[i];        
+            String[] occup = co.creaMat();
+            for (int j = 0; j < occup.length; j++) {
+                String oc = occup[j];
+                if (!oc.equals("")) {
+                    freeTimes[j] = "OCC";
+                }
+            }
+        }
+       
+    }
+
+private void createCalendarTableOLD() {
         for (int j = 0; j < settimane.length; j++) {
             String s1 = settimane[j];
             String s2 = ore[j];

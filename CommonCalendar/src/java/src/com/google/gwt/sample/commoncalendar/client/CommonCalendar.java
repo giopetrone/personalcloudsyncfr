@@ -576,14 +576,14 @@ public class CommonCalendar implements EntryPoint {
         MyDate end = null;
         Date dStart = startDate.getValue();
         Date dEnd = endDate.getValue();
-        start = new MyDate();
+        start = new MyDate(dStart.getTime());
         start.setDaysOfYear(0);
         start.setDayOfYear(0);
         start.setYear(dStart.getYear() + 1900);
         start.setMonth(dStart.getMonth());
         start.setDayOfWeek(dStart.getDay());
         start.setDayOfMonth(dStart.getDate());
-        end = new MyDate();
+        end = new MyDate(dEnd.getTime());
         end.setDaysOfYear(0);
         end.setDayOfYear(0);
         end.setYear(dEnd.getYear());
@@ -803,7 +803,7 @@ public class CommonCalendar implements EntryPoint {
         // aggiungo il pulsante "Invia" per inviare i dati di autenticazione
         // al server
 //inizio di v
-        buttonBar.add(new Button("Login", new SelectionListener<ButtonEvent>() {
+     /*   buttonBar.add(new Button("Login", new SelectionListener<ButtonEvent>() {
 
             @Override
             public void componentSelected(ButtonEvent ce) {
@@ -822,7 +822,7 @@ public class CommonCalendar implements EntryPoint {
                 getService().validateUser(userName.getValue(), userPwd.getValue(), callback222);
 
             }
-        }));
+        }));*/
 
         // aggiungo il pulsante "Cancella" per resettare il form
         buttonBar.add(new Button("Cancel", new SelectionListener<ButtonEvent>() {
