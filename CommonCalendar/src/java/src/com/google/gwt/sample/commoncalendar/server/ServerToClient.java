@@ -240,17 +240,6 @@ public class ServerToClient {
         return orcond;
     }
 
-    public void updateCalendarsOLD(CalendarOwner[] calendars, int rowIndex) {
-        //    System.out.println("modifico calendario google: "+ rowIndex + " "+ calendars.length);
-        long absTime = calendars[0].absoluteApptTime(rowIndex);
-        //     System.out.println("modifico calendario google: "+ absTime);
-        for (int i = 0; i < calendars.length; i++) {
-            CalendarOwner co = calendars[i];
-            System.out.println("modifico calendario google: " + co.getMailAddress() + " " + co.getPwd());
-           new CalendarCall(co.getMailAddress(), co.getPwd()).insertEvent(absTime);
-        }
-    }
-
     public void updateCalendars(CalendarOwner[] calendars, int rowIndex, SingleUser me) {
         //    System.out.println("modifico calendario google: "+ rowIndex + " "+ calendars.length);
         long absTime = calendars[0].absoluteApptTime(rowIndex);
@@ -260,7 +249,7 @@ public class ServerToClient {
             CalendarOwner co = calendars[i];
             System.out.println("modifico calendario google: " + co.getMailAddress() + " " + co.getPwd());
 
-            new CalendarCall(co.getMailAddress(), pwdMeetingProposeUser).insertEvent(absTime);
+            new CalendarCall(me.getMailAddress(), pwdMeetingProposeUser, co.getMailAddress()).insertEvent(absTime, "TITOLO", "CONTENUTO");
         }
     }
 
