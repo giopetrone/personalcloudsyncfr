@@ -247,7 +247,7 @@ public class ServerToClient {
         String pwdMeetingProposeUser = (cloudUsers.getUserByEmail(me.getMailAddress())).getPwd();
         for (int i = 0; i < calendars.length; i++) {
             CalendarOwner co = calendars[i];
-            System.out.println("modifico calendario google: " + co.getMailAddress() + " " + co.getPwd());
+            System.out.println("MODIFICO CALENDARIO GOOGLE google: " + me.getMailAddress() + " " + co.getMailAddress() + " " + co.getPwd() +"; " );
 
             new CalendarCall(me.getMailAddress(), pwdMeetingProposeUser, co.getMailAddress()).insertEvent(absTime, "TITOLO", "CONTENUTO");
         }

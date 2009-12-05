@@ -515,7 +515,7 @@ public class CommonCalendar implements EntryPoint {
         // can be completed
         //   CommonCalendar.debug("show45");
         EventDescription[] eve = (EventDescription[]) qwr;
-        EventDescription eD = null;
+     
         for (int i = 0; i < eve.length; i++) {
             if (eve[i] == null) {
                 return;
@@ -527,13 +527,16 @@ public class CommonCalendar implements EntryPoint {
                 //  debug("showevents 00");
                 MeetingSession sessio = waitingSessions.get(j);
                 if (sessio.addRisposta(eve[i])) {
-                    debug("showevents ricevo risposta!!! ");
-                    sessio.setConfirmedColor(eve[i]);
-                    eD = eve[i];
+                   
+                  //  per ora DISATTIVATO!!!! sessio.setConfirmedColor(eve[i]);
+                  //
+                  //  MessageBox.alert("showevents 1 ricevo risposta!!! ",eD.getDescription(),null);
                     break;
                 }
             }
+           
         }
+     //    MessageBox.alert("showevents 2 ricevo risposta!!! ",eD== null? "null":"non null",null);
         //     debug("showevents 1");
         for (int j = 0; j < waitingSessions.size(); j++) {
             MeetingSession v = waitingSessions.get(j);
@@ -558,8 +561,10 @@ public class CommonCalendar implements EntryPoint {
                 //    debug("showevents 3");
                 waitingSessions.remove(j);
                 //  Window.alert("event confirmed: " + v.getEventDescription());
-                String date = eD.getParameter("Date");
-                MessageBox.alert("Meeting confirmed: ", date, null);
+              
+             //   String date = eD.getParameter("Date");
+
+              MessageBox.alert("Meeting confirmed: ", v.getTemplate().getParameter("Date"), null);
             }
         }
     }

@@ -91,7 +91,7 @@ public class MeetingSession extends VerticalPanel {
         CommonCalendar.debug("\t" + evt.getSessionId() + " " + sessionId);
         // if the destination is this user AND the answer
         // relates to this meeting proposal, check if answe == yes
-        if (evt.getDestinatari().contains(template.getUser()) &&
+        if (evt.getDestinatari().contains(getTemplate().getUser()) &&
                 evt.getSessionId().equals(sessionId)) {
             ArrayList params = evt.getParameters();
             if (!params.isEmpty()) {
@@ -117,7 +117,7 @@ public class MeetingSession extends VerticalPanel {
     }
 
     public String getEventDescription() {
-        return template.getDescription();
+        return getTemplate().getDescription();
     }
 
     public EventDescription[] getConfirmation() {
@@ -144,14 +144,14 @@ public class MeetingSession extends VerticalPanel {
             // des.setDestinatario(tr.getMailAddress()); GIO
 
             des.setEventName("MeetingProposal");
-            des.setUser(template.getUser());
-            des.setApplication(template.getApplication());
+            des.setUser(getTemplate().getUser());
+            des.setApplication(getTemplate().getApplication());
             //commentato da gio
-            des.setDestinatari(template.getDestinatari());// NUOVO, MAR
+            des.setDestinatari(getTemplate().getDestinatari());// NUOVO, MAR
             // des.addDestinatario(tr.getMailAddress()); //??? GIO
             des.setSessionId(sessionId);
             //    des.setCorrelationId("*");
-            des.setParameters(template.getParameters());
+            des.setParameters(getTemplate().getParameters());
             CommonCalendar.debug("ev: " + des.getDescription());
         }
         return publishedEvents;
@@ -343,7 +343,7 @@ private void createCalendarTableOLD() {
         // set the position of appointment in the calendar table for retrieving later day and time
         this.rowIndex = meetingIndex;
 
-        template.setParameter("Date", messageParam);
+        getTemplate().setParameter("Date", messageParam);
         originator.sendEvents(getProposal());
         MessageBox.alert("Proposed meeting date", "", null);
     }
@@ -452,5 +452,19 @@ private void createCalendarTableOLD() {
         });
 
 
+    }
+
+    /**
+     * @return the template
+     */
+    public EventDescription getTemplate() {
+        return template;
+    }
+
+    /**
+     * @param template the template to set
+     */
+    public void setTemplate(EventDescription template) {
+        this.template = template;
     }
 }
