@@ -35,7 +35,7 @@ public interface ICommonCalendarAsync {
 
     public void getCalendars(SingleUser sU, SingleUser[] users, MyDate startDate, MyDate endDate, AsyncCallback callback);
 
-    public void updateCalendars(CalendarOwner[] calends, int rowIndex, SingleUser me, AsyncCallback callback);
+    public void updateCalendars(CalendarOwner[] calends, int rowIndex, SingleUser me, String title, AsyncCallback callback);
 
     public void cheGiornoOggi(AsyncCallback callback);
 

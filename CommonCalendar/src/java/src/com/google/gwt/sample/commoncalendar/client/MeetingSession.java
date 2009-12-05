@@ -18,6 +18,7 @@ import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.extjs.gxt.ui.client.widget.form.Radio;
 import com.extjs.gxt.ui.client.widget.form.RadioGroup;
+import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 //import com.google.gwt.user.client.ui.Button;
@@ -80,6 +81,7 @@ public class MeetingSession extends VerticalPanel {
     private CommonCalendar originator;
     private String title;
     private SingleUser organizerUser;
+    TextField<String> meetingTitle;
 
     public boolean addRisposta(EventDescription evt) {
 
@@ -209,10 +211,11 @@ public class MeetingSession extends VerticalPanel {
         };
         CommonCalendar.getService().getCalendars(organizerUser, selectedUsers, startDate, endDate, callback77);
     }
+
     private void createPossibleList(int appointments) {
 
         final int[] sceglibili = new int[appointments];
-        for (int i = 0, j=0; i < freeTimes.length ; i++) {
+        for (int i = 0, j = 0; i < freeTimes.length; i++) {
 
             if (freeTimes[i].equals("")) {
                 // can be chosen as possible meeting date
@@ -223,6 +226,7 @@ public class MeetingSession extends VerticalPanel {
         }
 
     }
+
     private void createPossibleListOLD(int appointments) {
         int rows = calendarTable.getRowCount();
         int cols = calendarTable.getCellCount(0);
@@ -252,15 +256,15 @@ public class MeetingSession extends VerticalPanel {
     }
 
     private void createFreeTimes() {
-      
-        
-   freeTimes = new String[settimane.length];
+
+
+        freeTimes = new String[settimane.length];
         for (int j = 0; j < freeTimes.length; j++) {
             freeTimes[j] = "";
         }
-        
+
         for (int i = 0; i < getCalendari().length - 1; i++) {
-            CalendarOwner co = getCalendari()[i];        
+            CalendarOwner co = getCalendari()[i];
             String[] occup = co.creaMat();
             for (int j = 0; j < occup.length; j++) {
                 String oc = occup[j];
@@ -269,10 +273,10 @@ public class MeetingSession extends VerticalPanel {
                 }
             }
         }
-       
+
     }
 
-private void createCalendarTableOLD() {
+    private void createCalendarTableOLD() {
         for (int j = 0; j < settimane.length; j++) {
             String s1 = settimane[j];
             String s2 = ore[j];
@@ -342,7 +346,7 @@ private void createCalendarTableOLD() {
         espressione.setEnabled(false);
         // set the position of appointment in the calendar table for retrieving later day and time
         this.rowIndex = meetingIndex;
-
+        this.title = meetingTitle.getValue();
         getTemplate().setParameter("Date", messageParam);
         originator.sendEvents(getProposal());
         MessageBox.alert("Proposed meeting date", "", null);
@@ -395,16 +399,25 @@ private void createCalendarTableOLD() {
         //    final String quest = msg;
         Html space = new Html("<br/>");
 
+        meetingTitle   = new TextField<String>();
+        meetingTitle.setAllowBlank(false);
+        meetingTitle.setFieldLabel("Meeting Titile");
         final Radio[] buttonsArray = new Radio[numberOfDates];
         final RadioGroup radioG = new RadioGroup();
-        radioG.setOrientation(Style.Orientation.VERTICAL);
-        radioG.setFieldLabel("options");
 
+        radioG.setOrientation(Style.Orientation.VERTICAL);
+
+        radioG.setFieldLabel("options");
         final FormPanel buttonsPanel = new FormPanel();
+
         buttonsPanel.setHeading("CommonCalendarMgr");
+
         buttonsPanel.setStyleAttribute("backgroundColor", "#DFE8F6");
         // #CCFFFF
-        for (int i = 0; i < numberOfDates; i++) {
+
+        for (int i = 0;
+                i < numberOfDates;
+                i++) {
             buttonsArray[i] = new Radio();
             buttonsArray[i].setFieldLabel((new Integer(i)).toString());
             //       buttonsArray[i].setFieldLabel("opzione " + (i + 1));
@@ -415,11 +428,15 @@ private void createCalendarTableOLD() {
             radioG.add(buttonsArray[i]);
             buttonsPanel.add(radioG);
         }
-
+        buttonsPanel.add(meetingTitle);
         final Button btnSendDate = new Button("Send date");
+
         buttonsPanel.add(space);
+
         buttonsPanel.add(btnSendDate);
+
         add(buttonsPanel);
+
         buttonsPanel.setVisible(true);
         //fine gestione radiobuttons
         final AsyncCallback callback = new AsyncCallback() {
@@ -450,7 +467,6 @@ private void createCalendarTableOLD() {
 
             }
         });
-
 
     }
 
