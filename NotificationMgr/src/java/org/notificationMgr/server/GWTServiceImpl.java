@@ -230,7 +230,7 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
                         //  String destName = tmp[i].getDestinatario();
                         String msg = evName;
                         if (tmp[i].getEventName().equals("MeetingProposal")) {
-                            msg = msg + " to participate  : " + tmp[i].getParameter("Date");
+                            msg = msg + " to participate  : " + tmp[i].getParameter("Title") + "when: " + tmp[i].getParameter("Date") ;
                             // msg = msg + "  Please connect to  http://localhost:8080/SurveyMgr/";
 
                         } else if (tmp[i].getEventName().equals("MembershipProposal")) {
