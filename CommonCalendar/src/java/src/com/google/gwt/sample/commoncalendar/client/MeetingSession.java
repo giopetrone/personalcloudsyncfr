@@ -124,7 +124,7 @@ public class MeetingSession extends VerticalPanel {
 
     public EventDescription[] getConfirmation() {
         for (int k = 0; k < publishedEvents.length; k++) {
-            MessageBox.alert("MEETING CONFIRMATION", "", null);
+           // MessageBox.alert("MEETING CONFIRMATION", "", null);
             publishedEvents[k].setEventName("MeetingConfirmation");
         }
         return publishedEvents;
@@ -348,6 +348,7 @@ public class MeetingSession extends VerticalPanel {
         this.rowIndex = meetingIndex;
         this.title = meetingTitle.getValue();
         getTemplate().setParameter("Date", messageParam);
+        getTemplate().setParameter("Title", title);  //GIO
         originator.sendEvents(getProposal());
         MessageBox.alert("Proposed meeting date", "", null);
     }
