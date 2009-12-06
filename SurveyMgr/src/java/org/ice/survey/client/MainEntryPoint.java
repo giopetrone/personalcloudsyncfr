@@ -346,7 +346,7 @@ public class MainEntryPoint implements EntryPoint {
             //      debug("SURVEY: sono in showtEvents prima di addMsgROW " + eve[i].getEventName() + " dest = " + eve[i].getDestinatario() + " eventId =  " + eve[i].getEventId());
             if (eve[i].getDestinatari().contains(me)) {
                 if (eve[i].getEventName().equals("MeetingProposal")) {
-                    addMsgRow(eve[i].getEventName() + "  " + eve[i].getParameter("Date") + "<br />", eve[i].getEventId());
+                    addMsgRow(eve[i].getEventName() + "  " +eve[i].getParameter("Title")  + " when: " + eve[i].getParameter("Date") + "<br />", eve[i].getEventId());
                 }
                 if ((eve[i].getEventName().equals("MembershipProposal"))) {
                     addMsgRow(eve[i].getEventName() + "  group: " + eve[i].getParameter("groupName") + "<br />", eve[i].getEventId());
