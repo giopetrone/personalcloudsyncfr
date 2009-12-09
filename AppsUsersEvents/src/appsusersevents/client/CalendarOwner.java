@@ -12,7 +12,7 @@ import java.util.ArrayList;
  *
  * @author marino
  */
-public class CalendarOwner implements Serializable, IsSerializable  {
+public class CalendarOwner implements Serializable, IsSerializable {
 
     SingleUser user;
     private ArrayList<Appointment> impegni = new ArrayList();
@@ -180,13 +180,14 @@ public class CalendarOwner implements Serializable, IsSerializable  {
         for (int j = 0; j < ret.length; j++) {
             ret[j] = "";
         }
-
         for (int j = 0; j < getImpegni().size(); j++) {
             Appointment ap = (Appointment) getImpegni().get(j);
             int posto = ap.getPosto(startHour, SlotsPerDay);
-            ret[posto] = ap.getTitolo();
+            // appointments longer than 1 hour ?
+            for (int i = 0; i < endHour - startHour; i++) {
+                ret[posto + i] = ap.getTitolo();
+            }
         }
-
         return ret;
     }
 
