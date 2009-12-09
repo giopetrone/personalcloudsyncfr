@@ -144,8 +144,8 @@ public class CommonCalendarServiceImpl extends RemoteServiceServlet implements
         return new ServerToClient().getCalendars(sU, users, startDate, endDate);
     }
 
-    public void updateCalendars(CalendarOwner[] users, int rowIndex, SingleUser me, String title) {
-        new ServerToClient().updateCalendars(users, rowIndex,  me, title);
+    public void updateCalendars(CalendarOwner[] users, int rowIndex, SingleUser me, String title, int durata) {
+        new ServerToClient().updateCalendars(users, rowIndex,  me, title, durata);
     }
 
     public MyDate cheGiornoOggi() {

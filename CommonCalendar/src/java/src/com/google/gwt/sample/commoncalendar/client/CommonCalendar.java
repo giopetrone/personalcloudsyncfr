@@ -53,6 +53,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.client.ui.SourcesTableEvents;
 import com.google.gwt.user.client.ui.TableListener;
 import com.google.gwt.user.client.ui.TextArea;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.TreeItem;
 
@@ -73,6 +74,7 @@ public class CommonCalendar implements EntryPoint {
     private Button addButton;  // Show possible meeting dates
     private DateField startDate;
     private DateField endDate;
+    private TextBox duration;
 //    private com.google.gwt.user.client.ui.Button creaTree = new com.google.gwt.user.client.ui.Button("get users and groups");
     private Label lblServerReply = new Label();
     // private Label msgLabel = new Label();
@@ -175,6 +177,8 @@ public class CommonCalendar implements EntryPoint {
         //   startDate = new DatePicker();
         startDate = new DateField();
         startDate.setFieldLabel("from...");
+        duration = new TextBox();
+        duration.setText("1");
         endDate = new DateField();
         endDate.setFieldLabel("to...");
         // layout
@@ -186,6 +190,8 @@ public class CommonCalendar implements EntryPoint {
         selectionPanel.add(startDate);
 //        selectionPanel.add(selectionDateEnd);
         selectionPanel.add(endDate);
+        selectionPanel.add(new Label("duration"));
+        selectionPanel.add(duration);
         selectionPanel.add(space);
         selectionPanel.add(addButton); //per possible meeting dates
         //   selectionPanel.add(messaggio);
@@ -515,7 +521,7 @@ public class CommonCalendar implements EntryPoint {
         // can be completed
         //   CommonCalendar.debug("show45");
         EventDescription[] eve = (EventDescription[]) qwr;
-     
+
         for (int i = 0; i < eve.length; i++) {
             if (eve[i] == null) {
                 return;
@@ -527,16 +533,16 @@ public class CommonCalendar implements EntryPoint {
                 //  debug("showevents 00");
                 MeetingSession sessio = waitingSessions.get(j);
                 if (sessio.addRisposta(eve[i])) {
-                   
-                  //  per ora DISATTIVATO!!!! sessio.setConfirmedColor(eve[i]);
-                  //
-                  //  MessageBox.alert("showevents 1 ricevo risposta!!! ",eD.getDescription(),null);
+
+                    //  per ora DISATTIVATO!!!! sessio.setConfirmedColor(eve[i]);
+                    //
+                    //  MessageBox.alert("showevents 1 ricevo risposta!!! ",eD.getDescription(),null);
                     break;
                 }
             }
-           
+
         }
-     //    MessageBox.alert("showevents 2 ricevo risposta!!! ",eD== null? "null":"non null",null);
+        //    MessageBox.alert("showevents 2 ricevo risposta!!! ",eD== null? "null":"non null",null);
         //     debug("showevents 1");
         for (int j = 0; j < waitingSessions.size(); j++) {
             MeetingSession v = waitingSessions.get(j);
@@ -557,14 +563,14 @@ public class CommonCalendar implements EntryPoint {
                     }
                 };
                 //    debug("showevents 2");
-                getService().updateCalendars(v.getUserCalendars(), v.getIndexDataMeeting(), me, v.getTitle(), callback33);
+                getService().updateCalendars(v.getUserCalendars(), v.getIndexDataMeeting(), me, v.getTitle(), v.getMeetingLength(), callback33);
                 //    debug("showevents 3");
                 waitingSessions.remove(j);
                 //  Window.alert("event confirmed: " + v.getEventDescription());
-              
-             //   String date = eD.getParameter("Date");
 
-              MessageBox.alert("Meeting confirmed: ", v.getTemplate().getParameter("Date"), null);
+                //   String date = eD.getParameter("Date");
+
+                MessageBox.alert("Meeting confirmed: ", v.getTemplate().getParameter("Date"), null);
             }
         }
     }
@@ -581,6 +587,11 @@ public class CommonCalendar implements EntryPoint {
         MyDate end = null;
         Date dStart = startDate.getValue();
         Date dEnd = endDate.getValue();
+        int durata = 1;
+        try {
+            durata = Integer.parseInt(duration.getText());
+        } catch (Exception ex) {
+        }
         start = new MyDate(dStart.getTime());
         start.setDaysOfYear(0);
         start.setDayOfYear(0);
@@ -598,6 +609,7 @@ public class CommonCalendar implements EntryPoint {
 
         debug(start.getDescription() + "    " + end.getDescription());
         SingleUser[] selectedUsers = getSelectedUsers();
+       
         if (selectedUsers.length > 0) {
             EventDescription template = new EventDescription("*");
             template.setUser(me.getMailAddress());
@@ -605,10 +617,10 @@ public class CommonCalendar implements EntryPoint {
             template.setApplication(thisApplication);
             // set shperes (alias groups and usrs in the event
             // UserGroup.getUserMap(getDestinationUsers());
-            template.setInvolvedUsers(UserGroup.getSingleUsers(getDestinationUsers()));            
-           template.setSpheres(UserGroup.getGroups(getDestinationUsers()));
+            template.setInvolvedUsers(UserGroup.getSingleUsers(getDestinationUsers()));
+            template.setSpheres(UserGroup.getGroups(getDestinationUsers()));
             //MeetingSession session = new MeetingSession(this, template, selectedUsers, start, end, "Meeting proposal");
-            session = new MeetingSession(this, template, selectedUsers, start, end, "Meeting proposal");
+            session = new MeetingSession(this, template, selectedUsers, start, end, "Meeting proposal", durata);
             waitingSessions.add(session);
             //        panel2.add(session);  MARINO
             selectionPanel.setVisible(false);
@@ -810,23 +822,23 @@ public class CommonCalendar implements EntryPoint {
 //inizio di v
      /*   buttonBar.add(new Button("Login", new SelectionListener<ButtonEvent>() {
 
-            @Override
-            public void componentSelected(ButtonEvent ce) {
-                final AsyncCallback callback222 = new AsyncCallback() {
+        @Override
+        public void componentSelected(ButtonEvent ce) {
+        final AsyncCallback callback222 = new AsyncCallback() {
 
-                    public void onSuccess(Object result) {
-                        debug("success");
-                        welcomeUser(result);
+        public void onSuccess(Object result) {
+        debug("success");
+        welcomeUser(result);
 
-                    }
+        }
 
-                    public void onFailure(Throwable caught) {
-                        debug("Communication failed");
-                    }
-                };
-                getService().validateUser(userName.getValue(), userPwd.getValue(), callback222);
+        public void onFailure(Throwable caught) {
+        debug("Communication failed");
+        }
+        };
+        getService().validateUser(userName.getValue(), userPwd.getValue(), callback222);
 
-            }
+        }
         }));*/
 
         // aggiungo il pulsante "Cancella" per resettare il form

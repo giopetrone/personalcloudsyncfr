@@ -81,6 +81,7 @@ public class MeetingSession extends VerticalPanel {
     private CommonCalendar originator;
     private String title;
     private SingleUser organizerUser;
+    private int meetingLength = 1;
     TextField<String> meetingTitle;
 
     public boolean addRisposta(EventDescription evt) {
@@ -163,10 +164,10 @@ public class MeetingSession extends VerticalPanel {
         return rowIndex;
     }
 
-    private void initialize(Object qwr) {
+    private void initialize(Object qwr, int hours) {
         this.setCalendari((CalendarOwner[]) qwr);
         createFreeTimes();
-        createPossibleList(5);
+        createPossibleList(5, hours);
         showCompleteButton.addClickListener(new ClickListener() {
 
             public void onClick(Widget sender) {
@@ -179,9 +180,10 @@ public class MeetingSession extends VerticalPanel {
     }
 
     public MeetingSession(CommonCalendar originator, EventDescription startingEvent, SingleUser[] selectedUsers,
-            MyDate startDate, MyDate endDate, String title) {
+            MyDate startDate, MyDate endDate, String title, int meetingLength) {
         this.originator = originator;
         this.template = startingEvent;
+        this.meetingLength = meetingLength;
         this.receivers = selectedUsers;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -200,7 +202,7 @@ public class MeetingSession extends VerticalPanel {
 
             public void onSuccess(Object result) {
                 CommonCalendar.debug("success");
-                initialize(result);
+                initialize(result, getMeetingLength());
             }
 
             public void onFailure(Throwable caught) {
@@ -212,16 +214,27 @@ public class MeetingSession extends VerticalPanel {
         CommonCalendar.getService().getCalendars(organizerUser, selectedUsers, startDate, endDate, callback77);
     }
 
-    private void createPossibleList(int appointments) {
+    private void createPossibleList(int appointments, int hours) {
 
         final int[] sceglibili = new int[appointments];
         for (int i = 0, j = 0; i < freeTimes.length; i++) {
-
             if (freeTimes[i].equals("")) {
                 // can be chosen as possible meeting date
-                espressione.addItem(trovaGiorno(i) + ";" + ore[i]);
-                sceglibili[j] = i;
-                j++;
+                // long meeting?
+                boolean ok = true;
+                if (hours > 1) {
+                    for (int k = 1; k < hours; k++) {
+                        if (!freeTimes[i + k].equals("")) {
+                            ok = false;
+                            break;
+                        }
+                    }
+                }
+                if (ok) {
+                    espressione.addItem(trovaGiorno(i) + ";" + ore[i]);
+                    sceglibili[j] = i;
+                    j++;
+                }
             }
         }
 
@@ -256,13 +269,10 @@ public class MeetingSession extends VerticalPanel {
     }
 
     private void createFreeTimes() {
-
-
         freeTimes = new String[settimane.length];
         for (int j = 0; j < freeTimes.length; j++) {
             freeTimes[j] = "";
         }
-
         for (int i = 0; i < getCalendari().length - 1; i++) {
             CalendarOwner co = getCalendari()[i];
             String[] occup = co.creaMat();
@@ -273,7 +283,6 @@ public class MeetingSession extends VerticalPanel {
                 }
             }
         }
-
     }
 
     private void createCalendarTableOLD() {
@@ -348,7 +357,11 @@ public class MeetingSession extends VerticalPanel {
         this.rowIndex = meetingIndex;
         this.title = meetingTitle.getValue();
         getTemplate().setParameter("Date", messageParam);
+
+        getTemplate().setParameter("Duration", "" + meetingLength);
+
         getTemplate().setParameter("Title", title);  //GIO
+
         originator.sendEvents(getProposal());
         MessageBox.alert("Proposed meeting date", "", null);
     }
@@ -400,7 +413,7 @@ public class MeetingSession extends VerticalPanel {
         //    final String quest = msg;
         Html space = new Html("<br/>");
 
-        meetingTitle   = new TextField<String>();
+        meetingTitle = new TextField<String>();
         meetingTitle.setAllowBlank(false);
         meetingTitle.setFieldLabel("Meeting Titile");
         final Radio[] buttonsArray = new Radio[numberOfDates];
@@ -484,4 +497,9 @@ public class MeetingSession extends VerticalPanel {
     public void setTemplate(EventDescription template) {
         this.template = template;
     }
+
+    public int getMeetingLength() {
+        return meetingLength;
+    }
+
 }
