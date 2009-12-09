@@ -128,7 +128,7 @@ public class CalendarCall {
         return retList;
     }
 
-    public void insertEvent(long absTime, String title, String content) {
+    public void insertEvent(long absTime, String title, String content, int durata) {
         try {
             EventEntry myEntry = new EventEntry();
             myEntry.setTitle(new PlainTextConstruct(title));
@@ -137,7 +137,7 @@ public class CalendarCall {
             Person author = new Person(googleUserMail, null, googleUserMail);
             myEntry.getAuthors().add(author);
             DateTime startTime = new DateTime(absTime);
-            DateTime endTime = new DateTime(absTime + 3600 * 1000);
+            DateTime endTime = new DateTime(absTime + durata * 3600 * 1000);
             When eventTimes = new When();
             eventTimes.setStartTime(startTime);
             eventTimes.setEndTime(endTime);
