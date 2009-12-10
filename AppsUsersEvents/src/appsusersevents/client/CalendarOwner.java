@@ -184,8 +184,8 @@ public class CalendarOwner implements Serializable, IsSerializable {
             Appointment ap = (Appointment) getImpegni().get(j);
             int posto = ap.getPosto(startHour, SlotsPerDay);
             // appointments longer than 1 hour ?
-            for (int i = 0; i < endHour - startHour; i++) {
-                ret[posto + i] = ap.getTitolo();
+            for (int i = 0; i < ap.getDurata(); i++) {
+                ret[posto + i] = ap.getTitolo() + ";";
             }
         }
         return ret;

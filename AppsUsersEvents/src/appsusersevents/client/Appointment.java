@@ -27,6 +27,10 @@ public class Appointment implements IsSerializable {
         this.oraFine = oraF;
     }
 
+    public int getDurata() {
+        return oraFine - oraInizio;
+    }
+
     public int getPosto(int offset, int slotsPerDay) {
         //this is the place in the table
         //could be moved to the GUI
