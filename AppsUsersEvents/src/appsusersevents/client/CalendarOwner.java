@@ -24,7 +24,7 @@ public class CalendarOwner implements Serializable, IsSerializable {
     private static int Weeks = 2;
     private static int startHour = 8;
     private static int endHour = 18;
-    private int offsetfromGMT = 2;
+    private int offsetfromGMT = 1;
     private static String[] giorniSettimana = {"Dom", "Lun", " Mar", "Mer", "Gio", "Ven", "Sab"};
 
     public String getName() {
