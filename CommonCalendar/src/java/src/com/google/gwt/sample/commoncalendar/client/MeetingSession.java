@@ -481,7 +481,8 @@ public class MeetingSession extends VerticalPanel {
 
                 //per mandare evento a giga
                 int appIndex = (new Integer(risp)).intValue();
-                createClickCall(appIndex, trovaGiorno(appIndex) + ";" + ore[appIndex]);
+            //    createClickCall(appIndex, trovaGiorno(appIndex) + ";" + ore[appIndex]);
+                createClickCall(appIndex,espressione.getItemText(appIndex));
 
             }
         });

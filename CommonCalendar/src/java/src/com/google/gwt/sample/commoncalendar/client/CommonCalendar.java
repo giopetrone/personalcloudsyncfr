@@ -194,7 +194,7 @@ public class CommonCalendar implements EntryPoint {
         selectionPanel.add(duration);
         selectionPanel.add(space);
         selectionPanel.add(addButton); //per possible meeting dates
-        //   selectionPanel.add(messaggio);
+       //   selectionPanel.add(messaggio);
 
         RootPanel.get().add(loginPanel()); // ANNA E GIO
         //           panel.add(selDatePanel);
