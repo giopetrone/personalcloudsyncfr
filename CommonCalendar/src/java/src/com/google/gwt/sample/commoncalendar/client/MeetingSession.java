@@ -20,6 +20,7 @@ import com.extjs.gxt.ui.client.widget.form.Radio;
 import com.extjs.gxt.ui.client.widget.form.RadioGroup;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 //import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.ClickListener;
@@ -273,16 +274,19 @@ public class MeetingSession extends VerticalPanel {
         for (int j = 0; j < freeTimes.length; j++) {
             freeTimes[j] = "";
         }
+        String tutti = "";
         for (int i = 0; i < getCalendari().length - 1; i++) {
             CalendarOwner co = getCalendari()[i];
             String[] occup = co.creaMat();
             for (int j = 0; j < occup.length; j++) {
                 String oc = occup[j];
+                tutti += oc +"\n";
                 if (!oc.equals("")) {
                     freeTimes[j] = "OCC";
                 }
             }
         }
+       // Window.alert(tutti);
     }
 
     private void createCalendarTableOLD() {
