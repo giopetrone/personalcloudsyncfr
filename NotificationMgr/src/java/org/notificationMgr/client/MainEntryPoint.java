@@ -312,7 +312,7 @@ public class MainEntryPoint implements EntryPoint {
                     addMsgRow(eve[i].getEventName()+ "  " + eve[i].getParameter("Title") + " when:  " + eve[i].getParameter("Date") + "<br />", eve[i].getEventId());
                 }
                 if ((eve[i].getEventName().equals("MeetingConfirmation"))) {
-                    addMsgRow(eve[i].getEventName() + "  " + eve[i].getParameter("Date") + "<br />", eve[i].getEventId());
+                    addMsgRow(eve[i].getEventName() + "  " + eve[i].getParameter("Title") + " when:  "+ eve[i].getParameter("Date") + "<br />", eve[i].getEventId());
                 }
                 if ((eve[i].getEventName().equals("MembershipProposal"))) {
                     // addMsgRow(eve[i].getEventName() + "  group: " + eve[i].getParameter("groupName") + "<br />Please connect to: " + linkSurvey + "<br />", eve[i].getEventId());
