@@ -20,7 +20,6 @@ import com.extjs.gxt.ui.client.widget.form.Radio;
 import com.extjs.gxt.ui.client.widget.form.RadioGroup;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 //import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.ClickListener;
@@ -215,9 +214,11 @@ public class MeetingSession extends VerticalPanel {
         CommonCalendar.getService().getCalendars(organizerUser, selectedUsers, startDate, endDate, callback77);
     }
 
+     int[] sceglibili ;
+
     private void createPossibleList(int appointments, int hours) {
 
-        final int[] sceglibili = new int[appointments];
+       sceglibili = new int[appointments];
         for (int i = 0, j = 0; i < freeTimes.length; i++) {
             if (freeTimes[i].equals("")) {
                 // can be chosen as possible meeting date
@@ -367,6 +368,7 @@ public class MeetingSession extends VerticalPanel {
         getTemplate().setParameter("Title", title);  //GIO
 
         originator.sendEvents(getProposal());
+       //Window.alert("Proposed meeting date" + meetingIndex);
         MessageBox.alert("Proposed meeting date", "", null);
     }
 
@@ -482,7 +484,7 @@ public class MeetingSession extends VerticalPanel {
                 //per mandare evento a giga
                 int appIndex = (new Integer(risp)).intValue();
             //    createClickCall(appIndex, trovaGiorno(appIndex) + ";" + ore[appIndex]);
-                createClickCall(appIndex,espressione.getItemText(appIndex));
+                createClickCall(sceglibili[appIndex],espressione.getItemText(appIndex));
 
             }
         });
