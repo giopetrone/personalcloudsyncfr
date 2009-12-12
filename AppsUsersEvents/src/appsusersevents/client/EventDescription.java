@@ -693,19 +693,62 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
 
     // returns true if the destinatari field of the template is empty
     // or if it has the same list of destinatary users (leaving order of occurrence apart)
+    //GIO 11-12-09
+    public boolean destinatariCompatibleNEW(EventDescription template) {
+        boolean compatible = false;
+        ArrayList<String> dest = template.getDestinatari();
+        System.out.println("%%%%%%EVENT DESCR destinatari: " + destinatari);
+        System.out.println("%%%%%%EVENT DESCR dest: " + dest);
+        if (dest != null && destinatari.size() != 0) { // if size==0 --> * case
+//            if (dest.size() != destinatari.size()) // not the same list of users
+//            {
+//                out = false;
+//            } else {
+            for (int i = 0; i < dest.size(); i++) {
+                // if (!dest.contains(destinatari.get(i))) {
+                if (destinatari.contains(dest.get(i))) {
+                    compatible = true;
+                    System.out.println("%%%%%%destinataricompatible : " + dest.get(i));
+                    break;
+                }
+                // }
+            }
+        }
+        return compatible;
+    }
+
     public boolean destinatariCompatible(EventDescription template) {
+        //boolean out = true;
+        ArrayList<String> destinatariFiltro = template.getDestinatari();
+        System.out.println("%%%%%%EVENT DESCR evento da GIGa: " + destinatari);
+        System.out.println("%%%%%%EVENT DESCR evento del filtro: " + destinatariFiltro);
+        if (destinatariFiltro.size() == 0) {
+            return true;
+        }
+        for (int i = 0; i < destinatariFiltro.size(); i++) {
+            if (destinatari.contains(destinatariFiltro.get(i))) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    // returns true if the destinatari field of the template is empty
+    // or if it has the same list of destinatary users (leaving order of occurrence apart)
+
+    public boolean destinatariCompatibleORIG(EventDescription template) {
         boolean out = true;
         ArrayList<String> dest = template.getDestinatari();
         System.out.println("%%%%%%EVENT DESCR destinatari: " + destinatari);
         System.out.println("%%%%%%EVENT DESCR dest: " + dest);
         if (dest.size() != 0) { // if size==0 --> * case
-//            if (dest.size() != destinatari.size()) // not the same list of users
-//            {
-//                out = false;
-//            } else {
+            if (dest.size() != destinatari.size()) // not the same list of users            {
+            {
+                out = false;
+            }
+        } else {
             for (int i = 0; i < destinatari.size(); i++) {
-               // if (!dest.contains(destinatari.get(i))) {
-                     if (!destinatari.contains(dest.get(i))) {
+                if (!dest.contains(destinatari.get(i))) {
                     out = false;
                     break;
                 }
@@ -714,11 +757,11 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
         }
         return out;
     }
+
     // creates a template with the same structure as this, where
     // only some fields are instantiated, and the others are set to "*" or []
     // NB: the template must be used in read-only mode, as its complex fields
     // (e.g., spheres) are not cloned from those of the source event
-
     public EventDescription createtemplate(boolean application, boolean explicitEvent,
             boolean processed, boolean eventName, boolean user,
             boolean spheres, boolean relevantSpheres,
