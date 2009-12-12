@@ -95,8 +95,8 @@ public class MeetingSession extends VerticalPanel {
      //   CommonCalendar.debug("\t" + evt.getSessionId() + " " + sessionId);
         // if the destination is this user AND the answer
         // relates to this meeting proposal, check if answe == yes
-      //  if (evt.getDestinatari().contains(getTemplate().getUser()) &&
-                if (evt.getSessionId().equals(sessionId)) {
+        //   if (evt.getDestinatari().contains(getTemplate().getUser()) &&
+        if (evt.getSessionId().equals(sessionId)) {
             ArrayList params = evt.getParameters();
             if (!params.isEmpty()) {
                 String answ = evt.getParameter("Answer");
@@ -127,7 +127,7 @@ public class MeetingSession extends VerticalPanel {
 
     public EventDescription[] getConfirmation() {
         for (int k = 0; k < publishedEvents.length; k++) {
-           // MessageBox.alert("MEETING CONFIRMATION", "", null);
+            // MessageBox.alert("MEETING CONFIRMATION", "", null);
             publishedEvents[k].setEventName("MeetingConfirmation");
         }
         return publishedEvents;
@@ -215,12 +215,11 @@ public class MeetingSession extends VerticalPanel {
         };
         CommonCalendar.getService().getCalendars(organizerUser, selectedUsers, startDate, endDate, callback77);
     }
-
-     int[] sceglibili ;
+    int[] sceglibili;
 
     private void createPossibleList(int appointments, int hours) {
 
-       sceglibili = new int[appointments];
+        sceglibili = new int[appointments];
         for (int i = 0, j = 0; i < freeTimes.length; i++) {
             if (freeTimes[i].equals("")) {
                 // can be chosen as possible meeting date
@@ -283,13 +282,13 @@ public class MeetingSession extends VerticalPanel {
             String[] occup = co.creaMat();
             for (int j = 0; j < occup.length; j++) {
                 String oc = occup[j];
-                tutti += oc +"\n";
+                tutti += oc + "\n";
                 if (!oc.equals("")) {
                     freeTimes[j] = "OCC";
                 }
             }
         }
-       // Window.alert(tutti);
+        // Window.alert(tutti);
     }
 
     private void createCalendarTableOLD() {
@@ -370,7 +369,7 @@ public class MeetingSession extends VerticalPanel {
         getTemplate().setParameter("Title", title);  //GIO
 
         originator.sendEvents(getProposal());
-       //Window.alert("Proposed meeting date" + meetingIndex);
+        //Window.alert("Proposed meeting date" + meetingIndex);
         MessageBox.alert("Proposed meeting date", "", null);
     }
 
@@ -485,8 +484,8 @@ public class MeetingSession extends VerticalPanel {
 
                 //per mandare evento a giga
                 int appIndex = (new Integer(risp)).intValue();
-            //    createClickCall(appIndex, trovaGiorno(appIndex) + ";" + ore[appIndex]);
-                createClickCall(sceglibili[appIndex],espressione.getItemText(appIndex));
+                //    createClickCall(appIndex, trovaGiorno(appIndex) + ";" + ore[appIndex]);
+                createClickCall(sceglibili[appIndex], espressione.getItemText(appIndex));
 
             }
         });
@@ -510,5 +509,4 @@ public class MeetingSession extends VerticalPanel {
     public int getMeetingLength() {
         return meetingLength;
     }
-
 }

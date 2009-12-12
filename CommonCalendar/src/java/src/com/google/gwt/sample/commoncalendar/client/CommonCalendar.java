@@ -111,7 +111,7 @@ public class CommonCalendar implements EntryPoint {
     }
 
     public static void debug(String s) {
-        messaggio.setText(messaggio.getText() + "\n" + s);
+     //   messaggio.setText(messaggio.getText() + "\n" + s);
     }
 
     public SingleUser getMe() {

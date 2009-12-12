@@ -260,9 +260,9 @@ public class ServerToClient {
             loadAppts(sU, calOwn, false);
             cw[i] = calOwn;
         }
-        CalendarOwner calo = new CalendarOwner(null, startDate, endDate);
-        loadAppts(sU, calo, true);
-        cw[users.length] = calo;
+     //   CalendarOwner calo = new CalendarOwner(null, startDate, endDate);
+     //   loadAppts(sU, calo, true);
+    //    cw[users.length] = calo;
         System.err.println("torno da server");
         return cw;
     }
@@ -335,6 +335,7 @@ public class ServerToClient {
             
          //   appts = new CalendarCall(co.getMailAddress(), uss.getPwd()).getCalendarEvents();
              appts = new CalendarCall(sU.getMailAddress(), sU.getPwd(),co.getMailAddress()).getCalendarEvents();
+             System.out.println("carico appts: "+ co.getMailAddress());
         }
         Iterator it = appts.iterator();
 
@@ -358,6 +359,7 @@ public class ServerToClient {
             //    System.err.println("CAL113");
             // if appt yesterday or later than shown  days continue
             if (e.getValue() < partenza || s.getValue() > fine) {
+                
                 continue;
             }
             //   System.err.println("CAL11");
@@ -366,7 +368,7 @@ public class ServerToClient {
             int giornoApp = calS.get(Calendar.DAY_OF_YEAR) - offsetFromStart;
             int oraInizio = calS.get(Calendar.HOUR_OF_DAY);
             int oraFine = calE.get(Calendar.HOUR_OF_DAY);
-            //   System.err.println("CAL2");
+             System.err.println("CAL2 " + giornoApp + " " +oraInizio + " " + oraFine);
             if (oraInizio == oraFine) {
                 oraFine++;
             }
