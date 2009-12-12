@@ -214,7 +214,7 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
             if (tmp == null) {
                 System.out.println("NOTIF getEvents tmp NULL");
             } else if (tmp.length == 0) {
-                System.out.println(" NOTIF getEvents tmp size 0");
+               // System.out.println(" NOTIF getEvents tmp size 0");
             } else {
                 // TEMP indice 0 : assumiamo che tutti gli eventi che arrivano con getEvents(), abbiano lo stesso destinataio (plausibile per come sono costruiti i filtri)
                 //    String dest = tmp[0].getDestinatario();
@@ -230,7 +230,7 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
                         //  String destName = tmp[i].getDestinatario();
                         String msg = evName;
                         if (tmp[i].getEventName().equals("MeetingProposal")) {
-                            msg = msg + " to participate  : " + tmp[i].getParameter("Title") + "when: " + tmp[i].getParameter("Date") ;
+                            msg = msg + " to participate  : " + tmp[i].getParameter("Title") + "when: " + tmp[i].getParameter("Date");
                             // msg = msg + "  Please connect to  http://localhost:8080/SurveyMgr/";
 
                         } else if (tmp[i].getEventName().equals("MembershipProposal")) {
@@ -260,9 +260,9 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
 
                             // per il momento per causa problemi di Smack, commento invio msg a gTalk
                             String senderMail = cloudUsers.getUserByEmail(tmp[i].getUser()).getMailAddress();
-                          //  if (!me.equals(senderMail)) {
+                            //  if (!me.equals(senderMail)) {
                             //    chClient.sendGTalkMsg(me, senderMail, cloudUsers.getUserByEmail(tmp[i].getUser()).getPwd(), msg, false);
-                          //  }
+                            //  }
                         } catch (Exception e) {
                             System.out.println("ECCEZIONE chat");
                         }
@@ -450,6 +450,15 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
         template.setEventName(evName);
         // template.setApplication(app);
         template.addDestinatario(dest);
+        if (cC != null) {
+            ArrayList<String> gNames = cC.getUserGroupNames();
+            if (gNames != null) {
+                for (String name : gNames) {
+                    template.addDestinatario(name);
+                }
+            }
+            System.out.println("NOTIF Subscrib filtro " + template.getDestinatari());
+        }
         //LILI  
         //   template.setProcessed("byContext");
 

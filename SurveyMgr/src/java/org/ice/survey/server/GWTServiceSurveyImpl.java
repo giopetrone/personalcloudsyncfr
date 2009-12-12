@@ -16,6 +16,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import giga.GigaListener;
 //import giga.Subscription;
 import googlecontacts.ContactCall;
+import googlecontacts.ContactsExampleParameters;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -39,6 +40,7 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
 // nuova versione
     String me = "";
     ArrayList<EventDescription> domande = new ArrayList();
+    ContactCall cC = null;
 
     @Override
     public void init() {
@@ -91,7 +93,9 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
                 while (iter.hasNext()) {
                     String app = iter.next();
                     ArrayList<String> events = eventSubscrData.get(app);
+
                     for (String ev : events) {
+                        System.out.println("getEvents prima di subscribe");
                         subscribeTo(ev, userName, app); // user arrivera' dal Gadget+iGooglepage
                     }
                 }
@@ -267,17 +271,41 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
 //        }
 //        return "inviato evento a cui ci si sottoscrivere a GIGA " + evName;
 //    }
+    private ContactCall connectContact(String userMail, String psswd) {
+        ContactCall cCallTmp = null;
+        try {
+            String[] myArg = {"--username=" + userMail, "--password=" + psswd, "-contactfeed", "--action=update"};  // OK
+            //   String[] myArg = {"--username=annamaria.goy@gmail.com", "--password=tex_willer", "-contactfeed", "--action=update"};  // OK
+            //String[] myArg = {"--username=" + iceMgrLogin, "--password=" + iceMgrPasswd, "-contactfeed", "--action=update"};  // OK
+            ContactsExampleParameters parameters = new ContactsExampleParameters(myArg); // X USAGE
+            cCallTmp = new ContactCall(parameters);
+            //FINE NUOVO
+        } catch (Exception e) {
+            System.out.println("error");
+        }
+        return cCallTmp;
+    }
 // vera
+
     private String subscribeTo(String evName, String dest, String app) {
         // invia a Giga il nome dell'evento a cui l'utente si vuole sottoscrivere
         EventDescription template = new EventDescription("*");
         template.setEventName(evName);
-       // template.setApplication(app);
+        // template.setApplication(app);
         template.addDestinatario(dest);
+        if (cC != null) {
+            ArrayList<String> gNames = cC.getUserGroupNames();
+            if (gNames != null) {
+                for (String name : gNames) {
+                    template.addDestinatario(name);
+                }
+            }
+            System.out.println("******Survey Subscrib filtro " + template.getDestinatari());
+        }
         //LILI
-     //   template.setProcessed("byContext");
+        //   template.setProcessed("byContext");
         getListener().addEvent(template);
-        
+
 
 
 //        Subscription f = new Subscription();
@@ -323,6 +351,7 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
         if (sU != null) {
             userEmail = sU.getMailAddress();
             me = userEmail;
+            cC = connectContact(userEmail, sU.getPwd());
         } else {
             System.out.println("singleUSer NULL");
         }

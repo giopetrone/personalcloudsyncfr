@@ -305,8 +305,8 @@ public class MainEntryPoint implements EntryPoint {
                 return;
             }
             String linkSurvey = "<a href='http://localhost:8080/SurveyMgr/' target='_blank'>SurveyMgr</a>";
-        
-            if (eve[i].getDestinatari().contains(me)) {
+        //x gruppi
+          //  if (eve[i].getDestinatari().contains(me)) {
                 if ((eve[i].getEventName().equals("MeetingProposal"))) {
                     //addMsgRow(eve[i].getEventName() + "  " + eve[i].getParameter("Date") + "<br />Please connect to: " + linkSurvey + "<br />", eve[i].getEventId());
                     addMsgRow(eve[i].getEventName()+ "  " + eve[i].getParameter("Title") + " when:  " + eve[i].getParameter("Date") + "<br />", eve[i].getEventId());
@@ -328,7 +328,7 @@ public class MainEntryPoint implements EntryPoint {
                     addMsgRow(eve[i].getEventName() + ":  " + linkDoc + "<br />" + eve[i].getParameter("date") + "<br />", eve[i].getEventId());
                 }
 
-            }
+           // }
         }
 
     }

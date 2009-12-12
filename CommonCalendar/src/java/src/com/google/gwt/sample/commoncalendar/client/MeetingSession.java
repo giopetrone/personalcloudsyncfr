@@ -89,21 +89,23 @@ public class MeetingSession extends VerticalPanel {
         // remove a recipient each time a confirmation is received
         // template contains this user!!!
 
-        CommonCalendar.debug("in meetingsession.addrisposta:");
-        //   CommonCalendar.debug("\t" + evt.getDestinatario() + " " + template.getUser());
-        CommonCalendar.debug("\t" + evt.getSessionId() + " " + sessionId);
+     //   CommonCalendar.debug("in meetingsession.addrisposta:");
+        MessageBox.alert("Add risposta I", "", null);
+        //   CommonCalendar.debug("\t" + evt.getDestinatario() + " " + template.getUser());        
+     //   CommonCalendar.debug("\t" + evt.getSessionId() + " " + sessionId);
         // if the destination is this user AND the answer
         // relates to this meeting proposal, check if answe == yes
-        if (evt.getDestinatari().contains(getTemplate().getUser()) &&
-                evt.getSessionId().equals(sessionId)) {
+      //  if (evt.getDestinatari().contains(getTemplate().getUser()) &&
+                if (evt.getSessionId().equals(sessionId)) {
             ArrayList params = evt.getParameters();
             if (!params.isEmpty()) {
                 String answ = evt.getParameter("Answer");
-                CommonCalendar.debug("\t" + "Yes" + " " + answ);
+                //CommonCalendar.debug("\t" + "Yes" + " " + answ);
+                MessageBox.alert("add risposta  II", "", null);
                 if (answ.equalsIgnoreCase("Yes")) {
                     return risposte.remove(evt.getUser());
                 } else {
-                    CommonCalendar.debug("utente ha rsiposto no o errore: " + answ);
+                  //  CommonCalendar.debug("utente ha rsiposto no o errore: " + answ);
                 }
             }
         }

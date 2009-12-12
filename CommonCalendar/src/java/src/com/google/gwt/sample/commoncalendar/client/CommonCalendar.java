@@ -521,7 +521,7 @@ public class CommonCalendar implements EntryPoint {
         // can be completed
         //   CommonCalendar.debug("show45");
         EventDescription[] eve = (EventDescription[]) qwr;
-
+System.out.println("CAL showEvents 1" );
         for (int i = 0; i < eve.length; i++) {
             if (eve[i] == null) {
                 return;
@@ -542,10 +542,12 @@ public class CommonCalendar implements EntryPoint {
             }
 
         }
+
         //    MessageBox.alert("showevents 2 ricevo risposta!!! ",eD== null? "null":"non null",null);
         //     debug("showevents 1");
         for (int j = 0; j < waitingSessions.size(); j++) {
             MeetingSession v = waitingSessions.get(j);
+
             //      debug("showevents 1.1");
             if (v.confermato()) {
                 sendEvents(v.getConfirmation()); // publish confirmation of meeting

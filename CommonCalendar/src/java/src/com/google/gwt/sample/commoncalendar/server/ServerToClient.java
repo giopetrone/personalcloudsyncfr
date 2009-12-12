@@ -344,7 +344,7 @@ public class ServerToClient {
             List<When> lw = en.getTimes();
             DateTime s = null;
             DateTime e = null;
-            System.err.println("CAL1");
+     //       System.err.println("CAL1");
             if (lw.size() > 0) {
                 When wh = lw.get(0);
                 s = wh.getStartTime();
@@ -377,7 +377,7 @@ public class ServerToClient {
             //          oraInizio + " " + oraFine);
             //   System.err.println("CAL3: " + giornoApp);
             String tit = en.getTitle().getPlainText();
-            Appointment appol = new Appointment(tit, giornoApp, oraInizio, oraFine);
+            Appointment appol = new Appointment(tit, giornoApp, oraInizio, oraFine);          
             co.addImpegno(appol);
             System.err.println("fine carico CALENDARIO!!!");
         }
@@ -424,7 +424,7 @@ public class ServerToClient {
             List<When> lw = en.getTimes();
             DateTime s = null;
             DateTime e = null;
-            System.err.println("CAL1");
+        //   System.err.println("CAL1");
             if (lw.size() > 0) {
                 When wh = lw.get(0);
                 s = wh.getStartTime();
