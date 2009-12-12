@@ -1129,6 +1129,22 @@ public class ContactCall {
         return lis;
     }
 
+    public ArrayList<String> getUserGroupNames() {
+        List<ContactGroupEntry> lis = null;
+        ArrayList<String> listNameGroups = new ArrayList();
+        try {
+            ContactGroupFeed resultFeed = service.getFeed(groupsUrl, ContactGroupFeed.class);
+            System.out.println("SONO IN ContactCall getUserGroups  " + resultFeed.getTitle().getPlainText());
+            lis = resultFeed.getEntries();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+         for (ContactGroupEntry g : lis) {
+             listNameGroups.add(g.getTitle().getPlainText());
+         }
+        return listNameGroups;
+    }
+
 
     // usata per  utilizzare service solo dentro GoogleContact , non x es GroupManager
     public ContactGroupEntry creaGruppo(String nomeGruppo, String noteGruppo, ExtendedProperty additionalInfo) {
