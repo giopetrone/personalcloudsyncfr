@@ -164,7 +164,7 @@ public class Notification66 implements RemoteEventListener {
     public void writeXMLObject(Object o) {
         Lease leases[] = new Lease[3];
         try {
-            System.out.println("Writing entry to space...");
+        //    System.out.println("Writing entry to space...");
             MyMetaDataEntry msg = new MyMetaDataEntry(o);
             //   msg.senderId = "gio";
             leases[0] = mSpace.write(msg, null, 20000); // cambiato in 20000

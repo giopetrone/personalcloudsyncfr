@@ -35,17 +35,17 @@ public class Filter implements INotifyDelegatorFilter {
             NotifyActionType notifyType = arrivedRemoteEvent.getNotifyActionType();
             //  String pippo =  Notification66.getNotifyDesc(notifyType);
             String msgStr = " ->> filter.process called - Type:" + Notification66.getNotifyDesc(notifyType) + " - Data:" + msg;
-            System.out.println(msgStr);
+         //   System.out.println(msgStr);
             EventDescription des = msg.getEvent();
             if (des != null) {
-                System.out.println("des  eventName (evento corrente)  = " + des.getEventName());
+            //    System.out.println("des  eventName (evento corrente)  = " + des.getEventName());
                 valore = checkEvent(des);
             }
             else System.out.println("filter.process des  NULL");
         } catch (UnusableEntryException e) {
             e.printStackTrace();
         }
-        System.out.println("filter da': " + valore);
+     //   System.out.println("filter da': " + valore);
         return valore;
     }
 
@@ -55,7 +55,7 @@ public class Filter implements INotifyDelegatorFilter {
 
     public boolean checkEvent(EventDescription evt) {
 
-         System.out.println("sono in filter.checkEvent");
+       //  System.out.println("sono in filter.checkEvent");
          for (EventDescription curr: descList) {
              if (evt.compatibleWith(curr))
                  return true;
