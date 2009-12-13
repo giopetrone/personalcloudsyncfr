@@ -90,7 +90,7 @@ public class MeetingSession extends VerticalPanel {
         // template contains this user!!!
 
      //   CommonCalendar.debug("in meetingsession.addrisposta:");
-        MessageBox.alert("Add risposta I", "", null);
+       // MessageBox.alert("Add risposta I", "", null);
         //   CommonCalendar.debug("\t" + evt.getDestinatario() + " " + template.getUser());        
      //   CommonCalendar.debug("\t" + evt.getSessionId() + " " + sessionId);
         // if the destination is this user AND the answer
@@ -101,7 +101,7 @@ public class MeetingSession extends VerticalPanel {
             if (!params.isEmpty()) {
                 String answ = evt.getParameter("Answer");
                 //CommonCalendar.debug("\t" + "Yes" + " " + answ);
-                MessageBox.alert("add risposta  II", "", null);
+            //    MessageBox.alert("add risposta  II", "", null);
                 if (answ.equalsIgnoreCase("Yes")) {
                     return risposte.remove(evt.getUser());
                 } else {
