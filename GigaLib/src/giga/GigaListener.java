@@ -93,6 +93,10 @@ public class GigaListener implements RemoteEventListener {
         session.removeListener(registration);
     }
 
+  public void removeListener(EventRegistration evReg) {
+        session.removeListener(evReg);
+    }
+
     private void loadPreviousEntries() {
         // load all the events present in the
         // space before this application has started
