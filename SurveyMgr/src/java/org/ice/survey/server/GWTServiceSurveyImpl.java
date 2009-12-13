@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 import javax.servlet.http.HttpSession;
+import net.jini.core.event.EventRegistration;
 import org.ice.survey.client.GWTServiceSurvey;
 
 /**
@@ -32,7 +33,8 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
         GWTServiceSurvey {
 
     HashMap<String, GigaListener> sessionListeners = new HashMap();
-    ArrayList addedFilterList = new ArrayList(); // lista di utenti gia' sottoscritti   
+    ArrayList addedFilterList = new ArrayList(); // lista di utenti gia' sottoscritti
+  //  boolean alreadySubscribed = false;
     HashMap<String, ArrayList<String>> eventSubscrData = new HashMap();  // chiave = applicazione e value = lista di eventi a cui sottoscriversi
     CloudUsers cloudUsers = new CloudUsers();
     //vecchia versione
@@ -41,6 +43,8 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
     String me = "";
     ArrayList<EventDescription> domande = new ArrayList();
     ContactCall cC = null;
+    boolean groupsModified = false;
+    EventRegistration eventRegistration = null;
 
     @Override
     public void init() {
@@ -57,6 +61,8 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
         eventSubscrData.put("CommonCalendar", aL1);
         ArrayList aL2 = new ArrayList();
         aL2.add("MembershipProposal");
+        aL2.add("GroupCreated");
+        aL2.add("GroupModified");
         eventSubscrData.put("GroupMgr", aL2);
 
         // caricare utenti
@@ -84,7 +90,8 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
 
         EventDescription[] tmp = null;
         if (userName != null) {
-            if (!alreadySubscr(userName)) {
+            if (!alreadySubscr(userName)) { //GIO 12-12-09
+          //      if (!alreadySubscribed) {
                 //le due subscribe con domanda sono solo x debug con GigaMgrUI
                 //    subscribeTo("domanda1", "gio");
                 //    subscribeTo("domanda2", "gio");
@@ -119,7 +126,11 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
                     System.out.println("!!!!!!!!!!!!!!!!!!!!!! SURVEY getEvents tmp user = " + tmp[i].getUser());
                     System.out.println("!!!!!!!!!!!!!!!!!!!!!! SURVEY getEvents tmp eventId = " + tmp[i].getEventId());
                     // (usersData.get(dest)).add(tmp[i]);    // si aggiunge un evento, ovvero in questo caso si assume una domanda alla lista delle domande per dest
-                    domande.add(tmp[i]);
+                   // if (tmp[i].getEventName().equals("MeetingProposal") || tmp[i].getEventName().equals("MembershipProposal")) {
+                        domande.add(tmp[i]);
+                  //  } else {
+                      //  alreadySubscribed=false;
+                  //  }
                 }
                 //printUsersData();
             }
@@ -131,7 +142,8 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
     // si chiama putEvents ma e' identica ad un publishEvent
     public void putEvents(EventDescription[] events, String userName) {
         if (userName != null) {
-            if (!alreadySubscr(userName)) {
+          //  if (!alreadySubscribed) {
+                if (!alreadySubscr(userName)) {
                 //       if (!addedFilter) {
                 //le due subscribe con domanda sono solo x debug con GigaMgrUI
                 //  subscribeTo("domanda1", "gio");
@@ -285,8 +297,24 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
         }
         return cCallTmp;
     }
-// vera
 
+//    private boolean groupsModified() {
+//        boolean modified = false;
+//        ArrayList<String> currGroups = null;
+//        if (cC != null) {
+//            currGroups = cC.getUserGroupNames();
+//            if (gNames != null && currGroups != null) {
+//                int i = 0;
+//                for (String name : gNames) {
+//                    if (!currGroups.contains(gNames.get(i))) {
+//                        modified = true;
+//                    }
+//                }
+//            }
+//        }
+//        return modified;
+//    }
+// vera
     private String subscribeTo(String evName, String dest, String app) {
         // invia a Giga il nome dell'evento a cui l'utente si vuole sottoscrivere
         EventDescription template = new EventDescription("*");
@@ -304,8 +332,10 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
         }
         //LILI
         //   template.setProcessed("byContext");
-        getListener().addEvent(template);
-
+//        if (eventRegistration !=null)
+//            getListener().removeListener(eventRegistration);
+        eventRegistration = getListener().addEvent(template);
+      //  alreadySubscribed = true;
 
 
 //        Subscription f = new Subscription();
