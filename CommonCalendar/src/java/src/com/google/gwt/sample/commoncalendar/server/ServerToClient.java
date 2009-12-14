@@ -36,9 +36,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 
 /**
  *
@@ -49,42 +46,6 @@ public class ServerToClient {
     //  static GigaListener listener = null;
     GigaListener listener = new GigaListener();
     CloudUsers cloudUsers = new CloudUsers();
-
-    public ApplicationDescription[] buildAppTree(String str) {
-        ArrayList applications = new ArrayList();
-        if (str != null) {
-            XStream xstream = new XStream();
-            applications = (ArrayList) xstream.fromXML(str);
-        } else {
-            ApplicationDescription a = new ApplicationDescription("Calendar");
-            applications.add(a);
-            ActivityDescription ad = new ActivityDescription("insertAppt");
-            a.addChild(ad);
-            ad.addEvent("completed");
-            ad.setCondition(buildFakeCondition(null));
-            a = new ApplicationDescription("Calendar1");
-            applications.add(a);
-            ad = new ActivityDescription("insertAppt1");
-            a.addChild(ad);
-            ad.addEvent("completed1");
-            a = new ApplicationDescription("Calendar2");
-            applications.add(a);
-            ad = new ActivityDescription("insertAppt2");
-            a.addChild(ad);
-            ad.addEvent("completed2");
-
-        }
-        XStream xstream = new XStream();
-        String appStrings = xstream.toXML(applications);
-        System.out.println("applications:" + "\n\n" + appStrings + "\n\n");
-        // conversione ad array 
-        int sz = applications.size();
-        ApplicationDescription[] ret = new ApplicationDescription[sz];
-        for (int i = 0; i < sz; i++) {
-            ret[i] = (ApplicationDescription) applications.get(i);
-        }
-        return ret;
-    }
 
     private SingleUser[] createUsers(ArrayList<ContactEntry> contacts) {
         SingleUser[] si = new SingleUser[contacts.size()];
@@ -149,97 +110,6 @@ public class ServerToClient {
         }
     }
 
-    public UserGroup[] buildGroupTree(String str) {
-        ArrayList groups = new ArrayList();
-
-        Collections s;
-        if (str != null) {
-            XStream xstream = new XStream();
-            groups = (ArrayList) xstream.fromXML(str);
-        } else {
-            UserGroup a = new UserGroup("seta", "");
-            groups.add(a);
-            SingleUser ad = new SingleUser("mar", "sgnmrn@gmail.com", "micio11", "");
-            a.addChild(ad);
-
-            ad = new SingleUser("gio", "gio.petrone@gmail.com", "mer20ia05", "");
-            a.addChild(ad);
-
-            a = new UserGroup("diamond", "");
-            groups.add(a);
-            ad = new SingleUser("luca");
-
-            a.addChild(ad);
-            ad = new SingleUser("anna");
-
-            a.addChild(ad);
-            a = new UserGroup("prin", "");
-            groups.add(a);
-            ad = new SingleUser("claud");
-            a.addChild(ad);
-            ad = new SingleUser("furn");
-            a.addChild(ad);
-
-        }
-        sortGroups(groups);
-        XStream xstream = new XStream();
-        String appStrings = xstream.toXML(groups);
-        System.out.println("groups:" + "\n\n" + appStrings + "\n\n");
-        // conversione ad array
-        int sz = groups.size();
-        UserGroup[] ret = new UserGroup[sz];
-        for (int i = 0; i < sz; i++) {
-            ret[i] = (UserGroup) groups.get(i);
-        }
-        return ret;
-    }
-
-    private void sortGroups(ArrayList groups) {
-        UserComparator comparator = new UserComparator();
-        Collections.sort(groups, comparator);
-        HashMap<String, TreeElement> allUs = new HashMap();
-        boolean foundAll = false;
-        for (int i = 0; i < groups.size(); i++) {
-            TreeNode t = (TreeNode) groups.get(i);
-            if (t.getName().equals("ALL")) {
-                foundAll = true;
-            }
-            ArrayList<TreeElement> chil = t.getChildren();
-            Collections.sort(chil, comparator);
-            for (int j = 0; j < chil.size(); j++) {
-                TreeElement elem = chil.get(j);
-                allUs.put(elem.getName(), elem);
-            }
-        }
-        // if group "All" misssing, create it
-        if (!foundAll) {
-            ArrayList us = new ArrayList(allUs.values());
-            Collections.sort(us, comparator);
-            UserGroup a = new UserGroup("ALL", "");
-            a.setChildren(us);
-            groups.add(a);
-        }
-    }
-
-    public Condition buildFakeCondition(String str) {
-        OrCondition orcond = null; //= new Condition();
-        if (str != null) {
-            XStream xstream = new XStream();
-            orcond = (OrCondition) xstream.fromXML(str);
-        } else {
-            orcond = new OrCondition();
-            AndCondition andc = new AndCondition();
-            orcond.addCondition(andc);
-            andc.addEvent("completed");
-
-            andc = new AndCondition();
-            orcond.addCondition(andc);
-            andc.addEvent("completed3");
-            andc.addEvent("completed4");
-        }
-        return orcond;
-    }
-
     public void updateCalendars(CalendarOwner[] calendars, int rowIndex, SingleUser me, String title, int durata) {
         //    System.out.println("modifico calendario google: "+ rowIndex + " "+ calendars.length);
         long absTime = calendars[0].absoluteApptTime(rowIndex);
@@ -247,7 +117,7 @@ public class ServerToClient {
         String pwdMeetingProposeUser = (cloudUsers.getUserByEmail(me.getMailAddress())).getPwd();
         for (int i = 0; i < calendars.length; i++) {
             CalendarOwner co = calendars[i];
-            System.out.println("MODIFICO CALENDARIO GOOGLE google: " + me.getMailAddress() + " " + co.getMailAddress() + " " + co.getPwd() +"; " );
+            System.out.println("MODIFICO CALENDARIO GOOGLE google: " + me.getMailAddress() + " " + co.getMailAddress() + " " + co.getPwd() + "; ");
 
             new CalendarCall(me.getMailAddress(), pwdMeetingProposeUser, co.getMailAddress()).insertEvent(absTime, title, "CONTENUTO", durata);
         }
@@ -257,31 +127,12 @@ public class ServerToClient {
         CalendarOwner[] cw = new CalendarOwner[users.length + 1];
         for (int i = 0; i < users.length; i++) {
             CalendarOwner calOwn = new CalendarOwner(users[i], startDate, endDate);
-            loadAppts(sU, calOwn, false);
+            loadAppts(sU, calOwn);//, false);
             cw[i] = calOwn;
         }
-     //   CalendarOwner calo = new CalendarOwner(null, startDate, endDate);
-     //   loadAppts(sU, calo, true);
-    //    cw[users.length] = calo;
-        System.err.println("torno da server");
+        //      System.err.println("torno da server");
         return cw;
     }
-
-    /*
-    public CalendarOwner[] getCalendarsFissiPerProvaOLD(SingleUser[] users) {
-    CalendarOwner[] cw = new CalendarOwner[3];
-    CalendarOwner calo = new CalendarOwner("Libero", "Orario", null);
-    CalendarOwner cal1 = new CalendarOwner("sgnmrn@gmail.com", "micio11");
-    CalendarOwner cal2 = new CalendarOwner("gio.petrone@gmail.com", "mer20ia05");
-    cw[0] = cal1;
-    cw[1] = cal2;
-    cw[2] = calo;
-    loadAppts(calo, true);
-    loadAppts(cal1, false);
-    loadAppts(cal2, false);
-    return cw;
-    }
-     */
 
     private void updateMidnight(Calendar one, MyDate date) {
         one.set(Calendar.YEAR, date.getYear());
@@ -298,21 +149,13 @@ public class ServerToClient {
     // any code dependencies in the client module
     // from whatever library we have
 
-    void loadAppts(SingleUser sU, CalendarOwner co, boolean special) {
+    void loadAppts(SingleUser sU, CalendarOwner co) { //, boolean special) {
 
-        /*  if (special) {
-        return;
-
-        }*/
         int oraInizioGiornata = CalendarOwner.getStartHour();
         int oraFineGiornata = CalendarOwner.getEndHour();
         MyDate startDate = co.getStartDate();
         MyDate endDate = co.getEndDate();
-        //    Calendar calNow = Calendar.getInstance();
-
-
-        //  co.setToday(oggi * 24 * 3600 * 1000);
-        //     int giornoSett = calNow.get(Calendar.DAY_OF_WEEK);
+      
         Calendar calS = Calendar.getInstance();
         Calendar calE = Calendar.getInstance();
 
@@ -325,27 +168,17 @@ public class ServerToClient {
         long fine = endDate.getTime(); //calFine.getTimeInMillis();
         int offsetFromStart = calNight.get(Calendar.DAY_OF_YEAR);
         List appts = null;
-        if (special) {
-            appts = new ArrayList();
-        } else {
-            // remote call to googgle calendar !!!
-          //  appts = new CalendarCall(sU.getMailAddress(), sU.getPwd()).getCalendarEvents();
-   // CloudUsers cloud = new CloudUsers();
-   // SingleUser uss = cloud.getUserByEmail(co.getMailAddress());
-            
-         //   appts = new CalendarCall(co.getMailAddress(), uss.getPwd()).getCalendarEvents();
-             appts = new CalendarCall(sU.getMailAddress(), sU.getPwd(),co.getMailAddress()).getCalendarEvents();
-             System.out.println("carico appts: "+ co.getMailAddress());
-        }
+        // remote call to googgle calendar !!!
+        appts = new CalendarCall(sU.getMailAddress(), sU.getPwd(), co.getMailAddress()).getCalendarEvents();
+        System.out.println("carico appts: " + co.getMailAddress());
         Iterator it = appts.iterator();
-
         while (it.hasNext()) {
             //       MyCalendarEventEntry en = new MyCalendarEventEntry((CalendarEventEntry) it.next());
             CalendarEventEntry en = (CalendarEventEntry) it.next();
             List<When> lw = en.getTimes();
             DateTime s = null;
             DateTime e = null;
-     //       System.err.println("CAL1");
+            //       System.err.println("CAL1");
             if (lw.size() > 0) {
                 When wh = lw.get(0);
                 s = wh.getStartTime();
@@ -359,7 +192,7 @@ public class ServerToClient {
             //    System.err.println("CAL113");
             // if appt yesterday or later than shown  days continue
             if (e.getValue() < partenza || s.getValue() > fine) {
-                
+
                 continue;
             }
             //   System.err.println("CAL11");
@@ -368,7 +201,7 @@ public class ServerToClient {
             int giornoApp = calS.get(Calendar.DAY_OF_YEAR) - offsetFromStart;
             int oraInizio = calS.get(Calendar.HOUR_OF_DAY);
             int oraFine = calE.get(Calendar.HOUR_OF_DAY);
-             System.err.println("CAL2 " + giornoApp + " " +oraInizio + " " + oraFine);
+            System.err.println("CAL2 " + giornoApp + " " + oraInizio + " " + oraFine);
             if (oraInizio == oraFine) {
                 oraFine++;
             }
@@ -379,210 +212,14 @@ public class ServerToClient {
             //          oraInizio + " " + oraFine);
             //   System.err.println("CAL3: " + giornoApp);
             String tit = en.getTitle().getPlainText();
-            Appointment appol = new Appointment(tit, giornoApp, oraInizio, oraFine);          
-            co.addImpegno(appol);
-            System.err.println("fine carico CALENDARIO!!!");
-        }
-    }
-
- void loadApptsSAVE(SingleUser sU, CalendarOwner co, boolean special) {
-
-        /*  if (special) {
-        return;
-
-        }*/
-        int oraInizioGiornata = CalendarOwner.getStartHour();
-        int oraFineGiornata = CalendarOwner.getEndHour();
-        MyDate startDate = co.getStartDate();
-        MyDate endDate = co.getEndDate();
-        //    Calendar calNow = Calendar.getInstance();
-
-
-        //  co.setToday(oggi * 24 * 3600 * 1000);
-        //     int giornoSett = calNow.get(Calendar.DAY_OF_WEEK);
-        Calendar calS = Calendar.getInstance();
-        Calendar calE = Calendar.getInstance();
-
-        Calendar calNight = Calendar.getInstance();
-        updateMidnight(calNight, startDate);
-        long partenza = calNight.getTimeInMillis();
-        co.setTodayMidNight(partenza);
-        Calendar calFine = Calendar.getInstance();
-        updateMidnight(calFine, endDate);
-        long fine = calFine.getTimeInMillis();
-        int offsetFromStart = calNight.get(Calendar.DAY_OF_YEAR);
-        List appts = null;
-        if (special) {
-            appts = new ArrayList();
-        } else {
-            // remote call to googgle calendar !!!
-            appts = new CalendarCall(sU.getMailAddress(), sU.getPwd()).getCalendarEvents();
-        }
-        Iterator it = appts.iterator();
-
-        while (it.hasNext()) {
-            //       MyCalendarEventEntry en = new MyCalendarEventEntry((CalendarEventEntry) it.next());
-            CalendarEventEntry en = (CalendarEventEntry) it.next();
-            List<When> lw = en.getTimes();
-            DateTime s = null;
-            DateTime e = null;
-        //   System.err.println("CAL1");
-            if (lw.size() > 0) {
-                When wh = lw.get(0);
-                s = wh.getStartTime();
-                e = wh.getEndTime();
-            }
-            //  System.err.println("CAL112");
-            if (s == null | e == null) {
-                System.err.println("Appointment with no time:" + en.getTitle().getPlainText());
-                continue;
-            }
-            //    System.err.println("CAL113");
-            // if appt yesterday or later than shown  days continue
-            if (e.getValue() < partenza || s.getValue() > fine) {
-                continue;
-            }
-            //   System.err.println("CAL11");
-            calS.setTimeInMillis(s.getValue());
-            calE.setTimeInMillis(e.getValue());
-            int giornoApp = calS.get(Calendar.DAY_OF_YEAR) - offsetFromStart;
-            int oraInizio = calS.get(Calendar.HOUR_OF_DAY);
-            int oraFine = calE.get(Calendar.HOUR_OF_DAY);
-            //   System.err.println("CAL2");
-            if (oraInizio == oraFine) {
-                oraFine++;
-            }
-            if (oraInizio >= oraFineGiornata || oraFine <= oraInizioGiornata) {
-                continue;
-            }
-            //  System.err.println("calendario, ora inizio fine e giorno" + giornoApp + " " +
-            //          oraInizio + " " + oraFine);
-            //   System.err.println("CAL3: " + giornoApp);
-            String tit = en.getTitle().getPlainText();
-             System.err.println("creo app giornoorainorafin" +
-                     giornoApp + "/" + oraInizio + "/" +oraFine);
             Appointment appol = new Appointment(tit, giornoApp, oraInizio, oraFine);
             co.addImpegno(appol);
             System.err.println("fine carico CALENDARIO!!!");
         }
     }
 
-    void loadApptsOLD(CalendarOwner co, boolean special) {
-
-        int oraInizioGiornata = CalendarOwner.getStartHour();
-        int oraFineGiornata = CalendarOwner.getEndHour();
-
-        Calendar calNow = Calendar.getInstance();
-
-        int oggi = calNow.get(Calendar.DAY_OF_YEAR);
-        //  co.setToday(oggi * 24 * 3600 * 1000);
-        int giornoSett = calNow.get(Calendar.DAY_OF_WEEK);
-        Calendar calS = Calendar.getInstance();
-        Calendar calE = Calendar.getInstance();
-
-        Calendar calNight = Calendar.getInstance();
-        calNight.set(Calendar.HOUR_OF_DAY, 0);
-        calNight.set(Calendar.MINUTE, 0);
-        calNight.set(Calendar.SECOND, 0);
-        calNight.set(Calendar.MILLISECOND, 0);
-        long partenza = calNight.getTimeInMillis();
-        co.setTodayMidNight(partenza);
-        long fine = partenza + CalendarOwner.getTotalDays() * 24 * 3600 * 1000;
-
-        List appts = null;
-        if (special) {
-            appts = new ArrayList();
-        } else {
-            // remote call to googgle calendar !!!
-            appts = new CalendarCall(co.getMailAddress(), co.getPwd()).getCalendarEvents();
-        }
-        Iterator it = appts.iterator();
-
-        while (it.hasNext()) {
-            //       MyCalendarEventEntry en = new MyCalendarEventEntry((CalendarEventEntry) it.next());
-            CalendarEventEntry en = (CalendarEventEntry) it.next();
-            List<When> lw = en.getTimes();
-            DateTime s = null;
-            DateTime e = null;
-            if (lw.size() > 0) {
-                When wh = lw.get(0);
-                s = wh.getStartTime();
-                e = wh.getEndTime();
-            }
-            if (s == null | e == null) {
-                System.err.println("Appointment with no time:" + en.getTitle().getPlainText());
-                continue;
-            }
-            // if appt yesterday or later than shown  days continue
-            if (e.getValue() < partenza || s.getValue() > fine) {
-                continue;
-            }
-            calS.setTimeInMillis(s.getValue());
-            calE.setTimeInMillis(e.getValue());
-            int giornoApp = calS.get(Calendar.DAY_OF_YEAR) - oggi;
-            int oraInizio = calS.get(Calendar.HOUR_OF_DAY);
-            int oraFine = calE.get(Calendar.HOUR_OF_DAY);
-            if (oraInizio == oraFine) {
-                oraFine++;
-            }
-            if (oraInizio >= oraFineGiornata || oraFine <= oraInizioGiornata) {
-                continue;
-            }
-            //  System.err.println("calendario, ora inizio fine e giorno" + giornoApp + " " +
-            //          oraInizio + " " + oraFine);
-
-            String tit = en.getTitle().getPlainText();
-            Appointment appol = new Appointment(tit, giornoApp, oraInizio, oraFine);
-            co.addImpegno(appol);
-        }
-    }
-
-    void creaMese(String[] unMese, int mese, int giornoSettInizio, int giorniMese) {
-
-        int slotPerMese = 6 * 7;
-        int i = mese * slotPerMese;
-        //  fill with blank initial part up to day of week of day 1 in month
-        while (i < (mese * slotPerMese) + giornoSettInizio) {
-            unMese[i++] = " ";
-        }
-        // now  i == giornoSettInizio
-        int j = 0;
-        // crea tabella rimepinedo coi numeri
-        // le caseliine dei giorni del mese
-        while (j < giorniMese) {
-            unMese[i++] = "" + (j + 1);
-            j++;
-        }
-        // now  fill with blank last part
-        while (i < (mese + 1) * slotPerMese) {
-            unMese[i++] = "";
-        }
-    }
-
-    String[] creaTabellina() {
-        int mesiCostruiti = 6;
-        int settimaneDelMese = 6; // inlucsi scampoli
-        Calendar calNow = Calendar.getInstance();
-        String[] ret = new String[mesiCostruiti * settimaneDelMese * 7];
-        calNow.set(Calendar.DAY_OF_MONTH, 1);
-        // sembra non funzionare!!!!   calNow.setFirstDayOfWeek(Calendar.MONDAY);
-        // fill next 6 months !!! boy!!
-        for (int i = 0; i < mesiCostruiti; i++) {
-            //    calNow.set(Calendar.DAY_OF_MONTH, 1);
-            int oggiSett = calNow.get(Calendar.DAY_OF_WEEK) - 2; // chissa' perche'
-            int giorniMese = calNow.getActualMaximum(Calendar.DAY_OF_MONTH);
-            creaMese(ret, i, oggiSett, giorniMese);
-            calNow.add(Calendar.MONTH, 1);
-        }
-        return ret;
-    }
 }
 
-class UserComparator implements Comparator<TreeElement> {
 
-    public int compare(TreeElement t1, TreeElement t2) {
-        return t1.getName().compareTo(t2.getName());
 
-    }
-}
 

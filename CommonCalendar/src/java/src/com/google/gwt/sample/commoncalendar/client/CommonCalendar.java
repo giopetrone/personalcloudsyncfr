@@ -50,8 +50,8 @@ import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.user.client.ui.SourcesTableEvents;
-import com.google.gwt.user.client.ui.TableListener;
+
+
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Tree;
@@ -68,9 +68,7 @@ public class CommonCalendar implements EntryPoint {
     AsyncCallback putEventsCb = null;
     AsyncCallback getEventsCb = null;
     private FormPanel selectionPanel;
-    //   private VerticalPanel vertPanel2 = new VerticalPanel();  Datepicker di marino
-    //   private VerticalPanel panel2 = new VerticalPanel(); // MARINO
-//    private VerticalPanel vertPanel3 = new VerticalPanel(); MARINO
+   
     private Button addButton;  // Show possible meeting dates
     private DateField startDate;
     private DateField endDate;
@@ -86,20 +84,17 @@ public class CommonCalendar implements EntryPoint {
     private TextField<String> userName;
     private TextField<String> userPwd;
     private static TextArea messaggio = new TextArea();
-    //  private FlexTable msgTable = new FlexTable();
-    private FlexTable calendarTable = new FlexTable();
+   
+
     private Tree userTree = new Tree();
 //    private Hyperlink changeViewLink = new Hyperlink("", "");
-    private ArrayList<Widget> rimozioni = new ArrayList<Widget>();
+  
     private static final int MSG_INTERVAL = 10000; // ms
-    private MyDate oggi = null;
+   private MyDate oggi = null;
     private SingleUser me = null;
     private String thisApplication = "CommonCalendar";
     private ArrayList<MeetingSession> waitingSessions = new ArrayList();
-    private String[] dayNumbers;
-    private boolean big = true; //false
-    private int settimaneInTabella = 6;
-    private int mesiMostrati = 2;
+  
     // variabili di ANNA E GIO
     private Panel panel;
     private FormPanel loginPanel;
@@ -145,22 +140,8 @@ public class CommonCalendar implements EntryPoint {
                 dialogBox.center();
             }
         });
-        // use a deferred command so that the handler catches onModuleLoad2() exceptions
-        // A CHE SERVE ?
-        /*
-        DeferredCommand.addCommand(new Command() {
-
-        public void execute() {
-        //DISANBILITATO !!!!!!
-        //    onModuleLoad2();
-
-        /// FINE
-        }
-        });
-         * */
-
-        //   msgTable.setStyleName("tabellaMessaggi");
-        calendarTable.setStyleName("calendari");
+       
+   
         messaggio.setCharacterWidth(40);
         messaggio.setVisibleLines(20);
         messaggio.setText("trace messages");
@@ -217,7 +198,7 @@ public class CommonCalendar implements EntryPoint {
 
             public void run() {
                 refreshMsgList();
-                //    debug("in timer, me =" + me);
+              
             }
         };
         msgTimer.scheduleRepeating(MSG_INTERVAL);
@@ -268,22 +249,7 @@ public class CommonCalendar implements EntryPoint {
     static boolean never = true;
 
     private void refreshMsgList() {
-        if (never) {
-            never = false;
-            final AsyncCallback callback44 = new AsyncCallback() {
-
-                public void onSuccess(Object result) {
-                    debug("tabella success");
-                    crea6Mesi(result);
-                }
-
-                public void onFailure(Throwable caught) {
-                    debug(caught.toString());
-                    debug("tabella Communication failed");
-                }
-            };
-            getService().calendario6Mesi(callback44);
-        }
+        
         if (getEventsCb == null) {
             getEventsCb = new AsyncCallback() {
 
@@ -324,204 +290,16 @@ public class CommonCalendar implements EntryPoint {
     private void nulla(Object res) {
         debug("Sono in NULLA");
     }
-    static String[] sigleGiorni = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "...."};
-    static String[] sigleMesi = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Now", "Dic"};
-    private int row1 = -1;
-    private int col1 = -1;
-    private int row2 = -1;
-    private int col2 = -1;
-    private FlexTable aTable = new FlexTable();
-
-    private void updateSelection(int row, int col) {
-        debug("update row col" + row + " " + col);
-        if (row > 1 && (col + 1) % 8 != 0) {
-            Label lab = (Label) aTable.getWidget(row, col);
-            if (lab.getText().trim().isEmpty()) {
-                return;
-            }
-            //  DOM.setStyleAttribute(lab.getElement(), "backgroundColor", "#ABCDEF");
-            DOM.setStyleAttribute(lab.getElement(), "backgroundColor", "#CCFFFF");
-
-            // update selection interval
-            if (row1 == -1) {
-                row1 = row;
-                col1 = col;
-            } else if (row2 == -1) {
-                row2 = row;
-                col2 = col;
-            } else {
-                if (row == row1 && col == col1) {
-                    // do not deselect
-                } else if (row == row2 && col == col2) {
-                    // do not deselect
-                } else {
-                    // delete old label color
-                    lab = (Label) aTable.getWidget(row1, col1);
-                    DOM.setStyleAttribute(lab.getElement(), "backgroundColor", "CCFFFF");
-                    row1 = row2;
-                    row2 = row;
-                    col1 = col2;
-                    col2 = col;
-                }
-            }
-
-        }
-    }
-
-    private void crea6Mesi(Object qwr) {
-        // the table contains :
-        //one row for names of months
-        // one for days of week
-        // six for weeks
-        // 48 columns: 8 for each month
-        // first seven weekdays, number 8 left empty
-// we assume that today is always present in the first month of the shown calendar
-        dayNumbers = (String[]) qwr;
-        aTable.addTableListener(new TableListener() {
-
-            public void onCellClicked(SourcesTableEvents sender, int row, int col) {
-                //  aTable.setText(row,cell,"OK");
-                // cell selection only on date labels , not on text
-                // tenere solo due celle selezionate, mostrare oggi
-                updateSelection(row, col);
-            }
-        });
-        int temporaneo = oggi.getMonth();// -1;
-        for (int i = 0; i < mesiMostrati; i++) {
-            aTable.setText(0, i * 8 + 3, sigleMesi[(temporaneo + i) % 12]);
-            for (int j = 0; j < 8; j++) {
-                aTable.setText(1, i * 8 + j, sigleGiorni[j]);
-            }
-            //   aTable.getCellFormatter().setWidth(0, i * 8 + 7, "40");
-        }
-        // tabella da mesiMostrati mesi in fila, a 7 colonne a mese
-        //settimaneInTabella settimane a mese su righe successive
-        int indice = 0;
-        for (int i = 0; i < mesiMostrati; i++) {
-            for (int k = 0; k < settimaneInTabella; k++) {
-                for (int j = 0; j < 7; j++) {
-                    String mos = dayNumbers[indice++];
-                    aTable.setWidget(k + 2, i * 8 + j, new Label(mos));  // 8 per una colonna vuota 2 per titoli
-                }
-            }
-        }
-//        vertPanel2.add(aTable);
-        // default: selectt calendar dates from today to 2 weeks
-        String s = "" + oggi.getDayOfMonth();
-        int j = 0;
-        while (j < mesiMostrati * settimaneInTabella * 7) {
-            String ss = dayNumbers[j];
-            if (ss.equals(s)) {
-                // found today position in widget
-                updateSelection(getRigaWidget(j), getColonnaWidget(j));
-                break;
-            }
-            j++;
-        }
-        //   int en = j + 15;
-        //   debug("F"+ en +" "+ j);
-        int limit = 14;
-        while (limit > 0) {
-            String ss = dayNumbers[++j];
-            if (!ss.trim().isEmpty()) {
-                //    debug("C"+ en +" "+ j + ss);
-                limit--;// valid day
-            }
-        }
-        //  debug("dueupd "+j);
-        updateSelection(getRigaWidget(j), getColonnaWidget(j));
-    }
-
-    private int getColonnaWidget(int i) {
-        return 8 * (i / 42) + (i % 42) % 7;
-    }
-
-    private int getRigaWidget(int i) {
-        return (i % 42) / 7 + 2;
-    }
-
-    private int getColonnaGiorni(int i) {
-        return i / 8 + i % 8;
-    }
-
-    private int getRigaGiorni(int i) {
-        return i - 2;
-    }
-
-    private int posizGiorno(int row, int col) {
-        // given row and col in widget,
-        // return poszion in the days array
-        row = getRigaGiorni(row);
-        col = getColonnaGiorni(col);
-        return 42 * (col / 7) + row * 7 + col % 7;
-    }
-
-    private void setDayOfYear(MyDate date, int row, int col) {
-        String og = "" + oggi.getDayOfMonth();
-        //  row -= 2;
-        //  col = col / 8 + col % 8;
-        int offset = 0;
-        boolean found = false;
-        int fine = posizGiorno(row, col);
-        for (int i = 0; i < mesiMostrati; i++) {  // mesi
-            for (int k = 0; k < settimaneInTabella; k++) { // settimane in un mese
-                for (int j = 0; j < 7; j++) { // giorni settimana
-                    int pos = i * settimaneInTabella * 7 + k * 7 + j;
-                    String s = dayNumbers[pos];
-                    if (!found) {
-                        if (s.equals(og)) {
-                            found = true;
-                        }
-                    } else {
-                        // count good days from today
-                        if (!s.trim().isEmpty()) {
-                            offset++;
-                        }
-                        if (pos >= fine) {
-                            date.setDayOfYear(oggi.getDayOfYear() + offset);
-                            debug("setto data da oggi" + offset);
-                            return;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private MyDate dayOf(int row, int col) {
-        if (row == -1) {
-            return oggi;
-        }
-        // find correct rows and cols
-        MyDate date = new MyDate();
-        setDayOfYear(date, row, col);
-        int mo = (col / 8);
-        String sigla = aTable.getText(0, mo * 8 + 3);
-        for (int i = 0; i < 12; i++) {
-            if (sigla.equals(sigleMesi[i])) {
-                date.setMonth(i + 1);
-                break;
-            }
-        }
-        String dm = ((Label) aTable.getWidget(row, col)).getText();
-        Integer av = Integer.parseInt(dm);
-        date.setDayOfMonth(av.intValue());
-        date.setDayOfWeek(col % 8 + 1); // o +2   ???
-// find if date is next year (after december)
-        if (oggi.getMonth() > date.getMonth()) {
-            date.setYear(oggi.getYear() + 1);
-        } else {
-            date.setYear(oggi.getYear());
-        }
-        return date;
-    }
+ //   static String[] sigleGiorni = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "...."};
+ //   static String[] sigleMesi = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Now", "Dic"};
+   
 
     private void showEvents(Object qwr) {
         // use this call for looking if any pending event
         // can be completed
         //   CommonCalendar.debug("show45");
         EventDescription[] eve = (EventDescription[]) qwr;
-System.out.println("CAL showEvents 1" );
+//System.out.println("CAL showEvents 1" );
         for (int i = 0; i < eve.length; i++) {
             if (eve[i] == null) {
                 return;
@@ -730,22 +508,6 @@ System.out.println("CAL showEvents 1" );
         }
     }
 
-    private SingleUser findUserOld(String name) {
-        Iterator<TreeItem> it = userTree.treeItemIterator();
-        while (it.hasNext()) {
-            MyTreeItem item = (MyTreeItem) it.next();
-            TreeElement t = item.getContent();
-            if (t.getClass() == SingleUser.class) {
-                if (((SingleUser) t).getMailAddress().equals(name)) {
-                    //  Class cl = ((Object) t).getClass();
-                    // if (cl == SingleUser.class) {
-                    return (SingleUser) t;
-                    //  }
-                }
-            }
-        }
-        return null;
-    }
 
     // interesting problem: how to get a minimal group
     // of destinations? maybe better

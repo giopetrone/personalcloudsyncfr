@@ -82,6 +82,7 @@ public class MeetingSession extends VerticalPanel {
     private String title;
     private SingleUser organizerUser;
     private int meetingLength = 1;
+    private  int[] sceglibili;
     TextField<String> meetingTitle;
 
     public boolean addRisposta(EventDescription evt) {
@@ -90,24 +91,21 @@ public class MeetingSession extends VerticalPanel {
         // template contains this user!!!
 
      //   CommonCalendar.debug("in meetingsession.addrisposta:");
-       // MessageBox.alert("Add risposta I", "", null);
+      //  MessageBox.alert("Add risposta I", "", null);
         //   CommonCalendar.debug("\t" + evt.getDestinatario() + " " + template.getUser());        
      //   CommonCalendar.debug("\t" + evt.getSessionId() + " " + sessionId);
         // if the destination is this user AND the answer
         // relates to this meeting proposal, check if answe == yes
         //   if (evt.getDestinatari().contains(getTemplate().getUser()) &&
         if (evt.getSessionId().equals(sessionId)) {
-            ArrayList params = evt.getParameters();
-            if (!params.isEmpty()) {
-                String answ = evt.getParameter("Answer");
+               String answ = evt.getParameter("Answer");
                 //CommonCalendar.debug("\t" + "Yes" + " " + answ);
-            //    MessageBox.alert("add risposta  II", "", null);
+             //   MessageBox.alert("add risposta  II", "", null);
                 if (answ.equalsIgnoreCase("Yes")) {
                     return risposte.remove(evt.getUser());
                 } else {
                   //  CommonCalendar.debug("utente ha rsiposto no o errore: " + answ);
                 }
-            }
         }
         return false;
     }
@@ -215,16 +213,15 @@ public class MeetingSession extends VerticalPanel {
         };
         CommonCalendar.getService().getCalendars(organizerUser, selectedUsers, startDate, endDate, callback77);
     }
-    int[] sceglibili;
 
     private void createPossibleList(int appointments, int hours) {
 
         sceglibili = new int[appointments];
         for (int i = 0, j = 0; i < freeTimes.length; i++) {
             if (freeTimes[i].equals("")) {
-                // can be chosen as possible meeting date
-                // long meeting?
+                // can be chosen as possible meeting date            
                 boolean ok = true;
+                    // long meeting?
                 if (hours > 1) {
                     for (int k = 1; k < hours; k++) {
                         if (!freeTimes[i + k].equals("")) {
@@ -241,34 +238,6 @@ public class MeetingSession extends VerticalPanel {
             }
         }
 
-    }
-
-    private void createPossibleListOLD(int appointments) {
-        int rows = calendarTable.getRowCount();
-        int cols = calendarTable.getCellCount(0);
-
-
-        final int[] sceglibili = new int[appointments];
-        for (int i = 1, j = 0; i < rows && j < appointments; i++) {
-            Widget w = calendarTable.getWidget(i, cols);
-            if (w != null) {
-                // can be chosen as possible meeting date
-                espressione.addItem(trovaGiorno(i) + ";" + ore[i]);
-                sceglibili[j] = i;
-                j++;
-            }
-        }
-        espressione.addClickListener(new ClickListener() {
-
-            public void onClick(Widget sender) {
-                int index = espressione.getSelectedIndex();
-
-                int appIndex = sceglibili[index];
-                //  debug("click0" + rowIndex);
-                createClickCall(appIndex, trovaGiorno(appIndex) + ";" + ore[appIndex]);
-            }
-        });
-        espressione.setVisibleItemCount(appointments);
     }
 
     private void createFreeTimes() {
@@ -289,55 +258,6 @@ public class MeetingSession extends VerticalPanel {
             }
         }
         // Window.alert(tutti);
-    }
-
-    private void createCalendarTableOLD() {
-        for (int j = 0; j < settimane.length; j++) {
-            String s1 = settimane[j];
-            String s2 = ore[j];
-            calendarTable.setText(j + 1, 0, s1);
-            calendarTable.setText(j + 1, 1, s2);
-        }
-
-        calendarTable.setBorderWidth(2);
-        String[] common = new String[settimane.length];
-
-        for (int j = 0; j < common.length; j++) {
-
-            common[j] = "________";
-        }
-        // last position is common calendar
-        // fill column for each user
-        for (int i = 0; i < getCalendari().length - 1; i++) {
-            CalendarOwner co = getCalendari()[i];
-            Label lab = new Label(co.getName());
-            calendarTable.setWidget(0, i + 2, lab);
-            String[] occup = co.creaMat();
-            for (int j = 0; j < occup.length; j++) {
-                String oc = occup[j];
-                if (!oc.equals(" ")) {
-                    common[j] = "OCC";
-                }
-                calendarTable.setText(j + 1, i + 2, oc);
-            }
-        }
-        // fill in common calendar
-        for (int j = 0; j < common.length; j++) {
-            String ss = common[j];
-            final int meetingIndex = j;
-            if (ss.equals("OCC")) {
-                calendarTable.setText(j + 1, (getCalendari().length - 1) + 2, ss);
-            } else {
-                com.google.gwt.user.client.ui.Button cho = new com.google.gwt.user.client.ui.Button("Choose");
-                cho.addClickListener(new ClickListener() {
-
-                    public void onClick(Widget sender) {
-                        createClickCall(meetingIndex, trovaGiorno(meetingIndex) + ";" + ore[meetingIndex]);
-                    }
-                });
-                calendarTable.setWidget(j + 1, (getCalendari().length - 1) + 2, cho);
-            }
-        }
     }
 
     private String trovaGiorno(int index) {
@@ -371,22 +291,6 @@ public class MeetingSession extends VerticalPanel {
         originator.sendEvents(getProposal());
         //Window.alert("Proposed meeting date" + meetingIndex);
         MessageBox.alert("Proposed meeting date", "", null);
-    }
-
-    public void setConfirmedColor(EventDescription eve) {
-        CommonCalendar.debug("colori 0");
-        for (int i = 0; i < getCalendari().length - 1; i++) {
-            CalendarOwner co = getCalendari()[i];
-            // controllare!!!!
-            CommonCalendar.debug("NICK " + co.getName() + " " + eve.getUser());
-            if (co.getMailAddress().equals(eve.getUser())) {
-                Label lab = (Label) calendarTable.getWidget(0, i + 2);
-                CommonCalendar.debug("colori 1");
-                //DOM.setStyleAttribute(lab.getElement(), "backgroundColor", "#ABCDEF");
-                DOM.setStyleAttribute(lab.getElement(), "backgroundColor", "#DFE8F6");
-                return;
-            }
-        }
     }
 
     /**

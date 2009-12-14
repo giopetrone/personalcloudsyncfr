@@ -23,10 +23,7 @@ import java.util.Calendar;
 import src.com.google.gwt.sample.commoncalendar.client.ICommonCalendar;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+
 import java.util.HashMap;
 import javax.servlet.http.HttpSession;
 
@@ -61,55 +58,9 @@ public class CommonCalendarServiceImpl extends RemoteServiceServlet implements
     }
      */
     public String[] calendario6Mesi() {
-        return new ServerToClient().creaTabellina();
+        return new String[1];//ServerToClient().creaTabellina();
     }
 
-    private String readAppsold(String xmlFile) {
-
-        InputStream is = getClass().getResourceAsStream(xmlFile);
-        if (is == null) {
-            return "";
-        }
-        //   System.out.println("in readapps, is == " + is);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        StringBuilder sb = new StringBuilder();
-
-        String line = null;
-        try {
-            while ((line = reader.readLine()) != null) {
-                sb.append(line + "\n");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                is.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return sb.toString();
-
-
-    }
-
-    /*
-    public String myMethod(String s) {
-    // Do something interesting with 's' here on the server.
-
-    String daGiga = listener.pollOld();
-    return "Server says: " + (daGiga == null ? "null" : daGiga) + " " + s;
-    }
-
-    public String[] myMethodS(String[] s) {
-    // Do something interesting with 's[]' here on the server.
-    String[] re = new String[2];
-    re[0] = "server says";
-    re[1] = s[0];
-    return re;
-    }
-     */
     public ApplicationDescription[] getApplicationTree() {
 
 
@@ -117,7 +68,7 @@ public class CommonCalendarServiceImpl extends RemoteServiceServlet implements
         //  return ServerToClient.buildAppTree(readApps("applicationList.xml"));
         //  InputStream is = getClass().getResourceAsStream("applicationList.xml");
         // return ServerToClient.buildAppTree(readApps(is));
-        return new ServerToClient().buildAppTree(null);
+        return new ApplicationDescription[1];//ServerToClient().buildAppTree(null);
     }
 
     public UserGroup[] getGroupTree(SingleUser me) {
@@ -157,17 +108,7 @@ public class CommonCalendarServiceImpl extends RemoteServiceServlet implements
         date.setDayOfMonth(calNow.get(Calendar.DAY_OF_MONTH));
         date.setDayOfWeek(calNow.get(Calendar.DAY_OF_WEEK) - 2);
         date.setDaysOfYear(calNow.getActualMaximum(Calendar.DAY_OF_YEAR));
-        // strano vero?
-      /*  HttpSession sess = getSession();
-        Enumeration enu = sess.getAttributeNames();
-        System.out.println("this: " + this + " SESSIONE: " + sess.getId());
-        while (enu.hasMoreElements()) {
-        String s = (String) enu.nextElement();
-        Object o = sess.getAttribute(s);
-        System.out.println(s + "  " + o.toString());
-
-        }*/
-
+       
         return date;
     }
 
