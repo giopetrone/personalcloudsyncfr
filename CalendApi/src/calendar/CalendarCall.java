@@ -31,7 +31,7 @@ public class CalendarCall {
     URL privateUrl;
     URL ownedUrl;
     URL allUrl;
-    static int count = 0; //  temporaneo
+   // static int count = 0; //  temporaneo
     static CalendarCall TheCall = null;
 
     public static CalendarCall getCalendarCall(String googleUserMail, String pwd) {
@@ -93,37 +93,37 @@ public class CalendarCall {
         try {
             CalendarFeed resultFeed = myService.getFeed(ownedUrl, CalendarFeed.class);
             System.out.println("Calendars you own:");
-            System.out.println();
+         //   System.out.println();
             for (int i = 0; i < resultFeed.getEntries().size(); i++) {
                 CalendarEntry entry = resultFeed.getEntries().get(i);
                 String urlref = entry.getLink(Link.Rel.ALTERNATE, Link.Type.ATOM).getHref();
-             //   System.out.println("edit link: [" + urlref + "]");
-                String toMatc = urlref.replaceFirst("%40","@");
+                //   System.out.println("edit link: [" + urlref + "]");
+                String toMatc = urlref.replaceFirst("%40", "@");
                 if (toMatc.contains(guestEmail)) {
-             //   System.out.println("\t" + entry.getTitle().getPlainText());
-             //   System.out.println("edit link: [" + entry.getLink(Link.Rel.ALTERNATE, Link.Type.ATOM).getHref() + "]");
-                final URL feedURL = new URL(entry.getLink(Link.Rel.ALTERNATE, Link.Type.ATOM).getHref());
-                CalendarEventFeed unFeed = myService.getFeed(feedURL, CalendarEventFeed.class);
-                retList = unFeed.getEntries();
-                break;
+                  //  System.out.println("\t" + entry.getTitle().getPlainText());
+                 //   System.out.println("edit link: [" + entry.getLink(Link.Rel.ALTERNATE, Link.Type.ATOM).getHref() + "]");
+                    // final URL feedURL = new URL(entry.getLink(Link.Rel.ALTERNATE, Link.Type.ATOM).getHref());
+                    final URL feedURL = new URL(urlref);
+                    CalendarEventFeed unFeed = myService.getFeed(feedURL, CalendarEventFeed.class);
+                    retList = unFeed.getEntries();
+                    break;
                 }
             }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-/*
-            Iterator it = retList.iterator();
-            while (it.hasNext()) {
-                CalendarEventEntry en = (CalendarEventEntry) it.next();
-                List<When> lw = en.getTimes();
-                System.out.println("evento titolo = " + en.getTitle().getPlainText());
-                if (lw.size() > 0) {
-                    When wh = lw.get(0);
-                    System.out.println(" " + wh.getStartTime().toString() + "  " + wh.getEndTime().toString());
-                }
-            } */
-        if (retList.isEmpty()){
-             System.out.println("\t no appts or not found calendar:"+ guestEmail);
+        /*           Iterator it = retList.iterator();
+        while (it.hasNext()) {
+        CalendarEventEntry en = (CalendarEventEntry) it.next();
+        List<When> lw = en.getTimes();
+        System.out.println("evento titolo = " + en.getTitle().getPlainText());
+        if (lw.size() > 0) {
+        When wh = lw.get(0);
+        System.out.println(" " + wh.getStartTime().toString() + "  " + wh.getEndTime().toString());
+        }
+        } */
+        if (retList.isEmpty()) {
+            System.out.println("\t no appts or not found calendar:" + guestEmail);
         }
         return retList;
     }
@@ -147,9 +147,8 @@ public class CalendarCall {
                 CalendarEntry entry = resultFeed.getEntries().get(i);
                 String urlref = entry.getLink(Link.Rel.ALTERNATE, Link.Type.ATOM).getHref();
                 System.out.println("edit link: [" + urlref + "]");
-                 String toMatc = urlref.replaceFirst("%40","@");
+                String toMatc = urlref.replaceFirst("%40", "@");
                 if (toMatc.contains(guestEmail)) {
-              
                     final URL postURL = new URL(urlref);
                     EventEntry insertedEntry = myService.insert(postURL, myEntry);
                     System.out.println("inserApt fatta");
@@ -160,7 +159,4 @@ public class CalendarCall {
             ex.printStackTrace();
         }
     }
-
- 
-
 }
