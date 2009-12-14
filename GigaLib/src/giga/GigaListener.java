@@ -134,9 +134,10 @@ public class GigaListener implements RemoteEventListener {
             NotifyActionType notifyType = arrivedRemoteEvent.getNotifyActionType();
 
             String msgStr = "NOTIFY- Type:" + Notification66.getNotifyDesc(notifyType) + "; " + "Event-Sequence#: " +
-                    theEvent.getSequenceNumber() + "; " + "Content: '" + msg.printString() + "';";
+                    theEvent.getSequenceNumber() + "; " /*+ "Content: '" + msg.printString()  */
+                    + "event: "+ msg.getEvent().getDescription() + "";
 
-            System.out.println(msgStr);
+         //   System.out.println(msgStr);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -147,6 +148,7 @@ public class GigaListener implements RemoteEventListener {
         if (started()) {
             for (int i = 0; i < eventBuf.size(); i++) {
                 de[i] = eventBuf.get(i);
+                System.out.println("GetEvent: "+ de[i].getDescription());
             }
         }
         eventBuf.clear();
@@ -155,9 +157,9 @@ public class GigaListener implements RemoteEventListener {
 
     public void putEvent(EventDescription desc) {
         if (started()) {
+            System.out.println("PutEvent: "+ desc.getDescription());
             session.writeXMLObject(desc);
         }
-
     }
 
     public void putEvents(EventDescription[] events) {

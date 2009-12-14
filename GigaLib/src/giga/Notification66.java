@@ -186,7 +186,7 @@ public class Notification66 implements RemoteEventListener {
             MyMetaDataEntry msg = (MyMetaDataEntry) arrivedRemoteEvent.getObject();
             NotifyActionType notifyType = arrivedRemoteEvent.getNotifyActionType();
 
-            String msgStr = "NOTIFY- Type:" + getNotifyDesc(notifyType) + "; " + "Event-Sequence#: " +
+            String msgStr = "NOTIFY66 Type:" + getNotifyDesc(notifyType) + "; " + "Event-Sequence#: " +
                     theEvent.getSequenceNumber() + "; " + "Content: '" + msg.printString() + "';";
 
             System.out.println(msgStr);
