@@ -295,6 +295,15 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
             }
         }
         ret += "}";
+           sz = destinatari.size();
+
+        for (int i = 0; i < sz; i++) {
+            ret += destinatari.get(i);
+            if (i < sz - 1) {
+                ret += ",";
+            }
+        }
+        ret += "}";
         return ret;
     }
 
