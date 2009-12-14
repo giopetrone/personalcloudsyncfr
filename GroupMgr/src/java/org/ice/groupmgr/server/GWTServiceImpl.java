@@ -49,7 +49,7 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
     // per Giga
     HashMap<String, GigaListener> sessionListeners = new HashMap();
     ArrayList addedFilterList = new ArrayList(); // lista di utenti gia' sottoscritti
-  //  HashMap<String, ArrayList<EventDescription>> usersData = new HashMap();  // chiave = destinatario e value = lista di eventi (domande) che i filtri fanno passare (per quello user)
+    //  HashMap<String, ArrayList<EventDescription>> usersData = new HashMap();  // chiave = destinatario e value = lista di eventi (domande) che i filtri fanno passare (per quello user)
     HashMap<String, ArrayList<String>> eventSubscrData = new HashMap();  // chiave = applicazione e value = lista di eventi a cui sottoscriversi
     HttpSession session = null;
     // fine Giga
@@ -68,7 +68,7 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
         //    logPasswdData.put("gio.petrone@gmail.com", "mer20ia05");
         //    logPasswdData.put("annamaria.goy@gmail.com", "tex_willer");
         // inizializzazione di userData, in futuro leggere gli utenti da users.xml
-     //   usersData.put("gio.petrone@gmail.com", new ArrayList());
+        //   usersData.put("gio.petrone@gmail.com", new ArrayList());
 //        usersData.put("sgnmrn@gmail.com", new ArrayList());
 //        usersData.put("marino@di.unito.it", new ArrayList());
 //        usersData.put("lg.petrone@gmail.com", new ArrayList());
@@ -126,7 +126,7 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
             } else {
                 System.out.println("************GroupMgr  getEvents tmp SIZE = " + tmp.length);
                 // TEMP indice 0 : assumiamo che tutti gli eventi che arrivano con getEvents(), abbiano lo stesso destinataio (plausibile per come sono costruiti i filtri)
-          //      String dest = tmp[0].getDestinatario();
+                //      String dest = tmp[0].getDestinatario();
                 for (int i = 0; i < tmp.length; i++) {
 
                     System.out.println("!!!!!!!!!!!!!!!!!!!!!!GroupMgr  getEvents tmp eventName = " + tmp[i].getEventName());
@@ -163,7 +163,7 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
                         subscribeTo(ev, userName, app); // user arrivera' dal Gadget+iGooglepage
                     }
                 }
-              //  addedFilterList.add(userName); GIO 18-11-09
+                //  addedFilterList.add(userName); GIO 18-11-09
             }
         }
         getListener().putEvents(events);
@@ -171,13 +171,13 @@ public class GWTServiceImpl extends RemoteServiceServlet implements
 
     private String subscribeTo(String evName, String dest, String app) {
         // invia a Giga il nome dell'evento a cui l'utente si vuole sottoscrivere
-         EventDescription template = new EventDescription("*");
+        EventDescription template = new EventDescription("*");
         template.setEventName(evName);
-     //   template.setApplication(app);
+        template.setApplication(app);
         template.addDestinatario(dest);
         addedFilterList.add(dest);
         getListener().addEvent(template);
-System.out.println(" ho fatto la new di Subscription in GROUPMGR  grande evName = " + evName + "  dest = " + dest + " app = " + app);
+        System.out.println(" ho fatto la new di Subscription in GROUPMGR  grande evName = " + evName + "  dest = " + dest + " app = " + app);
 //        Subscription f = new Subscription();
 //        System.out.println(" ho fatto la new di Subscription in GROUPMGR  grande evName = " + evName + "  dest = " + dest + " app = " + app);
 //        EventDescription evDescr = new EventDescription(evName);
@@ -239,7 +239,6 @@ System.out.println(" ho fatto la new di Subscription in GROUPMGR  grande evName 
     // fine metodi per Giga
     //*************************************************************************
     //*************************************************************************
-
     //ok
     public List<ContattoModelData> getContatti() {
         List<ContattoModelData> listaRis = new ArrayList<ContattoModelData>();
@@ -387,7 +386,7 @@ System.out.println(" ho fatto la new di Subscription in GROUPMGR  grande evName 
         eventDesc.setEventName("MembershipProposal");
         eventDesc.setUser(groupMakerLogin);
         for (ContattoModelData c : contatti) {
-           // eventDesc.setDestinatario(c.getMail()); //da elimimare in futuro
+            // eventDesc.setDestinatario(c.getMail()); //da elimimare in futuro
             eventDesc.addDestinatario(c.getMail());
             //per gestione risposte
             gP.addRequest(c.getMail());
@@ -437,7 +436,7 @@ System.out.println(" ho fatto la new di Subscription in GROUPMGR  grande evName 
                         // GIO :aggiungi idGruppo al contatto
                         try {
                             cCall.setGroupMembership(cE.getId(), groupId);
-                  //          eventDesc.setDestinatario(cmd.getMail()); // da eliminare mandare a Giga evento createdGroup per ogni utente
+                            //          eventDesc.setDestinatario(cmd.getMail()); // da eliminare mandare a Giga evento createdGroup per ogni utente
                             eventDesc.addDestinatario(cmd.getMail());
                         } catch (Exception e) {
                             System.out.println("GroupMgr ERRORE creaGruppo");
@@ -614,7 +613,7 @@ System.out.println(" ho fatto la new di Subscription in GROUPMGR  grande evName 
                     ContactEntry cE = it.next();
                     String mail = getEmailAddress(cE);
                     eventDesc.addDestinatario(mail);
-                 //   eventDesc.setDestinatario(mail); // da elimianre TEMP
+                    //   eventDesc.setDestinatario(mail); // da elimianre TEMP
                     //DA UTILIZZARE SOLO IN modifica gruppo
          /*       try {
                     cancellato = cCall.removeGroupMembership(cE.getId(), idGruppo);
@@ -681,7 +680,7 @@ System.out.println(" ho fatto la new di Subscription in GROUPMGR  grande evName 
 // metodi per gestire le risposte dal Suvey per ogni invitato
     public boolean addRisposta(EventDescription evt) {
         // remove a recipient each time a confirmation is received
-        boolean eliminato = false;      
+        boolean eliminato = false;
         System.out.println("in GROUPMGR.addrisposta: user  " + evt.getUser());  //chi risponde
 
         // if the destination is this user AND the answer
