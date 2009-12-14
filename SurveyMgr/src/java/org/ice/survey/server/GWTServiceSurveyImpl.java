@@ -319,7 +319,7 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
         // invia a Giga il nome dell'evento a cui l'utente si vuole sottoscrivere
         EventDescription template = new EventDescription("*");
         template.setEventName(evName);
-        // template.setApplication(app);
+        template.setApplication(app);
         template.addDestinatario(dest);
         if (cC != null) {
             ArrayList<String> gNames = cC.getUserGroupNames();
