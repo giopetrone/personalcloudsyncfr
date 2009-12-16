@@ -83,7 +83,7 @@ public class CommonCalendar implements EntryPoint {
     private Html space = new Html("<br/><br/>");
     private TextField<String> userName;
     private TextField<String> userPwd;
-    private static TextArea messaggio = new TextArea();
+  //  private static TextArea messaggio = new TextArea();
    
 
     private Tree userTree = new Tree();
@@ -141,10 +141,10 @@ public class CommonCalendar implements EntryPoint {
             }
         });
        
-   
-        messaggio.setCharacterWidth(40);
-        messaggio.setVisibleLines(20);
-        messaggio.setText("trace messages");
+   // commentato per evitare javascript errors
+//        messaggio.setCharacterWidth(40);
+//        messaggio.setVisibleLines(20);
+//        messaggio.setText("trace messages");
         addButton = new Button("Show possible meeting dates", new SelectionListener<ButtonEvent>() {
 
             @Override
