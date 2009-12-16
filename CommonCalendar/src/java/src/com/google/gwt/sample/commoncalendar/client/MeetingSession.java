@@ -167,7 +167,7 @@ public class MeetingSession extends VerticalPanel {
     private void initialize(Object qwr, int hours) {
         this.setCalendari((CalendarOwner[]) qwr);
         createFreeTimes();
-        createPossibleList(5, hours);
+        createPossibleList(3, hours);
         showCompleteButton.addClickListener(new ClickListener() {
 
             public void onClick(Widget sender) {
@@ -176,7 +176,7 @@ public class MeetingSession extends VerticalPanel {
         });
         // add(espressione);
         //   add(showCompleteButton);
-        buildDateChooser(5);
+        buildDateChooser(3);
     }
 
     public MeetingSession(CommonCalendar originator, EventDescription startingEvent, SingleUser[] selectedUsers,
