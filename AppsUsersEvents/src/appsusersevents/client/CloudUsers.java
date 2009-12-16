@@ -70,5 +70,15 @@ public class CloudUsers {
         cloudUsers.put("105588383970476786723", new SingleUser("utntest1", "utntest1@gmail.com", "passtest", "105588383970476786723", ""));
         cloudUsers.put("106599813745807651946", new SingleUser("utntest2", "utntest2@gmail.com", "passtest", "106599813745807651946", ""));
         cloudUsers.put("109389007736899610246", new SingleUser("utntest3", "utntest3@gmail.com", "passtest", "109389007736899610246", ""));
+        cloudUsers.put("109389007736899610246", new SingleUser("utntest4", "utntest4@gmail.com", "passtest", "109389007736899610246", ""));
+        cloudUsers.put("109816003321688504682", new SingleUser("utntest5", "utntest5@gmail.com", "passtest", "109816003321688504682", ""));
+        cloudUsers.put("105511499750624243589", new SingleUser("utntest6", "utntest6@gmail.com", "passtest", "105511499750624243589", ""));
+        cloudUsers.put("101265267177331581252", new SingleUser("utntest7", "utntest7@gmail.com", "passtest", "101265267177331581252", ""));
+        cloudUsers.put("102268038416982124819", new SingleUser("utntest8", "utntest8@gmail.com", "passtest", "102268038416982124819", ""));
+        cloudUsers.put("104985310118499786663", new SingleUser("utntest9", "utntest9@gmail.com", "passtest", "104985310118499786663", ""));
+        cloudUsers.put("100032147672403918727", new SingleUser("utntest10", "utntest10@gmail.com", "passtest", "100032147672403918727", ""));
+        cloudUsers.put("113980194353852078947", new SingleUser("utntest11", "utntest11@gmail.com", "passtest", "113980194353852078947", ""));
+        cloudUsers.put("107554240302350785323", new SingleUser("utntest12", "utntest12@gmail.com", "passtest", "107554240302350785323", ""));
+        cloudUsers.put("111571259565140978311", new SingleUser("utntest13", "utntest13@gmail.com", "passtest", "111571259565140978311", ""));
     }
 }
