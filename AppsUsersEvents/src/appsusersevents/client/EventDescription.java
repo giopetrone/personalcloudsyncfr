@@ -183,10 +183,11 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
                 fieldCompatible(time, template.time) &&
                 fieldCompatible(correlationId, template.correlationId) &&
                 fieldCompatible(sessionId, template.sessionId) &&
-                destinatariCompatible(template) &&
-                spheresCompatible(template) &&
-                relevantSpheresCompatible(template) &&
-                parametersCompatible(template);
+                destinatariCompatible(template) ;
+        // gio anna: per disperazione la vigilia di natale 2009 !! quando si userannovanno riattivati
+//                spheresCompatible(template) &&
+//                relevantSpheresCompatible(template) &&
+//                parametersCompatible(template);
     }
 
     public EventDescription copyEd() {
@@ -731,7 +732,7 @@ public class EventDescription extends TreeElement /*implements Serializable*/ {
         ArrayList<String> destinatariFiltro = template.getDestinatari();
         System.out.println("%%%%%%EVENT DESCR evento da GIGa: " + destinatari);
         System.out.println("%%%%%%EVENT DESCR evento del filtro: " + destinatariFiltro);
-        if (destinatariFiltro.size() == 0) {
+        if (destinatariFiltro.size() == 0) { // GIO ANNA : forse dovrebbe dare false, ma probabilmente non entra mai 22-12-09
             return true;
         }
         for (int i = 0; i < destinatariFiltro.size(); i++) {
