@@ -59,11 +59,12 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
         ArrayList aL1 = new ArrayList();
         aL1.add("MeetingProposal");
         eventSubscrData.put("CommonCalendar", aL1);
-        ArrayList aL2 = new ArrayList();
-        aL2.add("MembershipProposal");
-        aL2.add("GroupCreated");
-        aL2.add("GroupModified");
-        eventSubscrData.put("GroupMgr", aL2);
+        //GIO ANNA 22-12-2009 X DISPERAZIONE scommentare !!!!!!!!!!!!!!!!!!
+//        ArrayList aL2 = new ArrayList();
+//        aL2.add("MembershipProposal");
+//        aL2.add("GroupCreated"); // non x la Survey, ma per riottenere gruppi da contacts, finire il lavoro
+//        aL2.add("GroupModified");
+//        eventSubscrData.put("GroupMgr", aL2);
 
         // caricare utenti
 
@@ -140,7 +141,7 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
     }
 
     // si chiama putEvents ma e' identica ad un publishEvent
-    public void putEvents(EventDescription[] events, String userName) {
+ /*   public void putEvents(EventDescription[] events, String userName) {
         if (userName != null) {
           //  if (!alreadySubscribed) {
                 if (!alreadySubscr(userName)) {
@@ -163,6 +164,7 @@ public class GWTServiceSurveyImpl extends RemoteServiceServlet implements
         }
         getListener().putEvents(events);
     }
+  */
 // method e method2 :metodi di prova da sostituire con i veri metodi della app
 
     // metodo di prova per solo "RMI"

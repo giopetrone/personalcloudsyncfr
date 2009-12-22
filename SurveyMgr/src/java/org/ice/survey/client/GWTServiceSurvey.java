@@ -27,7 +27,7 @@ public interface GWTServiceSurvey extends RemoteService {
 
     public EventDescription[] getEvents(String userName);
 
-    public void putEvents(EventDescription[] events, String userName);
+  //  public void putEvents(EventDescription[] events, String userName);
 
     public Boolean validateUser(String name, String pwd);
 
