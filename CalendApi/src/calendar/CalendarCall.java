@@ -175,7 +175,7 @@ public class CalendarCall {
         long timeInMillis = System.currentTimeMillis();
 
         // 1000*3600*24*30  == millisec*secondi*ore*giorni
-        c.insertEvent(timeInMillis+ 1000*3600*24*30, "prova Liliana", "appuintamento", 3600 * 1000);
+        c.insertEvent(timeInMillis+ 1000*3600*24*30, "prova Liliana", "appuntamento", 2);
        // List aList = c.getCalendarEvents();
        // c.printCalendar(aList);
     }
