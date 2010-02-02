@@ -173,7 +173,9 @@ public class CalendarCall {
     public static void main(String[] args) {
         CalendarCall c = new CalendarCall("googlelogin", "googlepwd", "googlelogincalendario@gmail.com");
         long timeInMillis = System.currentTimeMillis();
-        c.insertEvent(timeInMillis, "prova Liliana", "appuintamento", 3600 * 1000);
+
+        // 1000*3600*24*30  == millisec*secondi*ore*giorni
+        c.insertEvent(timeInMillis+ 1000*3600*24*30, "prova Liliana", "appuintamento", 3600 * 1000);
        // List aList = c.getCalendarEvents();
        // c.printCalendar(aList);
     }
