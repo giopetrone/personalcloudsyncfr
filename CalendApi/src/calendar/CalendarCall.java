@@ -7,11 +7,13 @@ package calendar;
 import com.google.gdata.client.calendar.CalendarService;
 import com.google.gdata.data.*;
 import com.google.gdata.data.calendar.CalendarEntry;
+import com.google.gdata.data.calendar.CalendarEventEntry;
 import com.google.gdata.data.calendar.CalendarEventFeed;
 import com.google.gdata.data.calendar.CalendarFeed;
 import com.google.gdata.data.extensions.*;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -31,7 +33,7 @@ public class CalendarCall {
     URL privateUrl;
     URL ownedUrl;
     URL allUrl;
-   // static int count = 0; //  temporaneo
+    // static int count = 0; //  temporaneo
     static CalendarCall TheCall = null;
 
     public static CalendarCall getCalendarCall(String googleUserMail, String pwd) {
@@ -72,6 +74,11 @@ public class CalendarCall {
         }
     }
 
+    /*
+     * parametri: googleUserMail e pwd per login
+     * guestEmail : in quale calendario POSSEDUTO inseriro' l'evento
+     */
+
     public CalendarCall(String googleUserMail, String pwd, String guestEmail) {
 
         this.googleUserMail = googleUserMail;
@@ -93,15 +100,15 @@ public class CalendarCall {
         try {
             CalendarFeed resultFeed = myService.getFeed(ownedUrl, CalendarFeed.class);
             System.out.println("Calendars you own:");
-         //   System.out.println();
+            //   System.out.println();
             for (int i = 0; i < resultFeed.getEntries().size(); i++) {
                 CalendarEntry entry = resultFeed.getEntries().get(i);
                 String urlref = entry.getLink(Link.Rel.ALTERNATE, Link.Type.ATOM).getHref();
                 //   System.out.println("edit link: [" + urlref + "]");
                 String toMatc = urlref.replaceFirst("%40", "@");
                 if (toMatc.contains(guestEmail)) {
-                  //  System.out.println("\t" + entry.getTitle().getPlainText());
-                 //   System.out.println("edit link: [" + entry.getLink(Link.Rel.ALTERNATE, Link.Type.ATOM).getHref() + "]");
+//                    System.out.println("\t" + entry.getTitle().getPlainText());
+//                    System.out.println("edit link: [" + entry.getLink(Link.Rel.ALTERNATE, Link.Type.ATOM).getHref() + "]");
                     // final URL feedURL = new URL(entry.getLink(Link.Rel.ALTERNATE, Link.Type.ATOM).getHref());
                     final URL feedURL = new URL(urlref);
                     CalendarEventFeed unFeed = myService.getFeed(feedURL, CalendarEventFeed.class);
@@ -112,16 +119,6 @@ public class CalendarCall {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        /*           Iterator it = retList.iterator();
-        while (it.hasNext()) {
-        CalendarEventEntry en = (CalendarEventEntry) it.next();
-        List<When> lw = en.getTimes();
-        System.out.println("evento titolo = " + en.getTitle().getPlainText());
-        if (lw.size() > 0) {
-        When wh = lw.get(0);
-        System.out.println(" " + wh.getStartTime().toString() + "  " + wh.getEndTime().toString());
-        }
-        } */
         if (retList.isEmpty()) {
             System.out.println("\t no appts or not found calendar:" + guestEmail);
         }
@@ -159,4 +156,27 @@ public class CalendarCall {
             ex.printStackTrace();
         }
     }
+    
+    public void printCalendar(List retList) {
+        Iterator it = retList.iterator();
+        while (it.hasNext()) {
+            CalendarEventEntry en = (CalendarEventEntry) it.next();
+            List<When> lw = en.getTimes();
+            System.out.println("evento titolo = " + en.getTitle().getPlainText());
+            if (lw.size() > 0) {
+                When wh = lw.get(0);
+                System.out.println(" " + wh.getStartTime().toString() + "  " + wh.getEndTime().toString());
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        CalendarCall c = new CalendarCall("googlelogin", "googlepwd", "googlelogincalendario@gmail.com");
+        long timeInMillis = System.currentTimeMillis();
+        c.insertEvent(timeInMillis, "prova Liliana", "appuintamento", 3600 * 1000);
+       // List aList = c.getCalendarEvents();
+       // c.printCalendar(aList);
+    }
+
 }
+
