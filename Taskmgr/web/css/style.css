@@ -1,0 +1,134 @@
+body {
+  font-family: Verdana, Geneva, Arial, helvetica, sans-serif;
+  font-size: 11pt;
+  margin: 0px;
+}
+
+div.banner {
+  background-color: #EEEEEE;
+  width: 100%;
+  padding: 10px; 
+  padding-left: 20px;
+}
+
+a.link {
+  text-decoration: none;
+  border-bottom: 1px dashed #0000ff;
+}
+
+div.topbar {
+  position: absolute;
+  width: 200px;
+  white-space: nowrap;
+}
+
+ul.sflogo {
+  margin-top: 50px; margin-left: 20px;
+  list-style: none;
+  padding: 0px; 
+}
+
+ul.menu {
+  font-family: Verdana, Geneva, Arial, helvetica, sans-serif;
+  font-size: 12pt;
+  font-weight: bold;
+  list-style: none;
+  padding: 0px; 
+  margin: 10px; margin-left: 10px;
+}
+ul.menu li { 
+  padding-left: 10px;
+  padding-top: 3px; padding-bottom: 3px;
+  margin-right: 5px; 
+  border: 1px solid #FEFEFE;
+}
+ul.menu a {
+  text-decoration: none;
+  color: #000000;
+}
+ul.menu li.selected {
+  background-color: #3366CC;
+}
+ul.menu li.selected a {
+  color: #FFFFFF;
+}
+ul.submenu {
+  list-style: none;
+  padding: 0px; 
+  margin: 0px; margin-left: 3px; margin-top:4px;
+  color: #FFFFFF;	
+}
+ul.submenu li {
+  padding: 0px; 
+  margin: 0px; margin-left: 4px; margin-bottom: 3px;
+  font-size: 10pt;
+  border: 0px;
+}
+ul.submenu li.selected a {
+  color: #ffcc00;
+}
+
+div.main {
+  position: absolute;
+  left: 200px;
+  width: 70%;
+  padding-top: 6px; margin-bottom: 5px;
+  float: left;
+}
+
+#intro { width: 80%; float: left; }
+#hot { width: 10%; float: left;text-align: center;  margin: 4px; }
+#hot img { margin: 4px;  border: 0px;}
+
+ol.toc {
+  margin-top: 5px;
+  margin-left: 30px;
+  padding: 0px;
+}
+ol.toc li {
+  padding-bottom: 2px;
+  color: blue;
+}
+ol.toc a {
+  text-decoration: none;
+}
+
+h2 {
+  margin-top: 10px; margin-bottom: 3px;
+  font-size: 14pt;
+  color: #444444;
+}
+p { margin: 8px; margin-bottom: 20px; }
+
+pre {
+  margin: 20px; margin-left: 40px; margin-right: 40px;
+  border: 1px solid #333333;
+  background-color: #EEEEEE;	
+  padding: 5px;
+  font-size: 10pt;
+}
+
+div.screenshot { text-align: left; font-weight: bold; margin: 5px; margin-top: 20px; float: left; }
+div.screenshot img { border: 1px solid #AAAAAA; }
+div.screenshot div { text-align: center; }
+
+div.topmost { 
+  position:absolute; top:100px; left: 200px; z-index: 500; 
+  background-color: #ffffff;
+  border: 1px solid #ff9933;
+  padding: 6px;
+  background-color: #ffffcc;
+}
+
+a.downoad {
+  font-size: 20pt;
+  font-weight: bold;
+}
+
+a.hideshow {
+  font-size: 8pt;
+  color: #0000ff; 
+  cursor: hand; cursor: pointer;
+  border-bottom: 0px solid #0000ff;
+}
+

@@ -1,0 +1,177 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>JavaScript Picker Sample For The Google Contacts Data API</title>
+<link rel='stylesheet' type='text/css' href='http://code.google.com/css/dev_docs.css'>
+<style type='text/css'>
+  table {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  table td, table tr {
+    border-style: none;
+  }
+</style>
+<script type='text/javascript' src='http://www.google.com/jsapi'></script>
+<script type='text/javascript' src='./js/Picker.js'></script>
+<script type='text/javascript'>
+
+/* Copyright (c) 2008 Google Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/* Loads the Google Data JavaScript client library */
+google.load('gdata', '2.x', {packages: ['contacts']});
+
+/* Code to make the form on this sample work with the contact picker */
+var emailRecipients = [];
+
+/**
+ * Clear out the list of recipients. This is called on startup to make sure
+ * that any auto-filling done by browsers does not courrupt our internal
+ * state.
+ */
+function clearRecipients() {
+  var formRecipients = document.getElementById('recipients');
+  formRecipients.value = '';
+}
+
+/**
+ * Re-generate the contents of the recipient list in the form from
+ * the list of selected contacts.
+ */
+function updateForm() {
+  // Create a concatenated version of the emailRecipients array, suitable
+  // for use as an email header.
+  var emailRecipientsString = '';
+  for (var i = 0; i < emailRecipients.length; i++) {
+    var recipient = emailRecipients[i];
+    emailRecipientsString += recipient + ', ';
+  };
+  emailRecipientsString = emailRecipientsString.substring(0, emailRecipientsString.length - 2);
+
+  // Update the recipient display on the form
+  var formRecipients = document.getElementById('recipients');
+  formRecipients.value = emailRecipientsString;
+}
+
+/**
+ * Read the contents of the form into a mailto: URI and ask the browser to
+ * go there, sending the mail message.
+ */
+function share() {
+  // Get form data
+  opener.document.getElementById('share').value = document.getElementById('recipients').value;
+ // var formSubject = document.getElementById('subject').value;
+ // var formMessage = document.getElementById('message').value;
+ // window.location = 'mailto:' + formRecipients + '?subject=' + formSubject + '&body=' + formMessage;
+ self.close();
+ return false;
+}
+
+/**
+ * Callback method to let the contact picker inform us of user selections.
+ */
+var addContact = function(contactEntry) {
+  // Extract email addresses from the contact entry.
+  var emailAddresses = contactEntry.getEmailAddresses();
+
+  // Add the new address to our list of recipients and update the form. If
+  // the user has more than one address, we'll just use the first one
+  // listed.
+  if (emailAddresses) {
+    emailRecipients.push(emailAddresses[0].getAddress());
+  }
+  updateForm();
+}
+
+/**
+ * Callback method to let the contact picker inform us of user de-selections.
+ */
+var removeContact = function(contactEntry) {
+  // Extract email addresses from the contact entry.
+  var emailAddresses = contactEntry.getEmailAddresses();
+
+  // Remove the new address from our list of recipients and update the
+  // form. Ifthe user has more than one address, we'll just use the first
+  // one listed.
+  if (emailAddresses) {
+    var addressToRemove = emailAddresses[0].getAddress();
+
+    // Locate the index of the address
+    var result = -1;
+    for (var i = 0; i < emailRecipients.length && result == -1; i++) {
+      if (emailRecipients[i] == addressToRemove)
+        result = i;
+    }
+
+    // Remove the address from the array
+    if (result != -1) {
+      emailRecipients.splice(result, 1);
+    }
+  }
+  updateForm();
+}
+
+/**
+ * Callback method to use prepare the system after the Google JavaScript
+ * client library has loaded.
+ */
+function init() {
+    /* Configure options for this sample */
+    Picker.setServiceName('Google-PickerSample-1-0');
+    Picker.setUserAddCallback(addContact);
+    Picker.setUserRemoveCallback(removeContact);
+    clearRecipients();
+    Picker.render('picker_container');
+}
+
+google.setOnLoadCallback(init);
+
+</script>
+</head>
+<body>
+
+  <div id='picker_container' style='width: 99%; margin: auto'>
+
+
+  </div>
+
+  <h2 id='compose_and_send_message'><img src='../../common/images/steps/2b.gif' alt='' style='vertical-align:middle; margin: 0;'></h2>
+
+
+
+  <form accept-charset='utf-8'>
+   <table>
+     <tr>
+         <td><textarea id='recipients' name='recipients' rows='3' cols='55' disabled='true'></textarea></td></tr>
+     <tr>   <td>   <input type='button' value='Share diagram' onclick='share()'></td>
+     </tr>
+   </table>
+      
+    
+
+        
+        
+       
+        
+  </form>
+
+  
+
+  
+</body>
+</html>

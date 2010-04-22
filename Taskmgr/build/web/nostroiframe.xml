@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module>
+    <ModulePrefs title="HTML Gadget" height="120">
+        <Require feature="rpc" />
+        <Require feature="dynamic-height"/>
+    </ModulePrefs>
+    <Content type="html">
+        <![CDATA[
+  <script type="text/javascript" src="http://wave-api.appspot.com/public/wave.js"></script>
+
+    <script type="text/javascript">
+
+    var urlInput, embeddedIframe, formPane, embeddedPane, heightInput, headerPane, urlLink;
+
+    var currentHeight = 0;
+    var currentUrl = '';
+
+    var editPreviewState = false;
+
+    function stateUpdated() {
+        var state = wave.getState ();
+
+     //   var embeddedUrl = state.get('embeddedUrl', 'http://wave-ide.appspot.com/iframe.htm');
+var embeddedUrl = 'http://esperimento44444.appspot.com/demo_basic.htm';
+
+        var embeddedHeight = parseInt(state.get('embeddedHeight', '500'));
+        if (isNaN(embeddedHeight)) {
+            embeddedHeight = '200';
+        }
+
+        if (embeddedUrl != currentUrl) {
+            currentUrl = embeddedUrl;
+            embeddedIframe.src = embeddedUrl;
+
+            urlInput.value = embeddedUrl;
+            urlLink.innerHTML = embeddedUrl;
+            urlLink.href = embeddedUrl;
+        }
+
+        if (currentHeight != embeddedHeight) {
+            currentHeight = embeddedHeight;
+            embeddedIframe.height = embeddedHeight + "px";
+            heightInput.value = embeddedHeight;
+
+            gadgets.window.adjustHeight();
+        }
+    }
+
+    function main() {
+      initControls ();
+      wave.setStateCallback(stateUpdated);
+    }
+
+    function initControls () {
+        urlInput = document.getElementById ('urlInput');
+        embeddedIframe = document.getElementById ('embeddedIframe');
+        formPane = document.getElementById ('formPane');
+        embeddedPane = document.getElementById ('embeddedPane');
+        heightInput = document.getElementById ('heightInput');
+        headerPane = document.getElementById ('headerPane');
+        urlLink = document.getElementById ('urlLink');
+        editPreviewButton = document.getElementById ('editPreviewButton');
+    }
+
+    function onView () {
+        wave.getState().submitDelta ({
+          'embeddedUrl' : urlInput.value,
+          'embeddedHeight' : heightInput.value,
+        });
+
+      formPane.style.display = 'none';
+      urlLink.style.display = '';
+      gadgets.window.adjustHeight();
+    }
+
+    function onEdit () {
+      formPane.style.display = '';
+      urlLink.style.display = 'none';
+      gadgets.window.adjustHeight();
+    }
+
+    function onEditPreview () {
+        if(editPreviewState) {
+            editPreviewState = false;
+            editPreviewButton.innerHTML = 'Edit';
+            onView ();
+        }
+        else {
+            editPreviewState = true;
+            editPreviewButton.innerHTML = 'View';
+            onEdit ();
+        }
+    }
+
+    gadgets.util.registerOnLoadHandler(main);
+
+    </script>
+    <div id="headerPane" style="font-size: 9pt; background-color: #efefef;">
+        <table style="font-size: 9pt;" width="100%">
+            <tr>
+                <td align="left" valign="top">
+                    <div><a href="#" onclick="onEditPreview();" id="editPreviewButton">Edit</a></div>
+                </td>
+                <td align="left" valign="top" style="padding-left: 20px;">
+                    <div><a href="#" id="urlLink" target="_blank"></a></div>
+                    <div id="formPane" style="font-size: 8pt; border: 2px solid #efefef; padding: 2px; display: none;">
+                        <table style="font-size: 8pt;">
+                            <tr>
+                                <td align="right">&lt;iframe&gt; URL:</td><td><input type="text" id="urlInput" size="50"></td>
+                            </tr>
+                            <tr>
+                                <td align="right">&lt;iframe&gt; height(px):</td><td><input type="text" id="heightInput" maxlength="3" size="5"></td>
+                            </tr>
+                        </table>
+                    </div>
+                </td>
+                <td align="right" valign="top">
+                    <a href="http://bindows.net">&copy; 2009-10 MBTE Sweden AB</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div style="border: 2px solid #efefef; padding: 2px;">
+        <iframe id='embeddedIframe' width="100%" frameborder="0" height="0px"></iframe>
+    </div>
+  ]]>
+    </Content>
+</Module>
