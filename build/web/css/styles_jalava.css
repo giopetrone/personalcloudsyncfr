@@ -1,0 +1,154 @@
+P {
+  margin: 0px;
+  padding: 0px;
+}
+.block {
+  border: 0px solid black;
+  width: 100px;
+  height: 50px;
+  position: absolute;
+  top: 200px;
+  left: 200px;
+  background-color: transparent;
+  overflow: hidden;
+}
+
+.line {
+  position: absolute;
+  border: 0px solid black;
+  background-color: black;
+  overflow: hidden;
+}
+
+.anchor {
+  border: 0px solid black;
+  width: 7px;
+  height: 7px;
+  position: absolute;
+  display: none;
+  background-color: #444444;
+  z-index: 200
+}
+
+.anchorHover {
+  border: 0px solid #555555;
+  width: 12px;
+  height: 12px;
+  background-color: #FFCC00;
+  position: absolute;
+  overflow: hidden;
+  z-index: 201
+}
+
+.hover {
+  border: 0px solid black;
+  width: 7px;
+  height: 7px;
+  position: absolute;
+  display: none;
+  background-color: #AAAAAA;
+  z-index: 199
+}
+
+#container {
+  border: 1px solid black;
+}
+
+textarea.editTextbox {
+ /* font: inherit; text-decoration: inherit; font-size:inherit;*/
+ font-size: 12px;
+ margin-left: 5px; 
+ margin-right: 5px; 
+ border: 1px solid #DDDDDD;
+ font-family: Arial, Helvetica, sans-serif;
+ padding: 3px;
+}
+
+.throbber {
+  font-family: Arial, Helvetica, sans-serif;	
+  font-size: 12px;
+  color: #999999;
+}
+
+/********* Property Page **************************************************/
+div.propertypage {
+  position: absolute;
+  left: 20px;
+  top: 20px;	
+  border: 1px solid #000000;	  
+  font-family: Arial, Helvetica, sans-serif;
+}
+table.propertypage {
+  margin: 2px;
+  border: 0px solid #000099;	  
+  border-collapse: collapse;
+  background-color: #FFFFFF;
+}
+table.propertypage th {
+  background-color: #CC6600;	
+  color: white;
+  font-weight: bold;
+  font-size: 12px;
+  border: 1px solid #888888;
+  text-align: left; padding: 3px;
+  cursor: hand;
+  cursor: move;
+}
+table.propertypage tr { height: 24px; }
+table.propertypage td {
+  padding-left: 2px; padding-right: 2px;
+  font-size: 12px;
+  border: 1px solid #888888;
+  white-space: nowrap;
+}
+table.propertypage td.key { width: 100px;  }
+table.propertypage td.value { width: 100px; }
+table.propertypage input.value { 
+  border: 0px; padding: 0px; margin: 0px; height: 16px; width: 80px;
+}
+
+/********* Palette *********************************************************/
+div.palette {
+  position: absolute;
+  left: 0px; top: 0px;	
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #FFFFFF;
+}
+table.palette {
+  border: 1px solid #000099;	  
+  border-collapse: separate;
+}
+table.palette thead {
+  background-color: #000099;	
+  color: white;
+  font-weight: bold;
+  cursor: hand;
+  cursor: move;
+}
+table.palette td {
+  padding: 3px; padding-left: 5px; padding-right: 10px;
+  font-size: 12px;
+  border: 1px solid black;
+}
+table.palette td.hovering {
+  border: 1px dashed black;
+}
+
+table.palette td.activated {
+  border: 1px solid black;
+  background-color: #DDDDDD;	
+}
+
+.blanket {
+  background-color: #EEEEEE;
+  filter:alpha(opacity=30);
+  -moz-opacity:0.3;  
+  opacity:0.3; 
+}
+
+/*********** testing ******************************************************/
+.hello {
+  text-align: center;
+  font-size: 14px;
+  font-family: Arial, Helvetica, sans-serif;
+}
