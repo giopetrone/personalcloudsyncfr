@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Module>
+    <ModulePrefs title="Hello Read"   height="500">
+        <Require feature="wave" />
+        <Require feature="dynamic-height"/>
+    </ModulePrefs>
+    <Content type="html">
+        <![CDATA[
+     <FORM id="forma">
+         <input type=button value="Diagram!" id="butCount" onClick="getDiagram()">
+            <INPUT type="button" value="See JSon" name="button2" onClick="var jsonString = Jalava.diagram.persist();
+               confirm(jsonString);">
+                your comments:<BR>
+                   <TEXTAREA NAME="comments" id="comments" COLS=40 ROWS=8></TEXTAREA>
+                 <P><input type=button value="Done" id="fatto" onClick="commentato()">
+        </FORM>
+        <div id="content_div" style="height: 50px;"></div>
+       <script language="JavaScript" src="http://marinoflow.appspot.com/js/Jalava.js"></script>
+       <script language="JavaScript" src="http://marinoflow.appspot.com/js/Diagram.js"></script>
+              <script language="JavaScript">
+var comments = document.getElementById('comments');
+
+function salva(str){
+    document.forms["forma"].elements['comments'].value = str;
+}
+
+function commentato(){
+    confirm("fine operazione commentato");
+
+}
+
+function getDiagram() {
+// confirm("getdiagram");
+    var params = {};
+    params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.TEXT;
+    var url = "http://marinoflow.appspot.com/nstr.txt";
+    gadgets.io.makeRequest(url, response, params);
+};
+// Callback function to process the response
+var responseText;
+value = 0;
+function response(obj) {
+    responseText = obj.text;
+ //    confirm("response: " +responseText);
+ var value = parseInt(wave.getState().get('count', '0'));
+ wave.getState().submitDelta({'count': value + 1});
+//  wave.getState().submitDelta({'diagramma': responseText});
+}
+
+function stateUpdated() {
+// confirm("statupdate");
+  // quando funziona:  var responseText = wave.getState().get('diagramma');
+    if (responseText && responseText.length > 0) {
+        salva(responseText);
+      //  confirm(responseText);
+        Jalava.diagram.load(responseText);
+        responseText = "";
+    }
+}
+
+function initJalava(){
+    Jalava.diagram = new Diagram(220,200, "550", "600");
+    var palette = new Palette(new FlowChartPaletteFactory(), 0, 100, 200);
+    palette.addItem("rect", "Processing",  Palette.DRAG_TOOL, "http://marinoflow.appspot.com/img/rect.gif");
+    palette.addItem("connection", "Connection",  Palette.CLICK_TOOL, "http://marinoflow.appspot.com/img/line.gif");
+    palette.addItem("diamond", "Decision", Palette.DRAG_TOOL, "http://marinoflow.appspot.com/img/diamond.gif");
+    palette.addItem("parallel", "Input/Output", Palette.DRAG_TOOL, "http://marinoflow.appspot.com/img/parallel.gif");
+    palette.addItem("ellipse", "Connection", Palette.DRAG_TOOL, "http://marinoflow.appspot.com/img/ellipse.gif");
+    palette.addItem("rounded", "Start/End", Palette.DRAG_TOOL, "http://marinoflow.appspot.com/img/ellipse.gif");
+    Jalava.propertyPage = new FlowChartPropertyPage(20, 240, 10);
+    Jalava.palette = palette;
+}
+
+function starting() {
+    if (wave && wave.isInWaveContainer()) {
+        wave.setStateCallback(stateUpdated);
+     //   confirm("dopo registr");
+    }
+    Jalava.addModule("FlowChartPaletteFactory");
+    Jalava.addModule("FlowChartPropertyPage");
+    Jalava.addModule("UrlGradientBlock");
+    Jalava.start(initJalava);
+}
+
+gadgets.util.registerOnLoadHandler(starting);
+        </script>
+
+    ]]>
+    </Content>
+</Module>
