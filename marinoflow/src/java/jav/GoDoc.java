@@ -37,7 +37,7 @@ public class GoDoc {
 
     URL documentListFeedUrl = null;
     DocsService service = null;
-    HashMap<String, DateTime> documentVersions = new HashMap();
+    static HashMap<String, DateTime> documentVersions = new HashMap();
     private boolean printed = false;
     boolean one = false;
     //anna gio
@@ -76,8 +76,8 @@ public class GoDoc {
             DocumentListEntry documentEntry = findEntry(name);
             if (documentEntry == null) {
                 documentEntry = uploadFile(s, name);
-                addWriting(documentEntry,"fabrizio.torretta@gmail.com");
-                        addWriting(documentEntry,"gio.petrone@gmail.com");
+                addWriting(documentEntry, "fabrizio.torretta@gmail.com");
+                addWriting(documentEntry, "gio.petrone@gmail.com");
                 return "salvato";
             }
             service.getRequestFactory().setHeader("If-Match", "*");
@@ -117,9 +117,21 @@ public class GoDoc {
         return service.insert(url, entry);
     }
 
-    public String loadDoc(String valorefile) {
+    public String loadDoc(String valorefile, boolean refresh) {
         try {
             DocumentListEntry documentEntry = findEntry(valorefile);
+            if (documentEntry == null) {
+                return ""; //document not found
+            }
+            //
+            DateTime last = documentEntry.getUpdated();
+            DateTime curr = documentVersions.get(valorefile);
+            if (refresh) {
+                if (curr == null || curr.getValue() == last.getValue()) {
+                    return "";  // no version or no new version
+                }
+            }
+            documentVersions.put(valorefile, last); // update current version
             String resourceId = documentEntry.getResourceId();
             String docType = resourceId.substring(0, resourceId.lastIndexOf(':'));
             String docId = resourceId.substring(resourceId.lastIndexOf(':') + 1);
@@ -137,7 +149,7 @@ public class GoDoc {
             while ((c = inStream.read(b)) != -1) {
                 s += new String(b, 0, c);
             }
-            s = findBody(s);
+            s = findBody(s);          
             return s;
         } catch (Exception ex) {
             return ex.toString();
@@ -190,11 +202,11 @@ public class GoDoc {
         }
     }
 
-    public static String loadDiagram(String valorefile) {
+    public static String loadDiagram(String valorefile, boolean refresh) {
         DocsService service = new DocsService("Document List Demo");
         try {
             service.setUserCredentials(docMakerLogin, docMakerPasswd);
-            return new GoDoc(service).loadDoc(valorefile);
+            return new GoDoc(service).loadDoc(valorefile, refresh);
         } catch (Exception ex) {
             ex.printStackTrace();
             return ex.toString();

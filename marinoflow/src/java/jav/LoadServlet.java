@@ -31,10 +31,11 @@ public class LoadServlet extends HttpServlet {
 
         response.setContentType("text/plain");
         PrintWriter out = response.getWriter();
-        String val = GoDoc.loadDiagram(valorefile);
+        String val = GoDoc.loadDiagram(valorefile, request.getHeader("refresh") != null);
         try {
             /* TODO output your page here */
-            out.println(val);
+          //  out.println(val);
+            out.print(val);
         } finally { 
             out.close();
         }

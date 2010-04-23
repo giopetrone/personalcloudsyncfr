@@ -8,12 +8,15 @@
             var c=0;
             var t;
             var timer_is_on=0;
+            var nuovaVersione = 0;
 
             function timedCount()
             {
                 document.getElementById('txt').value=c;
+                nuovaVersione = 1;
+                loadDiagram(null);
                 c=c+1;
-                t=setTimeout("timedCount()",1000);
+                t=setTimeout("timedCount()",10000);
             }
 
             function doTimer()
@@ -26,9 +29,9 @@
             }
             // fine pezzo timer
             function saveDiagram(param){
-               // if (window.event.type == "click") {
-                    alert(param != 0);
-             //   }
+                // if (window.event.type == "click") {
+               // alert(param != 0);
+                //   }
                 // var url1 = "http://marinoflow.appspot.com/nuovastr.txt";
                 var diagramName = document.getElementById('diagramName').value;
                 if (diagramName.length ==0) {
@@ -43,7 +46,7 @@
                 objXml = new XMLHttpRequest();
                 objXml.open("POST",url1,false);
                 objXml.setRequestHeader('Content-Type',"text/plain");
-                 objXml.setRequestHeader('filenamemio',diagramName);
+                objXml.setRequestHeader('filenamemio',diagramName);
                 objXml.send(jsonString);
                 str = objXml.responseText;
                 confirm("RISP from server: " +str);
@@ -56,14 +59,33 @@
                 Jalava.diagram = new Diagram(220, 100, "550", "600");
             }
 
+            function update(str){
+            //    var msg = "update nuova stringa ? ";
+            //    alert(msg + "|" + str + "|");
+                if (nuovaVersione  == 1) {
+                    nuovaVersione = 0;
+                    if (str.length == 0) {
+                        return;
+                    }
+                    var answer = confirm("vuoi nuova versione?");
+                    if (answer){
+                        crepa();
+                        Jalava.diagram.load(str);
+                    } 
+                } else {
+                    crepa();
+                    Jalava.diagram.load(str);
+                }
+            }
+
             function loadDiagram(param){
-                  var diagramName = document.getElementById('diagramName').value;
+                var diagramName = document.getElementById('diagramName').value;
                 if (diagramName.length ==0) {
                     alert("Missing diagram name");
                     return;
                 }
 
-                alert(param !=0);
+              //  confirm("ciclico? "+ param == null);
 
                 var url1 = "./LoadServlet";
                 objXml = new XMLHttpRequest();
@@ -73,16 +95,17 @@
                     {
                         if(objXml.status  == 200) {
                             str = objXml.responseText;
-                            confirm("CARICO " +str);
-                            crepa();
-                            Jalava.diagram.load(str);
+                            update(str);                           
                         } else {}
 
                     }
                 };
                 objXml.open("GET",url1,true);
                 objXml.setRequestHeader('Content-Type',"text/plain");
-                  objXml.setRequestHeader('filenamemio',diagramName);
+                objXml.setRequestHeader('filenamemio',diagramName);
+                if (param == null) {
+                    objXml.setRequestHeader('refresh',"true");
+                }
                 objXml.send(null);
             }
             
