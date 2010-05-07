@@ -57,10 +57,10 @@ public class GoDoc {
     }
 
     public static void main(String[] args) {
-        System.out.println(prendi());
+        System.out.println(prendiListaDoc());
     }
 
-    public static String prendi() {
+    public static String prendiListaDoc() {
         DocsService service = new DocsService("Document List Demo");
         try {
             service.setUserCredentials(docMakerLogin, docMakerPasswd);
@@ -78,6 +78,7 @@ public class GoDoc {
                 documentEntry = uploadFile(s, name);
                 addWriting(documentEntry, "fabrizio.torretta@gmail.com");
                 addWriting(documentEntry, "gio.petrone@gmail.com");
+                   addWriting(documentEntry, "sgnmrn@gmail.com");
                 return "salvato";
             }
             service.getRequestFactory().setHeader("If-Match", "*");

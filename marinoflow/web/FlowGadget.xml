@@ -15,8 +15,8 @@
                 }">
         </FORM>
         <div id="content_div" style="height: 50px;"></div>
-       <script language="JavaScript" src="http://marinoflow.appspot.com/js/Jalava.js"></script>
-       <script language="JavaScript" src="http://marinoflow.appspot.com/js/Diagram.js"></script>
+       <script language="JavaScript" src="/js/Jalava.js"></script>
+       <script language="JavaScript" src="/js/Diagram.js"></script>
 
               <script language="JavaScript">
             

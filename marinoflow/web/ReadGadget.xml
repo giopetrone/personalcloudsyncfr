@@ -6,85 +6,117 @@
     </ModulePrefs>
     <Content type="html">
         <![CDATA[
-     <FORM id="forma">
-         <input type=button value="Diagram!" id="butCount" onClick="getDiagram()">
-            <INPUT type="button" value="See JSon" name="button2" onClick="var jsonString = Jalava.diagram.persist();
-               confirm(jsonString);">
-                your comments:<BR>
-                   <TEXTAREA NAME="comments" id="comments" COLS=40 ROWS=8></TEXTAREA>
-                 <P><input type=button value="Done" id="fatto" onClick="commentato()">
-        </FORM>
-        <div id="content_div" style="height: 50px;"></div>
-       <script language="JavaScript" src="http://marinoflow.appspot.com/js/Jalava.js"></script>
-       <script language="JavaScript" src="http://marinoflow.appspot.com/js/Diagram.js"></script>
-              <script language="JavaScript">
-var comments = document.getElementById('comments');
+     <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+        <title>Jalava : Web-based Diagram Editor</title>
+        <script language="JavaScript" src="./js/Jalava.js"></script>
+        <script language="JavaScript">
 
-function salva(str){
-    document.forms["forma"].elements['comments'].value = str;
-}
 
-function commentato(){
-    confirm("fine operazione commentato");
 
-}
+            function dada(){
+               // var url1 = "nuovastr.txt";
+                var url1 = "/ProvaServlet";
+                var jsonString = Jalava.diagram.persist();
+                if (confirm(jsonString)) {
+                    // do things if OK
+                }
 
-function getDiagram() {
-// confirm("getdiagram");
-    var params = {};
-    params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.TEXT;
-    var url = "http://marinoflow.appspot.com/nstr.txt";
-    gadgets.io.makeRequest(url, response, params);
-};
-// Callback function to process the response
-var responseText;
-value = 0;
-function response(obj) {
-    responseText = obj.text;
- //    confirm("response: " +responseText);
- var value = parseInt(wave.getState().get('count', '0'));
- wave.getState().submitDelta({'count': value + 1});
-//  wave.getState().submitDelta({'diagramma': responseText});
-}
+                objXml = new XMLHttpRequest();
+                objXml.open("POST",url1,false);
+                objXml.setRequestHeader('Content-Type',"text/plain");
+                // objXml.setRequestHeader("Content-Length", jsonString.length);
+                //objXml.sendAsBinary(jsonString);
+               // objXml.send(jsonString);
+                objXml.send(jsonString);
+                str = objXml.responseText;
+                confirm("RISP: " +str);
 
-function stateUpdated() {
-// confirm("statupdate");
-  // quando funziona:  var responseText = wave.getState().get('diagramma');
-    if (responseText && responseText.length > 0) {
-        salva(responseText);
-      //  confirm(responseText);
-        Jalava.diagram.load(responseText);
-        responseText = "";
-    }
-}
+            }
+            function dodo(){
+                var url = "/nstr.txt";
 
-function initJalava(){
-    Jalava.diagram = new Diagram(220,200, "550", "600");
-    var palette = new Palette(new FlowChartPaletteFactory(), 0, 100, 200);
-    palette.addItem("rect", "Processing",  Palette.DRAG_TOOL, "http://marinoflow.appspot.com/img/rect.gif");
-    palette.addItem("connection", "Connection",  Palette.CLICK_TOOL, "http://marinoflow.appspot.com/img/line.gif");
-    palette.addItem("diamond", "Decision", Palette.DRAG_TOOL, "http://marinoflow.appspot.com/img/diamond.gif");
-    palette.addItem("parallel", "Input/Output", Palette.DRAG_TOOL, "http://marinoflow.appspot.com/img/parallel.gif");
-    palette.addItem("ellipse", "Connection", Palette.DRAG_TOOL, "http://marinoflow.appspot.com/img/ellipse.gif");
-    palette.addItem("rounded", "Start/End", Palette.DRAG_TOOL, "http://marinoflow.appspot.com/img/ellipse.gif");
-    Jalava.propertyPage = new FlowChartPropertyPage(20, 240, 10);
-    Jalava.palette = palette;
-}
+                objXml = new XMLHttpRequest();
+                objXml.open("GET",url,false);
+                objXml.send(null);
+                str = objXml.responseText;
+                //confirm("ECCO " +str);
+                Jalava.diagram.load(str);
+            }
+            function dadaOLD(){
+                var url = "http://marinoflow.appspot.com/nuovastr.txt";
+                var url1 = "/nuovastr.txt";
+                var content = Jalava.diagram.persist();
+                if (confirm(jsonString)) {
+                    // do things if OK
+                }
 
-function starting() {
-    if (wave && wave.isInWaveContainer()) {
-        wave.setStateCallback(stateUpdated);
-     //   confirm("dopo registr");
-    }
-    Jalava.addModule("FlowChartPaletteFactory");
-    Jalava.addModule("FlowChartPropertyPage");
-    Jalava.addModule("UrlGradientBlock");
-    Jalava.start(initJalava);
-}
+                objXml = new XMLHttpRequest();
+                objXml.open("POST",url,false);
+                objXml.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                var data = "file=" + url1 + "&content=" + content;
+                //objXml.setRequestHeader('Content-Type', "text/plain");
+                //objXml.sendAsBinary(jsonString);
+                objXml.send(data);
+                //var text = JSON.parse(jsonString, reviver)
+                //objXml.send(text);
+                str = objXml.responseText;
+                confirm("RISP: " +str);
 
-gadgets.util.registerOnLoadHandler(starting);
+            }
+
+            // initialise Jalava here
+            function initJalava(){
+                Jalava.diagram = new Diagram(220, 100, "550", "600");
+                var palette = new Palette(new FlowChartPaletteFactory(), 0, 100, 200);
+                palette.addItem("rect", "Processing",  Palette.DRAG_TOOL, "./img/rect.gif");
+                palette.addItem("connection", "Connection",  Palette.CLICK_TOOL, "./img/line.gif");
+                palette.addItem("diamond", "Decision", Palette.DRAG_TOOL, "./img/diamond.gif");
+                palette.addItem("parallel", "Input/Output", Palette.DRAG_TOOL, "./img/parallel.gif");
+                palette.addItem("ellipse", "Connection", Palette.DRAG_TOOL, "./img/ellipse.gif");
+                palette.addItem("rounded", "Start/End", Palette.DRAG_TOOL, "./img/ellipse.gif");
+                Jalava.propertyPage = new FlowChartPropertyPage(20, 240, 10);
+
+                /*
+                 *  ESEMPIO CVHE SEMBRA FUNZIONARE A PARTE ICONE CHE NON SONO LE VARIE FIRUINE
+                 *   MA SEMPRE RETTANGOLI
+
+
+                Jalava.diagram = new Diagram(220, 100, "550", "600");
+                var palette = new Palette(new FlowChartPaletteFactory(), 0, 100, 200);
+                palette.addItem("rect", "Processing",  Palette.DRAG_TOOL, "./img/rect.gif");
+                palette.addItem("connection", "Connection",  Palette.CLICK_TOOL, "./img/line.gif");
+                palette.addItem("diamond", "Decision", Palette.DRAG_TOOL, "./img/diamond.gif");
+                palette.addItem("parallel", "Input/Output", Palette.DRAG_TOOL, "./img/parallel.gif");
+                palette.addItem("ellipse", "Connection", Palette.DRAG_TOOL, "./img/ellipse.gif");
+                palette.addItem("rounded", "Start/End", Palette.DRAG_TOOL, "./img/ellipse.gif");
+                Jalava.propertyPage = new FlowChartPropertyPage(20, 240, 10);
+                 */
+
+
+            }
+
+            // start Jalava
+            Jalava.addModule("FlowChartPaletteFactory");
+            Jalava.addModule("FlowChartPropertyPage");
+            Jalava.addModule("UrlGradientBlock");
+
+            Jalava.start(initJalava);
+
         </script>
 
+    </head>
+    <body>
+        <FORM >
+            <INPUT type="button" value="spedire" name="button44" onClick="dada();">
+        </FORM>
+        <FORM method="POST" action="/ProvaServlet">
+            <INPUT type="button" value="See JSon" name="button2" onClick="dadaOLD();">
+            <INPUT type="button" value="load" name="button3" onClick="dodo();">
+            <INPUT TYPE="SUBMIT" NAME="pippo" VALUE="Click Me">
+        </FORM>
+
+    </body>
     ]]>
     </Content>
 </Module>

@@ -7,12 +7,13 @@
  */
 function DirectedConnection() {
   DirectedConnection.parent.apply(this);
+
   this.color = "#000000";
   this.startArrowStyle = 'none';
   this.startArrowSize = 10;
   this.endArrowStyle = 'arrow';
   this.endArrowSize = 10;
-
+ // DirectedConnection.paarent.innerHTML = "parent";
   this.lineStyle = "solid";
   this.size = "small";
   this.createArrowHead();
@@ -22,15 +23,16 @@ function DirectedConnection() {
 }
 Jalava.copyPrototype(DirectedConnection, Connection);
 
-DirectedConnection.IMAGEPATH = "http://marinoflow.appspot.com/img/Connection/";
+DirectedConnection.IMAGEPATH = "/img/Connection/";
 
 DirectedConnection.prototype.createLabel = function(labeltext) {
   var label = DOM.createElement("DIV", "mytextarea");
-  label.innerHTML = labeltext ? labeltext : "Label";
+  var text = "";
+  label.innerHTML = labeltext ? labeltext : text;
   label.style.position = "absolute";
   label.style.margin = "3px";
   label.className = "editable";
-  label.ondblclick = function(event) { TextEdit.invoke(event); }	
+ // label.ondblclick = function(event) { TextEdit.invoke(event); }
   return label;
 }
 
@@ -111,7 +113,7 @@ DirectedConnection.prototype.drawArrow = function(startOrEnd) {
 
   if (this.anchors[last].x > this.anchors[secondlast].x) {	// left to right
     DirectedConnection.clipImage(theArrow.firstChild, yy+as,as,yy+as*2,0);
-	offsetX = as; offsetY = as/2;
+	offsetX = as;offsetY = as/2;
     // account for the arrowhead
     var w = parseInt(segment.style.width);
     var arrowW = halfArrow>w ? w : halfArrow;
@@ -119,7 +121,7 @@ DirectedConnection.prototype.drawArrow = function(startOrEnd) {
   }	
   else if (this.anchors[last].x < this.anchors[secondlast].x) {	// right to left
     DirectedConnection.clipImage(theArrow.firstChild, yy+as,yy+as*2,as*2,as);	
-	offsetX = 0; offsetY = as/2;
+	offsetX = 0;offsetY = as/2;
     // account for the arrowhead
     var w = parseInt(segment.style.width);
     var arrowW = halfArrow>w ? w : halfArrow;
@@ -128,7 +130,7 @@ DirectedConnection.prototype.drawArrow = function(startOrEnd) {
   }	
   else if (this.anchors[last].y > this.anchors[secondlast].y) { // top to bottom
     DirectedConnection.clipImage(theArrow.firstChild, yy,as,yy+as,0);	
-	offsetX = as/2; offsetY = as; // - this.halfBrushWidth;
+	offsetX = as/2;offsetY = as; // - this.halfBrushWidth;
     // account for the arrowhead
     var h = parseInt(segment.style.height);
     var arrowH = halfArrow>h ? h : halfArrow;
@@ -136,7 +138,7 @@ DirectedConnection.prototype.drawArrow = function(startOrEnd) {
   }	
   else { 
     DirectedConnection.clipImage(theArrow.firstChild, yy,as*2,yy+as,as);	
-	offsetX = as/2; offsetY = 0;
+	offsetX = as/2;offsetY = 0;
     // account for the arrowhead
     var h = parseInt(segment.style.height);
     var arrowH = halfArrow>h ? h : halfArrow;
@@ -203,11 +205,11 @@ DirectedConnection.prototype.sendToBack = function() {
 }
 
 DirectedConnection.prototype.setProperty = function(property, value) {
-  if (property=="Line Style") { this.setLineStyle(value); }
-  else if (property=="Start Arrow Style") { this.setStartArrowStyle(value); }
-  else if (property=="Start Arrow Size") { this.setStartArrowSize(parseInt(value)); }
-  else if (property=="End Arrow Style") { this.setEndArrowStyle(value); }
-  else if (property=="End Arrow Size") { this.setEndArrowSize(parseInt(value)); }
+  if (property=="Line Style") {this.setLineStyle(value);}
+  else if (property=="Start Arrow Style") {this.setStartArrowStyle(value);}
+  else if (property=="Start Arrow Size") {this.setStartArrowSize(parseInt(value));}
+  else if (property=="End Arrow Style") {this.setEndArrowStyle(value);}
+  else if (property=="End Arrow Size") {this.setEndArrowSize(parseInt(value));}
   
   
   DirectedConnection.parent.prototype.setProperty.apply(this, arguments);
@@ -338,7 +340,7 @@ DirectedConnection.prototype.load = function(obj) {
   if (this.endArrow) this.element.appendChild(this.endArrow);
   if (this.label) {
   	this.element.appendChild(this.label);
-    this.label.ondblclick = function(event) { TextEdit.invoke(event); }	
+    //this.label.ondblclick = function(event) {TextEdit.invoke(event);}
   }
  
   DirectedConnection.parent.prototype.load.apply(this, arguments);

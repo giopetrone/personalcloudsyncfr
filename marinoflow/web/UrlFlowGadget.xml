@@ -4,5 +4,5 @@
         <Require feature="dynamic-height"/>
             <Require feature="opensocial-1.0" />
     </ModulePrefs>
-    <Content type="url" href="http://marinoflow.appspot.com/Gadget.html" />
+    <Content type="url" href="/demo_basic.htm" />
 </Module>

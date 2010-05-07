@@ -13,14 +13,39 @@ FlowChartPaletteFactory.prototype.createContent = function(objId, real) {
   ele.className = "hello";
   var span = DOM.createElement("SPAN", "mytextarea");
  // confirm("CREO CONTENUTO");
-  span.innerHTML = "Double click to edit";
+ // var link = DOM.createElemtn("A","link");
+  // window.open('http://localhost:8080/mce.html','miaFinestra','');
+  // span.innerHTML = "<a href='http://localhost:8080/mce.html' target='_blank'> Edit </a>";
+
+   var nome = DOM.createElement("SPAN","nome");
+   var status = DOM.createElement("INPUT","status");
+   var date = DOM.createElement("INPUT","date");
+   var category = DOM.createElement("INPUT","category");
+   var assign = DOM.createElement("INPUT","assign");
+   nome.setAttribute("id","nome");
+   status.setAttribute("id","status");
+   status.setAttribute("type","hidden");
+   date.setAttribute("id","date");
+   date.setAttribute("type","hidden");
+   category.setAttribute("id","category");
+   category.setAttribute("type","hidden");
+   assign.setAttribute("id","assign");
+   assign.setAttribute("type","hidden");
+  
+   span.setAttribute("id","span");
+   nome.innerHTML = "Click to edit";
+   span.appendChild(nome);
+   span.appendChild(status);
+   span.appendChild(date);
+   span.appendChild(category);
+   span.appendChild(assign);
   if (real) {
     span.className = "editable";
-    span.ondblclick = function(event) { TextEdit.invoke(event); }
+    span.ondblclick = function(event) { TextEdit.invoke(event);}
   }
 //confirm(objId);
   var img = new Image();
-	img.src = "http://marinoflow.appspot.com/img/" + objId + ".gif";
+	img.src = "/img/" + objId + ".gif";
        // img.src = "./demo/african/Zebra32.gif";
 	img.style.width = "32px";
 	img.style.height = "32px";
@@ -29,6 +54,26 @@ FlowChartPaletteFactory.prototype.createContent = function(objId, real) {
 
   ele.appendChild(span);
   return ele;
+}
+
+
+FlowChartPaletteFactory.invoke = function(event) {
+try
+{
+  FlowChartPaletteFactory.target = DOM.getEventTarget(event, "mytextarea");
+
+
+ } catch (e) {
+  	alert(e.message);
+  }
+
+}
+
+
+FlowChartPaletteFactory.getCurrentContent = function() {
+  var content = FlowChartPaletteFactory.target.innerHTML;
+  if (content=="&nbsp;") content = "";
+  return content;
 }
 
 FlowChartPaletteFactory.prototype.generateTemplate = function(objId) {
@@ -40,7 +85,7 @@ FlowChartPaletteFactory.prototype.generateTemplate = function(objId) {
   var ele = this.createContent(objId, false);
   if (!ele) return;
   
-  this.templates[objId] = UrlGradientBlock.prototype.generateTemplate(ele, null, null, 100, 50, null, "http://marinoflow.appspot.com/img/flowchart/" + objId + "_f0f0f0_w100h50.gif"); 	
+  this.templates[objId] = UrlGradientBlock.prototype.generateTemplate(ele, null, null, 100, 50, null, "/img/flowchart/" + objId + "_f0f0f0_w100h50.gif"); 	
   return this.templates[objId];
 
 }
@@ -180,5 +225,8 @@ FlowChartPaletteFactory.prototype.generateAnchors = function(objId, width, heigh
   }  
   return anchors;
 }
+
+
+
 
 Jalava._modules['FlowChartPaletteFactory'] = true;

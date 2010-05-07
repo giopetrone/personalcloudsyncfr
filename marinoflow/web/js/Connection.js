@@ -17,7 +17,7 @@ function Connection() {
   //this.id = this.element.id;
   this.id = Jalava.diagram.generateId();
   this.element.id = this.id;
-  
+ // this.innerHTML = "ciao";
   this.propertyListener = new Array();
   
   this.startX = 0;
@@ -66,6 +66,7 @@ Connection.prototype.setLineColor = function(colorCode) {
 }
 
 Connection.prototype.setTarget = function(target, anchorIdx, suppress) {
+  // alert("settarget " + target.id);
   if (this.target) { 
     //alert("settarget " + this.target.id);
     this.target.removePropertyChangeListener(this);

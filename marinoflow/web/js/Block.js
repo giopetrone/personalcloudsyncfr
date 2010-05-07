@@ -30,7 +30,7 @@
 function Block(content, x, y, width, height, anchors, type, imagepath) {
   this.clazz = "Block";
   this.type = type;
-
+  
   this.x = Jalava.diagram.bound(x+width/2, Diagram.LEFT|Diagram.RIGHT) - width/2;
   this.y = Jalava.diagram.bound(y+height/2, Diagram.TOP|Diagram.BOTTOM) - height/2;
   this.height = height;
@@ -38,14 +38,10 @@ function Block(content, x, y, width, height, anchors, type, imagepath) {
   this.content = content;
   this.anchors = anchors;
   this.propertyListener = new Array();
-  
-  this.brushWidth = 0;
-  
+   this.brushWidth = 0;
   this.from = new Array();
   this.to = new Array();
-  
   this.element = this.generateTemplate(content, this.x, this.y, width, height, this.clazz, imagepath)
-
   this.id = Jalava.diagram.generateId();
 
   // IMPORTANT!!! block is no longer added to diagram
@@ -53,6 +49,9 @@ function Block(content, x, y, width, height, anchors, type, imagepath) {
   //this.id = this.element.id;
   
   this.element.id = this.id;
+  this.element.content = this.content;
+  this.element.type = this.type;
+ 
 }
 
 // Global constants
@@ -62,7 +61,7 @@ Block.MINSIZE = 20;
 /*
  * Generates the actual DOM element that makes up this Block
  */
-Block.prototype.generateTemplate = function(content, x, y, width, height, clazz, imagepath) {
+Block.prototype.generateTemplate = function(content, x, y, width, height, clazz, imagepath, status) {
   var element = DOM.createElement("div", "figure");
   element.style.zIndex = Jalava.diagram.baseZIndex;
   element.className = clazz ? clazz : "block";
@@ -73,8 +72,16 @@ Block.prototype.generateTemplate = function(content, x, y, width, height, clazz,
   element.style.borderStyle="none";
   element.style.borderColor="transparent";
   element.style.borderWidth="0px";
-  
+  var span = DOM.createElement("INPUT", "share");
+  span.setAttribute("id","share");
+  span.setAttribute("type","hidden");
+  var button = DOM.createElement("INPUT", "button");
+  button.setAttribute("id","button");
+  button.setAttribute("value","click");
+//  span.innerHTML = "CIAO!!!!!!!!";
   document.body.appendChild(element);
+  element.appendChild(span);
+ // element.appendChild(button);
     
   // populate the figure  
   if (content) {
@@ -92,6 +99,12 @@ Block.prototype.generateTemplate = function(content, x, y, width, height, clazz,
 	backgroundImg.style.zIndex = 1;
 	backgroundImg.style.position = "absolute";
     element.appendChild(backgroundImg);
+  }
+
+  if(status){
+
+      var s = element.appendChild(status);
+
   }
   
   return element;
@@ -572,7 +585,7 @@ Block.prototype.sendBackward = function() {
 Block.prototype.save = function() {  
   var obj = new Object();
   obj.clazz = this.clazz;
-  obj.type = this.type;
+  obj.type = this.element.type;
   obj.x = this.x;
   obj.y = this.y;
   obj.height = this.height;
@@ -603,7 +616,7 @@ Block.prototype.save = function() {
 
 Block.prototype.load = function(obj) {  
   this.clazz = obj.clazz;
-  this.type =obj.type;
+  this.element.type =obj.type;
   this.brushWidth = obj.brushWidth;
   this.id = obj.id;
 

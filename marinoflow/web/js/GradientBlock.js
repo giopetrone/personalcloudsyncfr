@@ -13,7 +13,7 @@ Jalava.copyPrototype(GradientBlock, Block);
 
 
 GradientBlock.prototype.generateImageUrl = function(id, color, width, height) {
-  return "http://marinoflow.appspot.com/img/" + id + "/" + id + "_" + GradientBlock.getColorIndex(color) + "_w400h200.gif";
+  return "/img/" + id + "/" + id + "_" + GradientBlock.getColorIndex(color) + "_w400h200.gif";
  
 }
 

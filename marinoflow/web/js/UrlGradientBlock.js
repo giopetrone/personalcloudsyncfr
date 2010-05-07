@@ -16,7 +16,7 @@ UrlGradientBlock.prototype.generateImageUrl = function(id, color, width, height)
   color = color.replace("#", "");
  // confirm("ciao");
  // return "./img/"+id +".gif";
-  return "http://marinoflow.appspot.com/img/flowchart/" + id + "_f0f0f0_w100h50.gif" // MAR restituisci immagine corretta nonsempre rettangolo
+  return "/img/flowchart/" + id + "_f0f0f0_w100h50.gif" // MAR restituisci immagine corretta nonsempre rettangolo
  // return "./genimage/gen.php?id=" + id +"&c=" + color + "&w=" + width + "&h=" + height;
 }
 

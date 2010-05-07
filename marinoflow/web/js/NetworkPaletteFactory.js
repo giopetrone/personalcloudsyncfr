@@ -12,7 +12,7 @@ NetworkPaletteFactory.prototype.createConnectionObject = function(id) {
 	var conn = new DirectedConnection();
 	conn.setLineColor("#aaaaff");
 	conn.setEndArrowStyle("none");
-	conn.setLabel("");
+	conn.setLabel("CIAO!!!!!!!!!!");
 	return conn;
 }
 

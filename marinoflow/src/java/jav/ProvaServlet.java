@@ -4,8 +4,6 @@ package jav;
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
-
 import jav.GoDoc;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,7 +18,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author marino
  */
 public class ProvaServlet extends HttpServlet {
-   
+
     /** 
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      * @param request servlet request
@@ -28,35 +26,29 @@ public class ProvaServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-
-
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-      //  String val = request.getParameter("pippo");
+            throws ServletException, IOException {
+        //  String val = request.getParameter("pippo");
         BufferedReader re = request.getReader();
         String s = re.readLine();
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        String val = GoDoc.prendi();
+        String val = GoDoc.prendiListaDoc();
         try {
-            /* TODO output your page here */
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet ProvaServlet</title>");  
+            out.println("<title>Servlet ProvaServlet</title>");
             out.println("</head>");
             out.println("<body>");
-           // out.println("VALUE DI PIPPO:"+ val +";;;;");
-           // out.println("RICEVUTO json: "+ s);
-            out.println("Documenti: "+ val);
-   
-  out.println("</body>");
+            out.println("Documenti: " + val);
+            out.println("</body>");
             out.println("</html>");
-       
-        } catch (Exception e)
-        { e.getMessage();} finally {
+        } catch (Exception e) {
+            e.getMessage();
+        } finally {
             out.close();
         }
-    } 
+    }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /** 
@@ -68,9 +60,9 @@ public class ProvaServlet extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         processRequest(request, response);
-    } 
+    }
 
     /** 
      * Handles the HTTP <code>POST</code> method.
@@ -81,7 +73,7 @@ public class ProvaServlet extends HttpServlet {
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         processRequest(request, response);
     }
 
@@ -93,5 +85,4 @@ public class ProvaServlet extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
 }

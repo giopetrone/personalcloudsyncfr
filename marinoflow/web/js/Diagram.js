@@ -26,7 +26,20 @@ function Diagram(x, y, width, height) {
     this.container.style.width = width;
     this.container.style.height = height;
     this.container.style.border = "3px solid #DDDDDD";
+    var share = DOM.createElement("SPAN","share");
+    var name = DOM.createElement("INPUT","name");
+    share.setAttribute("id","share");
+    name.id ="name";
+    name.setAttribute("type","hidden");
+    //share.setAttribute = ("value","Share Diagram");
+   // name.innerHTML = "Share Diagram";
+    //share.innerHTML ="Share Diagram";
+   // share.ondblclick = function(event) {childWindow=open('/popup.html','window','resizable=no,width=200,height=400');
+// }
+    
     document.body.appendChild(this.container);
+    //this.container.appendChild(share);
+  //  share.appendChild(name);
     this.container.id = "container";
     initaliseAnchors(this.container);
     this.baseZIndex = 90;
@@ -106,7 +119,7 @@ Diagram.prototype.addFigure = function(figure, position) {
     // DIOFFA E CHI SONO?
     if (position == "absolute") {
         figure.element.style.position = "absolute";
-        figure.element.style.border = "2px solid red"; // MARINO
+          //figure.element.style.border = "2px solid red"; // MARINO
     }
     // da load non era settato!!!!!
     //  confirm (figure.id);
@@ -291,7 +304,7 @@ function initaliseAnchors(container) {
         anchor.className = "anchor";
         var img = DOM.createElement("img", "image");
         anchor.appendChild(img);
-        img.src = "http://marinoflow.appspot.com/img/nothing.gif";
+        img.src = "img/nothing.gif";
     }
     for (var i=0; i<Diagram.NUM_ANCHORS; i++) {
         var hover = DOM.createElement("DIV", "hover");
@@ -300,8 +313,9 @@ function initaliseAnchors(container) {
         hover.className = "hover";
         var img = DOM.createElement("img", "image");
         hover.appendChild(img);
-        img.src = "http://marinoflow.appspot.com/img/nothing.gif";
+        img.src = "/img/nothing.gif";
     }
 }
+
 
 Jalava._modules['Diagram'] = true;

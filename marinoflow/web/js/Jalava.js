@@ -43,7 +43,7 @@ Jalava.LoadModule = function(scriptname, idx) {
     var script = document.createElement('script');
     script.type = 'text/javascript';
 //    script.src = './js/' + scriptname + '.js';
-  script.src = 'http://marinoflow.appspot.com/js/' + scriptname + '.js';
+  script.src = 'js/' + scriptname + '.js';
     head.appendChild(script);
     Jalava.showLoadingSign(scriptname);
   }	
@@ -74,7 +74,7 @@ Jalava.showLoadingSign = function(scriptname) {
 	div.style.backgroundColor = "#FFFFFF";
 	div.style.border = "1px solid #BBBBBB";
     var img = document.createElement("IMG");
-    img.src = 'http://marinoflow.appspot.com/img/roller.gif';
+    img.src = 'img/roller.gif';
 	img.style.verticalAlign = "middle";
 	img.style.marginRight = "5px";
     div.appendChild(img);

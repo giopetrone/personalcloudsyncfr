@@ -21,9 +21,9 @@
         var state = wave.getState ();
 
      //   var embeddedUrl = state.get('embeddedUrl', 'http://wave-ide.appspot.com/iframe.htm');
-var embeddedUrl = 'http://marinoflow.appspot.com/demo_basic.htm';
+var embeddedUrl = 'http://esperimento44444.appspot.com/demo_basic.htm';
 
-        var embeddedHeight = parseInt(state.get('embeddedHeight', '200'));
+        var embeddedHeight = parseInt(state.get('embeddedHeight', '500'));
         if (isNaN(embeddedHeight)) {
             embeddedHeight = '200';
         }

@@ -46,13 +46,13 @@ NumberInput.prototype.createControl = function(name,
  
   var numberBtnUp = DOM.createElement("DIV", "button");
   var image = document.createElement("IMG"); 
-  image.src = "http://marinoflow.appspot.com/img/up.gif";
+  image.src = "/img/up.gif";
   numberBtnUp.appendChild(image);
   NumberInput.buttonStyle(numberBtnUp);
   
   var numberBtnDown = DOM.createElement("DIV", "button");
   var image = document.createElement("IMG"); 
-  image.src = "http://marinoflow.appspot.com/img/down.gif";
+  image.src = "/img/down.gif";
   numberBtnDown.appendChild(image);
   NumberInput.buttonStyle(numberBtnDown);
   

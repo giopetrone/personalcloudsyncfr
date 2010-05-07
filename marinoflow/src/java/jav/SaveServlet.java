@@ -4,6 +4,7 @@
  */
 package jav;
 
+import com.google.gson.Gson;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -30,6 +31,9 @@ public class SaveServlet extends HttpServlet {
         String valorefile = request.getHeader("filenamemio");
         BufferedReader re = request.getReader();
         String s = re.readLine();
+        Gson gson = new Gson();
+        Grafico ob = gson.fromJson(s, Grafico.class);
+
         String val = GoDoc.saveDiagram(valorefile, s);
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
@@ -43,6 +47,7 @@ public class SaveServlet extends HttpServlet {
                out.println("<h1> nome grafico " + valorefile + "</h1>");
 
             out.println("<h1> salvando diagramma " + val + "</h1>");
+            out.println("<h1> grafo " + "\n" +ob.faGrafo() + "\nstatus= " + ob.blocks[0].type +  "</h1>");
             out.println("</body>");
             out.println("</html>");
           /*   */
