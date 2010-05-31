@@ -115,7 +115,7 @@ public class Subscriber {
 				nvps.add(new BasicNameValuePair("hub.verify_token", verifytoken));
 				nvps.add(new BasicNameValuePair("hub.lease_seconds", lease_seconds));
 				
-				webserver.addAction("subscribe",topic_url,verifytoken);
+				if (webserver != null) webserver.addAction("subscribe",topic_url,verifytoken);
 
 				httppost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
 
