@@ -10,6 +10,18 @@ Task Properties
 
 <!-- Meta Tags -->
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+<title>
+Task Properties
+</title>
+
+<!-- Meta Tags -->
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="Wufoo.com" />
 
 <!-- CSS -->
@@ -23,12 +35,12 @@ Task Properties
 
   <script type="text/javascript">
 function go() {
- 
-   
+
+
       var data = window.parent.TextEdit.getCurrentDesc();
       //document.forms['myform'].elements['elm1'].value = data;
       tinyMCE.activeEditor.setContent(data);
-   
+
 }
 
 
@@ -92,7 +104,7 @@ frmElement.value = window.parent.TextEdit.getCurrentCategory();
 function initShare(oForm, element_name) {
 
 frmElement = oForm.elements[element_name];
-frmElement.value = window.parent.TextEdit.getCurrentShare();
+frmElement.value = opener.document.getElementById('users').value;
 
 
 
@@ -135,13 +147,13 @@ frmElement.value = window.parent.TextEdit.getCurrentDesc();
 
 
 	<h2>Task Properties</h2>
-	
+
 
 
 <ul>
-		
-		
-	
+
+
+
 <li id="foli106" 		class="     ">
 	<label class="desc" id="title106" for="Field106">
 		Name
@@ -152,22 +164,22 @@ frmElement.value = window.parent.TextEdit.getCurrentDesc();
 	</li>
 
 
-<li id="foli107" 
+<li id="foli107"
 		class="     ">
-	
-		
+
+
 	<label class="desc" id="title107" for="Field107">
 		Description of task
 			</label>
-	
+
 	<div>
 				<textarea id="elm1" name="elm1" rows="15" style="width: 90%">
 	</textarea>
-			
+
 			</div>
-	
-		
-		
+
+
+
 	</li>
 
 <li id="foli106" 		class="     ">
@@ -198,7 +210,7 @@ frmElement.value = window.parent.TextEdit.getCurrentDesc();
             <label class="desc" id="title2" for="Field2">
 		Diagram Shared with
 			</label>
-        <input type="text"  id="share" name="share"  onclick="childWindow=open('/newhtml.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')"/>
+        <input type="text"  id="share" name="share"  onclick="childWindow=open('/newhtml.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" disabled="disabled"/>
 
     </li>
 
@@ -228,25 +240,25 @@ frmElement.value = window.parent.TextEdit.getCurrentDesc();
 		Due Date
 			</label>
 	<input type="text" value="dd/mm/yy" id="theDate" name="theDate" onclick="displayCalendar(document.forms[0].theDate,'yyyy/mm/dd',this)"/>
-		
+
 	</li>
 
-   
 
 
 
-	
-		
+
+
+
 	<li class="buttons ">
 		<div>
-	
+
 	<input type="button" name="ok" value="Ok"      onclick="parent.TextEdit.setContent(document.myform.nome.value,document.myform.status.value,document.myform.theDate.value,document.myform.category.value,document.myform.share.value,document.myform.assign.value,tinyMCE.activeEditor.getContent());"/>
 	<input type="button" name="reset" value="Cancella" onclick="window.parent.TextEdit.cancel()"/>
-	
+
 				</div>
 	</li>
 
-	
+
 </ul>
 </form>
 
