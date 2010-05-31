@@ -26,22 +26,12 @@ function Diagram(x, y, width, height) {
     this.container.style.width = width;
     this.container.style.height = height;
     this.container.style.border = "3px solid #DDDDDD";
-    var share = DOM.createElement("SPAN","share");
-    var name = DOM.createElement("INPUT","name");
-    share.setAttribute("id","share");
-    name.id ="name";
-    name.setAttribute("type","hidden");
-    //share.setAttribute = ("value","Share Diagram");
-   // name.innerHTML = "Share Diagram";
-    //share.innerHTML ="Share Diagram";
-   // share.ondblclick = function(event) {childWindow=open('/popup.html','window','resizable=no,width=200,height=400');
-// }
+  
     
     document.body.appendChild(this.container);
-    //this.container.appendChild(share);
-  //  share.appendChild(name);
+   
     this.container.id = "container";
-    initaliseAnchors(this.container);
+      initaliseAnchors(this.container);
     this.baseZIndex = 90;
 }
 
@@ -79,6 +69,7 @@ Diagram.prototype.persist = function() {
         else if (this.figures[fig].clazz=="Connection")
             persisted.connections.push(this.figures[fig].save());
     }
+    //alert(persisted.blocks.length);
     return JSON.stringify(persisted);
 }
 

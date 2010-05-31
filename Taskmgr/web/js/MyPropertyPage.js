@@ -26,9 +26,9 @@ MyPropertyPage.prototype.propertyChange = function(firer, property, value) {
 				  
 	}
 	else if (className=="DirectedConnection") {
-	  this.update("Line Color", 
+        this.update("Line Color",
 	              firer.color,
-	              this.colorPalette.createControl('Line Color',firer.color, PropertyPage.prototype.onChangeHandler));	  
+	              this.colorPalette.createControl('Line Color',firer.color, PropertyPage.prototype.onChangeHandler));
 	}
   }
   else if (property=="deselect" || property=="delete") {

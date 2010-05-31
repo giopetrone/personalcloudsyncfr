@@ -133,11 +133,31 @@ alert("value: "+frmElement.value);
 }
 
 
+ function permission(){
+        var writers = parent.TextEdit.target.parentNode.parentNode.writers;
+        var own = parent.TextEdit.target.parentNode.parentNode.owner;
+        
+        var logged = parent.document.getElementById("owner").value;
+     
+      
+        if(writers == null) writers == '';
+        if(own != logged && writers.indexOf(logged)==-1 )
+          {
+
+             document.myform.status.disabled = true;
+             document.myform.elm.disabled = true;
+
+          }
+
+
+        }
+
+
 <!-- /TinyMCE -->
 </script>
 
 </head>
-<body onload="initDesc(document.forms[0],'elm1');go();dado();" style="background: white;" >
+<body onload="initDesc(document.forms[0],'elm1');go();dado();permission();" style="background: white;" >
 
 <form name='myform'>
 	<!-- Gets replaced with TinyMCE, remember HTML in a textarea should be encoded -->
@@ -158,7 +178,7 @@ alert("value: "+frmElement.value);
 
 	
         
-	 <input type="button" name="ok" value="OK" onclick="window.parent.TextEdit.setContentDecision(tinyMCE.activeEditor.getContent())" />
+	 <input type="button" name="ok" value="OK" onclick="window.parent.TextEdit.setContentDecision(tinyMCE.activeEditor.getContent(),document.forms[0].status.value);" />
 	 <input type="button" name="reset" value="Cancel" onclick="window.parent.TextEdit.close()"/>
         
         </div>

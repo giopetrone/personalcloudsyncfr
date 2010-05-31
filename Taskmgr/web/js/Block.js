@@ -10,27 +10,33 @@
 // 201208: DESIGN CHANGE - added load/save functionality
 
 /*
- * Represents a single object on the diagram. Blocks can have 
+ * Represents a single object on the diagram. Blocks can have
  * any number of incoming and outgoing connections.
- * 
+ *
  * As part of the constructor, you can specify the inital position and size.
- * Position is defined as the centre of the block. 
- * 
- * You can specify a background image, as well as a CSS class for which 
- * you can define styles. 
- * 
- * You should also supply an array of anchors - anchors allow the user to 
+ * Position is defined as the centre of the block.
+ *
+ * You can specify a background image, as well as a CSS class for which
+ * you can define styles.
+ *
+ * You should also supply an array of anchors - anchors allow the user to
  * resize the block, as well as to hook Connections to the the Block as specific
  * points. Anchors are defined relative the centre of the block.
- * 
+ *
  * The 'clazz' attribute identifies this object as a Block object.
  * Child classes should retain this attribute.
- * 
+ *
  */
-function Block(content, x, y, width, height, anchors, type, imagepath) {
+function Block(content, x, y, width, height, anchors, type, imagepath, date, shared, assign, desc, cat, name,owner,writers) {
   this.clazz = "Block";
+  //this.shared = document.getElementById('shared').value;
+  this.shared = shared;
+  this.writers = writers;
+  this.assign = assign;
+  this.date = date;
   this.type = type;
-
+  this.cat = cat;
+  this.name = name;
   this.x = Jalava.diagram.bound(x+width/2, Diagram.LEFT|Diagram.RIGHT) - width/2;
   this.y = Jalava.diagram.bound(y+height/2, Diagram.TOP|Diagram.BOTTOM) - height/2;
   this.height = height;
@@ -38,21 +44,29 @@ function Block(content, x, y, width, height, anchors, type, imagepath) {
   this.content = content;
   this.anchors = anchors;
   this.propertyListener = new Array();
-  
   this.brushWidth = 0;
-  
   this.from = new Array();
   this.to = new Array();
-  
   this.element = this.generateTemplate(content, this.x, this.y, width, height, this.clazz, imagepath)
-
   this.id = Jalava.diagram.generateId();
-
+  this.desc = desc;
+  this.owner = owner;
   // IMPORTANT!!! block is no longer added to diagram
   //this.element.id = Jalava.diagram.addFigure(this);
   //this.id = this.element.id;
-  
+  this.element.name =this.name;
   this.element.id = this.id;
+  this.element.content = this.content;
+  this.element.type = this.type;
+  this.element.date = this.date;
+ // this.element.shared = document.getElementById('shared').value;
+   this.element.shared = this.shared;
+   this.element.assign = this.assign;
+   this.element.desc = this.desc;
+   this.element.cat = this.cat;
+   this.element.owner = this.owner;
+   this.element.writers = this.writers;
+  
 }
 
 // Global constants
@@ -64,6 +78,7 @@ Block.MINSIZE = 20;
  */
 Block.prototype.generateTemplate = function(content, x, y, width, height, clazz, imagepath) {
   var element = DOM.createElement("div", "figure");
+ 
   element.style.zIndex = Jalava.diagram.baseZIndex;
   element.className = clazz ? clazz : "block";
   element.style.width = width;
@@ -73,25 +88,19 @@ Block.prototype.generateTemplate = function(content, x, y, width, height, clazz,
   element.style.borderStyle="none";
   element.style.borderColor="transparent";
   element.style.borderWidth="0px";
-  var span = DOM.createElement("INPUT", "share");
-  span.setAttribute("id","share");
-  span.setAttribute("type","hidden");
-  var button = DOM.createElement("INPUT", "button");
-  button.setAttribute("id","button");
-  button.setAttribute("value","click");
-//  span.innerHTML = "CIAO!!!!!!!!";
+  
   document.body.appendChild(element);
-  element.appendChild(span);
- // element.appendChild(button);
-    
-  // populate the figure  
+ 
+//  element.appendChild(button);
+
+  // populate the figure
   if (content) {
   	var e = element.appendChild(content);
 	e.style.zIndex = 2;
 	e.style.position = "absolute";
 	e.style.width = width;
 	e.style.top = (height - e.offsetHeight) / 2;
-  }  
+  }
   if (imagepath) {
     var backgroundImg = DOM.createElement("img", "background");
     backgroundImg.src = imagepath;
@@ -101,7 +110,8 @@ Block.prototype.generateTemplate = function(content, x, y, width, height, clazz,
 	backgroundImg.style.position = "absolute";
     element.appendChild(backgroundImg);
   }
-  
+
+
   return element;
 }
 
@@ -114,7 +124,7 @@ Block.prototype.dispose = function() {
 }
 
 Block.prototype.addFrom = function(connection) {
-  // this.from.push(connection); 
+  // this.from.push(connection);
   Block.addToArray(this.from, connection);		//201208: Add to array only if not exists
 }
 
@@ -139,25 +149,25 @@ Block.addToArray = function(array, obj) {
   var n = array.length;
   for (var i = 0; i < n; i++) {
     if (obj == array[i]) return;
-  }	
-  array.push(obj);	
+  }
+  array.push(obj);
 }
 
 Block.removeFromArray = function(array, obj) {
   var list = new Array();
   var n = array.length;
   for (var i = 0; i < n; i++) {
-    if (obj != array[i]) 
+    if (obj != array[i])
       list.push(array[i]);
-  }	
+  }
   return list;
 }
 
 /*
  * Sets the Block at position x,y which refers to the
- * center of the Block. 
- * 
- * This will fire a PropertyChange event and will also cause 
+ * center of the Block.
+ *
+ * This will fire a PropertyChange event and will also cause
  * anchors to be displayed.
  */
 Block.prototype.setPosition = function(x, y){
@@ -165,9 +175,9 @@ Block.prototype.setPosition = function(x, y){
   this.y = y;
   this.element.style.top = y - this.height / 2 + "px";
   this.element.style.left = x - this.width / 2 + "px";
-  
-  this.firePropertyChange("position", {  x: x,
-    									 y: y  });
+
+  this.firePropertyChange("position", {x: x,
+    									 y: y});
   this.showAnchors();
 }
 
@@ -175,29 +185,29 @@ Block.prototype.setPosition = function(x, y){
  * Sets the size of the Block. Takes into account the border width.
  * Depending on which browser is in use, the true height/width is
  * adjusted accordingly.
- * 
- * This will fire a PropertyChange event and will also cause 
+ *
+ * This will fire a PropertyChange event and will also cause
  * anchors to be displayed.
  */
 Block.prototype.setSize = function(width, height){
   var scaleX = width / this.width;
   var scaleY = height / this.height;
-  
+
   this.width = width;
   this.height = height;
-  
+
   var effectiveBrush = this.element.style.borderTopStyle=="none" ? 0 : this.brushWidth*2;
   var pseudobrush = isIE() ? 0 : effectiveBrush;
   var truewidth = width - effectiveBrush;
   var trueheight = height - effectiveBrush;
-  
+
   this.element.style.width = width - pseudobrush + "px";
   this.element.style.height = height - pseudobrush + "px";
-  
+
   // resize the content
   if (this.element.firstChild) {
     this.element.firstChild.style.width = truewidth + "px";
-    this.element.firstChild.style.top = (trueheight - this.element.firstChild.offsetHeight) / 2;	
+    this.element.firstChild.style.top = (trueheight - this.element.firstChild.offsetHeight) / 2;
   }
   // resize the background image
   var backgroundImg = DOM.findNodeByName(this.element, "IMG", "background", false);
@@ -207,10 +217,10 @@ Block.prototype.setSize = function(width, height){
   }
 
   this.scaleAnchors(scaleX, scaleY);
-  this.firePropertyChange("size", { x: this.x,
+  this.firePropertyChange("size", {x: this.x,
 								    y: this.y,
 								    width: width,
-								    height: height }); 
+								    height: height});
   this.showAnchors();
 }
 
@@ -252,13 +262,13 @@ Block.prototype.showAnchors = function(hovering){
   for (var i = 0; i < numAnchors; i++) {
   	var anchor = document.getElementById(type + i);
     anchor.style.top = this.y + this.anchors[i].y - 2 + "px";
-    anchor.style.left = this.x + this.anchors[i].x - 2 + "px";   
+    anchor.style.left = this.x + this.anchors[i].x - 2 + "px";
     anchor.style.display = "block";
   }
 }
 
 /*
- * Reposition the anchors based on the size of the Block. Fired 
+ * Reposition the anchors based on the size of the Block. Fired
  * whenever the Block is resized.
  */
 Block.prototype.scaleAnchors = function(scaleX, scaleY){
@@ -297,7 +307,7 @@ Block.prototype.removePropertyChangeListener = function(callback){
   var list = new Array();
   var n = this.propertyListener.length;
   for (var i = 0; i < n; i++) {
-    if (callback != this.propertyListener[i]) 
+    if (callback != this.propertyListener[i])
       list.push(this.propertyListener[i]);
   }
   delete this.propertyListener;
@@ -305,32 +315,32 @@ Block.prototype.removePropertyChangeListener = function(callback){
 }
 
 /*
- * Determine the type of a given anchor. 'name' is the name of the 
+ * Determine the type of a given anchor. 'name' is the name of the
  * DOM element, which is typically 'anchorX', where X is a number.
- * 
+ *
  * Anchor can be LEFT, RIGHT, TOP or BOTTOM depending on its position
  * relative to the center of the Block.
  */
 Block.prototype.getAnchorType = function(name){
   var i = parseInt(name.substring(6));
-  if (isNaN(i)) 
+  if (isNaN(i))
     return 0;
-  
+
   var leftBound = -this.width / 2 + Block.THRESHOLD;
   var rightBound = +this.width / 2 - Block.THRESHOLD;
   var topBound = -this.height / 2 + Block.THRESHOLD;
   var bottomBound = +this.height / 2 - Block.THRESHOLD;
-  
+
   var result = 0;
-  if (this.anchors[i].x <= leftBound) 
+  if (this.anchors[i].x <= leftBound)
     result |= Diagram.LEFT;
-  if (this.anchors[i].x >= rightBound) 
+  if (this.anchors[i].x >= rightBound)
     result |= Diagram.RIGHT;
-  if (this.anchors[i].y >= bottomBound) 
+  if (this.anchors[i].y >= bottomBound)
     result |= Diagram.BOTTOM;
-  if (this.anchors[i].y <= topBound) 
+  if (this.anchors[i].y <= topBound)
     result |= Diagram.TOP;
-  
+
   return result;
 }
 
@@ -339,7 +349,7 @@ Block.prototype.getAnchorType = function(name){
  * to this Block
  */
 Block.prototype.isConnectable = function(connection) {
-  return true;	
+  return true;
 }
 
 /*
@@ -349,16 +359,16 @@ Block.prototype.resizeStart = function(evt, what){
   var posi = Jalava.diagram.findPos(what);
   var mousePos = getMousePos(evt);
   Jalava.temp_var.mode = this.getAnchorType(what.id);
-  
+
   Jalava.temp_var.grabbedX = mousePos.x;// - posi[0];
-  Jalava.temp_var.grabbedY = mousePos.y;// - posi[1]; 
+  Jalava.temp_var.grabbedY = mousePos.y;// - posi[1];
   if ((Jalava.temp_var.mode & Diagram.LEFT) > 0) {
     Jalava.temp_var.grabbedCornerX = parseInt(this.element.style.left) + this.width;
   }
   else {
     Jalava.temp_var.grabbedCornerX = parseInt(this.element.style.left);
   }
-  
+
   if ((Jalava.temp_var.mode & Diagram.TOP) > 0) {
     Jalava.temp_var.grabbedCornerY = parseInt(this.element.style.top) + this.height;
   }
@@ -375,18 +385,18 @@ Block.prototype.resizeStart = function(evt, what){
  */
 Block.prototype.resize = function(evt){
   var mousePos = getMousePos(evt);
-  
+
   var diffY = mousePos.y - Jalava.temp_var.grabbedY;
   var diffX = mousePos.x - Jalava.temp_var.grabbedX;
   var width, height;
-  
+
   if ((Jalava.temp_var.mode & Diagram.TOP) > 0) {
     height = Jalava.temp_var.grabbedHeight - diffY;
     if (height < Block.MINSIZE) height = Block.MINSIZE;
 	// prevent the Block from going out of the bounds of the container
     this.element.style.top = Jalava.diagram.bound(Jalava.temp_var.grabbedCornerY - height, Diagram.TOP);
   }
-  else 
+  else
     if ((Jalava.temp_var.mode & Diagram.BOTTOM) > 0) {
       height = Jalava.temp_var.grabbedHeight + diffY;
       if (height < Block.MINSIZE) height = Block.MINSIZE;
@@ -398,14 +408,14 @@ Block.prototype.resize = function(evt){
       height = Jalava.temp_var.grabbedHeight;
       this.element.style.top = Jalava.temp_var.grabbedCornerY;
     }
-  
+
   if ((Jalava.temp_var.mode & Diagram.LEFT) > 0) {
     width = Jalava.temp_var.grabbedWidth - diffX;
     if (width < Block.MINSIZE) width = Block.MINSIZE;
 	// prevent the Block from going out of the bounds of the container
     this.element.style.left = Jalava.diagram.bound(Jalava.temp_var.grabbedCornerX - width, Diagram.LEFT);
   }
-  else 
+  else
     if ((Jalava.temp_var.mode & Diagram.RIGHT) > 0) {
       width = Jalava.temp_var.grabbedWidth + diffX;
       if (width < Block.MINSIZE) width = Block.MINSIZE;
@@ -417,11 +427,11 @@ Block.prototype.resize = function(evt){
       width = Jalava.temp_var.grabbedWidth;
       this.element.style.left = Jalava.temp_var.grabbedCornerX;
     }
-  
+
   this.x = parseInt(this.element.style.left) + width / 2;
-  this.y = parseInt(this.element.style.top) + height / 2;  
+  this.y = parseInt(this.element.style.top) + height / 2;
   this.setSize(width, height);
-  
+
   return false;
 }
 
@@ -442,18 +452,18 @@ Block.prototype.resizeEnd = function(){
  * Sets a particular property for this Block
  */
 Block.prototype.setProperty = function(property, value){
-  if (property=="Backgrd Color") { this.setBackgroundColor(value); }
-  else if (property=="Border Color") { this.setBorderColor(value); }
-  else if (property=="Border Style") { this.setBorderStyle(value); }
-  else if (property=="Border Width") { this.setBorder(value); }
-  else if (property=="Layer") { this.setLayer(parseInt(value)); }
+  if (property=="Backgrd Color") {this.setBackgroundColor(value);}
+  else if (property=="Border Color") {this.setBorderColor(value);}
+  else if (property=="Border Style") {this.setBorderStyle(value);}
+  else if (property=="Border Width") {this.setBorder(value);}
+  else if (property=="Layer") {this.setLayer(parseInt(value));}
 }
 
 /*
  * Sets the background color of the Block
  */
 Block.prototype.setBackgroundColor = function(colorCode) {
-  this.element.style.backgroundColor = colorCode;	
+  this.element.style.backgroundColor = colorCode;
 }
 
 /*
@@ -461,7 +471,7 @@ Block.prototype.setBackgroundColor = function(colorCode) {
  */
 Block.prototype.setBorderColor = function(colorCode) {
   if (colorCode=="") colorCode="transparent";
-  this.element.style.borderColor = colorCode;	
+  this.element.style.borderColor = colorCode;
 }
 
 /*
@@ -479,15 +489,15 @@ Block.prototype.getBorderColor = function() {
 Block.prototype.setBorder = function(w) {
   var oldwidth = this.brushWidth;
   var newwidth = parseInt(w);
-  if (isNaN(newwidth)) newwidth = 0;  
+  if (isNaN(newwidth)) newwidth = 0;
   this.brushWidth = newwidth;
-  this.element.style.borderWidth = newwidth + "px";	
-  
+  this.element.style.borderWidth = newwidth + "px";
+
   // dun bother if borderStyle is set to 'none'
-  if (!this.element.style.borderStyle || 
-        this.element.style.borderStyle=="" || 
+  if (!this.element.style.borderStyle ||
+        this.element.style.borderStyle=="" ||
 		this.element.style.borderTopStyle=="none") return;
-		
+
   if (!isIE()) {
     // rescale the block
 	var diff = newwidth - oldwidth;
@@ -519,7 +529,7 @@ Block.prototype.setBorderStyle = function(s) {
  * Sets the background image of the Block.
  */
 Block.prototype.setBackground = function(imageUrl) {
-  
+
   var backgroundImg = DOM.findNodeByName(this.element, "IMG", "background", false);
   if (!backgroundImg) {
     backgroundImg = DOM.createElement("img", "background");
@@ -529,7 +539,7 @@ Block.prototype.setBackground = function(imageUrl) {
   }
   backgroundImg.src = imageUrl;
   backgroundImg.height = this.height;
-  backgroundImg.width = this.width;  
+  backgroundImg.width = this.width;
 }
 
 Block.prototype.getBackgroundColor = function(color) {
@@ -541,7 +551,7 @@ Block.prototype.setBackgroundColor = function(colorCode) {
 }
 
 /*
- * Sets the layer order of the Block. High layers are stacked on top (more 
+ * Sets the layer order of the Block. High layers are stacked on top (more
  * visible) of lower layers
  */
 Block.prototype.setLayer = function(layerNo) {
@@ -558,67 +568,75 @@ Block.prototype.getLayer = function() {
 /*
  * Brings the Block forward by 1 layer
  */
-Block.prototype.bringForward = function() {  
+Block.prototype.bringForward = function() {
   if (this.element.style.zIndex < Jalava.diagram.baseZIndex+100) // set a cap
-    this.element.style.zIndex = parseInt(this.element.style.zIndex) + 1; 
+    this.element.style.zIndex = parseInt(this.element.style.zIndex) + 1;
   this.firePropertyChange("Layer", this.getLayer());
 }
 
 /*
  * Sends the Block backward by 1 layer
  */
-Block.prototype.sendBackward = function() {  
+Block.prototype.sendBackward = function() {
   if (this.element.style.zIndex > Jalava.diagram.baseZIndex)   // set a cap
-    this.element.style.zIndex = parseInt(this.element.style.zIndex) - 1; 
-  this.firePropertyChange("Layer", this.getLayer());	
+    this.element.style.zIndex = parseInt(this.element.style.zIndex) - 1;
+  this.firePropertyChange("Layer", this.getLayer());
 }
 
 
 /*
  * 201208: Persistance functionality
  */
-Block.prototype.save = function() {  
+Block.prototype.save = function() {
   var obj = new Object();
   obj.clazz = this.clazz;
-  obj.type = this.type;
+  obj.type = this.element.type;
   obj.x = this.x;
   obj.y = this.y;
   obj.height = this.height;
   obj.width = this.width;
   obj.brushWidth = this.brushWidth;
   obj.id = this.id;
-
+  obj.cat = this.element.cat;
   obj.anchors = this.anchors;
-  
+  obj.name = this.element.name;
   obj.borderStyle = this.element.style.borderStyle;
   obj.borderColor = this.element.style.borderColor;
   obj.borderWidth = this.element.style.borderWidth;
-  
+  obj.owner = this.element.owner;
   obj.content = this.element.innerHTML;
-  
+  obj.date = this.element.date;
   obj.to = new Array();
   obj.from = new Array();
-
+  obj.shared = this.element.shared;
+  obj.assign = this.element.assign;
+  obj.desc = this.element.desc;
+  obj.writers = this.element.writers;
   for (var i=0; i<this.to.length; i++) {
   	obj.to[i] = this.to[i].id;
-  }      
+  }
   for (var i=0; i<this.from.length; i++) {
   	obj.from[i] = this.from[i].id;
-  }      
+  }
 
   return obj;
 }
 
-Block.prototype.load = function(obj) {  
+Block.prototype.load = function(obj) {
   this.clazz = obj.clazz;
-  this.type =obj.type;
+  this.element.type = obj.type;
+  this.element.desc = obj.desc;
   this.brushWidth = obj.brushWidth;
   this.id = obj.id;
-
+  this.element.date = obj.date;
   this.anchors = obj.anchors;
-
-  this.element.id = this.id;  
-
+  this.element.shared = obj.shared;
+  this.element.assign = obj.assign;
+  this.element.name = obj.name;
+  this.element.id = this.id;
+  this.element.cat = obj.cat;
+  this.element.owner = obj.owner;
+  this.element.writers = obj.writers;
   this.x = obj.x;
   this.y = obj.y;
 
@@ -634,7 +652,7 @@ Block.prototype.load = function(obj) {
   this.element.style.borderWidth = obj.borderWidth;
   this.element.innerHTML = obj.content;
 
-  this.setSize(this.width, this.height);  
+  this.setSize(this.width, this.height);
   this.hideAnchors();
 }
 

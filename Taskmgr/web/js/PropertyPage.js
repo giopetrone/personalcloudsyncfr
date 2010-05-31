@@ -93,17 +93,17 @@ PropertyPage.prototype.propertyChange = function(firer, property, value) {
 				  
 	}
 	else if (className=="Connection") {
-	  this.update("Line Color", 
-	              firer.color,
-	              this.colorPalette.createControl('Line Color',firer.color, PropertyPage.prototype.onChangeHandler));	  
+//	  this.update("Line Color",
+//	              firer.color,
+//	              this.colorPalette.createControl('Line Color',firer.color, PropertyPage.prototype.onChangeHandler));
       this.update("Line Width", 
 	              firer.halfBrushWidth*2,
 	              this.numberInput.createControl('Line Width', 4, firer.halfBrushWidth*2, PropertyPage.prototype.onChangeHandler, 2));	
 	}
 	else if (className=="DirectedConnection") {
-	  this.update("Line Color", 
-	              firer.color,
-	              this.colorPalette.createControl('Line Color',firer.color, PropertyPage.prototype.onChangeHandler));	  
+	//  this.update("Line Color",
+	//              firer.color,
+	//              this.colorPalette.createControl('Line Color',firer.color, PropertyPage.prototype.onChangeHandler));
       this.update("Line Width", 
 	              firer.halfBrushWidth*2,
 	              this.numberInput.createControl('Line Width', 4, firer.halfBrushWidth*2, PropertyPage.prototype.onChangeHandler, 2));	
@@ -178,6 +178,7 @@ PropertyPage.prototype.updateStrictly = function(property, value) {
  * select box, color palette, etc) is provided by the options argument.
  */
 PropertyPage.prototype.update = function(property, value, options) {
+      
   var rows = this.table.rows;
   var n = rows.length;
   if (value!="0" && !value) value = "none";
@@ -185,8 +186,10 @@ PropertyPage.prototype.update = function(property, value, options) {
   // first pass
   for (var i=1; i<n; i++) {
   	if (rows[i].cells[0].innerHTML==property) {
+            
 	  var input = rows[i].cells[1].firstChild;
 	  if (input.update) input.update(input, value);
+
 	  return;
 	}
   }	
@@ -220,6 +223,7 @@ PropertyPage.prototype.update = function(property, value, options) {
  * Fired when user makes a change to value in the property page
  */
 PropertyPage.prototype.onChangeHandler = function(obj, property, value) {
+
   var table = DOM.bubbleToTarget(obj, "propertypage");
   var fig = Jalava.diagram.getFigure(table.id);
   if (fig) fig.setProperty(property, value);

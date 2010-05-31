@@ -1,107 +1,303 @@
 <%-- 
     Document   : index
     Created on : Mar 17, 2010, 1:29:46 PM
-    Author     : marino
+    Author     : Fabrizio
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-   "http://www.w3.org/TR/html4/loose.dtd">
 
 
-<html> <!--</html> xmlns="http://www.w3.org/1999/xhtml">-->
-<head>
-<title>Edit Text</title>
-<link type="text/css" rel="stylesheet" href="./css/dhtmlgoodies_calendar.css?random=20051112" media="screen"></link>
-<script type="text/javascript" src="./js/dhtmlgoodies_calendar.js?random=20060118"></script>
-
-<script type="text/javascript">
-/*
- * Retrieve all contacts
- */
-
-tinyMCE.init({
-    mode : "textareas",
-    theme : "advanced",
-    theme_advanced_buttons1 : "fontselect,fontsizeselect,forecolor,separator,bold,italic,underline,justifyleft,justifycenter,justifyright,justifyfull",
-    theme_advanced_buttons2 : "",
-    theme_advanced_buttons3 : "",
-    theme_advanced_toolbar_location : "top",
-    theme_advanced_toolbar_align : "left",
-    theme_advanced_more_colors : 0,setup : function(ed) {
-    //ed.onInit.add(init);
-    }
-});
-
-function init()
-{
-   try
-   {
-    if (window.parent.TextEdit)
-    {
-        data = window.parent.TextEdit.getCurrentContent();
-
-    }
-   }
-  catch (e) {
-    alert(e.message);
-  }
 
 
-}
+      <html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+        <title>Jalava : Web-based Diagram Editor</title>
+        <script language="JavaScript" src="./js/Jalava.js"></script>
+        <script language="JavaScript">
+            // pezzo timer
+             // pezzo timer
+            var c=0;
+            var t;
+            var timer_is_on=0;
+            var nuovaVersione = 0;
+            var notifica = 0;
 
-function initForm(oForm, element_name) {
-
-frmElement = oForm.elements[element_name];
-frmElement.value = window.parent.TextEdit.getCurrentContent();
-
-}
-
-function initStatus(oForm, element_name) {
-
-frmElement = oForm.elements[element_name];
-frmElement.value = window.parent.TextEdit.getCurrentStatus();
-
-}
-
-function initDate(oForm, element_name) {
-
-frmElement = oForm.elements[element_name];
-frmElement.value = window.parent.TextEdit.getCurrentDate();
-
-}
-
-</script>
-
-</head>
-<body onload="initStatus(document.forms[0], 'status');initForm(document.forms[0], 'nome');initDate(document.forms[0], 'theDate');">
-<div id="basic_container"></div>
-<form name='myform'>
-	<!-- Gets replaced with TinyMCE, remember HTML in a textarea should be encoded -->
-	<label>Nome: <input id ="nome" name="nome" type="text" ></label>
-	<br />
-	<label>Stato del Task:
-		<select name="status" id="status" >
-
-            <option value="Task Status"> </option>
-	    <option value="In progress">In progress</option>
-	    <option value="Not Started yet">Not Started yet</option>
-	    <option value="Done">Done</option>
+            function timedCount()
+            {
+                document.getElementById('txt').value=c;
+                nuovaVersione = 1;
+                loadDiagram(null);
+                loadNotifiche();
+                c=c+1;
+                t=setTimeout("timedCount()",20000);
+            }
 
 
-	    </select>
-	</label>
-        <br />
-	
-        <label>Date: <input type="text" value="dd/mm/yy" id="theDate" name="theDate" onclick="displayCalendar(document.forms[0].theDate,'yyyy/mm/dd',this)"></label>
+            function loadNotifiche(){
+
+                var url2 = "./SubscribeServlet";
+                var url3 = "./CallbackServlet/subscribe/pippo";
+                objXml = new XMLHttpRequest();
+                objXml.onreadystatechange  = function()
+                {
+                    if(objXml.readyState  == 4)
+                    {
+                        if(objXml.status  == 200) {
+                            str = objXml.responseText;
+                            alert(str);
+                        } else {}
+
+                    }
+                };
+                if (notifica ==0) {
+                    notifica = 1;
+                    objXml.open("GET",url2,true);
+                    objXml.setRequestHeader('Content-Type',"text/plain");
+                    objXml.setRequestHeader('notifica',"start");
+                } else {
+                    objXml.open("GET",url3,true);
+                    objXml.setRequestHeader('Content-Type',"text/plain");
+                    objXml.setRequestHeader('notifica',"refresh");
+                }
+                objXml.send(null);
+            }
+
+            function doTimer()
+            {
+                if (!timer_is_on)
+                {
+                    timer_is_on=1;
+                    timedCount();
+                }
+            }
+            // fine pezzo timer
+            function saveDiagram(param){
+                // if (window.event.type == "click") {
+               // alert(param != 0);
+                //   }
+                // var url1 = "http://marinoflow.appspot.com/nuovastr.txt";
+                var diagramName = document.getElementById('area').value;
+                var owner = document.getElementById('owner').value;
+                var users = document.getElementById('users').value;
+                var writers = document.getElementById('writers').value;
+                if (diagramName.length ==0) {
+                    alert("Missing diagram name");
+                    return;
+                }
+                var url1 = "./SaveServlet";
+                var jsonString = Jalava.diagram.persist();
+                if (confirm(jsonString)) {
+                    // do things if OK
+                }
+                objXml = new XMLHttpRequest();
+                objXml.open("POST",url1,false);
+                objXml.setRequestHeader('Content-Type',"text/plain");
+                objXml.setRequestHeader('filenamemio',diagramName);
+                objXml.setRequestHeader('owner',owner);
+                objXml.setRequestHeader('users',users);
+                objXml.setRequestHeader('writers',writers);
+                objXml.send(jsonString);
+                str = objXml.responseText;
+                confirm("RISP from server: " +str);
+            }
+
+            function crepa() {
+                while (Jalava.diagram.container.childNodes.length >= 1 ){
+                    Jalava.diagram.container.removeChild( Jalava.diagram.container.firstChild );
+                }
+                Jalava.diagram = new Diagram(220, 100, "550", "600");
+            }
+
+            function update(str){
+            //    var msg = "update nuova stringa ? ";
+            //    alert(msg + "|" + str + "|");
+                if (nuovaVersione  == 1) {
+                    nuovaVersione = 0;
+                    if (str.length == 0) {
+                        return;
+                    }
+                    var answer = confirm("vuoi nuova versione?");
+                    if (answer){
+                        crepa();
+                        Jalava.diagram.load(str);
+                    }
+                } else {
+                    crepa();
+                    Jalava.diagram.load(str);
+                }
+            }
+
+            function loadDiagram(param){
+                var diagramName = document.getElementById('area').value;
+                if (diagramName.length ==0) {
+                    alert("Missing diagram name");
+                    return;
+                }
+
+              //  confirm("ciclico? "+ param == null);
+
+                var url1 = "./LoadServlet";
+                objXml = new XMLHttpRequest();
+                objXml.onreadystatechange  = function()
+                {
+                    if(objXml.readyState  == 4)
+                    {
+                        if(objXml.status  == 200) {
+                            str = objXml.responseText;
+                            try{
+                            var persisted = JSON.parse(str);
+                            var blocks = persisted.blocks;
+                            var users = blocks[0].shared;
+                            var writers = blocks[0].writers;
+                           
+                            document.getElementById('users').value =  users;
+                            document.getElementById('writers').value = writers;
+                           
+                            update(str);
+                            }catch(e){alert(e.message);}
+                        } else {}
+
+                    }
+                };
+               
+                objXml.open("GET",url1,true);
+                objXml.setRequestHeader('Content-Type',"text/plain");
+                objXml.setRequestHeader('filenamemio',diagramName);
+                if (param == null) {
+                    objXml.setRequestHeader('refresh',"true");
+                }
+                objXml.send(null);
+               
+            }
+
+
+            function loadLocal(){
+
+
+              //  confirm("ciclico? "+ param == null);
+
+                var url1 = "./SubServlet";
+                objXml = new XMLHttpRequest();
+                objXml.onreadystatechange  = function()
+                {
+                    if(objXml.readyState  == 4)
+                    {
+                        if(objXml.status  == 200) {
+                            str = objXml.responseText;
+                            update(str);
+                        } else {}
+
+                    }
+                };
+                objXml.open("GET",url1,true);
+                objXml.setRequestHeader('Content-Type',"text/plain");
+                objXml.setRequestHeader('filenamemio');
+                if (param == null) {
+                    objXml.setRequestHeader('refresh',"true");
+                }
+                objXml.send(null);
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            function dodo(){
+                var url = "/nstr.txt";
+
+                objXml = new XMLHttpRequest();
+                objXml.open("GET",url,false);
+                objXml.send(null);
+                str = objXml.responseText;
+                confirm("ECCO " +str);
+                Jalava.diagram.load(str);
+            }
+
+            function dada(){
+                var url1 = "./nuovastr.txt";
+                var jsonString = Jalava.diagram.persist();
+                if (confirm(jsonString)) {
+                    // do things if OK
+                }
+                objXml = new XMLHttpRequest();
+                objXml.open("POST",url1,false);
+                objXml.setRequestHeader('Content-Type',"text/plain");
+                objXml.send(jsonString);
+                str = objXml.responseText;
+                confirm("RISP: " +str);
+            }
+
+            function dado(){
+                var jsonString = Jalava.diagram.persist();
+                confirm(jsonString);
+            }
+
+
+            // initialise Jalava here
+            function initJalava(){
+                Jalava.diagram = new Diagram(220, 100, "550", "600");
+                var palette = new Palette(new FlowChartPaletteFactory(), 0, 100, 200);
+                palette.addItem("rect", "Processing",  Palette.DRAG_TOOL, "./img/rect.gif");
+                palette.addItem("connection", "Connection",  Palette.CLICK_TOOL, "./img/line.gif");
+                palette.addItem("diamond", "Decision", Palette.DRAG_TOOL, "./img/diamond.gif");
+                palette.addItem("parallel", "Input/Output", Palette.DRAG_TOOL, "./img/parallel.gif");
+                palette.addItem("ellipse", "And/Or", Palette.DRAG_TOOL, "./img/ellipse.gif");
+                palette.addItem("rounded", "Start/End", Palette.DRAG_TOOL, "./img/ellipse.gif");
+                Jalava.propertyPage = new FlowChartPropertyPage(20, 240, 10);
+            }
+
+            // start Jalava
+            Jalava.addModule("FlowChartPaletteFactory");
+            Jalava.addModule("FlowChartPropertyPage");
+            Jalava.addModule("UrlGradientBlock");
+
+            Jalava.start(initJalava);
+
+        </script>
+
+    </head>
+    <body>
         
-        <br/>
-        <input type="button" name="reset" value="Cancella" onclick="window.parent.TextEdit.cancel()"/>
-	<input type="button" name="ok" value="Ok"      onclick="window.parent.TextEdit.setContent(document.myform.nome.value,document.myform.status.value,document.myform.theDate.value);"/>
+<%
 
-</form>
+String email= request.getParameter("email");
 
-    <div id="basic_container"></div>
+String passWord = request.getParameter("passWord");
 
-</body>
+%>
+
+         <form name="saveandload" id="saveandload" >
+
+            <textarea rows="1" cols="5" name="area" id="area"> </textarea>
+            <input type="button" value="saveDiagram" name="buttonSave" onClick="aa=1000; saveDiagram(aa);"/>
+            <!--INPUT type="button" value="provalocale" name="buttonprova" onClick="dada();"-->
+            <input type="button" value="loadDiagram" name="buttonLoad" onClick="aa=1000;loadDiagram(aa);"/>
+            <input type="text" id="diagramName" name ="diagramName" value=""    />
+            <input type="button" value="Start count!" onClick="doTimer();"/>
+            <input type="text" id="txt" />
+            <input type="button" value="See JSON" onclick="dado();TextEdit.check();TextEdit.setOwner();"/>
+            <input type="button" value="Share" onclick="childWindow=open('/shared.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800');"/>
+            <input id="fileUtente" name="fileUtente" type="file" size="20"/>
+            <input type="text" id="owner" name="owner" value= "<%=email%>" disabled="disabled" />
+            <input type="text" id="users" name="users" value= "" disabled="disabled" />
+             <input type="text" id="writers" name="writers" value= "" disabled="disabled" />
+
+
+
+
+
+
+        </form>
+
+    </body>
 </html>

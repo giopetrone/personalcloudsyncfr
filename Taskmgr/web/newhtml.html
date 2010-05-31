@@ -74,12 +74,21 @@ function updateForm() {
  */
 function share() {
   // Get form data
-  opener.document.getElementById('share').value = document.getElementById('recipients').value;
- // var formSubject = document.getElementById('subject').value;
- // var formMessage = document.getElementById('message').value;
- // window.location = 'mailto:' + formRecipients + '?subject=' + formSubject + '&body=' + formMessage;
+  
+  
+ try
+ {
+
+ opener.document.getElementById('share').value = document.getElementById('recipients').value;
+ window.opener.setArray(emailRecipients);
  self.close();
  return false;
+ }catch(e){e.message();}
+}
+
+function get()
+{
+    return emailRecipients;
 }
 
 /**

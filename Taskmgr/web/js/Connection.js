@@ -11,7 +11,7 @@
 function Connection() {
   this.clazz = "Connection";
   this.element = DOM.createElement("div", "figure");
-  
+
   // IMPORTANT Connection is no longer added to diagram in constructor
   //this.element.id = Jalava.diagram.addFigure(this);
   //this.id = this.element.id;
@@ -39,6 +39,7 @@ function Connection() {
   
   this.halfBrushWidth = 1;
   this.color = "#000000";
+ // this.element.color = this.color;
 }
 
 // Global constants
@@ -59,6 +60,7 @@ Connection.prototype.setLineWidth = function(w) {
 }
 
 Connection.prototype.setLineColor = function(colorCode) {
+
   this.color = colorCode;
   for (var i = 1; i < this.numAnchors; i++) {
     if (this.segment[i]) this.segment[i].style.backgroundColor = colorCode;
@@ -66,6 +68,7 @@ Connection.prototype.setLineColor = function(colorCode) {
 }
 
 Connection.prototype.setTarget = function(target, anchorIdx, suppress) {
+   
   if (this.target) { 
     //alert("settarget " + this.target.id);
     this.target.removePropertyChangeListener(this);
@@ -91,6 +94,7 @@ Connection.prototype.setTarget = function(target, anchorIdx, suppress) {
 }
 
 Connection.prototype.setSource = function(source, anchorIdx, suppress) {
+   
   if (this.source) { 
     //alert("setsource");
     this.source.removePropertyChangeListener(this);
@@ -116,6 +120,7 @@ Connection.prototype.setSource = function(source, anchorIdx, suppress) {
 }
 
 Connection.prototype.firePropertyChange = function(property, value){
+  
   var n = this.propertyListener.length;
   for (var i = 0; i < n; i++) {
     this.propertyListener[i].propertyChange(this, property, value);
@@ -132,6 +137,7 @@ Connection.addToArray = function(array, obj) {
 
 Connection.prototype.addPropertyChangeListener = function(callback){
   //this.propertyListener.push(callback);
+
   Connection.addToArray(this.propertyListener, callback);		// prevent repetition
 }
 
@@ -147,6 +153,7 @@ Connection.prototype.removePropertyChangeListener = function(callback){
 }
 
 Connection.prototype.propertyChange = function(firer, property, value) {
+  
   var show = true;
   if (property == "position" || property == "size") {
     if (this.source == firer) {
@@ -178,6 +185,7 @@ Connection.prototype.propertyChange = function(firer, property, value) {
 }
 
 Connection.prototype.setProperty = function(property, value) {
+  
   if (property=="Line Color") { this.setLineColor(value); }
   else if (property=="Line Width") { this.setLineWidth(value); }
   this.findPath();
@@ -186,12 +194,15 @@ Connection.prototype.setProperty = function(property, value) {
 }
 
 Connection.prototype.showProperties = function(page) {
+      
   page.update("Line Color", this.color);
   page.update("Line Width", this.halfBrushWidth*2);
 }
 
 Connection.prototype.redraw = function() {
+  
   for (var i = 1; i < this.numAnchors; i++) {
+      
     var xx1 = Math.min(this.anchors[i].x, this.anchors[i - 1].x);
     var xx2 = Math.max(this.anchors[i].x, this.anchors[i - 1].x);
     var yy1 = Math.min(this.anchors[i].y, this.anchors[i - 1].y);
@@ -221,30 +232,35 @@ Connection.prototype.redraw = function() {
 }
 
 Connection.prototype.bringToFront = function() {
+       
   for (var i = 1; i < this.numAnchors; i++) {
     if (this.segment[i]) this.segment[i].style.zIndex = Jalava.diagram.baseZIndex + 100;
   }	
 }
 
 Connection.prototype.sendToBack = function() {
+       
   for (var i = 1; i < this.numAnchors; i++) {
     if (this.segment[i]) this.segment[i].style.zIndex = Jalava.diagram.baseZIndex - 1;
   }	
 }
 
 Connection.prototype.select = function(evt){
+    
   this.showAnchors();
   this.bringToFront();
   this.firePropertyChange("select", null);
 }
 
 Connection.prototype.deselect = function(){
+     
   this.hideAnchors();
   this.sendToBack();
   this.firePropertyChange("deselect", null);
 }
 
 Connection.prototype.showAnchors = function(hovering){
+      
   var type = hovering ? "hover" : "anchor";
   for (var i = 0; i < this.numAnchors; i++) {
     var anchor = document.getElementById(type + i);
@@ -259,6 +275,7 @@ Connection.prototype.showAnchors = function(hovering){
 }
 
 Connection.prototype.hideAnchors = function(hovering){
+   
   var type = hovering ? "hover" : "anchor";
   for (var i = 0; i < Connection.TOTAL_LINE_ANCHORS; i++) {
     var anchor = document.getElementById(type + i);
@@ -267,6 +284,7 @@ Connection.prototype.hideAnchors = function(hovering){
 }
 
 Connection.prototype.resizeStart = function(evt, what){
+  
   if (what.id == "anchor0") Jalava.temp_var.mode = Connection.START;
   else if (what.id == ("anchor" + (this.numAnchors - 1)))  Jalava.temp_var.mode = Connection.END;
 
@@ -277,6 +295,7 @@ Connection.prototype.resizeStart = function(evt, what){
 }
 
 Connection.prototype.resize = function(evt){
+  
   //var mousePos = calibrate(getMousePos(evt));
   var mousePos = Jalava.diagram.getRelativeMousePos(evt);
   
@@ -325,6 +344,7 @@ Connection.prototype.resize = function(evt){
 }
 
 Connection.prototype.resizeEnd = function() {
+ 
   if (Jalava.temp_var.source) {
   	if (!this.source) {
       this.firePropertyChange("disconnect", Jalava.temp_var.source);
@@ -365,6 +385,7 @@ Connection.prototype.resizeEnd = function() {
 }
 
 Connection.prototype.createSegment = function() {
+   
   var ele = DOM.createElement("div", "segment");
   ele.id = this.id;
   //confirm ("absolute");
@@ -378,6 +399,7 @@ Connection.prototype.createSegment = function() {
 }
 
 Connection.prototype.dispose = function() {
+  
   this.hideAnchors();
   this.setSource(null);
   this.setTarget(null);	
@@ -391,6 +413,7 @@ Connection.prototype.dispose = function() {
  * of any intersections with other Blocks.
  */
 Connection.prototype.findPath = function() {
+  
   this.anchors[0].x = this.startX;
   this.anchors[0].y = this.startY;
   var width = this.endX - this.startX;
@@ -440,6 +463,7 @@ Connection.prototype.findPath = function() {
  * the current mouse position.
  */
 Connection.findNearestAnchor = function(mousePos, blockObj) {
+    
   var minDist;
   var nearestAnchor = -1;
   var numAnchors = blockObj.anchors.length;
@@ -462,7 +486,8 @@ Connection.findNearestAnchor = function(mousePos, blockObj) {
 /*
  * 201208: Persistance functionality
  */
-Connection.prototype.save = function() {  
+Connection.prototype.save = function() {
+   
   var obj = new Object();
   
   obj.clazz = this.clazz;
@@ -491,7 +516,8 @@ Connection.prototype.save = function() {
   return obj;
 }
 
-Connection.prototype.load = function(obj) {  
+Connection.prototype.load = function(obj) {
+   
   this.clazz = obj.clazz;
   this.id = obj.id;
   this.element.id = this.id;

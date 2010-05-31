@@ -1,0 +1,184 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+<title>
+Task Properties
+</title>
+
+<!-- Meta Tags -->
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Wufoo.com" />
+
+<!-- CSS -->
+<link rel="stylesheet" href="./css/structure.css" type="text/css" />
+<link rel="stylesheet" href="./css/form.css" type="text/css" />
+<link type="text/css" rel="stylesheet" href="./css/dhtmlgoodies_calendar.css?random=20051112" media="screen"></link>
+<!-- JavaScript -->
+<script type="text/javascript" src="./scripts/wufoo.js"></script>
+
+<script type="text/javascript" src="./js/dhtmlgoodies_calendar.js?random=20060118"></script>
+<script type="text/javascript">
+/*
+ * Retrieve all contacts
+ */
+var users = new Array();
+
+function privilege()
+{
+    var user = parent.document.getElementById("owner").value;
+    var readers = parent.document.getElementById("users").value
+    var writers = parent.document.getElementById("writers").value;
+    var own = TextEdit.target.parentNode.parentNode.parentNode.owner;
+
+}
+
+
+function initShare(oForm, element_name) {
+
+frmElement = oForm.elements[element_name];
+frmElement.value = opener.document.getElementById('users').value;
+
+
+
+
+}
+function setArray(recipients)
+{
+   
+    users = recipients;
+   
+    return users;
+}
+
+
+function setUsers()
+{
+    opener.document.getElementById('users').value = document.getElementById("share").value;
+    check();
+    self.close();
+    return false;
+
+}
+
+
+ function append()
+      {
+          
+        var size = users.length;
+       
+        var add = document.getElementById("append");
+        
+
+            while (add.firstChild) {
+              add.removeChild(add.firstChild);
+            }
+
+
+            for(var i=0;i<size;i++)
+            {
+                 var cb = document.createElement( "input" );
+                 var value = users[i];
+                 cb.type = "checkbox";
+                 cb.id = value;
+                 cb.value = value;
+                 cb.checked = false;
+                 cb.name = "checkgroup";
+                 var text = document.createTextNode( value);
+                 var br = document.createElement("br");
+                 
+                 add.appendChild(cb);
+                 add.appendChild(text);
+                 
+                 add.appendChild(br);
+                
+            }
+        
+     
+      }
+
+
+      function check()
+      {
+          var checked = new Array();
+          var y =0;
+          for (i=0; i<document.myform.checkgroup.length; i++){
+            if (document.myform.checkgroup[i].checked==true){
+               checked[y] = document.myform.checkgroup[i].value;
+               y++;
+            }
+
+          }
+          var emailRecipientsString = '';
+          for (var i = 0; i < checked.length; i++) {
+            var recipient = checked[i];
+            emailRecipientsString += recipient + ', ';
+          }
+          emailRecipientsString = emailRecipientsString.substring(0, emailRecipientsString.length - 2);
+          opener.document.getElementById('writers').value = emailRecipientsString;
+
+      }
+
+
+
+
+</script>
+</head>
+
+<body id="public" onload="initShare(document.forms[0], 'share');">
+<div id="container">
+
+
+
+<form name='myform'>
+
+
+	<h2>Share this diagram with users</h2>
+
+
+
+<ul>
+
+
+
+
+ <li >
+            <label class="desc" id="title2" for="Field2">
+		Diagram Shared with
+			</label>
+        <input type="text"  id="share" name="share"  onclick="childWindow=open('/newhtml.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')"/>
+
+    </li>
+
+
+<li>
+    <a href="#" onclick="append();"id="add" name="add" >Add privileges to users </a>
+    </li>
+
+<li>
+    <div id="append" name="append"></div>
+
+</li>
+
+
+
+
+	<li class="buttons ">
+		<div>
+
+                    <input type="button" name="ok" value="Ok"    id="ok"  onclick="setUsers()"/>
+	<input type="button" name="reset" value="Cancella" onclick="check();self.close();"/>
+
+				</div>
+	</li>
+
+
+</ul>
+</form>
+
+</div><!--container-->
+
+</body>
+</html>

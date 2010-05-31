@@ -18,6 +18,7 @@ MyPaletteFactory.prototype.createContent = function(objId, real) {
 	ele.appendChild(img);
     var span = DOM.createElement("SPAN", "mytextarea");
     span.innerHTML = objId;
+   
 	span.style.marginLeft = "4px";
 	if (real) {
       span.className = "editableLine";

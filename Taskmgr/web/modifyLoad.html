@@ -23,12 +23,12 @@ Task Properties
 
   <script type="text/javascript">
 function go() {
- 
-   
+
+
       var data = window.parent.TextEdit.getCurrentDesc();
       //document.forms['myform'].elements['elm1'].value = data;
       tinyMCE.activeEditor.setContent(data);
-   
+
 }
 
 
@@ -121,12 +121,24 @@ frmElement.value = window.parent.TextEdit.getCurrentDesc();
 
 
 
+function initOwner(oForm, element_name) {
+
+frmElement = oForm.elements[element_name];
+
+frmElement.value = window.parent.TextEdit.getCurrentOwner();
+
+
+
+}
+
+
+
 
 
 </script>
 </head>
 
-<body id="public" onload="initStatus(document.forms[0], 'status');initForm(document.forms[0], 'nome');initDate(document.forms[0], 'theDate');initCat(document.forms[0], 'category');initShare(document.forms[0], 'share');initAssign(document.forms[0],'assign');initDesc(document.forms[0],'elm1');go();">
+<body id="public" onload="initStatus(document.forms[0], 'status');initForm(document.forms[0], 'nome');initDate(document.forms[0], 'theDate');initCat(document.forms[0], 'category');initShare(document.forms[0], 'share');initAssign(document.forms[0],'assign');initOwner(document.forms[0],'owner');initDesc(document.forms[0],'elm1');go();">
 <div id="container">
 
 
@@ -135,13 +147,13 @@ frmElement.value = window.parent.TextEdit.getCurrentDesc();
 
 
 	<h2>Task Properties</h2>
-	
+
 
 
 <ul>
-		
-		
-	
+
+
+
 <li id="foli106" 		class="     ">
 	<label class="desc" id="title106" for="Field106">
 		Name
@@ -152,22 +164,22 @@ frmElement.value = window.parent.TextEdit.getCurrentDesc();
 	</li>
 
 
-<li id="foli107" 
+<li id="foli107"
 		class="     ">
-	
-		
+
+
 	<label class="desc" id="title107" for="Field107">
 		Description of task
 			</label>
-	
+
 	<div>
 				<textarea id="elm1" name="elm1" rows="15" style="width: 90%">
 	</textarea>
-			
+
 			</div>
-	
-		
-		
+
+
+
 	</li>
 
 <li id="foli106" 		class="     ">
@@ -189,6 +201,7 @@ frmElement.value = window.parent.TextEdit.getCurrentDesc();
                     <option value="In progress">In progress</option>
                     <option value="Not Started yet">Not Started yet</option>
                     <option value="Done">Done</option>
+                    
 
 
 	    </select>
@@ -198,7 +211,7 @@ frmElement.value = window.parent.TextEdit.getCurrentDesc();
             <label class="desc" id="title2" for="Field2">
 		Diagram Shared with
 			</label>
-        <input type="text"  id="share" name="share"  onclick="childWindow=open('/newhtml.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')"/>
+        <input type="text"  id="share" name="share"  onclick="childWindow=open('/newhtml.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" disabled="disabled"/>
 
     </li>
 
@@ -228,25 +241,35 @@ frmElement.value = window.parent.TextEdit.getCurrentDesc();
 		Due Date
 			</label>
 	<input type="text" value="dd/mm/yy" id="theDate" name="theDate" onclick="displayCalendar(document.forms[0].theDate,'yyyy/mm/dd',this)"/>
-		
+
 	</li>
 
-   
+
+
+    <li id="foli2" 		class="date      ">
+	<label class="desc" id="title2" for="Field2">
+		Owner
+			</label>
+	<input type="text" value="" id="owner" name="owner" disabled="disabled"/>
+
+	</li>
 
 
 
-	
-		
+
+
+
+
 	<li class="buttons ">
 		<div>
-	
+
 	<input type="button" name="ok" value="Ok"      onclick="parent.TextEdit.setContent(document.myform.nome.value,document.myform.status.value,document.myform.theDate.value,document.myform.category.value,document.myform.share.value,document.myform.assign.value,tinyMCE.activeEditor.getContent());"/>
 	<input type="button" name="reset" value="Cancella" onclick="window.parent.TextEdit.cancel()"/>
-	
+
 				</div>
 	</li>
 
-	
+
 </ul>
 </form>
 

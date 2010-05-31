@@ -24,17 +24,17 @@ FlowChartPropertyPage.prototype.propertyChange = function(firer, property, value
 				  
 	}
 	else if (className=="Connection") {
-	  this.update("Line Color", 
+	  this.update("Line Color",
 	              firer.color,
-	              this.colorPalette.createControl('Line Color',firer.color, FlowChartPropertyPage.prototype.onChangeHandler));	  
+	              this.colorPalette.createControl('Line Color',firer.color, FlowChartPropertyPage.prototype.onChangeHandler));
       this.update("Line Width", 
 	              firer.halfBrushWidth*2,
 	              this.numberInput.createControl('Line Width', 4, firer.halfBrushWidth*2, FlowChartPropertyPage.prototype.onChangeHandler, 2));	
 	}
 	else if (className=="DirectedConnection") {
-	  this.update("Line Color", 
-	              firer.color,
-	              this.colorPalette.createControl('Line Color',firer.color, FlowChartPropertyPage.prototype.onChangeHandler));	  
+	  this.update("Line Color",
+	            firer.color,
+	            this.colorPalette.createControl('Line Color',firer.color, FlowChartPropertyPage.prototype.onChangeHandler));
       this.update("Line Width", 
 	              firer.halfBrushWidth*2,
 	              this.numberInput.createControl('Line Width', 4, firer.halfBrushWidth*2, FlowChartPropertyPage.prototype.onChangeHandler, 2));	

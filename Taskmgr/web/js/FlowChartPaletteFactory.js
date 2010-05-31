@@ -9,39 +9,100 @@ function FlowChartPaletteFactory() {
 Jalava.copyPrototype(FlowChartPaletteFactory, PaletteFactory);
 
 FlowChartPaletteFactory.prototype.createContent = function(objId, real) {
+
   var ele = DOM.createElement("DIV", "a");
   ele.className = "hello";
+  ele.setAttribute("id","ele");
+ 
   var span = DOM.createElement("SPAN", "mytextarea");
- // confirm("CREO CONTENUTO");
- // var link = DOM.createElemtn("A","link");
-  // window.open('http://localhost:8080/mce.html','miaFinestra','');
-  // span.innerHTML = "<a href='http://localhost:8080/mce.html' target='_blank'> Edit </a>";
+  span.setAttribute("id","span");
+ 
 
    var nome = DOM.createElement("SPAN","nome");
    var status = DOM.createElement("INPUT","status");
    var date = DOM.createElement("INPUT","date");
-   var category = DOM.createElement("INPUT","category");
+   var owner = DOM.createElement("INPUT","owner");
    var assign = DOM.createElement("INPUT","assign");
+   var elm1 = DOM.createElement("INPUT","elm1");
+   var shared = DOM.createElement("INPUT","shared");
+   var writers = DOM.createElement("INPUT","writers");
+   shared.setAttribute("type","hidden");
+   shared.setAttribute("id","shared");
+   writers.setAttribute("id","writers");
+   writers.setAttribute("type","hidden");
    nome.setAttribute("id","nome");
    status.setAttribute("id","status");
    status.setAttribute("type","hidden");
    date.setAttribute("id","date");
    date.setAttribute("type","hidden");
-   category.setAttribute("id","category");
-   category.setAttribute("type","hidden");
+   owner.setAttribute("id","owner");
+   owner.setAttribute("type","hidden");
    assign.setAttribute("id","assign");
    assign.setAttribute("type","hidden");
-  
+   elm1.setAttribute("id","desc");
+   elm1.setAttribute("type","hidden");
    span.setAttribute("id","span");
    nome.innerHTML = "Click to edit";
    span.appendChild(nome);
-   span.appendChild(status);
-   span.appendChild(date);
-   span.appendChild(category);
+ //  span.appendChild(status);
+ //  span.appendChild(date);
+   span.appendChild(owner);
    span.appendChild(assign);
+//   span.appendChild(elm1);
+   span.appendChild(shared);
+   span.appendChild(writers);
+   
   if (real) {
-    span.className = "editable";
-    span.ondblclick = function(event) { TextEdit.invoke(event);}
+      span.className = "editable";
+     if (objId=="rect") {
+    
+    var own = document.getElementById("owner").value;
+   
+    // {alert("owner uguali");span.className = "editable";}
+   // else alert("owner diversi");
+   // if(own == null) {span.className = "editable";alert("dentroIf")}
+   
+    span.ondblclick = function(event) {
+        
+        TextEdit.invoke(event);//Editable.tryedit();
+    }
+     }
+     if(objId=="diamond") 
+     {
+         nome.innerHTML = "Decision";
+         span.ondblclick = function(event) 
+         {
+            //alert(span.parentNode.parentNode.shared);
+            TextEdit.invokeAndor(event);
+        }
+
+     }
+     if(objId == "ellipse")
+     {
+         nome.innerHTML = "And?Or?";
+         span.ondblclick = function(event) 
+         {
+         
+            
+            TextEdit.invokeAndor(event);
+        }
+
+     }
+     if(objId == "rounded")
+     {
+         nome.innerHTML = "Start?End?";
+         span.ondblclick = function(event)
+         {
+
+
+            TextEdit.invokeAndor(event);
+        }
+
+     }
+
+
+
+
   }
 //confirm(objId);
   var img = new Image();
@@ -53,6 +114,7 @@ FlowChartPaletteFactory.prototype.createContent = function(objId, real) {
 	//ele.appendChild(img);
 
   ele.appendChild(span);
+
   return ele;
 }
 
@@ -77,15 +139,15 @@ FlowChartPaletteFactory.getCurrentContent = function() {
 }
 
 FlowChartPaletteFactory.prototype.generateTemplate = function(objId) {
-  
+
   // check the template cache
   if (this.templates[objId]) return this.templates[objId];
-  
+
   // default behaviour
   var ele = this.createContent(objId, false);
   if (!ele) return;
-  
-  this.templates[objId] = UrlGradientBlock.prototype.generateTemplate(ele, null, null, 100, 50, null, "/img/flowchart/" + objId + "_f0f0f0_w100h50.gif"); 	
+
+  this.templates[objId] = UrlGradientBlock.prototype.generateTemplate(ele, null, null, 100, 50, null, "/img/flowchart/" + objId + "_f0f0f0_w100h50.gif");
   return this.templates[objId];
 
 }
@@ -151,7 +213,7 @@ FlowChartPaletteFactory.prototype.generateAnchors = function(objId, width, heigh
   var anchors = new Array();
   var i = 0;
 
-  if (objId=="rect") {	
+  if (objId=="rect") {
     anchors[i] = new Object();
     anchors[i].x = 50;  anchors[i++].y = 25;
     anchors[i] = new Object();
@@ -169,7 +231,7 @@ FlowChartPaletteFactory.prototype.generateAnchors = function(objId, width, heigh
     anchors[i] = new Object();
     anchors[i].x = 50;  anchors[i++].y = 0;
   }
-  else if (objId=="diamond") {	
+  else if (objId=="diamond") {
     anchors[i] = new Object();
     anchors[i].x = 0;  anchors[i++].y = -25;
     anchors[i] = new Object();
@@ -187,7 +249,7 @@ FlowChartPaletteFactory.prototype.generateAnchors = function(objId, width, heigh
     anchors[i] = new Object();
     anchors[i].x = 50;  anchors[i++].y = -25;
   }
-  else if (objId=="parallel") {	
+  else if (objId=="parallel") {
     anchors[i] = new Object();
     anchors[i].x = 0;  anchors[i++].y = -25;
     anchors[i] = new Object();
@@ -204,8 +266,8 @@ FlowChartPaletteFactory.prototype.generateAnchors = function(objId, width, heigh
     anchors[i].x = 45;  anchors[i++].y = 0;
     anchors[i] = new Object();
     anchors[i].x = 50;  anchors[i++].y = -25;
-  }  
-  else {	
+  }
+  else {
     anchors[i] = new Object();
     anchors[i].x = 0;  anchors[i++].y = -25;
     anchors[i] = new Object();
@@ -222,7 +284,7 @@ FlowChartPaletteFactory.prototype.generateAnchors = function(objId, width, heigh
     anchors[i].x = 50;  anchors[i++].y = 0;
     anchors[i] = new Object();
     anchors[i].x = 50;  anchors[i++].y = -25;
-  }  
+  }
   return anchors;
 }
 

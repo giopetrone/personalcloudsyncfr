@@ -214,9 +214,39 @@ PaletteFactory.prototype.generateFigure = function(obj) {
     // add custom handlers to the block
     var span = DOM.findNodeByName(block.element, "SPAN", "mytextarea", true);
   //  confirm("generate span trovato? "+ span);
- // span.className = "editable"; // ?????
+ 
+  span.className = "editable";
+  var status = span.parentNode.parentNode.type;
+
+  //alert( span.parentNode.parentNode.type);
+  if (status=="Done")
+  {
+   //   span.childNodes[0].style.color = "green";
+
+      //state = "Done";
+
+  }
+  if (status=="Not Started yet")
+  {
+   //span.childNodes[0].style.color = "red";
+
+     // state = "Not Started yet";
+  }
+  if (status=="In progress") {
+    //  span.childNodes[0].style.color = "orange";
+
+     // state = "In progress";
+  }
+
+  if (status=="") {
+ //     span.childNodes[0].style.color = "black";
+
+     // state = "In progress";/
+  }
+ 
     span.ondblclick = function(event){
-      TextEdit.invoke(event);
+   
+      TextEdit.invokeLoad(event);
     }
     
     if (Jalava.propertyPage) block.addPropertyChangeListener(Jalava.propertyPage);
@@ -256,7 +286,7 @@ PaletteFactory.prototype.createContent = function(objId, real) {
     span.innerHTML = this.defaultText;
 	if (real) {
       span.className = "editable";
-      span.ondblclick = function(event) { TextEdit.invoke(event); }
+      span.ondblclick = function(event) {alert("BBBBBBB"); TextEdit.invoke(event); }
 	}
     ele.appendChild(span);
 	return ele;

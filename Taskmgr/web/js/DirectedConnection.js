@@ -13,7 +13,7 @@ function DirectedConnection() {
   this.startArrowSize = 10;
   this.endArrowStyle = 'arrow';
   this.endArrowSize = 10;
- // DirectedConnection.paarent.innerHTML = "parent";
+ 
   this.lineStyle = "solid";
   this.size = "small";
   this.createArrowHead();
