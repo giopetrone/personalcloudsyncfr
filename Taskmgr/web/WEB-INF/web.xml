@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
     <servlet>
+
+        <servlet-name>LoadServlet</servlet-name>
+        <servlet-class>jav.LoadServlet</servlet-class>
+
+        
+
+    </servlet>
+
+    <servlet>
+        <servlet-name>SaveServlet</servlet-name>
+        <servlet-class>jav.SaveServlet</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>SubscribeServlet</servlet-name>
         <servlet-class>jav.SubscribeServlet</servlet-class>
     </servlet>
@@ -8,36 +21,37 @@
         <servlet-name>CallbackServlet</servlet-name>
         <servlet-class>jav.CallbackServlet</servlet-class>
     </servlet>
-    <servlet>
+
+    <servlet-mapping>
+
         <servlet-name>LoadServlet</servlet-name>
-        <servlet-class>jav.LoadServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>SaveServlet</servlet-name>
-        <servlet-class>jav.SaveServlet</servlet-class>
-    </servlet>
+        <url-pattern>/LoadServlet</url-pattern>
+   </servlet-mapping>
+
     <servlet-mapping>
         <servlet-name>SubscribeServlet</servlet-name>
         <url-pattern>/SubscribeServlet</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>CallbackServlet</servlet-name>
-        <url-pattern>/CallbackServlet/subscribe/pippo</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>LoadServlet</servlet-name>
-        <url-pattern>/LoadServlet</url-pattern>
-    </servlet-mapping>
+         </servlet-mapping>
+
+    
+
     <servlet-mapping>
         <servlet-name>SaveServlet</servlet-name>
         <url-pattern>/SaveServlet</url-pattern>
     </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>CallbackServlet</servlet-name>
+        <url-pattern>/CallbackServlet/subscribe/pippo</url-pattern>
+    </servlet-mapping>
+    
+
     <session-config>
         <session-timeout>
             30
         </session-timeout>
     </session-config>
     <welcome-file-list>
-        <welcome-file>demo_basic.htm</welcome-file>
+        <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
 </web-app>

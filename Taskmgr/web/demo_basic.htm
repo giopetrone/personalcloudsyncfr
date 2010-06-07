@@ -188,18 +188,18 @@
             // initialise Jalava here
             function initJalava(){
                 Jalava.diagram = new Diagram(220, 100, "550", "600");
-                var palette = new Palette(new FlowChartPaletteFactory(), 0, 100, 200);
-                palette.addItem("rect", "Processing",  Palette.DRAG_TOOL, "./img/rect.gif");
-                palette.addItem("connection", "Connection",  Palette.CLICK_TOOL, "./img/line.gif");
-                palette.addItem("diamond", "Decision", Palette.DRAG_TOOL, "./img/diamond.gif");
-                palette.addItem("parallel", "Input/Output", Palette.DRAG_TOOL, "./img/parallel.gif");
-                palette.addItem("ellipse", "Connection Node", Palette.DRAG_TOOL, "./img/ellipse.gif");
-                palette.addItem("rounded", "Start/End", Palette.DRAG_TOOL, "./img/ellipse.gif");
-                Jalava.propertyPage = new FlowChartPropertyPage(20, 240, 10);
+            //    var palette = new Palette(new FlowChartPaletteFactory(), 0, 100, 200);
+             //   palette.addItem("rect", "Processing",  Palette.DRAG_TOOL, "./img/rect.gif");
+             //   palette.addItem("connection", "Connection",  Palette.CLICK_TOOL, "./img/line.gif");
+            //    palette.addItem("diamond", "Decision", Palette.DRAG_TOOL, "./img/diamond.gif");
+              //  palette.addItem("parallel", "Input/Output", Palette.DRAG_TOOL, "./img/parallel.gif");
+             //   palette.addItem("ellipse", "Connection Node", Palette.DRAG_TOOL, "./img/ellipse.gif");
+              //  palette.addItem("rounded", "Start/End", Palette.DRAG_TOOL, "./img/ellipse.gif");
+          //      Jalava.propertyPage = new FlowChartPropertyPage(20, 240, 10);
             }
 
             // start Jalava
-            Jalava.addModule("FlowChartPaletteFactory");
+         //   Jalava.addModule("FlowChartPaletteFactory");
             Jalava.addModule("FlowChartPropertyPage");
             Jalava.addModule("UrlGradientBlock");
 

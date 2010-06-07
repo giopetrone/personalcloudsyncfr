@@ -10,6 +10,7 @@
          <script language="JavaScript">
 
  var trovati = new Array();
+ var archi = new Array();
             function dado(){
                 try{
                 var jsonString = window.parent.Jalava.diagram.persist();
@@ -22,6 +23,7 @@
                 
                
                 var j =0;
+               
                 for(var i=0;i<connections;i++)
                 {
                     var source = persisted.connections[i].source;
@@ -29,53 +31,62 @@
                    
                     if(source == id) {
                         trovati[j] = persisted.connections[i];
-                        
+                      
                         j++;
+                       
 
                     }
                 }
-            for(var h=0;h<trovati.length;h++)
-            {
-                var value = "Vai al Nodo "+trovati[h].target;
-                var id = trovati[h].target;
-        
-              
-                var name = "conn "+h;
-                currentElement = document.createElement("option");
+                if(trovati.length !=0)
+                {
+
+                    //selectElement = document.createElement("select");
+                   // selectElement.setAttribute("id", "status");
+                   // selectElement.setAttribute("name","status");
+                  //  document.forms[0].appendChild(selectElement);
+                  //  labelElement = document.createElement("label");
+                  //  label.text = "Go to Task";
+                    for(var h=0;h<trovati.length;h++)
+                    {
+                       
+                        var value = "";
+                        var id = trovati[h].target;
+                        for(var l=0;l<blocks;l++)
+                        {
+                            var blockid = persisted.blocks[l].id;
+                            
+                            if(blockid == id)
+                            {
+                                var blockname = persisted.blocks[l].name;
+                                var blockfig = persisted.blocks[l].imageId;
+                                if(blockname == null && blockfig == "rect") blockname = "Click To Edit";
+                                else if (blockname == null && blockfig == "diamond") blockname = "Decision";
+                                value = "Vai al nodo "+ blockname;
+                            }
+                        }
+                        var add = document.getElementById("status");
+
+
+                        
+                          add.removeChild(add.firstChild);
+                       
+
+
+                        currentElement = document.createElement("option");
+
+                        currentElement.setAttribute("id", id);
+
+                        currentElement.value = id;
+                        currentElement.text = value;
+                        document.myform.status.appendChild(currentElement);
+                    }
+                }
                 
-                currentElement.setAttribute("id", id);
-            
-                currentElement.value = id;
-                currentElement.text = value;
-                document.forms[0].status.appendChild(currentElement);
-            }
             }catch(e){e.message;}
         }
 
 
-        function color()
-        {
-            var size = window.parent.TextEdit.target.parentNode.parentNode.parentNode.childNodes.length;
-            
-            var option = document.forms[0].status.value;
-           // alert(option);
-            for(var i=20;i<size;i++)
-            {
-                var conn = window.parent.TextEdit.target.parentNode.parentNode.parentNode.childNodes[i].id;
-
-                if(option == conn) {
-                    var colorCode = "#008000";
-                    alert(trovati[0].color);
-                   
-                    var segments = window.parent.TextEdit.target.parentNode.parentNode.parentNode.childNodes[i].childNodes.length;
-                     for(var j=3;j<segments;j++){
-                     window.parent.TextEdit.target.parentNode.parentNode.parentNode.childNodes[i].childNodes[j].style.borderColor = "green";
-                     window.parent.TextEdit.target.parentNode.parentNode.parentNode.childNodes[i].childNodes[j].style.backgroundColor = colorCode;
-                    
-                 }
-                }
-            }
-        }
+        
 
 
       </script>
@@ -151,37 +162,59 @@ alert("value: "+frmElement.value);
 
 
         }
+function done()
+{
+    
+    var size = document.forms[0].length;
+   
+    if(size != 4) ;
+    else window.parent.TextEdit.close();
+    
+}
 
+function initForm(oForm, element_name) {
+
+frmElement = oForm.elements[element_name];
+frmElement.value = window.parent.TextEdit.getCurrentContent();
+
+}
 
 <!-- /TinyMCE -->
 </script>
 
 </head>
-<body onload="initDesc(document.forms[0],'elm1');go();dado();permission();" style="background: white;" >
+<body onload="initForm(document.forms[0],'nome');initDesc(document.forms[0],'elm1');go();dado();permission();" style="background: white;" >
 
 <form name='myform'>
+
+
+
+	<label class="desc" id="title106" for="Field106">
+		Name
+			</label>
+	
+		<input id ="nome" name="nome" type="text"/>
+			
+
 	<!-- Gets replaced with TinyMCE, remember HTML in a textarea should be encoded -->
 	<textarea id="elm1" name="elm1" rows="15" style="width: 90%">
 	</textarea>
-	<br />
-        <div>
+
+        <div id="cont" name="cont">
        
-	<label>	Go to Task 	</label>
+            <label> Select a task to go </label>
+            <select id="status" name="status">
+            <option id="empty" name="empty"> </option>
+            </select>
 
-		<select name="status" id="status" >
+		
 
-                    <option value=""></option>
-                    
-
-
-	    </select>
-
-	
-        
-	 <input type="button" name="ok" value="OK" onclick="window.parent.TextEdit.setContentDecision(tinyMCE.activeEditor.getContent(),document.forms[0].status.value);" />
+	</div>
+        <div>
+	 <input type="button" name="ok" value="OK" onclick="window.parent.TextEdit.setContentDecision(tinyMCE.activeEditor.getContent(),document.forms[0].status.value,document.forms[0].nome.value);" />
 	 <input type="button" name="reset" value="Cancel" onclick="window.parent.TextEdit.close()"/>
-        
         </div>
+        
 </form>
 
 </body>

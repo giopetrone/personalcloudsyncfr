@@ -83,6 +83,7 @@ Palette.prototype.addItem = function(name, displayName, mode, iconUrl) {
 
 
 Palette.prototype.activate = function(evt) {
+  
   if (!evt) evt = window.event;	
   var obj = DOM.getEventTarget(evt);
   if (obj==null) return false;
@@ -104,6 +105,7 @@ Palette.prototype.activate = function(evt) {
 }
 
 Palette.prototype.deactivate = function() {
+     
   if (Jalava.temp_var.activated) {
     Jalava.temp_var.activated.style.backgroundColor="#FFFFFF";
     Palette.factory.deactivate(Jalava.temp_var.activated.getAttribute("id"));  	

@@ -27,11 +27,16 @@ DirectedConnection.IMAGEPATH = "/img/Connection/";
 
 DirectedConnection.prototype.createLabel = function(labeltext) {
   var label = DOM.createElement("DIV", "mytextarea");
-  var text = "";
-  label.innerHTML = labeltext ? labeltext : text;
+  label.setAttribute("id","label");
+ // var text = "";
+//  label.innerHTML = labeltext ? labeltext : text;
+  label.innerHTML = "";
   label.style.position = "absolute";
   label.style.margin = "3px";
+  label.style.color = "black";
   label.className = "editable";
+  label.style.fontSize ="12px";
+ 
  // label.ondblclick = function(event) { TextEdit.invoke(event); }
   return label;
 }

@@ -76,7 +76,9 @@ DOM.createElement = function(tagName, name, type){
     else newEle = document.createElement("<" + tagName + " name='" + name + "'>");
   } 
   catch (e) {
-    newEle = document.createElement("<" + tagName + ">");
+     // var prova = "container";
+     // alert(tagName + " " + name + " " + prova);
+    newEle = document.createElement(tagName);
     newEle.setAttribute("name", name);
     if (type) newEle.setAttribute("type", type);
   }

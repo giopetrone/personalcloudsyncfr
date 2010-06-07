@@ -59,9 +59,9 @@ function updateForm() {
   var emailRecipientsString = '';
   for (var i = 0; i < emailRecipients.length; i++) {
     var recipient = emailRecipients[i];
-    emailRecipientsString += recipient + ', ';
+    emailRecipientsString += recipient + ',';
   };
-  emailRecipientsString = emailRecipientsString.substring(0, emailRecipientsString.length - 2);
+ // emailRecipientsString = emailRecipientsString.substring(0, emailRecipientsString.length - 2);
 
   // Update the recipient display on the form
   var formRecipients = document.getElementById('recipients');
@@ -81,6 +81,7 @@ function share() {
 
  opener.document.getElementById('share').value = document.getElementById('recipients').value;
  window.opener.setArray(emailRecipients);
+
  self.close();
  return false;
  }catch(e){e.message();}

@@ -5,7 +5,7 @@
 <head>
 
 <title>
-Share The Diagram
+Task Properties
 </title>
 
 <!-- Meta Tags -->
@@ -36,81 +36,67 @@ function privilege()
 }
 
 
-function initShare(oForm, element_name) {
-
-frmElement = oForm.elements[element_name];
-frmElement.value = opener.document.getElementById('users').value;
-
-
-
-
-}
-function setArray(recipients)
-{
-   
-    users = recipients;
-    opener.setArray(recipients);
-    return users;
-}
-
-
-function setUsers()
-{
-    opener.document.getElementById('users').value = document.getElementById("share").value;
-    opener.document.getElementById('writers').value = "";
-    self.close();
-    return false;
-
-}
-
 
  function append()
       {
-          
-        var size = users.length;
-       
-        var add = document.getElementById("append");
         
+        var users = opener.document.getElementById('users').value;
 
-            while (add.firstChild) {
-              add.removeChild(add.firstChild);
-            }
+        var array=users.split(",");
+        var size = array.length;
+
+
+        var add = document.getElementById("append");
+
+
 
 
             for(var i=0;i<size;i++)
             {
                  var cb = document.createElement( "input" );
-                 var value = users[i];
-                 cb.type = "checkbox";
-                 cb.id = value;
-                 cb.value = value;
-                 cb.checked = false;
-                 cb.name = "checkgroup";
-                 var text = document.createTextNode( value);
-                 var br = document.createElement("br");
-                 
-                 add.appendChild(cb);
-                 add.appendChild(text);
-                 
-                 add.appendChild(br);
-                
+                 var value = array[i];
+                 if(value != "")
+                 {
+                     cb.type = "checkbox";
+                     cb.id = value;
+                     cb.value = value;
+                     cb.checked = false;
+                     cb.name = "checkgroup";
+                     var text = document.createTextNode( value);
+                     var br = document.createElement("br");
+
+                     add.appendChild(cb);
+                     add.appendChild(text);
+                     add.appendChild(br);
+                 }
+
             }
-        
-     
+
       }
 
 
       function check()
       {
           var checked = new Array();
-          var y =0;
-          
+          var y = 0;
+
           var z = document.myform.checkgroup;
+       
           if(z == null) return;
-          for (i=0; i<document.myform.checkgroup.length; i++){
-            if (document.myform.checkgroup[i].checked==true){
-               checked[y] = document.myform.checkgroup[i].value;
-               y++;
+          else if(z == "[object HTMLInputElement]")
+          {
+              checked[y] = z.value;
+              y++;
+          }
+          else
+          {
+
+              for (i=0; i<document.myform.checkgroup.length; i++){
+
+                if (document.myform.checkgroup[i].checked==true){
+                   checked[y] = document.myform.checkgroup[i].value;
+                   y++;
+                }
             }
 
           }
@@ -121,7 +107,9 @@ function setUsers()
           }
           //emailRecipientsString = emailRecipientsString.substring(0, emailRecipientsString.length - 2);
           opener.document.getElementById('writers').value = emailRecipientsString;
-          
+          self.close();
+          return false;
+
 
       }
 
@@ -131,7 +119,7 @@ function setUsers()
 </script>
 </head>
 
-<body id="public" onload="initShare(document.forms[0], 'share');">
+<body id="public" onload="append();">
 <div id="container">
 
 
@@ -139,7 +127,7 @@ function setUsers()
 <form name='myform'>
 
 
-	<h2>Share this diagram with users</h2>
+	<h2>Add privileges to users</h2>
 
 
 
@@ -147,16 +135,10 @@ function setUsers()
 
 
 
+<li>
+    <div id="append" name="append"></div>
 
- <li >
-            <label class="desc" id="title2" for="Field2">
-		Diagram Shared with
-			</label>
-        <input type="text"  id="share" name="share"  />
-        <a href="#" onclick="childWindow=open('/newhtml.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="add" name="add" >Import users from gmail </a>
-    </li>
-
-
+</li>
 
 
 
@@ -164,8 +146,8 @@ function setUsers()
 	<li class="buttons ">
 		<div>
 
-                    <input type="button" name="ok" value="Ok"    id="ok"  onclick="setUsers()"/>
-	<input type="button" name="reset" value="Cancella" onclick="opener.cleanArray();self.close();"/>
+                    <input type="button" name="ok" value="Ok"    id="ok"  onclick="check();self.close();"/>
+	<input type="button" name="reset" value="Cancella" onclick="self.close();"/>
 
 				</div>
 	</li>

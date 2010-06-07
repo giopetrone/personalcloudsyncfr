@@ -14,10 +14,10 @@ FlowChartPaletteFactory.prototype.createContent = function(objId, real) {
   ele.className = "hello";
   ele.setAttribute("id","ele");
  
+ 
   var span = DOM.createElement("SPAN", "mytextarea");
   span.setAttribute("id","span");
  
-
    var nome = DOM.createElement("SPAN","nome");
    var status = DOM.createElement("INPUT","status");
    var date = DOM.createElement("INPUT","date");
@@ -26,6 +26,12 @@ FlowChartPaletteFactory.prototype.createContent = function(objId, real) {
    var elm1 = DOM.createElement("INPUT","elm1");
    var shared = DOM.createElement("INPUT","shared");
    var writers = DOM.createElement("INPUT","writers");
+   var approved = DOM.createElement("SPAN","approved");
+   var link = DOM.createElement("A","link");
+ //  link.setAttribute("href","");
+   link.setAttribute("target",'_blank');
+  // link.innerHTML = "\nLink";
+   approved.setAttribute("id","approved");
    shared.setAttribute("type","hidden");
    shared.setAttribute("id","shared");
    writers.setAttribute("id","writers");
@@ -43,6 +49,8 @@ FlowChartPaletteFactory.prototype.createContent = function(objId, real) {
    elm1.setAttribute("type","hidden");
    span.setAttribute("id","span");
    nome.innerHTML = "Click to edit";
+   approved.innerHTML ="";
+   approved.style.fontSize ="10px";
    span.appendChild(nome);
  //  span.appendChild(status);
  //  span.appendChild(date);
@@ -51,13 +59,15 @@ FlowChartPaletteFactory.prototype.createContent = function(objId, real) {
 //   span.appendChild(elm1);
    span.appendChild(shared);
    span.appendChild(writers);
+   span.appendChild(approved);
+   span.appendChild(link);
    
   if (real) {
-      span.className = "editable";
+    span.className = "editable";
      if (objId=="rect") {
     
     var own = document.getElementById("owner").value;
-   
+     
     // {alert("owner uguali");span.className = "editable";}
    // else alert("owner diversi");
    // if(own == null) {span.className = "editable";alert("dentroIf")}

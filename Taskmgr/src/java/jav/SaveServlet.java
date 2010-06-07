@@ -12,7 +12,7 @@ import java.io.File;
 import com.google.gson.Gson;
 import java.io.BufferedReader;
 import java.io.FileWriter;
-import java.io.IOException;
+import java.io.IOException;     
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -22,8 +22,11 @@ import java.io.Writer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.LinkedList;
 import java.util.List;
+
 import pubsublib.event.AtomEvent;
+
 import pubsublib.test.TestPub;
 
 /**
@@ -55,51 +58,31 @@ public class SaveServlet extends HttpServlet {
         String s = re.readLine();
         String owner = request.getHeader("owner");
         String users = request.getHeader("users");
+        if(users == null) users="";
         String writers = request.getHeader("writers");
         Gson gson = new Gson();
         Grafico ob = gson.fromJson(s, Grafico.class);
+       // if(users == null) users ="";
+       // if(writers == null) writers="";
+/*
+        String[] temp;
+
+        String delimiter = ",";
+
+        temp = users.split(delimiter);*/
+
+
+
 
         response.setContentType("text/html;charset=UTF-8");
        
         PrintWriter out = response.getWriter();
         try {
-            /* TODO output your page here */
-          //  out.println("<html>");
-           // out.println("<head>");
-           // out.println("<title>Servlet SaveServlet</title>");
-          //  out.println("</head>");
-          //  out.println("<body>");
-          //  out.println("<h1> nome grafico " + valorefile + "</h1>");
-
-        //    out.println("<h1> salvando diagramma " + val + "</h1>");
-          /*  out.println("<h1> Connessione 0: " + ob.connections[0].target +  "</h1>");
-            out.println("<h1> Connessione 1: "  +ob.connections[1].target +  "</h1>");
-            out.println("<h1> Connessione 2: "  +ob.connections[2].target +  "</h1>");
-            out.println("</body>");
-            out.println("</html>");*/
-            AtomEvent event = new AtomEvent();
-          /*  
-          String date = ob.blocks[0].date;
-          String type = ob.blocks[0].type;
-          String shared =ob.blocks[0].shared;
-          String assign =ob.blocks[0].assign;
-          String desc = ob.blocks[0].desc;
-          String cat = ob.blocks[0].cat;
-          String nome = ob.blocks[0].name;
-          int lungh = ob.blocks.length;
-          String size = Integer.toString(lungh);
-          
-          event.setParameter("Numero Task", size);
-          event.setParameter("Nome",nome);
-          event.setParameter("TYPE", type);
-          event.setParameter("Due DATE", date);
-          event.setParameter("SHARED with users", shared);
-          event.setParameter("ASSIGN to users", assign);
-          event.setParameter("Description",desc);
-          event.setParameter("Category",cat); */
+            
           int blocks = ob.blocks.length;
-      
+          List<String> assign = new LinkedList();
           String ownerBlock = ob.blocks[0].owner;
+          String assigner = "";
           if(ownerBlock == null)
           {
               for(int i=0;i<blocks;i++)
@@ -123,7 +106,26 @@ public class SaveServlet extends HttpServlet {
 
               }
           }
+          
+                  
 
+         for(int j=0;j<blocks;j++)
+         {
+              String found = ob.blocks[j].assign;
+              if(found == null) found="";
+              assigner += found + ",";
+         }
+         assigner = assigner.substring(0, assigner.length() - 1);
+           
+
+
+             
+
+          users = users + assigner;
+          out.println(users);
+          String val = GoDoc.saveDiagram(valorefile, gson.toJson(ob),users,writers);
+
+          out.println(gson.toJson(ob));
       /*    int lungh = ob.blocks.length;
 
           for(int i=0;i<lungh;i++)
@@ -312,9 +314,8 @@ public class SaveServlet extends HttpServlet {
           //gson.toJson(ob);
          // gson.toJsonTree(ob);
          
-          //AtomEvent event = new AtomEvent();
-          String val = GoDoc.saveDiagram(valorefile, gson.toJson(ob));
-           out.println(gson.toJson(ob));
+          AtomEvent event = new AtomEvent();
+          
           addEntry(feed,event);
      //     new TestPub().testPublisher("http://pubsubhubbub.appspot.com","");
        //    new TestPub().testPublisher("https://code.launchpad.net/subhub","");

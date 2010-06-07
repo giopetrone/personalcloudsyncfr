@@ -121,11 +121,11 @@ frmElement.value = window.parent.TextEdit.getCurrentDesc();
 
 
 
-function initOwner(oForm, element_name) {
+function initLink(oForm, element_name) {
 
 frmElement = oForm.elements[element_name];
 
-frmElement.value = window.parent.TextEdit.getCurrentOwner();
+frmElement.value = window.parent.TextEdit.getCurrentLink();
 
 
 
@@ -138,7 +138,7 @@ frmElement.value = window.parent.TextEdit.getCurrentOwner();
 </script>
 </head>
 
-<body id="public" onload="initStatus(document.forms[0], 'status');initForm(document.forms[0], 'nome');initDate(document.forms[0], 'theDate');initCat(document.forms[0], 'category');initShare(document.forms[0], 'share');initAssign(document.forms[0],'assign');initOwner(document.forms[0],'owner');initDesc(document.forms[0],'elm1');go();">
+<body id="public" onload="initStatus(document.forms[0], 'status');initForm(document.forms[0], 'nome');initDate(document.forms[0], 'theDate');initCat(document.forms[0], 'category');initShare(document.forms[0], 'share');initAssign(document.forms[0],'assign');initLink(document.forms[0],'link');initDesc(document.forms[0],'elm1');go();">
 <div id="container">
 
 
@@ -246,12 +246,13 @@ frmElement.value = window.parent.TextEdit.getCurrentOwner();
 
 
 
-    <li id="foli2" 		class="date      ">
-	<label class="desc" id="title2" for="Field2">
-		Owner
+    <li id="foli106" 		class="     ">
+	<label class="desc" id="title106" for="Field106">
+		Link
 			</label>
-	<input type="text" value="" id="owner" name="owner" disabled="disabled"/>
-
+	<div>
+		<input id ="link" name="link" type="text"/>
+			</div>
 	</li>
 
 
@@ -263,7 +264,7 @@ frmElement.value = window.parent.TextEdit.getCurrentOwner();
 	<li class="buttons ">
 		<div>
 
-	<input type="button" name="ok" value="Ok"      onclick="parent.TextEdit.setContent(document.myform.nome.value,document.myform.status.value,document.myform.theDate.value,document.myform.category.value,document.myform.share.value,document.myform.assign.value,tinyMCE.activeEditor.getContent());"/>
+	<input type="button" name="ok" value="Ok"      onclick="parent.TextEdit.setContent(document.myform.nome.value,document.myform.status.value,document.myform.theDate.value,document.myform.category.value,document.myform.share.value,document.myform.assign.value,document.myform.link.value,tinyMCE.activeEditor.getContent());"/>
 	<input type="button" name="reset" value="Cancella" onclick="window.parent.TextEdit.cancel()"/>
 
 				</div>

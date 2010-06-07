@@ -5,7 +5,7 @@ function TextEdit() { }
 TextEdit.invoke = function(event) {
 try {
   TextEdit.target = DOM.getEventTarget(event, "mytextarea");
-  //TextEdit.target.parentNode.parentNode.owner = parent.document.getElementById("owner").value;
+ 
   TextEdit.showframe();
   
   } catch (e) {
@@ -21,17 +21,22 @@ TextEdit.invokeLoad= function(event)
         var name = TextEdit.target.childNodes[0].innerHTML;
 
         if( name == "And" || name =="Or" || name=="And?Or?") TextEdit.showframe2();
-        else if(name == "Decision" ) TextEdit.showframe6();
+        else if(name == "Decision" || TextEdit.target.parentNode.parentNode.type =="decision" ) TextEdit.showframe6();
         else
         {
+            
             var user = parent.document.getElementById("owner").value;
+       //     alert(user);
            // var readers = TextEdit.target.parentNode.parentNode.shared.value;
-            var writers = TextEdit.target.parentNode.parentNode.writers;
+        //    var writers = TextEdit.target.parentNode.parentNode.writers;
+
             var own = TextEdit.target.parentNode.parentNode.owner;
             var assign = TextEdit.target.parentNode.parentNode.assign;
-            if(assign == null) assign = '';
+            var writers = parent.document.getElementById("writers").value;
+            var shared = parent.document.getElementById("users").value;
+       //     alert(shared +" "+writers);
             /*
-            var shared = TextEdit.target.parentNode.parentNode.shared;
+            
             if(share d==null) shared="No Shared Users!";
             var assign = TextEdit.target.parentNode.parentNode.assign;
             if(assign==null) assign="No Users assigned to this task!"
@@ -42,13 +47,13 @@ TextEdit.invokeLoad= function(event)
           
  
   */
-  if(own == user || writers.indexOf(user)!=-1 ||assign.indexOf(user)!=-1 )
+  if(own == user  ||assign.indexOf(user)!=-1 ||writers.indexOf(user) !=-1 )
   {
-      //Utente loggato
+      //Utente loggato  e' owner, assegnatario o writer'
       TextEdit.showframe4();
   }
  
-  else{
+  else if(shared.indexOf(user)!=-1){
         //alert("Solo details");
         TextEdit.showframe3();
   }
@@ -117,7 +122,7 @@ TextEdit.showframe = function() {
   TextEdit.opaque = opaque;
 
   if (!TextEdit.frame) TextEdit.createFrame();
-  TextEdit.frame.src = '/modify.html';
+  TextEdit.frame.src = '/modifyLoad.html';
 
   // centre the frame
   var h = document.body.clientHeight;
@@ -316,7 +321,12 @@ TextEdit.getCurrentShare = function() {
 }
 
 
-
+TextEdit.getCurrentLink = function()
+{
+    var link = TextEdit.target.childNodes[6].href;
+   
+    return link;
+}
 
 
 
@@ -345,7 +355,7 @@ TextEdit.getCurrentDate = function() {
   return date;
 }
 
-TextEdit.setContent = function(data, status,date,cat,people,assign,desc) {
+TextEdit.setContent = function(data, status,date,cat,people,assign,link,desc) {
   try
   {
 
@@ -357,7 +367,12 @@ TextEdit.setContent = function(data, status,date,cat,people,assign,desc) {
   TextEdit.target.parentNode.parentNode.cat = cat;
   TextEdit.target.parentNode.parentNode.assign = assign;
   TextEdit.target.parentNode.parentNode.desc = desc;
-  
+  if(link != ""){
+      var http = "http://";
+      if(link.indexOf(http)<0) link = http + link;
+      TextEdit.target.childNodes[6].innerHTML = "\nLink"
+      TextEdit.target.childNodes[6].setAttribute('href',link);
+  }
   TextEdit.target.childNodes[1].value = parent.document.getElementById("owner").value;
   var i= TextEdit.target.parentNode.parentNode.parentNode.childNodes.length;
   var j= 20;
@@ -410,24 +425,27 @@ TextEdit.setContentCondition = function(andor)
     try{
         if (andor=="") andor = "And?Or?";
         TextEdit.target.childNodes[0].innerHTML = andor;
+        TextEdit.target.parentNode.parentNode.name = andor;
         TextEdit.target.parentNode.parentNode.type =andor;
         TextEdit.check();
         TextEdit.reposition();
         TextEdit.cancel();
 
     }
-    catch(e){alert(e.message);}
+    catch(e){alert("Dentro SetContentCondition "+e.message);}
 }
 
 
 
-TextEdit.setContentDecision = function(decision,target)
+TextEdit.setContentDecision = function(decision,target,nome)
 {
     try{
 
-       // TextEdit.target.childNodes[0].innerHTML = andor;
+        TextEdit.target.childNodes[0].innerHTML = nome;
+        TextEdit.target.parentNode.parentNode.name = nome;
         TextEdit.target.parentNode.parentNode.desc = decision;
         TextEdit.target.parentNode.parentNode.type = "decision";
+        
         TextEdit.checkDecision(target);
         TextEdit.reposition();
         TextEdit.cancel();
@@ -603,7 +621,7 @@ TextEdit.check = function()
 
                                            if(id3 == id5)
                                            {
-                                               alert(TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].childNodes[0].style.color);
+                                             //  alert(TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].childNodes[0].style.color);
                                                TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].childNodes[0].style.color = "orange";
                                                TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].type = "In progress";
                                            }
@@ -644,7 +662,7 @@ TextEdit.check = function()
                                    {
 
                                        var children= TextEdit.target.parentNode.parentNode.parentNode.childNodes.length;
-                                       alert(children);
+                                       
                                        for(var r=20;r<children;r++)
                                        {
                                               // alert(TextEdit.target.parentNode.parentNode.parentNode.childNodes[h].shared)
@@ -721,6 +739,7 @@ TextEdit.check = function()
 TextEdit.checkDecision = function(target)
 {
     try{
+                
                 var jsonString = window.parent.Jalava.diagram.persist();
                 var trovati = new Array();
                 var id = TextEdit.target.parentNode.parentNode.id;
@@ -728,9 +747,9 @@ TextEdit.checkDecision = function(target)
                 var persisted = JSON.parse(jsonString);
                 var blocks = persisted.blocks.length;
                 var connections = persisted.connections.length;
-
-
+                var archi = new Array();
                 var j =0;
+                var t=0;
                 for(var i=0;i<connections;i++)
                 {
                     var source = persisted.connections[i].source;
@@ -738,45 +757,98 @@ TextEdit.checkDecision = function(target)
 
                     if(source == id) {
                         trovati[j] = persisted.connections[i].target;
-
+                        archi[t] = persisted.connections[i];
                         j++;
+                        t++;
+
 
                     }
                 }
+                //alert(trovati.length);
                 for(var h=0;h<trovati.length;h++)
                 {
                     var trovatoid = trovati[h];
-                    var children= TextEdit.target.parentNode.parentNode.parentNode.childNodes.length;
+                    
                     if(trovatoid == target)
                     {
-
+                       var children= TextEdit.target.parentNode.parentNode.parentNode.childNodes.length;
                        for(var r=20;r<children;r++)
                        {
                            var id2 = TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].id;
                            if(target == id2)
                            {
                               
-                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].style.color = "pink";
-                              // content = content + " Not Approved By decisione Node";
+                         
+                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].childNodes[0].childNodes[5].style.color = "green";
+                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].childNodes[0].childNodes[5].innerHTML = "\nApproved\n";
+                              
                            
                            }
 
-                       }
-                    }
-                    else
-                    {
-                        for(var l=20;l<children;l++)
-                       {
-                           var id3 = TextEdit.target.parentNode.parentNode.parentNode.childNodes[l].id;
-                           if(trovatoid == id3)
-                           {
-                              
-                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[l].childNodes[0].style.color = "blue";
-                              // content = content + " Not Approved By decisione Node";
-                              
-                           }
 
                        }
+
+                       for(var l = 0;l<archi.length;l++)
+                              {
+                                  var target2 = archi[l].target;
+                                 
+                                  if(trovatoid == target2)
+                                  {
+                                      var id4 = archi[l].id;
+                                      for(var z = 0;z<children;z++)
+                                      {
+                                           var id3 = TextEdit.target.parentNode.parentNode.parentNode.childNodes[z].id;
+
+                                           if(id4 == id3)
+                                           {
+
+                                              TextEdit.target.parentNode.parentNode.parentNode.childNodes[z].childNodes[2].style.color = "green";
+                                              TextEdit.target.parentNode.parentNode.parentNode.childNodes[z].childNodes[2].innerHTML = "Approved";
+
+                                           }
+                                      }
+                                  }
+                                  else if(trovatoid != target2)
+                                  {
+                                      var id5 = archi[l].id;
+                                      for(var x = 0;x<children;x++)
+                                      {
+                                           var id6 = TextEdit.target.parentNode.parentNode.parentNode.childNodes[x].id;
+
+                                           if(id5 == id6)
+                                           {
+
+                                              TextEdit.target.parentNode.parentNode.parentNode.childNodes[x].childNodes[2].style.color = "red";
+                                              TextEdit.target.parentNode.parentNode.parentNode.childNodes[x].childNodes[2].innerHTML = "Rejected";
+
+                                           }
+                                      }
+                                  }
+                              }
+
+
+
+                    }
+                    else if(trovatoid != target)
+                    {
+                       var children2= TextEdit.target.parentNode.parentNode.parentNode.childNodes.length;
+                       for(var f=20;f<children2;f++)
+                       {
+                           var id7 = TextEdit.target.parentNode.parentNode.parentNode.childNodes[f].id;
+                          
+                           if(trovatoid == id7)
+                           {
+                               
+                              
+                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[f].childNodes[0].childNodes[0].childNodes[5].style.color = "red";
+                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[f].childNodes[0].childNodes[0].childNodes[5].innerHTML = "\nRejected\n";
+                             
+                           
+                              
+                           }
+                          
+                       }
+             
                     }
                 }
 

@@ -23,6 +23,8 @@
             var timer_is_on=0;
             var nuovaVersione = 0;
             var notifica = 0;
+            var allusers = new Array();
+            var z = 0;
 
             function timedCount()
             {
@@ -33,6 +35,26 @@
                 c=c+1;
                 t=setTimeout("timedCount()",20000);
             }
+             function setArray(recipients)
+             {
+
+                allusers = recipients;
+
+                return allusers;
+            }
+
+            function cleanArray()
+            {
+                var size = allusers.length;
+                for(var z=0;z<size;z++)
+                {
+                    allusers.shift();
+                    
+                }
+
+                return allusers;
+            }
+
 
 
             function loadNotifiche(){
@@ -78,6 +100,19 @@
                 // alert(param != 0);
                 //   }
                 // var url1 = "http://marinoflow.appspot.com/nuovastr.txt";
+                var jsonString = Jalava.diagram.persist();
+                var persisted = JSON.parse(jsonString);
+                var blocks = persisted.blocks;
+                var startcount = 0;
+                var endcount = 0;
+                for(var i=0;i<blocks.length;i++) {
+
+                    var type = blocks[i].type;
+                    if(type == "Start") startcount ++
+                    else if(type == "End") endcount ++
+                }
+                if(startcount != 1) {alert("No Start Element: you must use one");return};
+                if(endcount == 0) {alert("No End Element: at least one");return};
                 var diagramName = document.getElementById('area').value;
                 var owner = document.getElementById('owner').value;
                 var users = document.getElementById('users').value;
@@ -87,10 +122,7 @@
                     return;
                 }
                 var url1 = "./SaveServlet";
-                var jsonString = Jalava.diagram.persist();
-                if (confirm(jsonString)) {
-                    // do things if OK
-                }
+                
                 objXml = new XMLHttpRequest();
                 objXml.open("POST",url1,false);
                 objXml.setRequestHeader('Content-Type',"text/plain");
@@ -98,6 +130,7 @@
                 objXml.setRequestHeader('owner',owner);
                 objXml.setRequestHeader('users',users);
                 objXml.setRequestHeader('writers',writers);
+
                 objXml.send(jsonString);
                 str = objXml.responseText;
                 confirm("RISP from server: " +str);
@@ -173,17 +206,31 @@
                     {
                         if(objXml.status  == 200) {
                             str = objXml.responseText;
+                            people = objXml.getResponseHeader("people");
+                            writers = objXml.getResponseHeader("writers");
+                            
                             try{
+
+                            var persisted = JSON.parse(str);
+                            var blocks = persisted.blocks;
+
                                 var persisted = JSON.parse(str);
                                 var blocks = persisted.blocks;
                                 var users = blocks[0].shared;
                                 var writers = blocks[0].writers;
+
                            
+
+                                 
+                            document.getElementById('users').value =  people;
+                            document.getElementById('writers').value = writers;
+
                                 document.getElementById('users').value =  users;
                                 document.getElementById('writers').value = writers;
+
                            
                                 update(str);
-                            }catch(e){alert(e.message);}
+                            }catch(e){alert("Non hai i permessi necessari per il Load");}
                         } else {}
 
                     }
@@ -192,6 +239,8 @@
                 objXml.open("GET",url1,true);
                 objXml.setRequestHeader('Content-Type',"text/plain");
                 objXml.setRequestHeader('filenamemio',diagramName);
+                var owner = document.getElementById('owner').value;
+                objXml.setRequestHeader('owner',owner);
                 if (param == null) {
                     objXml.setRequestHeader('refresh',"true");
                 }
@@ -240,33 +289,9 @@
 
 
 
-            function dodo(){
-                var url = "/nstr.txt";
-
-                objXml = new XMLHttpRequest();
-                objXml.open("GET",url,false);
-                objXml.send(null);
-                str = objXml.responseText;
-                confirm("ECCO " +str);
-                Jalava.diagram.load(str);
-            }
-
-            function dada(){
-                var url1 = "./nuovastr.txt";
-                var jsonString = Jalava.diagram.persist();
-                if (confirm(jsonString)) {
-                    // do things if OK
-                }
-                objXml = new XMLHttpRequest();
-                objXml.open("POST",url1,false);
-                objXml.setRequestHeader('Content-Type',"text/plain");
-                objXml.send(jsonString);
-                str = objXml.responseText;
-                confirm("RISP: " +str);
-            }
-
             function dado(){
                 var jsonString = Jalava.diagram.persist();
+                
                 confirm(jsonString);
             }
 
@@ -275,13 +300,13 @@
             function initJalava(){
                 Jalava.diagram = new Diagram(220, 100, "550", "600");
                 var palette = new Palette(new FlowChartPaletteFactory(), 0, 100, 200);
-                palette.addItem("rect", "Processing",  Palette.DRAG_TOOL, "./img/rect.gif");
+               palette.addItem("rect", "Task",  Palette.DRAG_TOOL, "./img/rect.gif");
                 palette.addItem("connection", "Connection",  Palette.CLICK_TOOL, "./img/line.gif");
                 palette.addItem("diamond", "Decision", Palette.DRAG_TOOL, "./img/diamond.gif");
                 palette.addItem("parallel", "Input/Output", Palette.DRAG_TOOL, "./img/parallel.gif");
                 palette.addItem("ellipse", "And/Or", Palette.DRAG_TOOL, "./img/ellipse.gif");
                 palette.addItem("rounded", "Start/End", Palette.DRAG_TOOL, "./img/ellipse.gif");
-                Jalava.propertyPage = new FlowChartPropertyPage(20, 240, 10);
+                Jalava.propertyPage = new FlowChartPropertyPage(0, 290, 10);
             }
 
             // start Jalava
@@ -297,8 +322,8 @@
     <body onload="carica();"/>
     <%
 
-                String email = request.getParameter("email");
-
+             //   String email = request.getParameter("email");
+                   String email = "fabrizio.torretta@gmail.com";
                 String passWord = request.getParameter("passWord");
 
     %>
@@ -318,6 +343,7 @@
         <input type="text" id="owner" name="owner" value= "<%=email%>" disabled="disabled" />
         <input type="text" id="users" name="users" value= "" disabled="disabled" />
         <input type="text" id="writers" name="writers" value= "" disabled="disabled" />
+             <a href="#" onclick="childWindow=open('/addpriv.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="add" name="add" >Add privileges to users </a>
 
 
 

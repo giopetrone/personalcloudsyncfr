@@ -7,6 +7,7 @@ package jav;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -28,14 +29,22 @@ public class LoadServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
            String valorefile = request.getHeader("filenamemio");
-
+           String owner = request.getHeader("owner");
         response.setContentType("text/plain");
         PrintWriter out = response.getWriter();
-        String val = GoDoc.loadDiagram(valorefile, request.getHeader("refresh") != null);
+        List<String> list = GoDoc.loadDiagram(valorefile, request.getHeader("refresh") != null,owner);
+        String val = list.get(0);
+        String people = list.get(1);
+        String writers = null;
+        if(list.size() == 3) writers = list.get(2);
+        response.setHeader("people", people);
+        response.setHeader("writers",writers);
         try {
             /* TODO output your page here */
           //  out.println(val);
+          //  System.err.println(val);
             out.print(val);
+           
         } finally {
             out.close();
         }
