@@ -9,14 +9,15 @@
 
 
 
-      <html>
+<html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
         <title>Jalava : Web-based Diagram Editor</title>
         <script language="JavaScript" src="./js/Jalava.js"></script>
         <script language="JavaScript">
+        
             // pezzo timer
-             // pezzo timer
+            // pezzo timer
             var c=0;
             var t;
             var timer_is_on=0;
@@ -74,7 +75,7 @@
             // fine pezzo timer
             function saveDiagram(param){
                 // if (window.event.type == "click") {
-               // alert(param != 0);
+                // alert(param != 0);
                 //   }
                 // var url1 = "http://marinoflow.appspot.com/nuovastr.txt";
                 var diagramName = document.getElementById('area').value;
@@ -110,8 +111,8 @@
             }
 
             function update(str){
-            //    var msg = "update nuova stringa ? ";
-            //    alert(msg + "|" + str + "|");
+                //    var msg = "update nuova stringa ? ";
+                //    alert(msg + "|" + str + "|");
                 if (nuovaVersione  == 1) {
                     nuovaVersione = 0;
                     if (str.length == 0) {
@@ -128,6 +129,33 @@
                 }
             }
 
+            function gup( name )
+            {
+                name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+                var regexS = "[\\?&]"+name+"=([^&#]*)";
+                var regex = new RegExp( regexS );
+                var results = regex.exec( window.location.href );
+                if( results == null )
+                    return null; //return "";
+                else
+                    return results[1];
+            }
+
+               // if webapp loade3d with parameter 'flow''
+               // eg calling like: http:.........?flow=ccc.txt
+               // that filw is used as source
+
+            function carica(){
+                //  alert("in carica");
+                nomeFile = gup("flow");
+                if (nomeFile != null) {
+                    document.getElementById('area').value = nomeFile ;
+                    loadDiagram(100);
+                }
+            }
+            
+        
+
             function loadDiagram(param){
                 var diagramName = document.getElementById('area').value;
                 if (diagramName.length ==0) {
@@ -135,7 +163,7 @@
                     return;
                 }
 
-              //  confirm("ciclico? "+ param == null);
+                //  confirm("ciclico? "+ param == null);
 
                 var url1 = "./LoadServlet";
                 objXml = new XMLHttpRequest();
@@ -146,15 +174,15 @@
                         if(objXml.status  == 200) {
                             str = objXml.responseText;
                             try{
-                            var persisted = JSON.parse(str);
-                            var blocks = persisted.blocks;
-                            var users = blocks[0].shared;
-                            var writers = blocks[0].writers;
+                                var persisted = JSON.parse(str);
+                                var blocks = persisted.blocks;
+                                var users = blocks[0].shared;
+                                var writers = blocks[0].writers;
                            
-                            document.getElementById('users').value =  users;
-                            document.getElementById('writers').value = writers;
+                                document.getElementById('users').value =  users;
+                                document.getElementById('writers').value = writers;
                            
-                            update(str);
+                                update(str);
                             }catch(e){alert(e.message);}
                         } else {}
 
@@ -175,7 +203,7 @@
             function loadLocal(){
 
 
-              //  confirm("ciclico? "+ param == null);
+                //  confirm("ciclico? "+ param == null);
 
                 var url1 = "./SubServlet";
                 objXml = new XMLHttpRequest();
@@ -266,38 +294,37 @@
         </script>
 
     </head>
-    <body>
-        
-<%
+    <body onload="carica();"/>
+    <%
 
-String email= request.getParameter("email");
+                String email = request.getParameter("email");
 
-String passWord = request.getParameter("passWord");
+                String passWord = request.getParameter("passWord");
 
-%>
+    %>
 
-         <form name="saveandload" id="saveandload" >
+    <form name="saveandload" id="saveandload" >
 
-            <textarea rows="1" cols="5" name="area" id="area"> </textarea>
-            <input type="button" value="saveDiagram" name="buttonSave" onClick="aa=1000; saveDiagram(aa);"/>
-            <!--INPUT type="button" value="provalocale" name="buttonprova" onClick="dada();"-->
-            <input type="button" value="loadDiagram" name="buttonLoad" onClick="aa=1000;loadDiagram(aa);"/>
-            <input type="text" id="diagramName" name ="diagramName" value=""    />
-            <input type="button" value="Start count!" onClick="doTimer();"/>
-            <input type="text" id="txt" />
-            <input type="button" value="See JSON" onclick="dado();TextEdit.check();TextEdit.setOwner();"/>
-            <input type="button" value="Share" onclick="childWindow=open('/shared.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800');"/>
-            <input id="fileUtente" name="fileUtente" type="file" size="20"/>
-            <input type="text" id="owner" name="owner" value= "<%=email%>" disabled="disabled" />
-            <input type="text" id="users" name="users" value= "" disabled="disabled" />
-             <input type="text" id="writers" name="writers" value= "" disabled="disabled" />
-
+        <textarea rows="1" cols="5" name="area" id="area"> </textarea>
+        <input type="button" value="saveDiagram" name="buttonSave" onClick="aa=1000; saveDiagram(aa);"/>
+        <!--INPUT type="button" value="provalocale" name="buttonprova" onClick="dada();"-->
+        <input type="button" value="loadDiagram" name="buttonLoad" onClick="aa=1000;loadDiagram(aa);"/>
+        <input type="text" id="diagramName" name ="diagramName" value=""    />
+        <input type="button" value="Start count!" onClick="doTimer();"/>
+        <input type="text" id="txt" />
+        <input type="button" value="See JSON" onclick="dado();TextEdit.check();TextEdit.setOwner();"/>
+        <input type="button" value="Share" onclick="childWindow=open('/shared.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800');"/>
+        <input id="fileUtente" name="fileUtente" type="file" size="20"/>
+        <input type="text" id="owner" name="owner" value= "<%=email%>" disabled="disabled" />
+        <input type="text" id="users" name="users" value= "" disabled="disabled" />
+        <input type="text" id="writers" name="writers" value= "" disabled="disabled" />
 
 
 
 
 
-        </form>
 
-    </body>
+    </form>
+
+</body>
 </html>

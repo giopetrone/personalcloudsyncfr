@@ -57,8 +57,9 @@ public class CallbackServlet extends HttpServlet {
             if (refresh != null) {
                 //ciclic ajax call from UI
                 String notif = (String) getServletContext().getAttribute("atomo");
-                if (notif != null) {
-                    out.println(notif);
+                if (notif != null) {  // we have received new feed content
+                    out.println(notif); // send it to client
+                    // set new feed content to nul to avoid duplicate notifications
                     getServletContext().setAttribute("atomo", null);
                 } else {
                     System.err.println("session, get=" + getServletContext());
@@ -110,6 +111,7 @@ public class CallbackServlet extends HttpServlet {
                     }
                     //   System.err.println("session put =" + getServletContext());
                     System.err.println("new feed content =\n " + s);
+                    // save new feed content; at next refresh call will be given to client
                     getServletContext().setAttribute("atomo", s);
                     // AtomEvent notification = createAtom(inStream);
                 }
