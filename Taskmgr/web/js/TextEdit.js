@@ -22,6 +22,7 @@ TextEdit.invokeLoad= function(event)
 
         if( name == "And" || name =="Or" || name=="And?Or?") TextEdit.showframe2();
         else if(name == "Decision" || TextEdit.target.parentNode.parentNode.type =="decision" ) TextEdit.showframe6();
+        else if(name=="Start" || name=="End" || name=="Start?End?") alert("Da definire");
         else
         {
             
@@ -29,12 +30,13 @@ TextEdit.invokeLoad= function(event)
        //     alert(user);
            // var readers = TextEdit.target.parentNode.parentNode.shared.value;
         //    var writers = TextEdit.target.parentNode.parentNode.writers;
-
+            alert(user);
             var own = TextEdit.target.parentNode.parentNode.owner;
             var assign = TextEdit.target.parentNode.parentNode.assign;
+            if(assign == null) assign="";
             var writers = parent.document.getElementById("writers").value;
             var shared = parent.document.getElementById("users").value;
-       //     alert(shared +" "+writers);
+          
             /*
             
             if(share d==null) shared="No Shared Users!";
@@ -50,11 +52,12 @@ TextEdit.invokeLoad= function(event)
   if(own == user  ||assign.indexOf(user)!=-1 ||writers.indexOf(user) !=-1 )
   {
       //Utente loggato  e' owner, assegnatario o writer'
+      alert("dentro if");
       TextEdit.showframe4();
   }
  
   else if(shared.indexOf(user)!=-1){
-        //alert("Solo details");
+        alert("Solo details");
         TextEdit.showframe3();
   }
     }
@@ -77,7 +80,7 @@ TextEdit.invokeAndor = function(event){
           TextEdit.opaque = opaque;
 
           if (!TextEdit.frame) TextEdit.createFrame();
-          if(content=="Decision") TextEdit.frame.src = '/decision.html';
+          if(TextEdit.target.parentNode.parentNode.type =="decision" || content == "Decision") TextEdit.frame.src = '/decision.html';
           else if(content=="Start" || content == "Start?End?" || content=="End") TextEdit.frame.src = '/startend.html'
           else TextEdit.frame.src = '/andor.html';
               // centre the frame
@@ -270,18 +273,22 @@ TextEdit.getCurrentStatus = function() {
   var status = TextEdit.target.parentNode.parentNode.type;
   if (status=="Done")
   {
-      TextEdit.target.childNodes[0].style.color = "green";
+      TextEdit.target.childNodes[0].style.color = "black";
   
 
   }
-  if (status=="Not Started yet")
+  if (status=="Not Enabled")
   {
    TextEdit.target.childNodes[0].style.color = "red";
  
   }
-  if (status=="In progress") {
-      TextEdit.target.childNodes[0].style.color = "orange";
+  if (status=="Enabled") {
+      TextEdit.target.childNodes[0].style.color = "green";
    
+  }
+  if(status==null)
+  {
+      TextEdit.target.childNodes[0].style.color = "black";
   }
   return status;
 }
@@ -386,26 +393,26 @@ TextEdit.setContent = function(data, status,date,cat,people,assign,link,desc) {
   
   if (status=="Done")
   {
-      TextEdit.target.childNodes[0].style.color = "green";
+      TextEdit.target.childNodes[0].style.color = "black";
       TextEdit.target.parentNode.parentNode.type = status;
       
 
   }
-  if (status=="Not Started yet")
+  if (status=="Not Enabled")
   {
    TextEdit.target.childNodes[0].style.color = "red";
    TextEdit.target.parentNode.parentNode.type = status;
 
    
   }
-  if (status=="In progress") {
-      TextEdit.target.childNodes[0].style.color = "orange";
+  if (status=="Enabled") {
+      TextEdit.target.childNodes[0].style.color = "green";
       TextEdit.target.parentNode.parentNode.type = status;
 
   }
 
   if (status=="") {
-      TextEdit.target.childNodes[0].style.color = "black";
+      TextEdit.target.childNodes[0].style.color = "green";
       TextEdit.target.parentNode.parentNode.type = status;
     
   }
@@ -523,7 +530,7 @@ TextEdit.reposition = function() {
 TextEdit.check = function()
 {
     try{
-       
+      
        // TextEdit.target = DOM.getEventTarget(event, "mytextarea");
         var jsonString = window.parent.Jalava.diagram.persist();
         //var id = TextEdit.target.parentNode.parentNode.id;
@@ -591,8 +598,9 @@ TextEdit.check = function()
                                            
                                            if(id3 == id4)
                                            {
+                                              
                                                TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].style.color = "red";
-                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].type = "Not Started yet";
+                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].type = "Not Enabled";
                                            }
                                        }
                                    }
@@ -622,8 +630,8 @@ TextEdit.check = function()
                                            if(id3 == id5)
                                            {
                                              //  alert(TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].childNodes[0].style.color);
-                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].childNodes[0].style.color = "orange";
-                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].type = "In progress";
+                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].childNodes[0].style.color = "green";
+                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].type = "Enabled";
                                            }
                                        }
                                    }
@@ -670,8 +678,8 @@ TextEdit.check = function()
 
                                            if(id3 == id4)
                                            {
-                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].style.color = "orange";
-                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].type = "In progress";
+                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].style.color = "green";
+                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].type = "Enabled";
                                            }
                                        }
                                    }
@@ -700,8 +708,9 @@ TextEdit.check = function()
 
                                            if(id3 == id4)
                                            {
+                                               
                                                TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].style.color = "red";
-                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].type = "Not Started yet";
+                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].type = "Not Enabled";
                                            }
                                        }
                                    }

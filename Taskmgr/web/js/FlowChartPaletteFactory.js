@@ -49,6 +49,7 @@ FlowChartPaletteFactory.prototype.createContent = function(objId, real) {
    elm1.setAttribute("type","hidden");
    span.setAttribute("id","span");
    nome.innerHTML = "Click to edit";
+ //  nome.style.color = "green";
    approved.innerHTML ="";
    approved.style.fontSize ="10px";
    span.appendChild(nome);

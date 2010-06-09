@@ -30,15 +30,23 @@ public class LoadServlet extends HttpServlet {
     throws ServletException, IOException {
            String valorefile = request.getHeader("filenamemio");
            String owner = request.getHeader("owner");
+           String val = null;
         response.setContentType("text/plain");
         PrintWriter out = response.getWriter();
         List<String> list = GoDoc.loadDiagram(valorefile, request.getHeader("refresh") != null,owner);
-        String val = list.get(0);
-        String people = list.get(1);
-        String writers = null;
-        if(list.size() == 3) writers = list.get(2);
-        response.setHeader("people", people);
-        response.setHeader("writers",writers);
+        if(list.isEmpty())
+        {
+            val = "DIAGRAMMA NON TROVATO";
+        }
+        else
+        {
+            val= list.get(0);
+            String people = list.get(1);
+            String writers = list.get(2);
+
+            response.setHeader("people", people);
+            response.setHeader("writers",writers);
+        }
         try {
             /* TODO output your page here */
           //  out.println(val);

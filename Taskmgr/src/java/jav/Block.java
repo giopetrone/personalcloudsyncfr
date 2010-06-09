@@ -37,5 +37,6 @@ public class Block {
     String name;
     String owner;
     String writers;
+    String template;
 
 }

@@ -113,6 +113,53 @@
                     if(type == "Start") startcount ++
                     else if(type == "End") endcount ++
                 }
+                if(startcount != 1) {alert("You must only one a Start Element");return};
+                if(endcount == 0) {alert("No End Element: at least one");return};
+                var diagramName = document.getElementById('area').value;
+                var owner = document.getElementById('owner').value;
+                var users = document.getElementById('users').value;
+                var writers = document.getElementById('writers').value;
+                if (diagramName.length ==0) {
+                    alert("Missing diagram name");
+                    return;
+                }
+                else if(diagramName.indexOf("template")!=-1)
+                {
+
+
+                }
+                var url1 = "./SaveServlet";
+                
+                objXml = new XMLHttpRequest();
+                objXml.open("POST",url1,false);
+                objXml.setRequestHeader('Content-Type',"text/plain");
+                objXml.setRequestHeader('filenamemio',diagramName);
+                objXml.setRequestHeader('owner',owner);
+                objXml.setRequestHeader('users',users);
+                objXml.setRequestHeader('writers',writers);
+
+                objXml.send(jsonString);
+                str = objXml.responseText;
+                confirm("RISP from server: " +str);
+            }
+
+
+            function saveTemplate(param){
+                // if (window.event.type == "click") {
+                // alert(param != 0);
+                //   }
+                // var url1 = "http://marinoflow.appspot.com/nuovastr.txt";
+                var jsonString = Jalava.diagram.persist();
+                var persisted = JSON.parse(jsonString);
+                var blocks = persisted.blocks;
+                var startcount = 0;
+                var endcount = 0;
+                for(var i=0;i<blocks.length;i++) {
+
+                    var type = blocks[i].type;
+                    if(type == "Start") startcount ++
+                    else if(type == "End") endcount ++
+                }
                 if(startcount != 1) {alert("No Start Element: you must use one");return};
                 if(endcount == 0) {alert("No End Element: at least one");return};
                 var diagramName = document.getElementById('area').value;
@@ -123,8 +170,9 @@
                     alert("Missing diagram name");
                     return;
                 }
+                diagramName = "template_" + diagramName;
+                alert(diagramName);
                 var url1 = "./SaveServlet";
-                
                 objXml = new XMLHttpRequest();
                 objXml.open("POST",url1,false);
                 objXml.setRequestHeader('Content-Type',"text/plain");
@@ -210,16 +258,19 @@
                             str = objXml.responseText;
                             people = objXml.getResponseHeader("people");
                             writers = objXml.getResponseHeader("writers");
+                            if(str=="DIAGRAMMA NON TROVATO") {alert("DIAGRAMMA NON TROVATO");return}
                             
                             try{
 
-                            var persisted = JSON.parse(str);
+                            /*/var persisted = JSON.parse(str);
                             var blocks = persisted.blocks;
 
                                 var persisted = JSON.parse(str);
                                 var blocks = persisted.blocks;
                                 var users = blocks[0].shared;
                                 var writers = blocks[0].writers;
+                                 document.getElementById('users').value =  users;
+                                document.getElementById('writers').value = writers;*/
 
                            
 
@@ -227,8 +278,7 @@
                             document.getElementById('users').value =  people;
                             document.getElementById('writers').value = writers;
 
-                                document.getElementById('users').value =  users;
-                                document.getElementById('writers').value = writers;
+                               
 
                            
                                 update(str);
@@ -251,34 +301,7 @@
             }
 
 
-            function loadLocal(){
-
-
-                //  confirm("ciclico? "+ param == null);
-
-                var url1 = "./SubServlet";
-                objXml = new XMLHttpRequest();
-                objXml.onreadystatechange  = function()
-                {
-                    if(objXml.readyState  == 4)
-                    {
-                        if(objXml.status  == 200) {
-                            str = objXml.responseText;
-                            update(str);
-                        } else {}
-
-                    }
-                };
-                objXml.open("GET",url1,true);
-                objXml.setRequestHeader('Content-Type',"text/plain");
-                objXml.setRequestHeader('filenamemio');
-                if (param == null) {
-                    objXml.setRequestHeader('refresh',"true");
-                }
-                objXml.send(null);
-            }
-
-
+            
 
 
 
@@ -324,8 +347,8 @@
     <body onload="carica();"/>
     <%
 
-             //   String email = request.getParameter("email");
-                   String email = "fabrizio.torretta@gmail.com";
+                String email = request.getParameter("email");
+             //      String email = "fabrizio.torretta@gmail.com";
                 String passWord = request.getParameter("passWord");
 
     %>
@@ -341,11 +364,11 @@
         <input type="text" id="txt" />
         <input type="button" value="See JSON" onclick="dado();TextEdit.check();TextEdit.setOwner();"/>
         <input type="button" value="Share" onclick="childWindow=open('/shared.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800');"/>
-        <input id="fileUtente" name="fileUtente" type="file" size="20"/>
+        <input type="button" value="saveTemplate" name="buttonTemplate" onClick="aa=1000; saveTemplate(aa);"/>
         <input type="text" id="owner" name="owner" value= "<%=email%>" disabled="disabled" />
         <input type="text" id="users" name="users" value= "" disabled="disabled" />
         <input type="text" id="writers" name="writers" value= "" disabled="disabled" />
-             <a href="#" onclick="childWindow=open('/addpriv.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="add" name="add" >Add privileges to users </a>
+        <a href="#" onclick="childWindow=open('/addpriv.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="add" name="add" >Add privileges to users </a>
 
 
 

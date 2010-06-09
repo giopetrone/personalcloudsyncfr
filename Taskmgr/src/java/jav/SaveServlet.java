@@ -48,24 +48,51 @@ public class SaveServlet extends HttpServlet {
         String writers = request.getHeader("writers");
         Gson gson = new Gson();
         Grafico ob = gson.fromJson(s, Grafico.class);
-       // if(users == null) users ="";
-       // if(writers == null) writers="";
-/*
-        String[] temp;
-
-        String delimiter = ",";
-
-        temp = users.split(delimiter);*/
-
-
-
-
+      
         response.setContentType("text/html;charset=UTF-8");
        
         PrintWriter out = response.getWriter();
         try {
-            
-          int blocks = ob.blocks.length;
+            if(nomeFile.contains("template"))
+            {
+                out.println("Dentro IF");
+                users ="";
+                writers = "";
+                int blocks = ob.blocks.length;
+               
+         
+          String ownerBlock = ob.blocks[0].owner;
+           for(int i=0;i<blocks;i++)
+              {
+                  String imageid = ob.blocks[i].imageId;
+                  if(ownerBlock == null) ob.blocks[i].owner = owner;
+                  else ob.blocks[i].owner = ownerBlock;
+                  if(imageid.equalsIgnoreCase("rect"))
+                  {
+                      out.println("DENTRO IF RECT");
+                      ob.blocks[i].assign = null;
+                      ob.blocks[i].date = null;
+                      ob.blocks[i].shared = null;
+                      ob.blocks[i].type = null;
+                      ob.blocks[i].cat = null;
+                      ob.blocks[i].template = "template";
+
+                  }
+                  else
+                  {
+                      ob.blocks[i].template = "template";
+                      ob.blocks[i].shared = null;
+                  
+
+                  }
+
+
+
+              }
+            }
+            else
+            {
+                int blocks = ob.blocks.length;
           List<String> assign = new LinkedList();
           String ownerBlock = ob.blocks[0].owner;
           String assigner = "";
@@ -92,26 +119,31 @@ public class SaveServlet extends HttpServlet {
 
               }
           }
-          
-                  
+
+
 
          for(int j=0;j<blocks;j++)
          {
               String found = ob.blocks[j].assign;
               if(found == null) found="";
-              assigner += found + ",";
+              assigner += ","+found + ",";
          }
-         assigner = assigner.substring(0, assigner.length() - 1);
-           
+     //    assigner = assigner.substring(0, assigner.length() - 1);
 
 
-             
+
+
 
           users = users + assigner;
-          out.println(users);
+      //    out.println(users);
+
+            }
+
+            
+          
           String val = GoDoc.saveDiagram(nomeFile, gson.toJson(ob),users,writers);
 
-          out.println(gson.toJson(ob));
+         // out.println(gson.toJson(ob));
       /*    int lungh = ob.blocks.length;
 
           for(int i=0;i<lungh;i++)

@@ -40,9 +40,9 @@ function privilege()
  function append()
       {
         
-        var users = opener.document.getElementById('users').value;
+        var users = opener.document.getElementById('writers').value;
 
-        var array=users.split(",");
+        var array = users.split(",");
         var size = array.length;
 
 
@@ -106,7 +106,7 @@ function privilege()
             emailRecipientsString += recipient + ',';
           }
           //emailRecipientsString = emailRecipientsString.substring(0, emailRecipientsString.length - 2);
-          opener.document.getElementById('writers').value = emailRecipientsString;
+          opener.document.getElementById('users').value = emailRecipientsString;
           self.close();
           return false;
 

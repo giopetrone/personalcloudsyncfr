@@ -7,7 +7,7 @@
 function PaletteFactory() {
   this.templates = new Array();	// template cache
 }
-
+var template = "false";
 /*
  * Override this method to return a different Connection object.
  * By default, this PaletteFactory will always return a DirectedConnection.
@@ -74,9 +74,9 @@ if (objId=="connection") {
 	  if (!event) event = window.event;
 	  var obj = DOM.getEventTarget(event, "figure");
 
-      if (!obj) { Palette.prototype.deactivate(); return false; }
+      if (!obj) {Palette.prototype.deactivate();return false;}
 	  var fig = Jalava.diagram.getFigure(obj.id);
-	  if (!fig) { Palette.prototype.deactivate(); return false; }
+	  if (!fig) {Palette.prototype.deactivate();return false;}
 	  
 	  if (Jalava.temp_var.outline) { 
 		Jalava.diagram.container.removeChild(Jalava.temp_var.outline);
@@ -203,8 +203,8 @@ PaletteFactory.prototype.dropTarget = function(evt, objId, left, top) {
  * Allow creation of a Figure from persisted data
  */
 PaletteFactory.prototype.generateFigure = function(obj) {
-	
-  if (obj.clazz=="Block") {	
+  
+  if (obj.clazz=="Block") {
     var anchors = this.generateAnchors(obj.type, obj.width, obj.height);
   //  var block = new GradientBlock(null, obj.x, obj.y, obj.width, obj.height, anchors, null, "rect", "transparent");
     var block = this.createBlockObject();
@@ -217,32 +217,19 @@ PaletteFactory.prototype.generateFigure = function(obj) {
  
   span.className = "editable";
   var status = span.parentNode.parentNode.type;
+  var templ = span.parentNode.parentNode.template;
 
-  //alert( span.parentNode.parentNode.type);
-  if (status=="Done")
-  {
-   //   span.childNodes[0].style.color = "green";
+  
 
-      //state = "Done";
-
-  }
-  if (status=="Not Started yet")
-  {
-   //span.childNodes[0].style.color = "red";
-
-     // state = "Not Started yet";
-  }
-  if (status=="In progress") {
-    //  span.childNodes[0].style.color = "orange";
-
-     // state = "In progress";
-  }
-
-  if (status=="") {
- //     span.childNodes[0].style.color = "black";
-
+  if (templ == "template" ) {
+      span.childNodes[0].style.color = "black";
+      span.childNodes[6].innerHTML = "";
+      span.childNodes[6].removeAttribute("href");
+      span.childNodes[5].innerHTML = "";
+      template = "true";
      // state = "In progress";/
   }
+  
  
     span.ondblclick = function(event){
    
@@ -256,13 +243,32 @@ PaletteFactory.prototype.generateFigure = function(obj) {
 	Jalava.diagram.addFigure(block,"absolute");
         //	alert("block " + block.x);
 	
-	
+	//alert(template);
     return block;
   }
-  else {	// Connection object
+  else if(obj.clazz=="Connection" && template == "true"){	// Connection object
     var conn = this.createConnectionObject();
+   
   	conn.load(obj);
-     //   alert(" conn " +conn);
+       // alert("dentro if 1")
+ //      var span = DOM.findNodeByName(block.element, "SPAN", "mytextarea", true);
+       var label = DOM.findNodeByName(conn.element,"DIV", "mytextarea",true);
+       label.style.color = "black";
+       label.innerHTML = "";
+    //   alert(" conn " +label.style.color);
+	Jalava.diagram.addFigure(conn,"default");
+    if (Jalava.propertyPage) conn.addPropertyChangeListener(Jalava.propertyPage);
+	return conn;
+  }
+
+  else if (obj.clazz=="Connection"){
+  //    alert(template);
+     // alert("ultimo if");
+      // Connection object
+    var conn = this.createConnectionObject();
+
+  	conn.load(obj);
+       
 	Jalava.diagram.addFigure(conn,"default");
     if (Jalava.propertyPage) conn.addPropertyChangeListener(Jalava.propertyPage);
 	return conn;
@@ -286,7 +292,7 @@ PaletteFactory.prototype.createContent = function(objId, real) {
     span.innerHTML = this.defaultText;
 	if (real) {
       span.className = "editable";
-      span.ondblclick = function(event) {alert("BBBBBBB"); TextEdit.invoke(event); }
+      span.ondblclick = function(event) {alert("BBBBBBB");TextEdit.invoke(event);}
 	}
     ele.appendChild(span);
 	return ele;

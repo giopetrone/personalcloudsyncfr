@@ -27,7 +27,7 @@
  * Child classes should retain this attribute.
  *
  */
-function Block(content, x, y, width, height, anchors, type, imagepath, date, shared, assign, desc, cat, name,owner,writers) {
+function Block(content, x, y, width, height, anchors, type, imagepath, date, shared, assign, desc, cat, name,owner,writers,template) {
   this.clazz = "Block";
   //this.shared = document.getElementById('shared').value;
   this.shared = shared;
@@ -51,6 +51,7 @@ function Block(content, x, y, width, height, anchors, type, imagepath, date, sha
   this.id = Jalava.diagram.generateId();
   this.desc = desc;
   this.owner = owner;
+  this.template = template;
   // IMPORTANT!!! block is no longer added to diagram
   //this.element.id = Jalava.diagram.addFigure(this);
   //this.id = this.element.id;
@@ -66,6 +67,7 @@ function Block(content, x, y, width, height, anchors, type, imagepath, date, sha
    this.element.cat = this.cat;
    this.element.owner = this.owner;
    this.element.writers = this.writers;
+   this.element.template = this.template
   
 }
 
@@ -610,6 +612,7 @@ Block.prototype.save = function() {
   obj.from = new Array();
   obj.shared = this.element.shared;
   obj.assign = this.element.assign;
+  obj.template = this.element.template;
   obj.desc = this.element.desc;
   obj.writers = this.element.writers;
   for (var i=0; i<this.to.length; i++) {
@@ -637,6 +640,7 @@ Block.prototype.load = function(obj) {
   this.element.cat = obj.cat;
   this.element.owner = obj.owner;
   this.element.writers = obj.writers;
+  this.element.template = obj.template;
   this.x = obj.x;
   this.y = obj.y;
 
