@@ -75,9 +75,11 @@
                 };
                 if (notifica ==0) {
                     notifica = 1;
+                    var diagramName = document.getElementById('area').value;
                     objXml.open("GET",url2,true);
                     objXml.setRequestHeader('Content-Type',"text/plain");
                     objXml.setRequestHeader('notifica',"start");
+                    objXml.setRequestHeader('filenamemio',diagramName);
                 } else {
                     objXml.open("GET",url3,true);
                     objXml.setRequestHeader('Content-Type',"text/plain");

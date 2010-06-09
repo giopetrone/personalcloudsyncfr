@@ -4,24 +4,14 @@
  */
 package jav;
 
-import com.sun.syndication.feed.synd.*;
-import com.sun.syndication.io.SyndFeedInput;
-import com.sun.syndication.io.SyndFeedOutput;
-import com.sun.syndication.io.XmlReader;
-import java.io.File;
 import com.google.gson.Gson;
 import java.io.BufferedReader;
-import java.io.FileWriter;
 import java.io.IOException;     
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.Writer;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -42,18 +32,14 @@ public class SaveServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-    private DateFormat DATE_PARSER = new SimpleDateFormat("yyyy-MM-dd");
-    static String fileName = "/var/www/Atomi/marinofeed.xml";
-   // SyndFeed feed = new SyndFeedImpl();
-    SyndFeed feed = new SyndFeedImpl();
   
-    String valore;
+  //  String valore;
 
 
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String valorefile = request.getHeader("filenamemio");
+        String nomeFile = request.getHeader("filenamemio");
         BufferedReader re = request.getReader();
         String s = re.readLine();
         String owner = request.getHeader("owner");
@@ -123,7 +109,7 @@ public class SaveServlet extends HttpServlet {
 
           users = users + assigner;
           out.println(users);
-          String val = GoDoc.saveDiagram(valorefile, gson.toJson(ob),users,writers);
+          String val = GoDoc.saveDiagram(nomeFile, gson.toJson(ob),users,writers);
 
           out.println(gson.toJson(ob));
       /*    int lungh = ob.blocks.length;
@@ -314,12 +300,9 @@ public class SaveServlet extends HttpServlet {
           //gson.toJson(ob);
          // gson.toJsonTree(ob);
          
-          AtomEvent event = new AtomEvent();
-          
-          addEntry(feed,event);
-     //     new TestPub().testPublisher("http://pubsubhubbub.appspot.com","");
-       //    new TestPub().testPublisher("https://code.launchpad.net/subhub","");
-          new TestPub().testPublisher("http://localhost:8080","");
+          AtomEvent event = new AtomEvent();          
+          FeedUtil.addEntry(nomeFile, event);
+          new TestPub().testPublisher("http://localhost:8080",FeedUtil.SubFeedName(nomeFile));
              } catch (Exception ex) {ex.printStackTrace();
         }
 
@@ -329,36 +312,8 @@ public class SaveServlet extends HttpServlet {
          finally {
             out.close();
         }
-    }
+    
 
-    void addEntry(SyndFeed feed,AtomEvent event) {
-        try
-        {
-            final SyndFeedInput input = new SyndFeedInput();
-            File f = new File(fileName);
-            feed =  input.build(new XmlReader(f));
-            List entries = feed.getEntries();
-            SyndEntry entry;
-            SyndContent description;
-            entry = new SyndEntryImpl();
-            entry.setTitle("ROME " + "12");
-            entry.setLink("http://wiki.java.net/bin/view/Javawsxml/Rome03");
-            //  entry.setPublishedDate(DATE_PARSER.parse("2009-07-" + i));
-            entry.setPublishedDate(Calendar.getInstance().getTime());
-            description = new SyndContentImpl();
-            description.setType("text/plain");
-            description.setValue(event.toXml());
-            entry.setDescription(description);
-            entries.add(entry);
-            feed.setEntries(entries);
-
-            Writer writer = new FileWriter(fileName);
-            SyndFeedOutput output = new SyndFeedOutput();
-            output.output(feed, writer);
-            writer.close();
-         } catch (Exception e) {
-            e.printStackTrace();
-        }
     }// <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.

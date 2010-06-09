@@ -36,9 +36,10 @@ public class SubscribeServlet extends HttpServlet {
         try {
             response.setContentType("text/html");
             casoSubscribe = request.getHeader("notifica");
+            String nomeFile = request.getHeader("filenamemio");
             if (casoSubscribe != null) {
                 if (casoSubscribe.equals("start")) {
-                    new TestSub().testSubscriber("", "http://localhost:8081/CallbackServlet", "");
+                    new TestSub().testSubscriber(FeedUtil.SubFeedName(nomeFile), "http://localhost:8081/CallbackServlet", "");
                     out.println("fatta subscribe");
                     out.close();
                 } else {
