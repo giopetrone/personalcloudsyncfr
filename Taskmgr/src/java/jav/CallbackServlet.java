@@ -81,17 +81,17 @@ public class CallbackServlet extends HttpServlet {
                     response.setStatus(HttpServletResponse.SC_OK);
                     out.print(hubchallenge);
                     /*
-                       String hubtopic = "";
-                       String hublease = "";
-                       String hubverify = "";
+                    String hubtopic = "";
+                    String hublease = "";
+                    String hubverify = "";
                     if (request.getParameter("hub.topic") != null) {
-                        hubtopic = request.getParameter("hub.topic");
-                     }
+                    hubtopic = request.getParameter("hub.topic");
+                    }
                     if (request.getParameter("hub.lease") != null) {
-                        hublease = request.getParameter("hub.lease");
+                    hublease = request.getParameter("hub.lease");
                     }
                     if (request.getParameter("hub.verify") != null) {
-                        hubverify = request.getParameter("hub.verify");
+                    hubverify = request.getParameter("hub.verify");
                     }
 
                     System.err.println("\nin callback for hub request mode: "
@@ -110,10 +110,15 @@ public class CallbackServlet extends HttpServlet {
                         s += new String(b, 0, c);
                     }
                     //   System.err.println("session put =" + getServletContext());
-                    System.err.println("new feed content =\n " + s);
-                    // save new feed content; at next refresh call will be given to client
+                    // save new feed content; at next refresh call it will be given to client
                     getServletContext().setAttribute("atomo", s);
-                    // AtomEvent notification = createAtom(inStream);
+                    List<AtomEvent> notifications = FeedUtil.createAtom(s);
+                    if (!notifications.isEmpty()) {
+                        System.err.println("new feed content");
+                        for (AtomEvent ev : notifications) {
+                            System.err.println("new feed content =\n " + ev.toString(true));
+                        }
+                    }
                 }
             }
         } catch (Exception ex) {
@@ -122,7 +127,6 @@ public class CallbackServlet extends HttpServlet {
             out.close();
         }
     }
-
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /** 

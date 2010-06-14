@@ -17,6 +17,7 @@ import com.sun.syndication.io.XmlReader;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.io.Writer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -81,46 +82,16 @@ public class FeedUtil {
             link.setRel("hub");
             links.add(link);
             feed.setLinks(links);
-
             // <link rel="hub" href="http://pubsubhubbub.appspot.com"/>
-
-            SyndEntry entry;
-            SyndContent description;
-
-            entry = new SyndEntryImpl();
-            entry.setTitle("ROME v1.0");
-            entry.setLink("http://wiki.java.net/bin/view/Javawsxml/Rome01");
-            entry.setPublishedDate(DATE_PARSER.parse("2004-06-08"));
-            description = new SyndContentImpl();
-            description.setType("text/plain");
-            description.setValue("Initial release of ROME");
-            entry.setDescription(description);
-            entries.add(entry);
-
-
-            feed.setEntries(entries);
-
-            Writer writer = new FileWriter(fileName);
+Writer writer = new FileWriter(fileName);
             SyndFeedOutput output = new SyndFeedOutput();
             output.output(feed, writer);
             writer.close();
-
-            System.out.println("The feed has been written to the file [" + fileName + "]");
-
+            System.err.println("The feed has been written to the file [" + fileName + "]");
             ok = true;
         } catch (Exception ex) {
             ex.printStackTrace();
             System.out.println("ERROR: " + ex.getMessage());
-        }
-
-
-        if (!ok) {
-            System.out.println();
-            System.out.println("FeedWriter creates a RSS/Atom feed and writes it to a file.");
-            System.out.println("The first parameter must be the syndication format for the feed");
-            System.out.println("  (rss_0.90, rss_0.91, rss_0.92, rss_0.93, rss_0.94, rss_1.0 rss_2.0 or atom_0.3)");
-            System.out.println("The second parameter must be the file name for the feed");
-            System.out.println();
         }
         return ok;
     }
@@ -174,7 +145,6 @@ public class FeedUtil {
             entry.setDescription(description);
             entries.add(entry);
             feed.setEntries(entries);
-
             Writer writer = new FileWriter(fileName);
             SyndFeedOutput output = new SyndFeedOutput();
             output.output(feed, writer);
@@ -186,7 +156,25 @@ public class FeedUtil {
         return true;
     }
 
-    public AtomEvent createAtom(ServletInputStream inStream) {
+    public static List <AtomEvent> createAtom(String s) {
+        SyndFeedInput input = new SyndFeedInput();
+        List <AtomEvent> retEvent = new ArrayList();
+        try {
+            SyndFeed feed = input.build(new StringReader(s));
+            List<SyndEntry> entries = feed.getEntries();
+            for (SyndEntry entry : entries) {
+            SyndContent description = entry.getDescription();
+            String value = description.getValue();
+            retEvent.add( AtomEvent.fromXml(value));
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return retEvent;
+    }
+
+
+    public static AtomEvent createAtomOld(ServletInputStream inStream) {
         SyndFeedInput input = new SyndFeedInput();
         AtomEvent retEvent = null;
         try {
@@ -206,3 +194,20 @@ public class FeedUtil {
     }
 
 }
+
+/*
+
+            SyndEntry entry;
+            SyndContent description;
+            entry = new SyndEntryImpl();
+            entry.setTitle("ROME v1.0");
+            entry.setLink("http://wiki.java.net/bin/view/Javawsxml/Rome01");
+            entry.setPublishedDate(DATE_PARSER.parse("2004-06-08"));
+            description = new SyndContentImpl();
+            description.setType("text/plain");
+            description.setValue("Initial release of ROME");
+            entry.setDescription(description);
+            entries.add(entry);
+
+
+            feed.setEntries(entries);*/
