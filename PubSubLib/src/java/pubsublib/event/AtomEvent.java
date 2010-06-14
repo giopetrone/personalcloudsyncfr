@@ -6,6 +6,7 @@ package pubsublib.event;
 
 import com.thoughtworks.xstream.XStream;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  *
@@ -18,14 +19,59 @@ public class AtomEvent {
     private String user = "";
     private String application = "";
     private String activity = "";
-    private String name = "";
     private String context = "";
     private ArrayList<String> parameters = new ArrayList();
-    static long serial = 0;
+
+    private static long serial = 0;
 
     public AtomEvent() {
         id = "" + serial++;
         time = "" + System.currentTimeMillis();
+    }
+
+    public AtomEvent(String user, String application, String activity) {
+        id = "" + serial++;
+        time = "" + System.currentTimeMillis();
+        this.user = user;
+        this.application = application;
+        this.activity = activity;
+    }
+
+    public String toString(boolean corto) {
+        String ret = "EV";
+        if (!user.isEmpty()) {
+            ret += " User(" + user + ")";
+        }
+        if (!application.isEmpty()) {
+            ret += " Application(" + application + ")";
+        }
+        if (!activity.isEmpty()) {
+            ret += " Activity(" + activity + ")";
+        }
+        if (!parameters.isEmpty()) {
+            ret += " PAR(";
+            for (int i = 0; i < parameters.size(); i += 2) {
+                ret += parameters.get(i) + "=" + parameters.get(i + 1);
+                if (i < parameters.size() + 1) {
+                    ret += ", ";
+                }
+            }
+            ret += ")";
+        }
+        if (!corto) {
+            if (!time.isEmpty()) {
+                Calendar cal = Calendar.getInstance();
+                cal.setTimeInMillis(Long.parseLong(time));
+                ret += " Time(" + cal.toString()+ ")";
+            }
+               if (!id.isEmpty()) {
+                ret += " Id(" + id + ")";
+            }
+            if (!context.isEmpty()) {
+                ret += " Context(" + context + ")";
+            }
+        }
+        return ret;
     }
 
     public static AtomEvent fromXml(String s) {
@@ -56,7 +102,7 @@ public class AtomEvent {
         String ret = null;
         for (int i = 0; i < parameters.size(); i += 2) {
             String parName = parameters.get(i);
-            if (parName.equalsIgnoreCase(name.toLowerCase())) { // found
+            if (parName.equalsIgnoreCase(name)) { // found
                 i++;
                 if (i < parameters.size()) {
                     ret = parameters.get(i);
@@ -77,6 +123,14 @@ public class AtomEvent {
         }
         addParameter(name, value);
         return false;
+    }
+
+    public ArrayList<String> getParameterNames() {
+        ArrayList<String> ret = new ArrayList();
+        for (int i = 0; i < parameters.size(); i += 2) {
+            ret.add(parameters.get(i));
+        }
+        return ret;
     }
 
     /**
@@ -122,20 +176,6 @@ public class AtomEvent {
     }
 
     /**
-     * @return the name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * @param name the name to set
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
      * @return the context
      */
     public String getContext() {
@@ -149,25 +189,12 @@ public class AtomEvent {
         this.context = context;
     }
 
-    /**
-     * @return the parameters
-     */
-    public ArrayList<String> getParameters() {
-        return parameters;
-    }
-
-    /**
-     * @param parameters the parameters to set
-     */
-    public void setParameters(ArrayList<String> parameters) {
-        this.parameters = parameters;
-    }
     public static AtomEvent creaPerProva() {
         AtomEvent ret = new AtomEvent();
         ret.setUser("sgnmrn@gmail.com");
         ret.setApplication("jalava");
         ret.setActivity("review");
-        ret.setName("completed");
+        ret.setParameter("name", "completed");
         return ret;
     }
 }
