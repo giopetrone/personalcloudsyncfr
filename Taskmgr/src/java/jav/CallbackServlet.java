@@ -123,24 +123,6 @@ public class CallbackServlet extends HttpServlet {
         }
     }
 
-    AtomEvent createAtom(ServletInputStream inStream) {
-        SyndFeedInput input = new SyndFeedInput();
-        AtomEvent retEvent = null;
-        try {
-            SyndFeed feed = input.build(new InputStreamReader(inStream));
-            List<SyndEntry> entries = feed.getEntries();
-            SyndEntry entry = entries.get(0); // per ora 1 sola entry nuova ad ogni callback
-            SyndContent description = entry.getDescription();
-            String value = description.getValue();
-            retEvent = AtomEvent.fromXml(value);
-            if (retEvent != null) {
-                System.err.println("utente evento: " + retEvent.getUser());
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return retEvent;
-    }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /** 
