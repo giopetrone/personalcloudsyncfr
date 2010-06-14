@@ -11,6 +11,7 @@ import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndEntryImpl;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.feed.synd.SyndFeedImpl;
+import com.sun.syndication.feed.synd.SyndLinkImpl;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.SyndFeedOutput;
 import com.sun.syndication.io.XmlReader;
@@ -57,7 +58,16 @@ public class FeedWriter {
     }
 
     void addEntry(SyndFeed feed) {
-        List entries = feed.getEntries();
+        SyndLinkImpl s = new SyndLinkImpl();
+        s.setHref("http://localhost:8080");
+        s.setRel("hub");
+
+        List links = feed.getLinks();
+        for (int i=0; i< links.size();i++){
+            System.err.println(links.get(i).toString());
+        }
+       links.add(s); feed.setLinks(links);
+      //  List entries = feed.getEntries();
          SyndEntry entry;
         SyndContent description;
         entry = new SyndEntryImpl();
