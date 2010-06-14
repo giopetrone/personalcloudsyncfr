@@ -51,7 +51,7 @@ public class GoDoc {
     //anna gio
     //   static String docMakerLogin = "annamaria.goy@gmail.com";  // fino a che  ???  auth funziona
     //   static String docMakerPasswd = "tex_willer";
-   // static String docMakerLogin = "sgnmrn@gmail.com";  // fino a che  ???  auth funziona
+    // static String docMakerLogin = "sgnmrn@gmail.com";  // fino a che  ???  auth funziona
     //static String docMakerPasswd = "micio11";
     static String docMakerLogin = "fabrizio.torretta@gmail.com";  // fino a che  ???  auth funziona
     static String docMakerPasswd = "gregorio";
@@ -68,202 +68,204 @@ public class GoDoc {
     }
 
     public static void main(String[] args) throws MalformedURLException, IOException, ServiceException {
-         DocsService service = new DocsService("Document List Demo");
-         service.setUserCredentials(docMakerLogin, docMakerPasswd);
+        DocsService service = new DocsService("Document List Demo");
+        service.setUserCredentials(docMakerLogin, docMakerPasswd);
         DocumentQuery query = new DocumentQuery(new URL("http://docs.google.com/feeds/documents/private/full/-/mine"));
 //DocumentListEntry documentEntry = findEntry("prova6.txt");
-DocumentListFeed resultFeed = service.getFeed(query, DocumentListFeed.class);
-
-
-
-
-
-
-       System.out.println(prendi());
+        DocumentListFeed resultFeed = service.getFeed(query, DocumentListFeed.class);
+        System.out.println(prendi());
     }
 
     public static String prendi() {
         DocsService service = new DocsService("Document List Demo");
         try {
             service.setUserCredentials(docMakerLogin, docMakerPasswd);
-           return new GoDoc(service).saveTemplate("temp.txt","ciao");
-       //     return new GoDoc(service).showAllDocs();
+            return new GoDoc(service).saveTemplate("temp.txt", "ciao");
+            //     return new GoDoc(service).showAllDocs();
         } catch (Exception ex) {
             ex.printStackTrace();
             return ex.toString();
         }
     }
 
-
-    public String saveDoc(String name, String s,String users, String writers) {
+    public String saveDoc(String name, String s, String users, String writers) {
         try {
             DocumentListEntry documentEntry = findEntry(name);
             if (documentEntry == null) {
                 System.out.println("DocumentEntry null");
                 documentEntry = uploadFile(s, name);
-                
+
                 String[] tempwriter;
                 String delimiter = ",";
 
-                if(users != null){
+                if (users != null) {
                     String[] tempusers;
 
-                   tempusers = users.split(delimiter);
-                    
-                    for(int i =0; i < tempusers.length ; i++)
-                    {
-                        System.out.println("Reader "+tempusers[i]);
-                        addReaders(documentEntry, tempusers[i]);
-                        
-                    }
-                    tempwriter = writers.split(delimiter);
-                    for(int j =0; j < tempwriter.length ; j++)
-                    {
-                       boolean check = false;
+                    tempusers = users.split(delimiter);
 
-                       for(int i = 0;i<tempusers.length;i++)
-                       {
-                           if(tempusers[i].equals(tempwriter[j])) check = true;
-                           System.out.println("true");
-                       }
-                        if(check == false) { System.out.println("Writer " +tempwriter[j]+check); addWriting(documentEntry,tempwriter[j]);}
+                    for (int i = 0; i < tempusers.length; i++) {
+                        System.out.println("Reader " + tempusers[i]);
+                        addReaders(documentEntry, tempusers[i]);
+
                     }
-                    
-                }
-                else
-                {
                     tempwriter = writers.split(delimiter);
-                    for(int j =0; j < tempwriter.length ; j++)
-                    {
-                        addWriting(documentEntry,tempwriter[j]);
+                    for (int j = 0; j < tempwriter.length; j++) {
+                        boolean check = false;
+
+                        for (int i = 0; i < tempusers.length; i++) {
+                            if (tempusers[i].equals(tempwriter[j])) {
+                                check = true;
+                            }
+                            System.out.println("true");
+                        }
+                        if (check == false) {
+                            System.out.println("Writer " + tempwriter[j] + check);
+                            addWriting(documentEntry, tempwriter[j]);
+                        }
+                    }
+
+                } else {
+                    tempwriter = writers.split(delimiter);
+                    for (int j = 0; j < tempwriter.length; j++) {
+                        addWriting(documentEntry, tempwriter[j]);
                     }
                 }
-                
-                
-               
-                
+
+
+
+
                 //addWriting(documentEntry, "gio.petrone@gmail.com");
 
                 return "salvato";
-            }
-            else{
-           System.out.println("DocumentEntry NOT null");
-           //     service.getRequestFactory().setHeader("If-Match", "*");
-            //    AclFeed aclFeed = service.getFeed(new URL(documentEntry.getAclFeedLink().getHref()), AclFeed.class);
-             //   for (AclEntry entry : aclFeed.getEntries()) entry.delete();
+            } else {
+                System.out.println("DocumentEntry NOT null");
+                //     service.getRequestFactory().setHeader("If-Match", "*");
+                //    AclFeed aclFeed = service.getFeed(new URL(documentEntry.getAclFeedLink().getHref()), AclFeed.class);
+                //   for (AclEntry entry : aclFeed.getEntries()) entry.delete();
 
-                try{
+                try {
 
-                List<String> readers = new ArrayList();
-                List<String> collaborators = new ArrayList();
-                AclFeed aclFeed = service.getFeed(new URL(documentEntry.getAclFeedLink().getHref()), AclFeed.class);
+                    List<String> readers = new ArrayList();
+                    List<String> collaborators = new ArrayList();
+                    AclFeed aclFeed = service.getFeed(new URL(documentEntry.getAclFeedLink().getHref()), AclFeed.class);
 
-                for (AclEntry entry : aclFeed.getEntries()) {
-                    if(entry.getRole().getValue().equals("reader")) readers.add(entry.getScope().getValue());
-                 
-                    else if(entry.getRole().getValue().equals("writer")) collaborators.add(entry.getScope().getValue());
-
-
-                }
-
-
-
-
-                String[] tempwriter;
-                String delimiter = ",";
-
-                if(users != null){
-                    String[] tempusers;
-                    if(writers == null) writers = "";
-                   tempusers = users.split(delimiter);
-                    System.out.println("READERS SIZE: "+readers.size());
-                    System.out.println("TEMPUSERS LENGTH: "+tempusers.length);
-                    for(int i =0; i < tempusers.length ; i++)
-                    {
-                        boolean check = false;
-                        System.out.println("-------------------------");
-                        System.out.println("TEMPUSER: "+tempusers[i]);
-                        for(int z=0;z<readers.size();z++)
-                        {
-                            System.out.println(readers.get(z));
-                            if(readers.get(z).equals(tempusers[i])) check = true;
-                         
-                            System.out.println("Check Reader: "+check);
+                    for (AclEntry entry : aclFeed.getEntries()) {
+                        if (entry.getRole().getValue().equals("reader")) {
+                            readers.add(entry.getScope().getValue());
+                        } else if (entry.getRole().getValue().equals("writer")) {
+                            collaborators.add(entry.getScope().getValue());
                         }
-                         
-                            for(int z=0;z<collaborators.size();z++)
-                            {
-                                
-                            System.out.println("collaborators: "+collaborators.get(z));
-                                if(collaborators.get(z).equalsIgnoreCase(tempusers[i]))
-                                {
-                                   update(documentEntry, aclFeed,collaborators.get(z));
-                                   System.out.println("DOPO UPDATE");
-                                   check = true;
+
+
+                    }
+
+
+
+
+                    String[] tempwriter;
+                    String delimiter = ",";
+
+                    if (users != null) {
+                        String[] tempusers;
+                        if (writers == null) {
+                            writers = "";
+                        }
+                        tempusers = users.split(delimiter);
+                        System.out.println("READERS SIZE: " + readers.size());
+                        System.out.println("TEMPUSERS LENGTH: " + tempusers.length);
+                        for (int i = 0; i < tempusers.length; i++) {
+                            boolean check = false;
+                            System.out.println("-------------------------");
+                            System.out.println("TEMPUSER: " + tempusers[i]);
+                            for (int z = 0; z < readers.size(); z++) {
+                                System.out.println(readers.get(z));
+                                if (readers.get(z).equals(tempusers[i])) {
+                                    check = true;
+                                }
+
+                                System.out.println("Check Reader: " + check);
+                            }
+
+                            for (int z = 0; z < collaborators.size(); z++) {
+
+                                System.out.println("collaborators: " + collaborators.get(z));
+                                if (collaborators.get(z).equalsIgnoreCase(tempusers[i])) {
+                                    update(documentEntry, aclFeed, collaborators.get(z));
+                                    System.out.println("DOPO UPDATE");
+                                    check = true;
 
                                 }
                             }
-                           
-                            if(check == false) addReaders(documentEntry, tempusers[i]);
-                        
-                    }
-                    tempwriter = writers.split(delimiter);
-                   // System.out.println("tempwriter: "+tempwriter.length);
-                   // System.out.println("Collaborators SIZE: "+collaborators.size());
-                    for(int j =0; j < tempwriter.length ; j++)
-                    {
-                       boolean check = false;
-                        System.out.println("-------------------------");
-                        System.out.println("TEMPWRITER: "+tempwriter[j]);
 
-                       for(int i = 0;i<tempusers.length;i++)
-                       {
-                           System.out.println("TEMPUSER: "+tempusers[i]);
-                           if(tempusers[i].equals(tempwriter[j])) check = true;
-                       }
-                       for(int z=0;z<collaborators.size();z++)
-                       {
-                            System.out.println("collaborators: "+collaborators.get(z));
-                            if(collaborators.get(z).equals(tempwriter[j])) check = true;
-                       }
-                        System.out.println("Check Writer: "+check);
-                        if(check == false) { System.out.println("Writer " +tempwriter[j]+check); addWriting(documentEntry,tempwriter[j]);}
-                    }
+                            if (check == false) {
+                                addReaders(documentEntry, tempusers[i]);
+                            }
 
-                }
-                else
-                {
-                    tempwriter = writers.split(delimiter);
-                    for(int j =0; j < tempwriter.length ; j++)
-                    {
-                        boolean check = false;
-                        for(int z=0;z<collaborators.size();z++)
-                        {
-                                System.out.println("collaborators: "+collaborators.get(z));
-                                if(collaborators.get(z).equals(tempwriter[j])) check = true;
                         }
-                        System.out.println("Check Writer: "+check);
-                        if(check == false) { System.out.println("Writer " +tempwriter[j]+check); addWriting(documentEntry,tempwriter[j]);}
+                        tempwriter = writers.split(delimiter);
+                        // System.out.println("tempwriter: "+tempwriter.length);
+                        // System.out.println("Collaborators SIZE: "+collaborators.size());
+                        for (int j = 0; j < tempwriter.length; j++) {
+                            boolean check = false;
+                            System.out.println("-------------------------");
+                            System.out.println("TEMPWRITER: " + tempwriter[j]);
+
+                            for (int i = 0; i < tempusers.length; i++) {
+                                System.out.println("TEMPUSER: " + tempusers[i]);
+                                if (tempusers[i].equals(tempwriter[j])) {
+                                    check = true;
+                                }
+                            }
+                            for (int z = 0; z < collaborators.size(); z++) {
+                                System.out.println("collaborators: " + collaborators.get(z));
+                                if (collaborators.get(z).equals(tempwriter[j])) {
+                                    check = true;
+                                }
+                            }
+                            System.out.println("Check Writer: " + check);
+                            if (check == false) {
+                                System.out.println("Writer " + tempwriter[j] + check);
+                                addWriting(documentEntry, tempwriter[j]);
+                            }
+                        }
+
+                    } else {
+                        tempwriter = writers.split(delimiter);
+                        for (int j = 0; j < tempwriter.length; j++) {
+                            boolean check = false;
+                            for (int z = 0; z < collaborators.size(); z++) {
+                                System.out.println("collaborators: " + collaborators.get(z));
+                                if (collaborators.get(z).equals(tempwriter[j])) {
+                                    check = true;
+                                }
+                            }
+                            System.out.println("Check Writer: " + check);
+                            if (check == false) {
+                                System.out.println("Writer " + tempwriter[j] + check);
+                                addWriting(documentEntry, tempwriter[j]);
+                            }
+                        }
                     }
+
+                } catch (Exception ex) {
+                    System.out.println(ex.toString());
                 }
-                
-                }catch(Exception ex){System.out.println(ex.toString());}}
-                service.getRequestFactory().setHeader("If-Match", "*");
-                documentEntry.setMediaSource(new MediaByteArraySource(s.getBytes(), "text/plain"));
+            }
+            service.getRequestFactory().setHeader("If-Match", "*");
+            documentEntry.setMediaSource(new MediaByteArraySource(s.getBytes(), "text/plain"));
 
             //  documentEntry.setContent(new PlainTextConstruct(s));
             documentEntry.updateMedia(false);
-            return "salvato";
+          //  return "salvato";
+            return documentEntry.getDocumentLink().getHref();
         } catch (Exception ex) {
             ex.printStackTrace();
-          
+
             return ex.toString();
         }
     }
 
-
-
-     public String saveDoc(String name, String s) {
+    public String saveDoc(String name, String s) {
         try {
             DocumentListEntry documentEntry = findEntry(name);
             if (documentEntry == null) {
@@ -284,11 +286,6 @@ DocumentListFeed resultFeed = service.getFeed(query, DocumentListFeed.class);
             return ex.toString();
         }
     }
-
-
-
-
-
 
     public DocumentListEntry uploadFile(String content, String title)
             throws IOException, ServiceException {
@@ -316,23 +313,22 @@ DocumentListFeed resultFeed = service.getFeed(query, DocumentListFeed.class);
         return service.insert(url, entry);
     }
 
-   private void update(DocumentListEntry documentEntry,AclFeed aclFeed, String who) throws IOException, MalformedURLException, ServiceException {
+    private void update(DocumentListEntry documentEntry, AclFeed aclFeed, String who) throws IOException, MalformedURLException, ServiceException {
 
 
-            for (AclEntry entry : aclFeed.getEntries()) {
+        for (AclEntry entry : aclFeed.getEntries()) {
 
-              //  System.err.println(entry.getRole().getValue());
-                if(entry.getScope().getValue().equals(who)) {
-                    entry.setRole(new AclRole("reader"));
-                    entry.update();
-                }
-
-
-
+            //  System.err.println(entry.getRole().getValue());
+            if (entry.getScope().getValue().equals(who)) {
+                entry.setRole(new AclRole("reader"));
+                entry.update();
             }
 
-               }
 
+
+        }
+
+    }
 
     private AclEntry addReaders(DocumentListEntry documentEntry, String who) throws IOException, MalformedURLException, ServiceException {
         AclRole role = new AclRole("reader");
@@ -354,7 +350,7 @@ DocumentListFeed resultFeed = service.getFeed(query, DocumentListFeed.class);
                 return list; //document not found
             }
 
-            
+
             DateTime last = documentEntry.getUpdated();
             DateTime curr = documentVersions.get(valorefile);
             if (refresh) {
@@ -386,28 +382,47 @@ DocumentListFeed resultFeed = service.getFeed(query, DocumentListFeed.class);
             List<String> collaborators = new ArrayList();
             List<String> readers = new ArrayList();
             AclFeed aclFeed = service.getFeed(new URL(documentEntry.getAclFeedLink().getHref()), AclFeed.class);
-          
-            for (AclEntry entry : aclFeed.getEntries()) {
-                if(entry.getRole().getValue().equals("reader")) readers.add(entry.getScope().getValue());
-                 people.add(entry.getScope().getValue());
-                if(entry.getRole().getValue().equals("writer")) collaborators.add(entry.getScope().getValue());
 
-                        
+            for (AclEntry entry : aclFeed.getEntries()) {
+                if (entry.getRole().getValue().equals("reader")) {
+                    readers.add(entry.getScope().getValue());
+                }
+                people.add(entry.getScope().getValue());
+                if (entry.getRole().getValue().equals("writer")) {
+                    collaborators.add(entry.getScope().getValue());
+                }
+
+
             }
             String users = readers.toString();
             System.out.println(users);
-            String nousers= "";
-            if(users.equals("[]")) users = "";
-            else users = users.substring(1, users.length() - 1);
-            
+            String nousers = "";
+            if (users.equals("[]")) {
+                users = "";
+            } else {
+                users = users.substring(1, users.length() - 1);
+            }
+
             String writers = collaborators.toString();
             System.out.println(writers);
-            if(writers.equals("[]"))writers = "";
-            else writers = writers.substring(1, writers.length() - 1);
-            if(people.toString().contains(owner) == true)  {list.add(s);list.add(users);list.add(writers);return list;}
-            else { list.add(error);list.add(nousers);list.add(nousers); return list;}
+            if (writers.equals("[]")) {
+                writers = "";
+            } else {
+                writers = writers.substring(1, writers.length() - 1);
+            }
+            if (people.toString().contains(owner) == true) {
+                list.add(s);
+                list.add(users);
+                list.add(writers);
+                return list;
+            } else {
+                list.add(error);
+                list.add(nousers);
+                list.add(nousers);
+                return list;
+            }
         } catch (Exception ex) {
-            System.out.println( ex.toString());
+            System.out.println(ex.toString());
             return null;
         }
     }
@@ -447,29 +462,15 @@ DocumentListFeed resultFeed = service.getFeed(query, DocumentListFeed.class);
         return s;
     }
 
-    public static String saveDiagram(String name, String s,String users,String writers) {
+    public static String saveDiagram(String name, String s, String users, String writers) {
         DocsService service = new DocsService("Document List Demo");
         try {
             service.setUserCredentials(docMakerLogin, docMakerPasswd);
-            if(users != null) return new GoDoc(service).saveDoc(name, s, users,writers);
-
-            else  return new GoDoc(service).saveDoc(name,s);
-         
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return ex.toString();
-        }
-    }
-
-
-
-     public static String saveTemplate(String name, String s) {
-        DocsService service = new DocsService("Document List Demo");
-        try {
-            service.setUserCredentials(docMakerLogin, docMakerPasswd);
-
-
-           return new GoDoc(service).saveDoc(name,s);
+            if (users != null) {
+                return new GoDoc(service).saveDoc(name, s, users, writers);
+            } else {
+                return new GoDoc(service).saveDoc(name, s);
+            }
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -477,13 +478,26 @@ DocumentListFeed resultFeed = service.getFeed(query, DocumentListFeed.class);
         }
     }
 
-
-    public static List<String> loadDiagram(String valorefile, boolean refresh,String owner) {
+    public static String saveTemplate(String name, String s) {
         DocsService service = new DocsService("Document List Demo");
         try {
             service.setUserCredentials(docMakerLogin, docMakerPasswd);
 
-            return new GoDoc(service).loadDoc(valorefile, refresh,owner);
+
+            return new GoDoc(service).saveDoc(name, s);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ex.toString();
+        }
+    }
+
+    public static List<String> loadDiagram(String valorefile, boolean refresh, String owner) {
+        DocsService service = new DocsService("Document List Demo");
+        try {
+            service.setUserCredentials(docMakerLogin, docMakerPasswd);
+
+            return new GoDoc(service).loadDoc(valorefile, refresh, owner);
         } catch (Exception ex) {
             ex.printStackTrace();
             System.out.println(ex.toString());
