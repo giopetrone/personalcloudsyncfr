@@ -16,12 +16,14 @@ import com.sun.syndication.io.SyndFeedOutput;
 import com.sun.syndication.io.XmlReader;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.InputStreamReader;
 import java.io.Writer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import javax.servlet.ServletInputStream;
 import pubsublib.event.AtomEvent;
 
 /**
@@ -133,7 +135,19 @@ public class FeedUtil {
         }
     }
 
-    static boolean addEntry(String flowName, AtomEvent event) {
+    static void addLink(SyndEntry entry, String href) {
+        List links = entry.getLinks();
+        if (links == null) {
+            links = new ArrayList();
+            entry.setLinks(links);
+        }
+        SyndLinkImpl link = new SyndLinkImpl();
+        link.setHref(href);
+        link.setRel("alternate");
+        links.add(link);
+    }
+
+    static boolean addEntry(String editLink, String flowName, AtomEvent event) {
         if (!FeedWriteOk(flowName)) {  // crea feed se non esiste
             CreateFeedFile(flowName);
         }
@@ -147,8 +161,11 @@ public class FeedUtil {
             SyndEntry entry;
             SyndContent description;
             entry = new SyndEntryImpl();
-            entry.setTitle("ROME " + "12");
-            entry.setLink("http://wiki.java.net/bin/view/Javawsxml/Rome03");
+            entry.setTitle("Flow (specificare meglio)");
+            // set links to google documents; maybe could be link
+            // taskmanager with http://localhost:8081?Flow=filename.txt
+          //  addLink(entry, editLink);
+            addLink(entry, "http://localhost:8081/index.jsp?Flow=" + flowName);
             //  entry.setPublishedDate(DATE_PARSER.parse("2009-07-" + i));
             entry.setPublishedDate(Calendar.getInstance().getTime());
             description = new SyndContentImpl();
@@ -168,4 +185,24 @@ public class FeedUtil {
         }
         return true;
     }
+
+    public AtomEvent createAtom(ServletInputStream inStream) {
+        SyndFeedInput input = new SyndFeedInput();
+        AtomEvent retEvent = null;
+        try {
+            SyndFeed feed = input.build(new InputStreamReader(inStream));
+            List<SyndEntry> entries = feed.getEntries();
+            SyndEntry entry = entries.get(0); // per ora 1 sola entry nuova ad ogni callback
+            SyndContent description = entry.getDescription();
+            String value = description.getValue();
+            retEvent = AtomEvent.fromXml(value);
+            if (retEvent != null) {
+                System.err.println("utente evento: " + retEvent.getUser());
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return retEvent;
+    }
+
 }
