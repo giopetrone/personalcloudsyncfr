@@ -52,7 +52,7 @@ public class AtomEvent {
             ret += " PAR(";
             for (int i = 0; i < parameters.size(); i += 2) {
                 ret += parameters.get(i) + "=" + parameters.get(i + 1);
-                if (i < parameters.size() + 1) {
+                if (i + 2 < parameters.size() ) {
                     ret += ", ";
                 }
             }
