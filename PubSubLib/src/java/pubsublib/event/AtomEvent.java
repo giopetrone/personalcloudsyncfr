@@ -32,9 +32,9 @@ public class AtomEvent {
     public AtomEvent(String user, String application, String activity) {
         id = "" + serial++;
         time = "" + System.currentTimeMillis();
-        this.user = user;
-        this.application = application;
-        this.activity = activity;
+        this.user = user != null? user: "NULLUSER";
+        this.application = application != null? application: "NULLAPLLICATION";;
+        this.activity = activity != null? activity: "NULLACTIVITY";;
     }
 
     public String toString(boolean corto) {
