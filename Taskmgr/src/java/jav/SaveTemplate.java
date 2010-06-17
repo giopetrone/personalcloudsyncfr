@@ -40,12 +40,9 @@ public class SaveTemplate extends HttpServlet {
      */
     private DateFormat DATE_PARSER = new SimpleDateFormat("yyyy-MM-dd");
     static String fileName = "/var/www/Atomi/marinofeed.xml";
-   // SyndFeed feed = new SyndFeedImpl();
+    // SyndFeed feed = new SyndFeedImpl();
     SyndFeed feed = new SyndFeedImpl();
-
     String valore;
-
-
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -54,7 +51,10 @@ public class SaveTemplate extends HttpServlet {
         String s = re.readLine();
         String owner = request.getHeader("owner");
         String users = request.getHeader("users");
-        if(users == null) users="";
+        String login = request.getHeader("login");
+        if (users == null) {
+            users = "";
+        }
         String writers = request.getHeader("writers");
         Gson gson = new Gson();
         Grafico ob = gson.fromJson(s, Grafico.class);
@@ -63,118 +63,105 @@ public class SaveTemplate extends HttpServlet {
 
         PrintWriter out = response.getWriter();
         try {
-            if(valorefile.contains("template"))
-            {
+            if (valorefile.contains("template")) {
                 out.println("Dentro IF");
-                users ="";
+                users = "";
                 writers = "";
-                 int blocks = ob.blocks.length;
-
-
-          String ownerBlock = ob.blocks[0].owner;
-           for(int i=0;i<blocks;i++)
-              {
-                  String imageid = ob.blocks[i].imageId;
-                  if(ownerBlock == null) ob.blocks[i].owner = owner;
-                  else ob.blocks[i].owner = ownerBlock;
-                  if(imageid.equalsIgnoreCase("rect"))
-                  {
-                      out.println("DENTRO IF RECT");
-                      ob.blocks[i].assign = null;
-                      ob.blocks[i].date = null;
-                      ob.blocks[i].shared = null;
-                      ob.blocks[i].type = null;
-                      ob.blocks[i].cat = null;
-
-
-                  }
-                  else
-                  {
-                      ob.blocks[i].shared = null;
-
-                  }
-
-
-
-              }
-            }
-            else
-            {
                 int blocks = ob.blocks.length;
-          List<String> assign = new LinkedList();
-          String ownerBlock = ob.blocks[0].owner;
-          String assigner = "";
-          if(ownerBlock == null)
-          {
-              for(int i=0;i<blocks;i++)
-              {
-                  ob.blocks[i].owner = owner;
-                  ob.blocks[i].writers = writers;
-                  ob.blocks[i].shared = users;
 
 
-              }
+                String ownerBlock = ob.blocks[0].owner;
+                for (int i = 0; i < blocks; i++) {
+                    String imageid = ob.blocks[i].imageId;
+                    if (ownerBlock == null) {
+                        ob.blocks[i].owner = owner;
+                    } else {
+                        ob.blocks[i].owner = ownerBlock;
+                    }
+                    if (imageid.equalsIgnoreCase("rect")) {
+                        out.println("DENTRO IF RECT");
+                        ob.blocks[i].assign = null;
+                        ob.blocks[i].date = null;
+                        ob.blocks[i].shared = null;
+                        ob.blocks[i].type = null;
+                        ob.blocks[i].cat = null;
 
-          }
-          else
-          {
-              for(int i=0;i<blocks;i++)
-              {
-                  ob.blocks[i].owner = ownerBlock;
-                  ob.blocks[i].writers = writers;
-                  ob.blocks[i].shared = users;
 
+                    } else {
+                        ob.blocks[i].shared = null;
 
-              }
-          }
+                    }
 
 
 
-         for(int j=0;j<blocks;j++)
-         {
-              String found = ob.blocks[j].assign;
-              if(found == null) found="";
-              assigner += found + ",";
-         }
-         assigner = assigner.substring(0, assigner.length() - 1);
+                }
+            } else {
+                int blocks = ob.blocks.length;
+                List<String> assign = new LinkedList();
+                String ownerBlock = ob.blocks[0].owner;
+                String assigner = "";
+                if (ownerBlock == null) {
+                    for (int i = 0; i < blocks; i++) {
+                        ob.blocks[i].owner = owner;
+                        ob.blocks[i].writers = writers;
+                        ob.blocks[i].shared = users;
+
+
+                    }
+
+                } else {
+                    for (int i = 0; i < blocks; i++) {
+                        ob.blocks[i].owner = ownerBlock;
+                        ob.blocks[i].writers = writers;
+                        ob.blocks[i].shared = users;
+
+
+                    }
+                }
+
+
+
+                for (int j = 0; j < blocks; j++) {
+                    String found = ob.blocks[j].assign;
+                    if (found == null) {
+                        found = "";
+                    }
+                    assigner += found + ",";
+                }
+                assigner = assigner.substring(0, assigner.length() - 1);
 
 
 
 
 
-          users = users + assigner;
-      //    out.println(users);
+                users = users + assigner;
+                //    out.println(users);
 
             }
 
 
 
-          String val = GoDoc.saveDiagram(valorefile, gson.toJson(ob),users,writers);
+            String val = GoDoc.saveDiagram(login, valorefile, gson.toJson(ob), users, writers);
 
 
-          AtomEvent event = new AtomEvent();
+            AtomEvent event = new AtomEvent();
 
-          addEntry(feed,event);
-     //     new TestPub().testPublisher("http://pubsubhubbub.appspot.com","");
-       //    new TestPub().testPublisher("https://code.launchpad.net/subhub","");
-          new TestPub().testPublisher("http://localhost:8080","");
-             } catch (Exception ex) {ex.printStackTrace();
-        }
-
-
-
-          /*   */
-         finally {
+            addEntry(feed, event);
+            //     new TestPub().testPublisher("http://pubsubhubbub.appspot.com","");
+            //    new TestPub().testPublisher("https://code.launchpad.net/subhub","");
+            new TestPub().testPublisher("http://localhost:8080", "");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } /*   */ finally {
             out.close();
         }
     }
 
-    void addEntry(SyndFeed feed,AtomEvent event) {
-        try
-        {
+    void addEntry(SyndFeed feed, AtomEvent event) {
+        try {
             final SyndFeedInput input = new SyndFeedInput();
             File f = new File(fileName);
-            feed =  input.build(new XmlReader(f));
+            feed = input.build(new XmlReader(f));
             List entries = feed.getEntries();
             SyndEntry entry;
             SyndContent description;
@@ -194,10 +181,11 @@ public class SaveTemplate extends HttpServlet {
             SyndFeedOutput output = new SyndFeedOutput();
             output.output(feed, writer);
             writer.close();
-         } catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }// <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+
     /**
      * Handles the HTTP <code>GET</code> method.
      * @param request servlet request

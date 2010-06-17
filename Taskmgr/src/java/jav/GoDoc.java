@@ -5,12 +5,10 @@
 package jav;
 
 //import com.google.appengine.repackaged.com.google.protobuf.ServiceException;
-import com.google.gdata.client.*;
 import com.google.gdata.client.DocumentQuery;
 import com.google.gdata.client.docs.DocsService;
 import com.google.gdata.data.DateTime;
 import com.google.gdata.data.MediaContent;
-import com.google.gdata.data.Person;
 import com.google.gdata.data.PlainTextConstruct;
 import com.google.gdata.data.acl.AclEntry;
 import com.google.gdata.data.acl.AclFeed;
@@ -28,10 +26,11 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import pubsublib.event.AtomEvent;
+import pubsublib.test.TestPub;
 
 /**
  *
@@ -80,7 +79,7 @@ public class GoDoc {
         DocsService service = new DocsService("Document List Demo");
         try {
             service.setUserCredentials(docMakerLogin, docMakerPasswd);
-            return new GoDoc(service).saveTemplate("temp.txt", "ciao");
+            return new GoDoc(service).saveTemplate("NULLUSER", "temp.txt", "ciao");
             //     return new GoDoc(service).showAllDocs();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -88,12 +87,12 @@ public class GoDoc {
         }
     }
 
-    public String saveDoc(String name, String s, String users, String writers) {
+    public String saveDoc(String login, String documentName, String s, String users, String writers) {
         try {
-            DocumentListEntry documentEntry = findEntry(name);
+            DocumentListEntry documentEntry = findEntry(documentName);
             if (documentEntry == null) {
                 System.out.println("DocumentEntry null");
-                documentEntry = uploadFile(s, name);
+                documentEntry = uploadFile(s, documentName);
 
                 String[] tempwriter;
                 String delimiter = ",";
@@ -106,7 +105,12 @@ public class GoDoc {
                     for (int i = 0; i < tempusers.length; i++) {
                         System.out.println("Reader " + tempusers[i]);
                         addReaders(documentEntry, tempusers[i]);
-
+                        AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
+                        event.setParameter("File", documentName);
+                        event.setParameter("Permission", "Read");
+                        event.setParameter("Who", tempusers[i]);
+                        FeedUtil.addEntry("", documentName, event);
+                        new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
                     }
                     tempwriter = writers.split(delimiter);
                     for (int j = 0; j < tempwriter.length; j++) {
@@ -121,6 +125,12 @@ public class GoDoc {
                         if (check == false) {
                             System.out.println("Writer " + tempwriter[j] + check);
                             addWriting(documentEntry, tempwriter[j]);
+                            AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
+                            event.setParameter("File", documentName);
+                            event.setParameter("Permission", "Write");
+                            event.setParameter("Who", tempwriter[j]);
+                            FeedUtil.addEntry("", documentName, event);
+                            new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
                         }
                     }
 
@@ -128,14 +138,14 @@ public class GoDoc {
                     tempwriter = writers.split(delimiter);
                     for (int j = 0; j < tempwriter.length; j++) {
                         addWriting(documentEntry, tempwriter[j]);
+                        AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
+                        event.setParameter("File", documentName);
+                        event.setParameter("Permission", "Write");
+                        event.setParameter("Who", tempwriter[j]);
+                        FeedUtil.addEntry("", documentName, event);
+                        new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
                     }
                 }
-
-
-
-
-                //addWriting(documentEntry, "gio.petrone@gmail.com");
-
                 return "salvato";
             } else {
                 System.out.println("DocumentEntry NOT null");
@@ -199,6 +209,12 @@ public class GoDoc {
 
                             if (check == false) {
                                 addReaders(documentEntry, tempusers[i]);
+                                AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
+                                event.setParameter("File", documentName);
+                                event.setParameter("Permission", "Read");
+                                event.setParameter("Who", tempusers[i]);
+                                FeedUtil.addEntry("", documentName, event);
+                                new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
                             }
 
                         }
@@ -226,6 +242,12 @@ public class GoDoc {
                             if (check == false) {
                                 System.out.println("Writer " + tempwriter[j] + check);
                                 addWriting(documentEntry, tempwriter[j]);
+                                AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
+                                event.setParameter("File", documentName);
+                                event.setParameter("Permission", "Write");
+                                event.setParameter("Who", tempwriter[j]);
+                                FeedUtil.addEntry("", documentName, event);
+                                new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
                             }
                         }
 
@@ -243,6 +265,12 @@ public class GoDoc {
                             if (check == false) {
                                 System.out.println("Writer " + tempwriter[j] + check);
                                 addWriting(documentEntry, tempwriter[j]);
+                                AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
+                                event.setParameter("File", documentName);
+                                event.setParameter("Permission", "Write");
+                                event.setParameter("Who", tempwriter[j]);
+                                FeedUtil.addEntry("", documentName, event);
+                                new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
                             }
                         }
                     }
@@ -256,7 +284,7 @@ public class GoDoc {
 
             //  documentEntry.setContent(new PlainTextConstruct(s));
             documentEntry.updateMedia(false);
-          //  return "salvato";
+            //  return "salvato";
             return documentEntry.getDocumentLink().getHref();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -265,12 +293,11 @@ public class GoDoc {
         }
     }
 
-    public String saveDoc(String name, String s) {
+    public String saveDoc(String login, String name, String s) {
         try {
             DocumentListEntry documentEntry = findEntry(name);
             if (documentEntry == null) {
                 documentEntry = uploadFile(s, name);
-
 
                 return "salvato";
             }
@@ -331,6 +358,7 @@ public class GoDoc {
     }
 
     private AclEntry addReaders(DocumentListEntry documentEntry, String who) throws IOException, MalformedURLException, ServiceException {
+
         AclRole role = new AclRole("reader");
 
         AclScope scope = new AclScope(AclScope.Type.USER, who);
@@ -462,14 +490,14 @@ public class GoDoc {
         return s;
     }
 
-    public static String saveDiagram(String name, String s, String users, String writers) {
+    public static String saveDiagram(String login, String name, String s, String users, String writers) {
         DocsService service = new DocsService("Document List Demo");
         try {
             service.setUserCredentials(docMakerLogin, docMakerPasswd);
             if (users != null) {
-                return new GoDoc(service).saveDoc(name, s, users, writers);
+                return new GoDoc(service).saveDoc(login, name, s, users, writers);
             } else {
-                return new GoDoc(service).saveDoc(name, s);
+                return new GoDoc(service).saveDoc(login, name, s);
             }
 
         } catch (Exception ex) {
@@ -478,13 +506,13 @@ public class GoDoc {
         }
     }
 
-    public static String saveTemplate(String name, String s) {
+    public static String saveTemplate(String login, String name, String s) {
         DocsService service = new DocsService("Document List Demo");
         try {
             service.setUserCredentials(docMakerLogin, docMakerPasswd);
 
 
-            return new GoDoc(service).saveDoc(name, s);
+            return new GoDoc(service).saveDoc(login, name, s);
 
         } catch (Exception ex) {
             ex.printStackTrace();

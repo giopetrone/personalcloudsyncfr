@@ -41,11 +41,12 @@ public class SaveServlet extends HttpServlet {
         String flowSource = re.readLine();
         String owner = request.getHeader("owner");
         String users = request.getHeader("users");
+        String login = request.getHeader("login");
         if (users == null) {
             users = "";
         }
         String writers = request.getHeader("writers");
-       
+
         Gson gson = new Gson();
         Grafico ob = gson.fromJson(flowSource, Grafico.class);
 
@@ -133,7 +134,7 @@ public class SaveServlet extends HttpServlet {
 
 
 
-            String editLink = GoDoc.saveDiagram(nomeFile, gson.toJson(ob), users, writers);
+            String editLink = GoDoc.saveDiagram(login, nomeFile, gson.toJson(ob), users, writers);
 
             // out.println(gson.toJson(ob));
       /*    int lungh = ob.blocks.length;
@@ -324,10 +325,11 @@ public class SaveServlet extends HttpServlet {
             //gson.toJson(ob);
             // gson.toJsonTree(ob);
             //AtomEvent(String user, String application, String activity)
-            AtomEvent event = new AtomEvent(owner, "TaskManager", "Save");
+            AtomEvent event = new AtomEvent(login != null ? login : owner, "TaskManager", "Save");
             event.setParameter("File", nomeFile);
             FeedUtil.addEntry(editLink, nomeFile, event);
             new TestPub().testPublisher("", FeedUtil.SubFeedName(nomeFile));
+            out.print("pubblicato evento");
         } catch (Exception ex) {
             ex.printStackTrace();
         } /*   */ finally {
