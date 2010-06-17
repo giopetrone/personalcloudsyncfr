@@ -35,8 +35,8 @@
                 c=c+1;
                 t=setTimeout("timedCount()",20000);
             }
-             function setArray(recipients)
-             {
+            function setArray(recipients)
+            {
 
                 allusers = recipients;
 
@@ -108,18 +108,17 @@
                 var startcount = 0;
                 var endcount = 0;
                 for(var i=0;i<blocks.length;i++) {
-
                     var type = blocks[i].type;
                     if(type == "Start") startcount ++
                     else if(type == "End") endcount ++
                 }
-                if(startcount != 1) {alert("You must only one a Start Element");return};
+                if(startcount != 1) {alert("You must have only one Start Element");return};
                 if(endcount == 0) {alert("No End Element: at least one");return};
                 var diagramName = document.getElementById('area').value;
                 var owner = document.getElementById('owner').value;
                 var users = document.getElementById('users').value;
                 var writers = document.getElementById('writers').value;
-                if (diagramName.length ==0) {
+                if (diagramName.length <= 1) {
                     alert("Missing diagram name");
                     return;
                 }
@@ -224,9 +223,9 @@
                     return results[1];
             }
 
-               // if webapp loade3d with parameter 'flow''
-               // eg calling like: http:.........?flow=ccc.txt
-               // that filw is used as source
+            // if webapp loade3d with parameter 'flow''
+            // eg calling like: http:.........?flow=ccc.txt
+            // that filw is used as source
 
             function carica(){
                 //  alert("in carica");
@@ -262,7 +261,7 @@
                             
                             try{
 
-                            /*/var persisted = JSON.parse(str);
+                                /*/var persisted = JSON.parse(str);
                             var blocks = persisted.blocks;
 
                                 var persisted = JSON.parse(str);
@@ -275,8 +274,8 @@
                            
 
                                  
-                            document.getElementById('users').value =  people;
-                            document.getElementById('writers').value = writers;
+                                document.getElementById('users').value =  people;
+                                document.getElementById('writers').value = writers;
 
                                
 
@@ -325,7 +324,7 @@
             function initJalava(){
                 Jalava.diagram = new Diagram(220, 100, "550", "600");
                 var palette = new Palette(new FlowChartPaletteFactory(), 0, 100, 200);
-               palette.addItem("rect", "Task",  Palette.DRAG_TOOL, "./img/rect.gif");
+                palette.addItem("rect", "Task",  Palette.DRAG_TOOL, "./img/rect.gif");
                 palette.addItem("connection", "Connection",  Palette.CLICK_TOOL, "./img/line.gif");
                 palette.addItem("diamond", "Decision", Palette.DRAG_TOOL, "./img/diamond.gif");
                 palette.addItem("parallel", "Input/Output", Palette.DRAG_TOOL, "./img/parallel.gif");
@@ -348,7 +347,7 @@
     <%
 
                 String email = request.getParameter("email");
-             //      String email = "fabrizio.torretta@gmail.com";
+                //      String email = "fabrizio.torretta@gmail.com";
                 String passWord = request.getParameter("passWord");
 
     %>
@@ -365,7 +364,7 @@
         <input type="button" value="See JSON" onclick="dado();TextEdit.check();TextEdit.setOwner();"/>
         <input type="button" value="Share" onclick="childWindow=open('/shared.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800');"/>
         <input type="button" value="saveTemplate" name="buttonTemplate" onClick="aa=1000; saveTemplate(aa);"/>
-        <input type="text" id="owner" name="owner" value= "<%=email%>" disabled="disabled" />
+        <input type="text" id="owner" name="owner" value= "fabrizio.torretta@gmail.com" disabled="disabled" />
         <input type="text" id="users" name="users" value= "" disabled="disabled" />
         <input type="text" id="writers" name="writers" value= "" disabled="disabled" />
         <a href="#" onclick="childWindow=open('/addpriv.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="add" name="add" >Add privileges to users </a>
