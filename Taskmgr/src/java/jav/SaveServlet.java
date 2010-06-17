@@ -134,7 +134,7 @@ public class SaveServlet extends HttpServlet {
 
 
 
-            String editLink = GoDoc.saveDiagram(login, nomeFile, gson.toJson(ob), users, writers);
+            String editLink = GoDoc.saveDiagram(owner,  nomeFile, gson.toJson(ob), users, writers);
 
             // out.println(gson.toJson(ob));
       /*    int lungh = ob.blocks.length;

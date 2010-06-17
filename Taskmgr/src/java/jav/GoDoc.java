@@ -87,7 +87,7 @@ public class GoDoc {
         }
     }
 
-    public String saveDoc(String login, String documentName, String s, String users, String writers) {
+    public String saveDoc(String login,  String documentName, String s, String users, String writers) {
         try {
             DocumentListEntry documentEntry = findEntry(documentName);
             if (documentEntry == null) {
@@ -497,7 +497,7 @@ public class GoDoc {
             if (users != null) {
                 return new GoDoc(service).saveDoc(login, name, s, users, writers);
             } else {
-                return new GoDoc(service).saveDoc(login, name, s);
+                return new GoDoc(service).saveDoc( login, name, s);
             }
 
         } catch (Exception ex) {
