@@ -46,10 +46,14 @@ public class SubscribeServlet extends HttpServlet {
             response.setContentType("text/html");
             casoSubscribe = request.getHeader("notifica");
             String nomeFile = request.getHeader("filenamemio");
+            System.err.println("subscribe di Notift  1");
             if (casoSubscribe != null) {
+                   System.err.println("caso =" + casoSubscribe);
+
                 if (casoSubscribe.equals("start")) {
-                    new TestSub().testSubscriber(FeedUtil.SubFeedName(nomeFile), "http://localhost:8081/CallbackServlet", "");
-                    out.println("fatta subscribe");
+                    new TestSub().testSubscriber(FeedUtil.SubFeedName(nomeFile), "http://localhost:8081/NotifMgr/NotifCallbackServlet", "");
+                    System.err.println("subscribe di Notift  3");
+            out.println("fatta subscribe");
                     out.close();
                 } else {
                 }

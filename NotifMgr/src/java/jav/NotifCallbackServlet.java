@@ -4,11 +4,11 @@
  */
 
 package jav;
+
 import googlecontacts.ContactCall;
 import googlecontacts.ContactsExampleParameters;
 import googletalkclient.ChatClient;
 import java.io.IOException;
-
 import java.io.PrintWriter;
 import java.util.List;
 import javax.servlet.ServletException;
@@ -22,10 +22,10 @@ import pubsublib.event.AtomEvent;
  *
  * @author marino
  */
-public class CallbackServlet extends HttpServlet {
+public class NotifCallbackServlet extends HttpServlet {
 
     ChatClient chClient = new ChatClient();
-    /**
+    /** 
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      * @param request servlet request
      * @param response servlet response
@@ -33,7 +33,7 @@ public class CallbackServlet extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    throws ServletException, IOException {
 
         // ricordare che deploy di callabck e' sotto  <CallbackServlett>/subscribe/pippo
 
@@ -48,7 +48,7 @@ public class CallbackServlet extends HttpServlet {
         }
         System.err.println("\n");
          * */
- System.err.println("inzio in callback di notif");
+// System.err.println("inzio in callback di notif");
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
         try {
@@ -114,9 +114,9 @@ public class CallbackServlet extends HttpServlet {
                     sendGMsg(s);
                     List<AtomEvent> notifications = FeedUtil.createAtom(s);
                     if (!notifications.isEmpty()) {
-                        System.err.println("new feed content");
+                        System.err.println("notifMgr new feed content");
                         for (AtomEvent ev : notifications) {
-                            System.err.println("new feed content =\n " + ev.toString(true));
+                            System.err.println("\t" + ev.toString(true));
                         }
                     }
                 }
@@ -171,7 +171,7 @@ public class CallbackServlet extends HttpServlet {
             genIM(chClient, "gio.petrone@gmail.com", s);
             disconnectChatClient(chClient);
         } catch (Exception e) {
-            System.out.println("ECCEZIONE chat");
+            System.err.println("ECCEZIONE chat");
         }
         return "Server says: " + s;
     }
@@ -191,8 +191,9 @@ public class CallbackServlet extends HttpServlet {
         return cCallTmp;
     }
 
+
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
+    /** 
      * Handles the HTTP <code>GET</code> method.
      * @param request servlet request
      * @param response servlet response
@@ -201,11 +202,11 @@ public class CallbackServlet extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    throws ServletException, IOException {
         processRequest(request, response);
-    }
+    } 
 
-    /**
+    /** 
      * Handles the HTTP <code>POST</code> method.
      * @param request servlet request
      * @param response servlet response
@@ -214,11 +215,11 @@ public class CallbackServlet extends HttpServlet {
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    throws ServletException, IOException {
         processRequest(request, response);
     }
 
-    /**
+    /** 
      * Returns a short description of the servlet.
      * @return a String containing servlet description
      */
@@ -226,4 +227,5 @@ public class CallbackServlet extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
+
 }

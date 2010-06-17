@@ -5,16 +5,16 @@
         <servlet-class>jav.SubscribeServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>CallbackServlet</servlet-name>
-        <servlet-class>jav.CallbackServlet</servlet-class>
+        <servlet-name>NotifCallbackServlet</servlet-name>
+        <servlet-class>jav.NotifCallbackServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>SubscribeServlet</servlet-name>
         <url-pattern>/SubscribeServlet</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>CallbackServlet</servlet-name>
-        <url-pattern>/CallbackServlet/subscribe/pippo</url-pattern>
+        <servlet-name>NotifCallbackServlet</servlet-name>
+        <url-pattern>/NotifCallbackServlet/subscribe/pippo</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
