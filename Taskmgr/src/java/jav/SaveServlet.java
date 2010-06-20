@@ -41,15 +41,23 @@ public class SaveServlet extends HttpServlet {
         String flowSource = re.readLine();
         String owner = request.getHeader("owner");
         String users = request.getHeader("users");
+        String loadjson = request.getHeader("loadjson");
+       // System.err.println(loadjson);
+      //  int loadblocks = Integer.parseInt(request.getHeader("blocks"));
+      //  int loadconnections = Integer.parseInt(request.getHeader("connections"));
+        if(users == null) users="";
+
         String login = request.getHeader("login");
         if (users == null) {
             users = "";
         }
+
         String writers = request.getHeader("writers");
 
         Gson gson = new Gson();
         Grafico ob = gson.fromJson(flowSource, Grafico.class);
-
+        
+        
         response.setContentType("text/html;charset=UTF-8");
 
         PrintWriter out = response.getWriter();
@@ -114,30 +122,160 @@ public class SaveServlet extends HttpServlet {
 
 
 
-                for (int j = 0; j < blocks; j++) {
-                    String found = ob.blocks[j].assign;
-                    if (found == null) {
-                        found = "";
-                    }
-                    assigner += "," + found + ",";
-                }
+
+         for(int j=0;j<blocks;j++)
+         {
+             if(ob.blocks[j].imageId.equalsIgnoreCase("rect"))
+             {
+                 System.out.println("qui dentro");
+              String found = ob.blocks[j].assign;
+              if(found != null) assigner += ","+found + ",";
+              
+             }
+
+         }
+
+              
                 //    assigner = assigner.substring(0, assigner.length() - 1);
 
 
 
 
 
+
                 users = users + assigner;
-                //    out.println(users);
+            //   System.out.println("USERS: "+users);
 
             }
 
 
+            
+          
+          String val = GoDoc.saveDiagram(owner,  nomeFile, gson.toJson(ob), users, writers);
+          out.println("VALLLLLLLLLLLLLL "+val);
+          if(val.equals("new"))
+          {
+              
+              for(int j=0;j<ob.blocks.length;j++)
+            {
 
-            String editLink = GoDoc.saveDiagram(owner,  nomeFile, gson.toJson(ob), users, writers);
+              if(ob.blocks[j].imageId.equalsIgnoreCase("rect"))
+              {
+                  String found = ob.blocks[j].assign;
+                  if(found !=null)
+                  {
+                      AtomEvent event = new AtomEvent(owner, "TaskManager", "Assign User");
+                      event.setParameter("Task", ob.blocks[j].name);
+                    //  event.setParameter("Permission", "Write");
+                      event.setParameter("Who", found);
+                      FeedUtil.addEntry("", nomeFile, event);
+                  }
+              }
+
+             }
+
+          }
+          else if(val.equals("notnew"))
+          {
+              if(loadjson!=null){
+
+              Gson gsonLoad = new Gson();
+              Grafico ob2 = gsonLoad.fromJson(loadjson, Grafico.class);
+              int newsize = ob.blocks.length;
+              int oldsize = ob2.blocks.length;
+              int newconnections = ob.connections.length;
+              int oldconnections = ob2.connections.length;
+              if(newsize < oldsize || newsize > oldsize)
+              {
+
+                  AtomEvent event = new AtomEvent();
+                  event.setActivity("Number of blocks is changed");
+                     // event.setParameter("assigners",found);
+                   FeedUtil.addEntry("",nomeFile, event);
+              }
+              if(newconnections < oldconnections || newconnections > oldconnections)
+              {
+
+                  AtomEvent event = new AtomEvent();
+                  event.setActivity("Number of connections is changed");
+                     // event.setParameter("assigners",found);
+                   FeedUtil.addEntry("",nomeFile, event);
+              }
+              for(int j=0;j<newsize;j++)
+              {
+                  if(ob.blocks[j].imageId.equalsIgnoreCase("rect"))
+                  {
+                      String id = ob.blocks[j].id;
+                      String newstatus = ob.blocks[j].type;
+                      String newassign = ob.blocks[j].assign;
+                      for(int i=0;i<oldsize;i++)
+                      {
+                          if(ob2.blocks[i].id.equals(id))
+                          {
+                              String oldstatus = ob2.blocks[i].type;
+                              String oldassign = ob2.blocks[i].assign;
+                              if(!newstatus.equals(oldstatus))
+                              {
+
+                                  AtomEvent event = new AtomEvent(owner, "TaskManager", "Change Status of Task");
+                                  event.setParameter("Task", ob.blocks[j].name);
+                                //  event.setParameter("Permission", "Write");
+                                  event.setParameter("New Status", newstatus);
+                                  FeedUtil.addEntry("", nomeFile, event);
+                              }
+                              if(!newassign.equals(oldassign))
+                              {
+                                  AtomEvent event = new AtomEvent(owner, "TaskManager", "Change Users assigned to Task");
+                                  event.setParameter("Task", ob.blocks[j].name);
+                                //  event.setParameter("Permission", "Write");
+                                  event.setParameter("New Assigned users", newassign);
+                                  FeedUtil.addEntry("", nomeFile, event);
+                              }
+                          }
+                      }
+                  }
+              }
+              //System.err.println(length);
+          }//System.err.println(size);
+          }
+       //   AtomEvent event = new AtomEvent();
+
+      //    FeedUtil.addEntry(nomeFile, event);
+
+          new TestPub().testPublisher("http://localhost:8080",FeedUtil.SubFeedName(nomeFile));
+
+         // out.println(gson.toJson(ob));
+
+
+            
 
             // out.println(gson.toJson(ob));
-      /*    int lungh = ob.blocks.length;
+
+      /*
+
+
+              int length = ob.blocks.length;
+              if(length < loadblocks || length > loadblocks)
+              {
+
+                  AtomEvent event = new AtomEvent();
+                  event.setActivity("Number of blocks is changed");
+                     // event.setParameter("assigners",found);
+                   FeedUtil.addEntry("",nomeFile, event);
+              }
+              int connlength = ob.connections.length;
+              if(connlength < loadconnections || connlength > loadconnections)
+              {
+
+                  AtomEvent event = new AtomEvent();
+                 event.setActivity("Number of connections is changed");
+                     // event.setParameter("assigners",found);
+                   FeedUtil.addEntry("",nomeFile, event);
+              }
+
+
+
+       int lungh = ob.blocks.length;
 
             for(int i=0;i<lungh;i++)
             {
@@ -244,6 +382,13 @@ public class SaveServlet extends HttpServlet {
             }
 
 
+    //      ob.blocks[0].desc = "CIAO!!!!!!!!!!!!";
+          //gson.toJson(ob);
+         // gson.toJsonTree(ob);
+         
+          
+             } catch (Exception ex) {ex.printStackTrace();
+        }
 
             }
             if(andor.equalsIgnoreCase("or"))
@@ -325,9 +470,10 @@ public class SaveServlet extends HttpServlet {
             //gson.toJson(ob);
             // gson.toJsonTree(ob);
             //AtomEvent(String user, String application, String activity)
-            AtomEvent event = new AtomEvent(login != null ? login : owner, "TaskManager", "Save");
-            event.setParameter("File", nomeFile);
-            FeedUtil.addEntry(editLink, nomeFile, event);
+        //   String editLink = GoDoc.saveDiagram(owner,  nomeFile, gson.toJson(ob), users, writers);
+      //      AtomEvent event = new AtomEvent(login != null ? login : owner, "TaskManager", "Save");
+      //      event.setParameter("File", nomeFile);
+      //     FeedUtil.addEntry(editLink, nomeFile, event);
             new TestPub().testPublisher("", FeedUtil.SubFeedName(nomeFile));
             out.print("pubblicato evento");
         } catch (Exception ex) {

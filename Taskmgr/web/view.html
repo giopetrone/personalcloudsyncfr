@@ -1,12 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-
-<title>
-Task Properties
-</title>
 
 <!-- Meta Tags -->
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -17,7 +9,7 @@ Task Properties
 <head>
 
 <title>
-Task Properties
+Task Properties: View
 </title>
 
 <!-- Meta Tags -->
@@ -132,13 +124,39 @@ frmElement.value = window.parent.TextEdit.getCurrentDesc();
 }
 
 
+function getLinks()
+{
+    try
+    {
+    var links = window.parent.TextEdit.getCurrentLinks();
+    var arraylinks = links.split(",");
+    var add = document.getElementById("links");
+   // alert(arraylinks[1]);
+   for(var i=0;i<arraylinks.length;i++)
+   {
+
+                var link = document.createElement("a");
+                link.setAttribute('href',arraylinks[i]);
+                link.setAttribute('target', '_blank');
+                var num = i+1;
+                var text = document.createTextNode("Link"+num);
+                var br = document.createElement("br");
+                link.appendChild(text);
+                
+                add.appendChild(link);
+                add.appendChild(br);
+                
+   }}catch(e){alert(e.message);}
+}
+
+
 
 
 
 </script>
 </head>
 
-<body id="public" onload="initStatus(document.forms[0], 'status');initForm(document.forms[0], 'nome');initDate(document.forms[0], 'theDate');initCat(document.forms[0], 'category');initShare(document.forms[0], 'share');initAssign(document.forms[0],'assign');initDesc(document.forms[0],'elm1');go();">
+<body id="public" onload="getLinks();initStatus(document.forms[0], 'status');initForm(document.forms[0], 'nome');initDesc(document.forms[0],'elm1');go();">
 <div id="container">
 
 
@@ -146,7 +164,7 @@ frmElement.value = window.parent.TextEdit.getCurrentDesc();
 <form name='myform'>
 
 
-	<h2>Task Properties</h2>
+	<h2>View Task Properties</h2>
 
 
 
@@ -182,64 +200,27 @@ frmElement.value = window.parent.TextEdit.getCurrentDesc();
 
 	</li>
 
-<li id="foli106" 		class="     ">
-	<label class="desc" id="title106" for="Field106">
-		Assign Task to users
-			</label>
-	<div>
-		<input id ="assign" name="assign" type="text" onclick="childWindow=open('/assign.html','_blank','status=1,toolbar=1,scrollbars=1,width=900,height=1200')"/>
-			</div>
-	</li>
+
 <li id="foli1" 		class="leftHalf      ">
 	<label class="desc" id="title1" for="Field1">
 		Status
 			</label>
 	<div>
-		<select name="status" id="status" >
+		<input type="text" name="status" id="status" value="" disabled="">
 
-                    <option value=""></option>
-                    <option value="In progress">In progress</option>
-                    <option value="Not Started yet">Not Started yet</option>
-                    <option value="Done">Done</option>
+                  
 
-
-	    </select>
-	</div>
-	</li>
- <li >
-            <label class="desc" id="title2" for="Field2">
-		Diagram Shared with
-			</label>
-        <input type="text"  id="share" name="share"  onclick="childWindow=open('/newhtml.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" disabled="disabled"/>
-
-    </li>
-
-<li id="foli108" 		class="      ">
-	<label class="desc" id="title108" for="Field108">
-		Category
-			</label>
-	<div>
-		<select id="category" 			name="category" 			class="field select medium" 						tabindex="4" >
-                    <option > </option>
-						<option value="Personal" 				>
-				Personal
-			</option>
-						<option value="Home" 				>
-				Home
-			</option>
-						<option value="Business" 				>
-				Business
-			</option>
-					</select>
+	   
 	</div>
 	</li>
 
 
 <li id="foli2" 		class="date      ">
 	<label class="desc" id="title2" for="Field2">
-		Due Date
+		Links
 			</label>
-	<input type="text" value="dd/mm/yy" id="theDate" name="theDate" onclick="displayCalendar(document.forms[0].theDate,'yyyy/mm/dd',this)"/>
+	<div id="links">
+        </div>
 
 	</li>
 
@@ -252,8 +233,8 @@ frmElement.value = window.parent.TextEdit.getCurrentDesc();
 	<li class="buttons ">
 		<div>
 
-	<input type="button" name="ok" value="Ok"      onclick="parent.TextEdit.setContent(document.myform.nome.value,document.myform.status.value,document.myform.theDate.value,document.myform.category.value,document.myform.share.value,document.myform.assign.value,tinyMCE.activeEditor.getContent());"/>
-	<input type="button" name="reset" value="Cancella" onclick="window.parent.TextEdit.cancel()"/>
+
+	<input type="button" name="ok" value="Ok" onclick="window.parent.TextEdit.cancel()"/>
 
 				</div>
 	</li>

@@ -87,30 +87,53 @@ public class GoDoc {
         }
     }
 
+/*
+
+    public List<String> saveDoc(String name, String s,String users, String writers) {
+        List<String> status = new ArrayList();
+        int update = 0;
+        int newriters = 0;
+        int newreaders = 0;
+
+*/
     public String saveDoc(String login,  String documentName, String s, String users, String writers) {
+
         try {
             DocumentListEntry documentEntry = findEntry(documentName);
+
             if (documentEntry == null) {
+                
                 System.out.println("DocumentEntry null");
                 documentEntry = uploadFile(s, documentName);
-
+                AtomEvent eventSave = new AtomEvent(login, "TaskManager", "Save New Diagram");
+                String link = documentEntry.getDocumentLink().getHref();
+                eventSave.setParameter("File", documentName);
+                eventSave.setParameter("Link", link);
+                FeedUtil.addEntry("", documentName, eventSave);
                 String[] tempwriter;
                 String delimiter = ",";
-
-                if (users != null) {
+           //     if(writers == null) writers = "";
+                if (users != null && writers != null) {
                     String[] tempusers;
 
                     tempusers = users.split(delimiter);
 
                     for (int i = 0; i < tempusers.length; i++) {
-                        System.out.println("Reader " + tempusers[i]);
-                        addReaders(documentEntry, tempusers[i]);
-                        AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
-                        event.setParameter("File", documentName);
-                        event.setParameter("Permission", "Read");
-                        event.setParameter("Who", tempusers[i]);
-                        FeedUtil.addEntry("", documentName, event);
-                        new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
+                        if(!tempusers[i].equals(""))
+                            {
+
+                                System.out.println("Reader " + tempusers[i]);
+                                addReaders(documentEntry, tempusers[i]);
+                                AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
+                                event.setParameter("File", documentName);
+                                event.setParameter("Permission", "Read");
+                                event.setParameter("Who", tempusers[i]);
+                                FeedUtil.addEntry("", documentName, event);
+                                new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
+
+
+                        }
+                        
                     }
                     tempwriter = writers.split(delimiter);
                     for (int j = 0; j < tempwriter.length; j++) {
@@ -119,8 +142,9 @@ public class GoDoc {
                         for (int i = 0; i < tempusers.length; i++) {
                             if (tempusers[i].equals(tempwriter[j])) {
                                 check = true;
+                                System.out.println("true");
                             }
-                            System.out.println("true");
+                            
                         }
                         if (check == false) {
                             System.out.println("Writer " + tempwriter[j] + check);
@@ -135,7 +159,7 @@ public class GoDoc {
                     }
 
                 } else {
-                    tempwriter = writers.split(delimiter);
+                   /* tempwriter = writers.split(delimiter);
                     for (int j = 0; j < tempwriter.length; j++) {
                         addWriting(documentEntry, tempwriter[j]);
                         AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
@@ -144,11 +168,16 @@ public class GoDoc {
                         event.setParameter("Who", tempwriter[j]);
                         FeedUtil.addEntry("", documentName, event);
                         new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
-                    }
+                    }*/
                 }
-                return "salvato";
+
+                return "new";
+
             } else {
                 System.out.println("DocumentEntry NOT null");
+                AtomEvent eventUpdate = new AtomEvent(login, "TaskManager", "Update Diagram");
+                eventUpdate.setParameter("File", documentName);
+                FeedUtil.addEntry("", documentName, eventUpdate);
                 //     service.getRequestFactory().setHeader("If-Match", "*");
                 //    AclFeed aclFeed = service.getFeed(new URL(documentEntry.getAclFeedLink().getHref()), AclFeed.class);
                 //   for (AclEntry entry : aclFeed.getEntries()) entry.delete();
@@ -175,7 +204,7 @@ public class GoDoc {
                     String[] tempwriter;
                     String delimiter = ",";
 
-                    if (users != null) {
+                        if (users != null) {
                         String[] tempusers;
                         if (writers == null) {
                             writers = "";
@@ -186,10 +215,13 @@ public class GoDoc {
                         for (int i = 0; i < tempusers.length; i++) {
                             boolean check = false;
                             System.out.println("-------------------------");
-                            System.out.println("TEMPUSER: " + tempusers[i]);
+
+                            if(!tempusers[i].equals(""))
+                            {
+                                System.out.println("TEMPUSER: " + tempusers[i] +" finisce qui");
                             for (int z = 0; z < readers.size(); z++) {
                                 System.out.println(readers.get(z));
-                                if (readers.get(z).equals(tempusers[i])) {
+                                if (tempusers[i].contains(readers.get(z))) {
                                     check = true;
                                 }
 
@@ -199,8 +231,14 @@ public class GoDoc {
                             for (int z = 0; z < collaborators.size(); z++) {
 
                                 System.out.println("collaborators: " + collaborators.get(z));
-                                if (collaborators.get(z).equalsIgnoreCase(tempusers[i])) {
+                                if (tempusers[i].contains(collaborators.get(z))) {
                                     update(documentEntry, aclFeed, collaborators.get(z));
+                                    AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
+                                    event.setParameter("File", documentName);
+                                    event.setParameter("Change Permission", "From Write To Read");
+                                    event.setParameter("Who", collaborators.get(z));
+                                    FeedUtil.addEntry("", documentName, event);
+                                    new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
                                     System.out.println("DOPO UPDATE");
                                     check = true;
 
@@ -208,6 +246,7 @@ public class GoDoc {
                             }
 
                             if (check == false) {
+                                System.out.println("QUI!");
                                 addReaders(documentEntry, tempusers[i]);
                                 AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
                                 event.setParameter("File", documentName);
@@ -217,6 +256,7 @@ public class GoDoc {
                                 new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
                             }
 
+                        }
                         }
                         tempwriter = writers.split(delimiter);
                         // System.out.println("tempwriter: "+tempwriter.length);
@@ -284,14 +324,15 @@ public class GoDoc {
 
             //  documentEntry.setContent(new PlainTextConstruct(s));
             documentEntry.updateMedia(false);
-            //  return "salvato";
-            return documentEntry.getDocumentLink().getHref();
+             return "notnew";
+        //    return documentEntry.getDocumentLink().getHref();
         } catch (Exception ex) {
             ex.printStackTrace();
 
             return ex.toString();
         }
     }
+    
 
     public String saveDoc(String login, String name, String s) {
         try {
@@ -423,21 +464,23 @@ public class GoDoc {
 
             }
             String users = readers.toString();
-            System.out.println(users);
-            String nousers = "";
-            if (users.equals("[]")) {
-                users = "";
-            } else {
-                users = users.substring(1, users.length() - 1);
-            }
+           
 
+            String nousers= "";
+            if(users.equals("[]")) users = "";
+            else users = users.substring(1, users.length() - 1);
+            System.out.println(users);
             String writers = collaborators.toString();
+            
+
+            
+
+
+            if(writers.equals("[]"))writers = "";
+            else writers = writers.substring(1, writers.length() - 1);
             System.out.println(writers);
-            if (writers.equals("[]")) {
-                writers = "";
-            } else {
-                writers = writers.substring(1, writers.length() - 1);
-            }
+            
+            
             if (people.toString().contains(owner) == true) {
                 list.add(s);
                 list.add(users);
@@ -449,6 +492,7 @@ public class GoDoc {
                 list.add(nousers);
                 return list;
             }
+
         } catch (Exception ex) {
             System.out.println(ex.toString());
             return null;
@@ -490,10 +534,18 @@ public class GoDoc {
         return s;
     }
 
+
     public static String saveDiagram(String login, String name, String s, String users, String writers) {
+
         DocsService service = new DocsService("Document List Demo");
+        //List<String> errore = new ArrayList();
+      //  errore.add("errore");
         try {
             service.setUserCredentials(docMakerLogin, docMakerPasswd);
+
+
+            
+
             if (users != null) {
                 return new GoDoc(service).saveDoc(login, name, s, users, writers);
             } else {
@@ -503,6 +555,7 @@ public class GoDoc {
         } catch (Exception ex) {
             ex.printStackTrace();
             return ex.toString();
+            
         }
     }
 

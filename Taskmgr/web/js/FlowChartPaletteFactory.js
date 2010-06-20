@@ -27,9 +27,11 @@ FlowChartPaletteFactory.prototype.createContent = function(objId, real) {
    var shared = DOM.createElement("INPUT","shared");
    var writers = DOM.createElement("INPUT","writers");
    var approved = DOM.createElement("SPAN","approved");
-   var link = DOM.createElement("A","link");
+   var link = DOM.createElement("INPUT","link");
+   var view = DOM.createElement("SPAN","view");
+   var br = DOM.createElement("BR","br");
  //  link.setAttribute("href","");
-   link.setAttribute("target",'_blank');
+   link.setAttribute("type",'hidden');
   // link.innerHTML = "\nLink";
    approved.setAttribute("id","approved");
    shared.setAttribute("type","hidden");
@@ -48,7 +50,8 @@ FlowChartPaletteFactory.prototype.createContent = function(objId, real) {
    elm1.setAttribute("id","desc");
    elm1.setAttribute("type","hidden");
    span.setAttribute("id","span");
-   nome.innerHTML = "Click to edit";
+   nome.innerHTML = "Dblclick to edit";
+   view.innerHTML = "\nView";
  //  nome.style.color = "green";
    approved.innerHTML ="";
    approved.style.fontSize ="10px";
@@ -62,11 +65,13 @@ FlowChartPaletteFactory.prototype.createContent = function(objId, real) {
    span.appendChild(writers);
    span.appendChild(approved);
    span.appendChild(link);
+   span.appendChild(br);
+  
    
   if (real) {
     span.className = "editable";
      if (objId=="rect") {
-    
+     span.appendChild(view);
     var own = document.getElementById("owner").value;
      
     // {alert("owner uguali");span.className = "editable";}
@@ -77,6 +82,12 @@ FlowChartPaletteFactory.prototype.createContent = function(objId, real) {
         
         TextEdit.invoke(event);//Editable.tryedit();
     }
+    view.onclick = function(event) {
+
+        TextEdit.invokeView(event);//Editable.tryedit();
+    }
+
+
      }
      if(objId=="diamond") 
      {

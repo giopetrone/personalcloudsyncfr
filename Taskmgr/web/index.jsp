@@ -25,6 +25,11 @@
             var notifica = 0;
             var allusers = new Array();
             var z = 0;
+            var rect = 0;
+            var archi = 0;
+            var blocksid = new Array();
+            var blockstatus = new Array();
+            var loadjson = "";
 
             function timedCount()
             {
@@ -102,6 +107,7 @@
                 // alert(param != 0);
                 //   }
                 // var url1 = "http://marinoflow.appspot.com/nuovastr.txt";
+               // alert(rect);
                 var jsonString = Jalava.diagram.persist();
                 var persisted = JSON.parse(jsonString);
                 var blocks = persisted.blocks;
@@ -136,7 +142,11 @@
                 objXml.setRequestHeader('owner',owner);
                 objXml.setRequestHeader('users',users);
                 objXml.setRequestHeader('writers',writers);
-
+              //  objXml.setRequestHeader('blocks',rect);
+              //  objXml.setRequestHeader('connections',loadjson);
+                objXml.setRequestHeader('loadjson',loadjson);
+        
+                
                 objXml.send(jsonString);
                 str = objXml.responseText;
                 confirm("RISP from server: " +str);
@@ -254,26 +264,44 @@
                     if(objXml.readyState  == 4)
                     {
                         if(objXml.status  == 200) {
+                           
                             str = objXml.responseText;
+                        //     alert(str);
+                            loadjson = objXml.responseText;
+                      //      alert(loadjson);
                             people = objXml.getResponseHeader("people");
                             writers = objXml.getResponseHeader("writers");
                             if(str=="DIAGRAMMA NON TROVATO") {alert("DIAGRAMMA NON TROVATO");return}
                             
                             try{
 
-                                /*/var persisted = JSON.parse(str);
-                            var blocks = persisted.blocks;
+
+                            var persisted = JSON.parse(str);
+                            rect = persisted.blocks.length;
+                            archi = persisted.connections.length;
+                            var z =0;
+                            for(var j=0;j<rect;j++)
+                            {
+                                if(persisted.blocks[j].imageId == "rect")
+                                {
+                                    var status = persisted.blocks[j].type;
+                                    var id = persisted.blocks[j].id;
+                                    blocksid[z] = id;
+                                    blockstatus[z] = status;
+                                    z++;
+                                }
+                                
 
                                 var persisted = JSON.parse(str);
                                 var blocks = persisted.blocks;
-                                var users = blocks[0].shared;
-                                var writers = blocks[0].writers;
-                                 document.getElementById('users').value =  users;
-                                document.getElementById('writers').value = writers;*/
+
+
+                            }
+                               
 
                            
 
-                                 
+                           
                                 document.getElementById('users').value =  people;
                                 document.getElementById('writers').value = writers;
 
@@ -315,7 +343,8 @@
 
             function dado(){
                 var jsonString = Jalava.diagram.persist();
-                
+                confirm(blocksid.toString());
+                confirm(blockstatus.toString());
                 confirm(jsonString);
             }
 
@@ -346,8 +375,11 @@
     <body onload="carica();"/>
     <%
 
-                String email = request.getParameter("email");
-                //      String email = "fabrizio.torretta@gmail.com";
+
+             //   String email = request.getParameter("email");
+                   String email = "fabrizio.torretta@gmail.com";
+
+               
                 String passWord = request.getParameter("passWord");
 
     %>
@@ -367,7 +399,7 @@
         <input type="text" id="owner" name="owner" value= "fabrizio.torretta@gmail.com" disabled="disabled" />
         <input type="text" id="users" name="users" value= "" disabled="disabled" />
         <input type="text" id="writers" name="writers" value= "" disabled="disabled" />
-        <a href="#" onclick="childWindow=open('/addpriv.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="add" name="add" >Add privileges to users </a>
+        <a href="#" onclick="childWindow=open('/addpriv.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="add" name="add" >Change privileges of users </a>
 
 
 

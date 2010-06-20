@@ -133,12 +133,95 @@ frmElement.value = window.parent.TextEdit.getCurrentLink();
 
 
 
+function append()
+      {
+
+                var add = document.getElementById("lilink");
+                var cb = document.createElement( "input" );
+                var children = add.childNodes.length;
+            //    alert(children);
+              //  if(children == 3) add.appendChild(br);
+                cb.type = "text";
+                //cb.id = value;
+                //cb.value = value;
+               // cb.name = "checkgroup";
+                //var text = document.createTextNode( value);
+                var br = document.createElement("br");
+                
+                //add.appendChild(text);
+                add.appendChild(br);
+                add.appendChild(cb);
+
+                 }
+
+
+function getLinks()
+{
+    try
+    {
+    var links = window.parent.TextEdit.getCurrentLinks();
+    var arraylinks = links.split(",");
+    var add = document.getElementById("lilink");
+  
+   for(var i=0;i<arraylinks.length;i++)
+   {
+                if(arraylinks[i] != "" )
+                {
+                    var link = document.createElement("a");
+                    link.setAttribute('href',arraylinks[i]);
+                    link.setAttribute('target', '_blank');
+                    var num = i+1;
+                    var text = document.createTextNode("Link"+num);
+                    var br = document.createElement("br");
+                    link.appendChild(text);
+                    add.appendChild(br);
+                    add.appendChild(link);
+                }
+                
+                
+
+   }}catch(e){alert(e.message);}
+}
+
+ function mergelinks()
+ {
+     var add = document.getElementById("lilink");
+     var children = add.childNodes.length;
+     var linkString = '';
+     for(var i=0;i<children;i++)
+     {
+         if(add.childNodes[i].type == "text")
+         {
+             var value = add.childNodes[i].value;
+             if(value != "") 
+             {
+
+
+
+                 linkString += value + ',';
+                 };
+             }
+         }
+         var length = linkString.length;
+         var links = linkString.substr(0, length - 1);
+     //    alert(linkString.substr(0, length - 1));
+         parent.TextEdit.setLinks(links);
+         
+     }
+ 
+
+
+
+
+
+
+
 
 
 </script>
 </head>
 
-<body id="public" onload="initStatus(document.forms[0], 'status');initForm(document.forms[0], 'nome');initDate(document.forms[0], 'theDate');initCat(document.forms[0], 'category');initShare(document.forms[0], 'share');initAssign(document.forms[0],'assign');initLink(document.forms[0],'link');initDesc(document.forms[0],'elm1');go();">
+<body id="public" onload="getLinks();initStatus(document.forms[0], 'status');initForm(document.forms[0], 'nome');initDate(document.forms[0], 'theDate');initCat(document.forms[0], 'category');initShare(document.forms[0], 'share');initAssign(document.forms[0],'assign');initDesc(document.forms[0],'elm1');go();">
 <div id="container">
 
 
@@ -197,9 +280,9 @@ frmElement.value = window.parent.TextEdit.getCurrentLink();
 	<div>
 		<select name="status" id="status" >
 
-                    <option value=""></option>
-                    <option value="Not Enabled">Not Enabled</option>
                     <option value="Enabled">Enabled</option>
+                    <option value="Not Enabled">Not Enabled</option>
+                    
                     <option value="Done">Done</option>
                     
 
@@ -246,13 +329,15 @@ frmElement.value = window.parent.TextEdit.getCurrentLink();
 
 
 
-    <li id="foli106" 		class="     ">
-	<label class="desc" id="title106" for="Field106">
-		Link
+    <li  		class="     ">
+	<label class="desc" id="links" for="Field106">
+		Links
 			</label>
-	<div>
+        <a href="#" onclick="append();" >Add Link </a>
+	<div id="lilink">
 		<input id ="link" name="link" type="text"/>
-			</div>
+                
+	</div>
 	</li>
 
 
@@ -264,8 +349,9 @@ frmElement.value = window.parent.TextEdit.getCurrentLink();
 	<li class="buttons ">
 		<div>
 
-	<input type="button" name="ok" value="Ok"      onclick="parent.TextEdit.setContent(document.myform.nome.value,document.myform.status.value,document.myform.theDate.value,document.myform.category.value,document.myform.share.value,document.myform.assign.value,document.myform.link.value,tinyMCE.activeEditor.getContent());"/>
+	<input type="button" name="ok" value="Ok"      onclick="mergelinks(),window.parent.TextEdit.setContent(document.myform.nome.value,document.myform.status.value,document.myform.theDate.value,document.myform.category.value,document.myform.share.value,document.myform.assign.value,tinyMCE.activeEditor.getContent())"/>
 	<input type="button" name="reset" value="Cancella" onclick="window.parent.TextEdit.cancel()"/>
+        <input type="button" name="merge" value="Merge Links" onclick="mergelinks(),window.parent.TextEdit.cancel()"/>
 
 				</div>
 	</li>

@@ -141,7 +141,9 @@ public class SaveTemplate extends HttpServlet {
 
 
 
+
             String val = GoDoc.saveDiagram(login, valorefile, gson.toJson(ob), users, writers);
+
 
 
             AtomEvent event = new AtomEvent();

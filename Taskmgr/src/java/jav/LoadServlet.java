@@ -34,9 +34,11 @@ public class LoadServlet extends HttpServlet {
         response.setContentType("text/plain");
         PrintWriter out = response.getWriter();
         List<String> list = GoDoc.loadDiagram(valorefile, request.getHeader("refresh") != null,owner);
+        
         if(list.isEmpty())
         {
             val = "DIAGRAMMA NON TROVATO";
+           
         }
         else
         {
@@ -46,12 +48,14 @@ public class LoadServlet extends HttpServlet {
 
             response.setHeader("people", people);
             response.setHeader("writers",writers);
+           
         }
         try {
             /* TODO output your page here */
           //  out.println(val);
           //  System.err.println(val);
             out.print(val);
+          
            
         } finally {
             out.close();

@@ -13,6 +13,22 @@ try {
   }
 
 }
+
+
+TextEdit.invokeView = function(event) {
+try {
+  TextEdit.target = DOM.getEventTarget(event, "mytextarea");
+
+  TextEdit.showframe4();
+
+  } catch (e) {
+  	alert("DENTRO INVOKE View " +e.message);
+  }
+
+}
+
+
+
 TextEdit.invokeLoad= function(event)
 {
     try
@@ -53,7 +69,7 @@ TextEdit.invokeLoad= function(event)
   {
       //Utente loggato  e' owner, assegnatario o writer'
       alert("dentro if");
-      TextEdit.showframe4();
+      TextEdit.showframe();
   }
  
   else if(shared.indexOf(user)!=-1){
@@ -212,7 +228,7 @@ TextEdit.showframe4 = function() {
   TextEdit.opaque = opaque;
 
   if (!TextEdit.frame) TextEdit.createFrame();
-  TextEdit.frame.src = '/modifyLoad.html';
+  TextEdit.frame.src = '/view.html';
 
   // centre the frame
   var h = document.body.clientHeight;
@@ -328,11 +344,11 @@ TextEdit.getCurrentShare = function() {
 }
 
 
-TextEdit.getCurrentLink = function()
+TextEdit.getCurrentLinks = function()
 {
-    var link = TextEdit.target.childNodes[6].href;
+    var links = TextEdit.target.childNodes[6].value;
    
-    return link;
+    return links;
 }
 
 
@@ -340,7 +356,7 @@ TextEdit.getCurrentLink = function()
 TextEdit.getCurrentAssign = function()
 {
     var assign = TextEdit.target.parentNode.parentNode.assign;
-    if (assign==null) assign = "Assign Task to users";
+    if (assign==null) assign = "";
     return assign;
 }
 
@@ -362,7 +378,7 @@ TextEdit.getCurrentDate = function() {
   return date;
 }
 
-TextEdit.setContent = function(data, status,date,cat,people,assign,link,desc) {
+TextEdit.setContent = function(data, status,date,cat,people,assign,desc) {
   try
   {
 
@@ -374,12 +390,12 @@ TextEdit.setContent = function(data, status,date,cat,people,assign,link,desc) {
   TextEdit.target.parentNode.parentNode.cat = cat;
   TextEdit.target.parentNode.parentNode.assign = assign;
   TextEdit.target.parentNode.parentNode.desc = desc;
-  if(link != ""){
-      var http = "http://";
-      if(link.indexOf(http)<0) link = http + link;
-      TextEdit.target.childNodes[6].innerHTML = "\nLink"
-      TextEdit.target.childNodes[6].setAttribute('href',link);
-  }
+  
+      //var http = "http://";
+     // if(link.indexOf(http)<0) link = http + link;
+   //   TextEdit.target.childNodes[6].innerHTML = "\nLink"
+   //   TextEdit.target.childNodes[6].setAttribute('href',link);
+  
   TextEdit.target.childNodes[1].value = parent.document.getElementById("owner").value;
   var i= TextEdit.target.parentNode.parentNode.parentNode.childNodes.length;
   var j= 20;
@@ -393,7 +409,7 @@ TextEdit.setContent = function(data, status,date,cat,people,assign,link,desc) {
   
   if (status=="Done")
   {
-      TextEdit.target.childNodes[0].style.color = "black";
+      TextEdit.target.childNodes[0].style.color = "gray";
       TextEdit.target.parentNode.parentNode.type = status;
       
 
@@ -412,7 +428,7 @@ TextEdit.setContent = function(data, status,date,cat,people,assign,link,desc) {
   }
 
   if (status=="") {
-      TextEdit.target.childNodes[0].style.color = "green";
+      TextEdit.target.childNodes[0].style.color = "black";
       TextEdit.target.parentNode.parentNode.type = status;
     
   }
@@ -441,7 +457,17 @@ TextEdit.setContentCondition = function(andor)
     }
     catch(e){alert("Dentro SetContentCondition "+e.message);}
 }
+TextEdit.setLinks = function(links)
+{
+    try
+    {
+        TextEdit.target.childNodes[6].value = links;
+      //  TextEdit.target.childNodes[6].setAttribute('href',link);
+        
 
+    }
+    catch(e){alert("DENTRO SETLINKS "+e.message);}
+}
 
 
 TextEdit.setContentDecision = function(decision,target,nome)
