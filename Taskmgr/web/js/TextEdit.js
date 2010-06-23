@@ -68,12 +68,12 @@ TextEdit.invokeLoad= function(event)
   if(own == user  ||assign.indexOf(user)!=-1 ||writers.indexOf(user) !=-1 )
   {
       //Utente loggato  e' owner, assegnatario o writer'
-      alert("dentro if");
+    //  alert("dentro if");
       TextEdit.showframe();
   }
  
   else if(shared.indexOf(user)!=-1){
-        alert("Solo details");
+     //   alert("Solo details");
         TextEdit.showframe3();
   }
     }
@@ -276,8 +276,17 @@ TextEdit.showframe6 = function() {
 TextEdit.getCurrentContent = function() {
 
 
-  var content =  TextEdit.target.childNodes[0].innerHTML
+  var content =  TextEdit.target.childNodes[0].innerHTML;
   if (content=="") content = "Task Name";
+  return content;
+}
+
+
+TextEdit.getCheck = function() {
+
+
+  var content =  TextEdit.target.childNodes[8].value;
+ // if (content=="") content = "Task Name";
   return content;
 }
 
@@ -432,7 +441,9 @@ TextEdit.setContent = function(data, status,date,cat,people,assign,desc) {
       TextEdit.target.parentNode.parentNode.type = status;
     
   }
-  TextEdit.check();
+  var check = TextEdit.getCheck();
+  //alert(check);
+  if(check == "false") TextEdit.check();
   TextEdit.reposition();
  
   TextEdit.cancel();
@@ -602,7 +613,7 @@ TextEdit.check = function()
                        var check = list[h];
                        if(check == "Done") {done[x]=check;x++}
                    }
-                   if(done.length != list.length)
+                   if(done.length != list.length || list.length == 0)
                    {
                        for(var z=0;z<connections;z++)
                        {
@@ -625,15 +636,16 @@ TextEdit.check = function()
                                            if(id3 == id4)
                                            {
                                               
-                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].style.color = "red";
+                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].childNodes[0].childNodes[0].style.color = "red";
                                                TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].type = "Not Enabled";
+                                              // TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].childNodes[0].childNodes[7].value = "false";
                                            }
                                        }
                                    }
                                }
                            }
                        }
-                   }else if(done.length == list.length)
+                   }else if(done.length == list.length && done.length != 0)
                    {
                            for(var z=0;z<connections;z++)
                        {
@@ -656,8 +668,9 @@ TextEdit.check = function()
                                            if(id3 == id5)
                                            {
                                              //  alert(TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].childNodes[0].style.color);
-                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].childNodes[0].style.color = "green";
+                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].childNodes[0].childNodes[0].childNodes[0].style.color = "green";
                                                TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].type = "Enabled";
+                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].childNodes[0].childNodes[0].childNodes[8].value = "true";
                                            }
                                        }
                                    }
@@ -704,8 +717,11 @@ TextEdit.check = function()
 
                                            if(id3 == id4)
                                            {
-                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].style.color = "green";
+                                               var nome = TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].childNodes[0].childNodes[0];
+                                               nome.style.color = "green";
+                                            //   TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].style.color = "green";
                                                TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].type = "Enabled";
+                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].childNodes[0].childNodes[8].value = "true";
                                            }
                                        }
                                    }
@@ -714,29 +730,30 @@ TextEdit.check = function()
                        }
                    }else
                    {
-                           for(var z=0;z<connections;z++)
-                       {
-                           var source2 = persisted.connections[z].source;
-                           if(blockid == source2){
-                               var target2 = persisted.connections[z].target;
-                               for(var g=0;g<blocks;g++)
+                           for(var q=0;q<connections;q++)
+                           {
+                           var source3 = persisted.connections[q].source;
+                           if(blockid == source3){
+                               var target3 = persisted.connections[q].target;
+                               for(var d=0;d<blocks;d++)
                                {
-                                   var id3 = persisted.blocks[g].id;
-                                   if(target2 == id3)
+                                   var id6 = persisted.blocks[d].id;
+                                   if(target3 == id6)
                                    {
 
-                                       var children= TextEdit.target.parentNode.parentNode.parentNode.childNodes.length;
+                                       var children3= TextEdit.target.parentNode.parentNode.parentNode.childNodes.length;
                                        //alert(children);
-                                       for(var r=20;r<children;r++)
+                                       for(var p=20;p<children3;p++)
                                        {
                                               // alert(TextEdit.target.parentNode.parentNode.parentNode.childNodes[h].shared)
-                                           var id4 = TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].id;
+                                           var id7 = TextEdit.target.parentNode.parentNode.parentNode.childNodes[p].id;
 
-                                           if(id3 == id4)
+                                           if(id6 == id7)
                                            {
-                                               
-                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].style.color = "red";
-                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].type = "Not Enabled";
+                                               var nome = TextEdit.target.parentNode.parentNode.parentNode.childNodes[p].childNodes[0].childNodes[0].childNodes[0];
+                                               nome.style.color = "red";
+                                           //    TextEdit.target.parentNode.parentNode.parentNode.childNodes[p].childNodes[0].style.color = "red";
+                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[p].type = "Not Enabled";
                                            }
                                        }
                                    }
@@ -838,7 +855,7 @@ TextEdit.checkDecision = function(target)
                                            {
 
                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[z].childNodes[2].style.color = "green";
-                                              TextEdit.target.parentNode.parentNode.parentNode.childNodes[z].childNodes[2].innerHTML = "Approved";
+                                              TextEdit.target.parentNode.parentNode.parentNode.childNodes[z].childNodes[2].innerHTML = "Yes";
 
                                            }
                                       }
@@ -854,7 +871,7 @@ TextEdit.checkDecision = function(target)
                                            {
 
                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[x].childNodes[2].style.color = "red";
-                                              TextEdit.target.parentNode.parentNode.parentNode.childNodes[x].childNodes[2].innerHTML = "Rejected";
+                                              TextEdit.target.parentNode.parentNode.parentNode.childNodes[x].childNodes[2].innerHTML = "No";
 
                                            }
                                       }

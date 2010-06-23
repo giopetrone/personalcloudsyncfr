@@ -167,13 +167,18 @@ function getLinks()
    {
                 if(arraylinks[i] != "" )
                 {
-                    var link = document.createElement("a");
-                    link.setAttribute('href',arraylinks[i]);
-                    link.setAttribute('target', '_blank');
-                    var num = i+1;
-                    var text = document.createTextNode("Link"+num);
+                    var link = document.createElement("input");
+                    link.setAttribute('value',arraylinks[i]);
+                 //   var a = document.createElement("a");
+                  //  a.setAttribute('target', '_blank');
+                  //  a.setAttribute('href',arraylinks[i]);
+                  //  var num = i+1;
+                   // var text = document.createTextNode("Link"+num);
                     var br = document.createElement("br");
-                    link.appendChild(text);
+                    
+                    //a.appendChild(text);
+                   // link.appendChild(a);
+                   // link.appendChild(text);
                     add.appendChild(br);
                     add.appendChild(link);
                 }

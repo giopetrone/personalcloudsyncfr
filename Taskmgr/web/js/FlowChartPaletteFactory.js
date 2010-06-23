@@ -30,6 +30,10 @@ FlowChartPaletteFactory.prototype.createContent = function(objId, real) {
    var link = DOM.createElement("INPUT","link");
    var view = DOM.createElement("SPAN","view");
    var br = DOM.createElement("BR","br");
+   var check = DOM.createElement("input");
+   view.setAttribute("id","view");
+   check.setAttribute("value","false");
+   check.setAttribute("type","hidden");
  //  link.setAttribute("href","");
    link.setAttribute("type",'hidden');
   // link.innerHTML = "\nLink";
@@ -51,8 +55,9 @@ FlowChartPaletteFactory.prototype.createContent = function(objId, real) {
    elm1.setAttribute("type","hidden");
    span.setAttribute("id","span");
    nome.innerHTML = "Dblclick to edit";
-   view.innerHTML = "\nView";
+   
  //  nome.style.color = "green";
+   view.style.fontSize ="10px";
    approved.innerHTML ="";
    approved.style.fontSize ="10px";
    span.appendChild(nome);
@@ -66,12 +71,15 @@ FlowChartPaletteFactory.prototype.createContent = function(objId, real) {
    span.appendChild(approved);
    span.appendChild(link);
    span.appendChild(br);
+   span.appendChild(check);
+   span.appendChild(view);
   
    
   if (real) {
     span.className = "editable";
      if (objId=="rect") {
-     span.appendChild(view);
+
+     view.innerHTML = "\nView";
     var own = document.getElementById("owner").value;
      
     // {alert("owner uguali");span.className = "editable";}

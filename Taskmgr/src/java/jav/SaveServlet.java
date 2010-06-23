@@ -35,14 +35,14 @@ public class SaveServlet extends HttpServlet {
     //  String valore;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        System.err.println("in save servlet");
+        System.out.println("in save servlet");
         String nomeFile = request.getHeader("filenamemio");
         BufferedReader re = request.getReader();
         String flowSource = re.readLine();
         String owner = request.getHeader("owner");
         String users = request.getHeader("users");
-        String loadjson = request.getHeader("loadjson");
-       // System.err.println(loadjson);
+       String loadjson = request.getHeader("loadjson");
+    
       //  int loadblocks = Integer.parseInt(request.getHeader("blocks"));
       //  int loadconnections = Integer.parseInt(request.getHeader("connections"));
         if(users == null) users="";
@@ -58,7 +58,7 @@ public class SaveServlet extends HttpServlet {
      //   vecchia versione Grafico ob = gson.fromJson(flowSource, Grafico.class);
 
         DeltaGrafico dg = gson.fromJson(flowSource, DeltaGrafico.class);
-        dg.createChangeEvents();
+        
         Grafico ob = dg.getNuovo();
         
       //  System.err.println(ob.faGrafo());
@@ -168,7 +168,8 @@ public class SaveServlet extends HttpServlet {
               if(ob.blocks[j].imageId.equalsIgnoreCase("rect"))
               {
                   String found = ob.blocks[j].assign;
-                  if(found !=null)
+                  if(found == null) found="";
+                  if(!found.equals(""))
                   {
                       AtomEvent event = new AtomEvent(owner, "TaskManager", "Assign User");
                       event.setParameter("Task", ob.blocks[j].name);
@@ -183,6 +184,7 @@ public class SaveServlet extends HttpServlet {
           }
           else if(val.equals("notnew"))
           {
+              dg.createChangeEvents(nomeFile,owner);
               if(loadjson!=null){
 
               Gson gsonLoad = new Gson();
@@ -213,13 +215,17 @@ public class SaveServlet extends HttpServlet {
                   {
                       String id = ob.blocks[j].id;
                       String newstatus = ob.blocks[j].type;
+                      if(newstatus == null) newstatus="";
                       String newassign = ob.blocks[j].assign;
+                      if(newassign == null) newassign = "";
                       for(int i=0;i<oldsize;i++)
                       {
                           if(ob2.blocks[i].id.equals(id))
                           {
                               String oldstatus = ob2.blocks[i].type;
+                              if(oldstatus == null) oldstatus = "";
                               String oldassign = ob2.blocks[i].assign;
+                              if(oldassign == null) oldassign = "";
                               if(!newstatus.equals(oldstatus))
                               {
 

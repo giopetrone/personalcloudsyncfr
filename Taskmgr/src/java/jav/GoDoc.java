@@ -79,8 +79,8 @@ public class GoDoc {
         DocsService service = new DocsService("Document List Demo");
         try {
             service.setUserCredentials(docMakerLogin, docMakerPasswd);
-            return new GoDoc(service).saveTemplate("NULLUSER", "temp.txt", "ciao");
-            //     return new GoDoc(service).showAllDocs();
+         //   return new GoDoc(service).saveTemplate("NULLUSER", "temp.txt", "ciao");
+              return new GoDoc(service).showAllDocs();
         } catch (Exception ex) {
             ex.printStackTrace();
             return ex.toString();
@@ -267,14 +267,15 @@ public class GoDoc {
                             System.out.println("TEMPWRITER: " + tempwriter[j]);
 
                             for (int i = 0; i < tempusers.length; i++) {
-                                System.out.println("TEMPUSER: " + tempusers[i]);
+                               // System.out.println("TEMPUSER: " + tempusers[i]);
                                 if (tempusers[i].equals(tempwriter[j])) {
                                     check = true;
                                 }
                             }
                             for (int z = 0; z < collaborators.size(); z++) {
                                 System.out.println("collaborators: " + collaborators.get(z));
-                                if (collaborators.get(z).equals(tempwriter[j])) {
+                                if (collaborators.get(z).contains(tempwriter[j]) || tempwriter[j].contains(collaborators.get(z))) {
+                                    System.out.println("DENTRO IF");
                                     check = true;
                                 }
                             }
@@ -513,7 +514,7 @@ public class GoDoc {
         // for (int i = 0; i < 10; i++) {
         DocumentListFeed feed = service.getFeed(documentListFeedUrl, DocumentListFeed.class);
         for (DocumentListEntry entry : feed.getEntries()) {
-            ret += printDocumentEntry(entry) + "\n";
+            ret += printDocumentEntry(entry) + ",";
         }
         try {
             //  Thread.currentThread().sleep(1000 * 121);
@@ -528,10 +529,15 @@ public class GoDoc {
         DateTime date = doc.getPublished();
         DateTime date1 = doc.getUpdated();
         String versionId = doc.getVersionId();
+        String resourceId = doc.getResourceId();
+        String title = "";
+        if(doc.getTitle().getPlainText().contains(".txt")) title = doc.getTitle().getPlainText();
+        String docType = resourceId.substring(0, resourceId.lastIndexOf(':'));
+
         //   System.out.println(" -- Document(" + shortId + "/" + doc.getTitle().getPlainText() + ")" + date.toString() +" ver. "+ versionId);
         String s = " " + doc.getTitle().getPlainText() + "C: " + date.toString() + " U: " + date1.toString();
         // System.out.println(s);
-        return s;
+        return title;
     }
 
 

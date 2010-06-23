@@ -213,27 +213,45 @@ PaletteFactory.prototype.generateFigure = function(obj) {
 
     // add custom handlers to the block
     var span = DOM.findNodeByName(block.element, "SPAN", "mytextarea", true);
-  //  confirm("generate span trovato? "+ span);
+   // var view = DOM.findNodeByIdOrName(span, "SPAN", "nome", true);
+   
+    
+   
+         
+        
+    
+  //  confi;rm("generate span trovato? "+ view.id);
  
   span.className = "editable";
   var status = span.parentNode.parentNode.type;
   var templ = span.parentNode.parentNode.template;
-
+  
   
 
   if (templ == "template" ) {
       span.childNodes[0].style.color = "black";
-      span.childNodes[6].innerHTML = "";
-      span.childNodes[6].removeAttribute("href");
+    //  span.childNodes[6].innerHTML = "";
+    //  span.childNodes[6].removeAttribute("href");
       span.childNodes[5].innerHTML = "";
       template = "true";
      // state = "In progress";/
   }
-  
+    
+
+   
  
     span.ondblclick = function(event){
+       
    
       TextEdit.invokeLoad(event);
+    }
+   
+        var view = span.childNodes[9];
+       
+         view.onclick = function(event) {
+
+         
+         TextEdit.invokeView(event);//Editable.tryedit();
     }
     
     if (Jalava.propertyPage) block.addPropertyChangeListener(Jalava.propertyPage);
