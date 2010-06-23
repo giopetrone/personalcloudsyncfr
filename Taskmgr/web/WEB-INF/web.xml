@@ -20,6 +20,10 @@
         <servlet-name>SaveTemplate</servlet-name>
         <servlet-class>jav.SaveTemplate</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ChangeStateServlet</servlet-name>
+        <servlet-class>jav.ChangeStateServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>LoadServlet</servlet-name>
         <url-pattern>/LoadServlet</url-pattern>
@@ -39,6 +43,10 @@
     <servlet-mapping>
         <servlet-name>SaveTemplate</servlet-name>
         <url-pattern>/SaveTemplate</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ChangeStateServlet</servlet-name>
+        <url-pattern>/ChangeStateServlet</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

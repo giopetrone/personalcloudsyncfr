@@ -55,7 +55,13 @@ public class SaveServlet extends HttpServlet {
         String writers = request.getHeader("writers");
 
         Gson gson = new Gson();
-        Grafico ob = gson.fromJson(flowSource, Grafico.class);
+     //   vecchia versione Grafico ob = gson.fromJson(flowSource, Grafico.class);
+
+        DeltaGrafico dg = gson.fromJson(flowSource, DeltaGrafico.class);
+        dg.createChangeEvents();
+        Grafico ob = dg.getNuovo();
+        
+      //  System.err.println(ob.faGrafo());
         
         
         response.setContentType("text/html;charset=UTF-8");

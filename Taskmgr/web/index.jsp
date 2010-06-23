@@ -30,6 +30,11 @@
             var blocksid = new Array();
             var blockstatus = new Array();
             var loadjson = "";
+            var versioneOriginale = "{\"connections\":[],\"blocks\":[]}"; // vuota
+            // pezzi per creare oggetto DeltaGrafico da spedire a servlet
+            var primoPezzo = "{\"vecchio\":";
+            var secondoPezzo = ",\"nuovo\":";
+            var terzoPezzo = "}";
 
             function timedCount()
             {
@@ -146,8 +151,8 @@
               //  objXml.setRequestHeader('connections',loadjson);
                 objXml.setRequestHeader('loadjson',loadjson);
         
-                
-                objXml.send(jsonString);
+                var deltaString = primoPezzo + versioneOriginale + secondoPezzo + jsonString + terzoPezzo;
+                objXml.send(deltaString);
                 str = objXml.responseText;
                 confirm("RISP from server: " +str);
             }
@@ -307,7 +312,7 @@
 
                                
 
-                           
+                           versioneOriginale = str;
                                 update(str);
                             }catch(e){alert("Non hai i permessi necessari per il Load");}
                         } else {}

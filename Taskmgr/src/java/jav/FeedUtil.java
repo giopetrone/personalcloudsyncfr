@@ -140,7 +140,7 @@ Writer writer = new FileWriter(fileName);
             //  entry.setPublishedDate(DATE_PARSER.parse("2009-07-" + i));
             entry.setPublishedDate(Calendar.getInstance().getTime());
             description = new SyndContentImpl();
-            description.setType("text/plain");
+            description.setType("text/html");
             description.setValue(event.toXml());
             entry.setDescription(description);
             entries.add(entry);
