@@ -14,11 +14,12 @@
         <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
         <title>Jalava : Web-based Diagram Editor</title>
         <script language="JavaScript" src="./js/Jalava.js"></script>
+       
         <script language="JavaScript">
         
             // pezzo timer
             // pezzo timer
-            var c=0;
+            var c = 0;
             var t;
             var timer_is_on=0;
             var nuovaVersione = 0;
@@ -113,6 +114,7 @@
                 //   }
                 // var url1 = "http://marinoflow.appspot.com/nuovastr.txt";
                // alert(rect);
+                c = 1;
                 var jsonString = Jalava.diagram.persist();
                 var persisted = JSON.parse(jsonString);
                 var blocks = persisted.blocks;
@@ -260,10 +262,10 @@
 
             function carica(){
                 //  alert("in carica");
-                nomeFile = gup("flow");
+                nomeFile = gup("Flow");
                 if (nomeFile != null) {
                     document.getElementById('area').value = nomeFile ;
-                    loadDiagram(100);
+                    loadDiagram(nomeFile);
                 }
             }
             
@@ -395,6 +397,21 @@
 
             Jalava.start(initJalava);
 
+
+ function closeIt()
+{
+  if(c==0) {
+     // var aa = 1000;
+    //  saveDiagram(aa);
+      return "You should save your diagram before exit";
+  }
+  if(c==1)
+  {
+      return "Diagramma gia' salvato";
+  }
+}
+window.onbeforeunload = closeIt;
+
         </script>
 
     </head>
@@ -415,7 +432,7 @@
         <textarea rows="1" cols="5" name="area" id="area"> </textarea>
         <input type="button" value="saveDiagram" name="buttonSave" onClick="aa=1000; saveDiagram(aa);"/>
         <!--INPUT type="button" value="provalocale" name="buttonprova" onClick="dada();"-->
-        <input type="button" value="loadDiagram" name="buttonLoad" onClick="aa=1000;loadDiagram(aa);"/>
+       
         <input type="text" id="diagramName" name ="diagramName" value=""    />
         <input type="button" value="Start count!" onClick="doTimer();"/>
         <input type="text" id="txt" />

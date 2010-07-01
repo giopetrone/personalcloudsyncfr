@@ -323,7 +323,7 @@ public class GoDoc {
             service.getRequestFactory().setHeader("If-Match", "*");
             documentEntry.setMediaSource(new MediaByteArraySource(s.getBytes(), "text/plain"));
 
-            //  documentEntry.setContent(new PlainTextConstruct(s));
+   //         documentEntry.setContent(new PlainTextConstruct(s));
             documentEntry.updateMedia(false);
              return "notnew";
         //    return documentEntry.getDocumentLink().getHref();
@@ -413,6 +413,7 @@ public class GoDoc {
 
     public List<String> loadDoc(String valorefile, boolean refresh, String owner) {
         try {
+            System.out.println("-----------" +valorefile);
             DocumentListEntry documentEntry = findEntry(valorefile);
             List<String> list = new LinkedList();
 
@@ -496,7 +497,11 @@ public class GoDoc {
 
         } catch (Exception ex) {
             System.out.println(ex.toString());
-            return null;
+            List<String> list = new LinkedList();
+            list.add("errore");
+            list.add("errore");
+            list.add("errore");
+                return list;
         }
     }
 
