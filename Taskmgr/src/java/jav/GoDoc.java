@@ -321,7 +321,8 @@ public class GoDoc {
                 }
             }
             service.getRequestFactory().setHeader("If-Match", "*");
-            documentEntry.setMediaSource(new MediaByteArraySource(s.getBytes(), "text/plain"));
+           // documentEntry.setMediaSource(new MediaByteArraySource(s.getBytes(), "text/plain"));
+           documentEntry.setMediaSource(new MediaByteArraySource(s.getBytes(), "text/plain"));
 
    //         documentEntry.setContent(new PlainTextConstruct(s));
             documentEntry.updateMedia(false);
@@ -415,9 +416,11 @@ public class GoDoc {
         try {
             System.out.println("-----------" +valorefile);
             DocumentListEntry documentEntry = findEntry(valorefile);
+             System.out.println(documentEntry.toString());
             List<String> list = new LinkedList();
 
             if (documentEntry == null) {
+               
                 return list; //document not found
             }
 

@@ -39,6 +39,7 @@ public class FeedUtil {
 
     public static String FileFeedName(String flowName) {
         return "/var/www" + "/Flow/" + flowName + ".xml";
+    //    return "http://taskmgrunito.x10.mx/" +flowName +".xml";
     }
 
     public static boolean FeedWriteOk(String flowName) {

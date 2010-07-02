@@ -39,15 +39,19 @@
 
                 if (document.myform.radiogroup[i].checked==true){
                    diagram = document.myform.radiogroup[i].value;
+                   document.getElementById("name").value = diagram;
 
 
                 }}
-            // alert(diagram);
-             opener.saveDiagram(diagram);
+            // alert(diagram);  
+             opener.document.getElementById('area').value  = diagram;
+             opener.saveDiagram("true");
         }
         else
         {
-            opener.saveDiagram(name);
+            if(name.indexOf(".txt") == -1) name = name +".txt";
+            opener.document.getElementById('area').value  = name;
+            opener.saveDiagram("true");
         }
 
         }
@@ -58,7 +62,7 @@
     <body>
         <h1>Save the diagram</h1>
         <form id="myform" name="myform">
-        <input type="text" id="name" name="name" value="Inserisci nome"/>
+        <input type="text" id="name" name="name" value="Inserisci nome" onclick="document.myform.name.value=''"/>
         <br>
 <%
         String docs = jav.GoDoc.prendi();

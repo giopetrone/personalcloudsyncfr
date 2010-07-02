@@ -161,6 +161,7 @@
                 objXml.setRequestHeader('owner',owner);
                 objXml.setRequestHeader('users',users);
                 objXml.setRequestHeader('writers',writers);
+                objXml.setRequestHeader('public', param);
            //     objXml.setRequestHeader('a',a);
            //     objXml.setRequestHeader('b',b);
 
@@ -292,44 +293,12 @@
                             try{
                            
                             str = objXml.responseText;
-                        //     alert(str);
-                          //  var persisted = JSON.parse(str);
-                          //  alert(persisted);
                             loadjson = str;
-                      //      alert(loadjson);
                             people = objXml.getResponseHeader("people");
                             writers = objXml.getResponseHeader("writers");
                             if(str=="DIAGRAMMA NON TROVATO") {alert("DIAGRAMMA NON TROVATO");return}
                             
-                        //
-
-
-                        //    var persisted = JSON.parse(str);
-                        //    rect = persisted.blocks.length;
-                        //    archi = persisted.connections.length;
-                        ///    var z =0;
-                        //    for(var j=0;j<rect;j++)
-                        //    {
-                        //        if(persisted.blocks[j].imageId == "rect")
-                       //         {
-                       //             var status = persisted.blocks[j].type;
-                       //             var id = persisted.blocks[j].id;
-                        //            blocksid[z] = id;
-                      //              blockstatus[z] = status;
-                      //              z++;
-                      //          }
-                                
-
-                              //  var persisted = JSON.parse(str);
-                               // var blocks = persisted.blocks;
-
-
-                         //   }
-                               
-
-                           
-
-                           
+                    
                                 document.getElementById('users').value =  people;
                                 document.getElementById('writers').value = writers;
 
@@ -371,9 +340,19 @@
 
             function dado(){
                 var jsonString = Jalava.diagram.persist();
-                confirm(blocksid.toString());
-                confirm(blockstatus.toString());
-                confirm(jsonString);
+                var url1 = "http://taskmgrunito.x10.mx/scrifile.php";
+                objXml = new XMLHttpRequest();
+                objXml.open("POST",url1,false);
+                objXml.setRequestHeader('Content-Type',"text/plain");
+                objXml.setRequestHeader('filenamemio',diagramName);
+                objXml.setRequestHeader('owner',owner);
+                objXml.setRequestHeader('users',users);
+                objXml.setRequestHeader('writers',writers);
+
+                objXml.send(jsonString);
+                str = objXml.responseText;
+                confirm("RISP from server: " +str);
+               // confirm(jsonString);
             }
 
 
@@ -430,7 +409,7 @@ window.onbeforeunload = closeIt;
     <form name="saveandload" id="saveandload" >
         <a href="#" onclick="childWindow=open('/docs2.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="add" name="add" >SaveDiagram </a>
         <textarea rows="1" cols="5" name="area" id="area"> </textarea>
-        <input type="button" value="saveDiagram" name="buttonSave" onClick="aa=1000; saveDiagram(aa);"/>
+        <input type="button" value="Save temp Copy" name="buttonSave" onClick=" saveDiagram('false');"/>
         <!--INPUT type="button" value="provalocale" name="buttonprova" onClick="dada();"-->
        
         <input type="text" id="diagramName" name ="diagramName" value=""    />
