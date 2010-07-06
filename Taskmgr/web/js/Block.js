@@ -27,10 +27,11 @@
  * Child classes should retain this attribute.
  *
  */
-function Block(content, x, y, width, height, anchors, type, imagepath, date, shared, assign, desc, cat, name,owner,writers,template) {
+function Block(content, x, y, width, height, anchors, type, imagepath, date, shared, assign, desc, cat, name,owner,writers,template,link) {
   this.clazz = "Block";
   //this.shared = document.getElementById('shared').value;
   this.shared = shared;
+  this.link = link;
   this.writers = writers;
   this.assign = assign;
   this.date = date;
@@ -67,6 +68,7 @@ function Block(content, x, y, width, height, anchors, type, imagepath, date, sha
    this.element.cat = this.cat;
    this.element.owner = this.owner;
    this.element.writers = this.writers;
+   this.element.link = this.link;
    this.element.template = this.template
   
 }
@@ -593,6 +595,7 @@ Block.prototype.save = function() {
   var obj = new Object();
   obj.clazz = this.clazz;
   obj.type = this.element.type;
+  obj.link = this.element.link;
   obj.x = this.x;
   obj.y = this.y;
   obj.height = this.height;
@@ -634,6 +637,7 @@ Block.prototype.load = function(obj) {
   this.element.date = obj.date;
   this.anchors = obj.anchors;
   this.element.shared = obj.shared;
+  this.element.link = obj.link;
   this.element.assign = obj.assign;
   this.element.name = obj.name;
   this.element.id = this.id;

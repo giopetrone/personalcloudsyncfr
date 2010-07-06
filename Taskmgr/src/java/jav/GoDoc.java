@@ -414,9 +414,9 @@ public class GoDoc {
 
     public List<String> loadDoc(String valorefile, boolean refresh, String owner) {
         try {
-            System.out.println("-----------" +valorefile);
+           // System.out.println("-----------" +valorefile);
             DocumentListEntry documentEntry = findEntry(valorefile);
-             System.out.println(documentEntry.toString());
+          //   System.out.println(documentEntry.toString());
             List<String> list = new LinkedList();
 
             if (documentEntry == null) {

@@ -5,15 +5,21 @@
 package jav;
 
 import com.google.gson.Gson;
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URL;
+import java.net.URLConnection;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.LinkedList;
 import java.util.List;
+import sun.net.ftp.*;
+import java.net.URL;
 
 import pubsublib.event.AtomEvent;
 
@@ -61,7 +67,7 @@ public class SaveServlet extends HttpServlet {
         
         Grafico ob = dg.getNuovo();
         
-      //  System.err.println(ob.faGrafo());
+      System.out.println(ob.blocks.length);
         
         
         response.setContentType("text/html;charset=UTF-8");
@@ -69,7 +75,7 @@ public class SaveServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         try {
             if (nomeFile.contains("template")) {
-                out.println("Dentro IF");
+                System.out.println("TEMPLATE-------");
                 users = "";
                 writers = "";
                 int blocks = ob.blocks.length;
@@ -84,7 +90,7 @@ public class SaveServlet extends HttpServlet {
                         ob.blocks[i].owner = ownerBlock;
                     }
                     if (imageid.equalsIgnoreCase("rect")) {
-                        out.println("DENTRO IF RECT");
+                       
                         ob.blocks[i].assign = null;
                         ob.blocks[i].date = null;
                         ob.blocks[i].shared = null;
@@ -133,7 +139,7 @@ public class SaveServlet extends HttpServlet {
          {
              if(ob.blocks[j].imageId.equalsIgnoreCase("rect"))
              {
-                 System.out.println("qui dentro");
+                 System.out.println("-------LINKS: "+ob.blocks[j].link);
               String found = ob.blocks[j].assign;
               if(found != null) assigner += ","+found + ",";
               
@@ -175,6 +181,25 @@ public class SaveServlet extends HttpServlet {
                       event.setParameter("Task", ob.blocks[j].name);
                     //  event.setParameter("Permission", "Write");
                       event.setParameter("Who", found);
+                      FeedUtil.addEntry("", nomeFile, event);
+                  }
+                  String delimiter = ",";
+                  String[] links;
+                  links = ob.blocks[j].link.split(delimiter);
+                  for(int i=0;i<links.length;i++)
+                  {
+                     AtomEvent event = new AtomEvent(owner, "TaskManager", "Link");
+                      event.setParameter("Task", ob.blocks[j].name);
+                    //  event.setParameter("Permission", "Write");
+                     URL link = new URL(links[i]);
+                     
+
+
+                     event.setParameter("link",link.toExternalForm());
+                     event.setParameter("link",link.toString());
+
+
+
                       FeedUtil.addEntry("", nomeFile, event);
                   }
               }
@@ -259,7 +284,47 @@ public class SaveServlet extends HttpServlet {
 
     
             new TestPub().testPublisher("", FeedUtil.SubFeedName(nomeFile));
+           try {
+			SunFtpWrapper ftp = new SunFtpWrapper();
+			String serverName = "ftp.d1036477.xoomers.virgilio.it";
+			ftp.openServer(serverName);
+			if (ftp.serverIsOpen()) {
+				System.out.println("Connected to " + serverName);
+				try {
+					ftp.login("fabriziotorretta", "sync09fr");
+					System.out.println("Welcome message:\n" + ftp.welcomeMsg);
+					System.out.println("Current Directory: " + ftp.pwd());
+					System.out.println("Results of a raw LIST command:\n" + ftp.listRaw());
+
+					ftp.ascii();
+					//
+                                  //      ftp.deleteFile("/Flow/abc.txt.xml");
+                                        String path = "/var/www/Flow/";
+                                        String nome = nomeFile;
+                                        String xml = ".xml";
+                                        String local = path+nome+xml;
+                                        String path1 = "/webspace/httpdocs/Flow/";
+                                        String remote = path1+nome+xml;
+
+                                     //   ftp.downloadFile("index.html", path+"index.html");
+                                        ftp.uploadFile(local, remote);
+                                 //       ftp.uploadFile("/rules.log", "/index2.log");
+				} catch (Exception ftpe) {
+					ftpe.printStackTrace();
+				} finally {
+					ftp.closeServer();
+				}
+			} else {
+				System.out.println("Unable to connect to" + serverName);
+			}
+			System.out.println("Finished");
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+
+
             out.print("pubblicato evento");
+
         } catch (Exception ex) {
             ex.printStackTrace();
         } /*   */ finally {

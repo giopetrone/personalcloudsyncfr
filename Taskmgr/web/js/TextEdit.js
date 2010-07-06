@@ -473,6 +473,7 @@ TextEdit.setLinks = function(links)
     try
     {
         TextEdit.target.childNodes[6].value = links;
+        TextEdit.target.parentNode.parentNode.link = links;
       //  TextEdit.target.childNodes[6].setAttribute('href',link);
         
 

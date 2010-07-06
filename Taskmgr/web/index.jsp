@@ -178,45 +178,73 @@
 
 
             function saveTemplate(param){
+
                 // if (window.event.type == "click") {
                 // alert(param != 0);
                 //   }
                 // var url1 = "http://marinoflow.appspot.com/nuovastr.txt";
+                c = 1;
                 var jsonString = Jalava.diagram.persist();
                 var persisted = JSON.parse(jsonString);
                 var blocks = persisted.blocks;
                 var startcount = 0;
                 var endcount = 0;
                 for(var i=0;i<blocks.length;i++) {
-
                     var type = blocks[i].type;
                     if(type == "Start") startcount ++
                     else if(type == "End") endcount ++
                 }
-                if(startcount != 1) {alert("No Start Element: you must use one");return};
+                if(startcount != 1) {alert("You must have only one Start Element");return};
                 if(endcount == 0) {alert("No End Element: at least one");return};
                 var diagramName = document.getElementById('area').value;
+                diagramName = "template_" + diagramName;
+             //   alert(param);
+               // var diagramName = param;
+             //   if(diagramName.indexOf(".txt") == -1) diagramName = diagramName + ".txt";
+              //  alert(diagramName);
                 var owner = document.getElementById('owner').value;
                 var users = document.getElementById('users').value;
                 var writers = document.getElementById('writers').value;
-                if (diagramName.length ==0) {
+                if (diagramName.length <= 1) {
                     alert("Missing diagram name");
                     return;
                 }
-                diagramName = "template_" + diagramName;
-                alert(diagramName);
+                else if(diagramName.indexOf("template")!=-1)
+                {
+
+
+                }
+                try{
                 var url1 = "./SaveServlet";
+
+                var a = loadjson.substring(0, 4000);
+                var b = loadjson.substring(4000, loadjson.length);
+                var old = a+b;
+
                 objXml = new XMLHttpRequest();
+
                 objXml.open("POST",url1,false);
-                objXml.setRequestHeader('Content-Type',"text/plain");
+
+                objXml.setRequestHeader('Content-Type', "text/plain;charset=UTF-8");
+
                 objXml.setRequestHeader('filenamemio',diagramName);
                 objXml.setRequestHeader('owner',owner);
                 objXml.setRequestHeader('users',users);
                 objXml.setRequestHeader('writers',writers);
+                objXml.setRequestHeader('public', param);
+           //     objXml.setRequestHeader('a',a);
+           //     objXml.setRequestHeader('b',b);
 
-                objXml.send(jsonString);
+              //  objXml.setRequestHeader('blocks',rect);
+            //    objXml.setRequestHeader('loadjson',loadjson);
+
+
+                var deltaString = primoPezzo + versioneOriginale + secondoPezzo + jsonString + terzoPezzo;
+                objXml.send(deltaString);
                 str = objXml.responseText;
                 confirm("RISP from server: " +str);
+                }catch(e){alert(e.message);}
+
             }
 
             function crepa() {
@@ -417,7 +445,7 @@ window.onbeforeunload = closeIt;
         <input type="text" id="txt" />
         <input type="button" value="See JSON" onclick="dado();TextEdit.check();TextEdit.setOwner();"/>
         <input type="button" value="Share" onclick="childWindow=open('/shared.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800');"/>
-        <input type="button" value="saveTemplate" name="buttonTemplate" onClick="aa=1000; saveTemplate(aa);"/>
+        <input type="button" value="saveTemplate" name="buttonTemplate" onClick=" saveTemplate('false');"/>
         <input type="text" id="owner" name="owner" value= '<%=email%>' disabled="disabled" />
         <input type="text" id="users" name="users" value= "" disabled="disabled" />
         <input type="text" id="writers" name="writers" value= "" disabled="disabled" />

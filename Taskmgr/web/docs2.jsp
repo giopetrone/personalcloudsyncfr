@@ -32,7 +32,7 @@
             var diagram;
      //   alert(document.myform.radiogroup.length);
      var name = document.getElementById("name").value;
-        alert(name);
+       // alert(name);
         if(name == "Inserisci nome" || name == "")
         {
             for (var i=0; i<document.myform.radiogroup.length; i++){
