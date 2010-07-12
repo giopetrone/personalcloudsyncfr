@@ -37,6 +37,10 @@ public class FeedUtil {
         return "http://localhost" + "/Flow/" + flowName + ".xml";
     }
 
+     public static String RemoteFeedName(String flowName) {
+        return "/webspace/httpdocs" + "/Flow/" + flowName + ".xml";
+    }
+
     public static String FileFeedName(String flowName) {
         return "/var/www" + "/Flow/" + flowName + ".xml";
     //    return "http://taskmgrunito.x10.mx/" +flowName +".xml";
@@ -84,7 +88,7 @@ public class FeedUtil {
             links.add(link);
             feed.setLinks(links);
             // <link rel="hub" href="http://pubsubhubbub.appspot.com"/>
-Writer writer = new FileWriter(fileName);
+            Writer writer = new FileWriter(fileName);
             SyndFeedOutput output = new SyndFeedOutput();
             output.output(feed, writer);
             writer.close();
@@ -136,14 +140,12 @@ Writer writer = new FileWriter(fileName);
             entry.setTitle("Flow (specificare meglio)");
             // set links to google documents; maybe could be link
             // taskmanager with http://localhost:8081?Flow=filename.txt
-          //  addLink(entry, editLink);
+            //  addLink(entry, editLink);
             addLink(entry, "http://localhost:8081/index.jsp?Flow=" + flowName);
             //  entry.setPublishedDate(DATE_PARSER.parse("2009-07-" + i));
             entry.setPublishedDate(Calendar.getInstance().getTime());
-            description = new SyndContentImpl();
-            description.setType("text/html");
-            description.setValue(event.toXml());
-            entry.setDescription(description);
+           setDescription(entry, event, "text/plain");
+          //    setDescription(entry, event, "text/html");
             entries.add(entry);
             feed.setEntries(entries);
             Writer writer = new FileWriter(fileName);
@@ -157,23 +159,44 @@ Writer writer = new FileWriter(fileName);
         return true;
     }
 
-    public static List <AtomEvent> createAtom(String s) {
+    static void setDescription(SyndEntry entry, AtomEvent event, String style) {
+        SyndContent description = new SyndContentImpl();
+        description.setType(style);
+        if (style.equals("text/plain")) {
+            description.setValue(event.toXml());
+            entry.setDescription(description);
+        } else if (style.equals("text/html")) {
+            List cont = new ArrayList();
+        //    String content = "<H2>the event</H2> " +event.toXml() + "</P>";
+            String content = "<H2>here is the event</H2> " +event.toHtml(false) + "</P>";
+            description.setValue(content);
+            entry.setDescription(description);
+            description = new SyndContentImpl();
+            description.setType("text/plain");
+            content = event.toXml();
+            description.setValue(content);
+            cont.add(description);
+            entry.setContents(cont);
+        }
+
+    }
+
+    public static List<AtomEvent> createAtom(String s) {
         SyndFeedInput input = new SyndFeedInput();
-        List <AtomEvent> retEvent = new ArrayList();
+        List<AtomEvent> retEvent = new ArrayList();
         try {
             SyndFeed feed = input.build(new StringReader(s));
             List<SyndEntry> entries = feed.getEntries();
             for (SyndEntry entry : entries) {
-            SyndContent description = entry.getDescription();
-            String value = description.getValue();
-            retEvent.add( AtomEvent.fromXml(value));
+                SyndContent description = entry.getDescription();
+                String value = description.getValue();
+                retEvent.add(AtomEvent.fromXml(value));
             }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
         return retEvent;
     }
-
 
     public static AtomEvent createAtomOld(ServletInputStream inStream) {
         SyndFeedInput input = new SyndFeedInput();
@@ -193,22 +216,21 @@ Writer writer = new FileWriter(fileName);
         }
         return retEvent;
     }
-
 }
 
 /*
 
-            SyndEntry entry;
-            SyndContent description;
-            entry = new SyndEntryImpl();
-            entry.setTitle("ROME v1.0");
-            entry.setLink("http://wiki.java.net/bin/view/Javawsxml/Rome01");
-            entry.setPublishedDate(DATE_PARSER.parse("2004-06-08"));
-            description = new SyndContentImpl();
-            description.setType("text/plain");
-            description.setValue("Initial release of ROME");
-            entry.setDescription(description);
-            entries.add(entry);
+SyndEntry entry;
+SyndContent description;
+entry = new SyndEntryImpl();
+entry.setTitle("ROME v1.0");
+entry.setLink("http://wiki.java.net/bin/view/Javawsxml/Rome01");
+entry.setPublishedDate(DATE_PARSER.parse("2004-06-08"));
+description = new SyndContentImpl();
+description.setType("text/plain");
+description.setValue("Initial release of ROME");
+entry.setDescription(description);
+entries.add(entry);
 
 
-            feed.setEntries(entries);*/
+feed.setEntries(entries);*/

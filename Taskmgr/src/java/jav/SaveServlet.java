@@ -5,23 +5,13 @@
 package jav;
 
 import com.google.gson.Gson;
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.URL;
-import java.net.URLConnection;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.LinkedList;
-import java.util.List;
-import sun.net.ftp.*;
-import java.net.URL;
-
-import pubsublib.event.AtomEvent;
 
 import pubsublib.test.TestPub;
 
@@ -47,293 +37,51 @@ public class SaveServlet extends HttpServlet {
         String flowSource = re.readLine();
         String owner = request.getHeader("owner");
         String users = request.getHeader("users");
-       String loadjson = request.getHeader("loadjson");
-    
-      //  int loadblocks = Integer.parseInt(request.getHeader("blocks"));
-      //  int loadconnections = Integer.parseInt(request.getHeader("connections"));
-        if(users == null) users="";
-
+        //     String loadjson = request.getHeader("loadjson");
+        boolean publish = request.getHeader("publish") != null;
         String login = request.getHeader("login");
         if (users == null) {
             users = "";
         }
-
         String writers = request.getHeader("writers");
-
         Gson gson = new Gson();
-     //   vecchia versione Grafico ob = gson.fromJson(flowSource, Grafico.class);
-
+        //   vecchia versione Grafico ob = gson.fromJson(flowSource, Grafico.class);
         DeltaGrafico dg = gson.fromJson(flowSource, DeltaGrafico.class);
-        
         Grafico ob = dg.getNuovo();
-        
-      System.out.println(ob.blocks.length);
-        
-        
+        //   System.out.println(ob.blocks.length);
         response.setContentType("text/html;charset=UTF-8");
 
         PrintWriter out = response.getWriter();
         try {
             if (nomeFile.contains("template")) {
-                System.out.println("TEMPLATE-------");
+                //   System.out.println("TEMPLATE-------");
+                ob.setToTemplate(owner);
                 users = "";
                 writers = "";
-                int blocks = ob.blocks.length;
-
-
-                String ownerBlock = ob.blocks[0].owner;
-                for (int i = 0; i < blocks; i++) {
-                    String imageid = ob.blocks[i].imageId;
-                    if (ownerBlock == null) {
-                        ob.blocks[i].owner = owner;
-                    } else {
-                        ob.blocks[i].owner = ownerBlock;
-                    }
-                    if (imageid.equalsIgnoreCase("rect")) {
-                       
-                        ob.blocks[i].assign = null;
-                        ob.blocks[i].date = null;
-                        ob.blocks[i].shared = null;
-                        ob.blocks[i].type = null;
-                        ob.blocks[i].cat = null;
-                        ob.blocks[i].template = "template";
-
-                    } else {
-                        ob.blocks[i].template = "template";
-                        ob.blocks[i].shared = null;
-
-
-                    }
-
-
-
-                }
             } else {
-                int blocks = ob.blocks.length;
-                List<String> assign = new LinkedList();
-                String ownerBlock = ob.blocks[0].owner;
-                String assigner = "";
-                if (ownerBlock == null) {
-                    for (int i = 0; i < blocks; i++) {
-                        ob.blocks[i].owner = owner;
-                        ob.blocks[i].writers = writers;
-                        ob.blocks[i].shared = users;
-
-
-                    }
-
-                } else {
-                    for (int i = 0; i < blocks; i++) {
-                        ob.blocks[i].owner = ownerBlock;
-                        ob.blocks[i].writers = writers;
-                        ob.blocks[i].shared = users;
-
-
-                    }
-                }
-
-
-
-
-         for(int j=0;j<blocks;j++)
-         {
-             if(ob.blocks[j].imageId.equalsIgnoreCase("rect"))
-             {
-                 System.out.println("-------LINKS: "+ob.blocks[j].link);
-              String found = ob.blocks[j].assign;
-              if(found != null) assigner += ","+found + ",";
-              
-             }
-
-         }
-
-              
-                //    assigner = assigner.substring(0, assigner.length() - 1);
-
-
-
-
-
-
-                users = users + assigner;
-            //   System.out.println("USERS: "+users);
-
+                users = ob.setUsers(owner, writers, users);
             }
-
-
-            
-          
-          String val = GoDoc.saveDiagram(owner,  nomeFile, gson.toJson(ob), users, writers);
-          out.println("VALLLLLLLLLLLLLL "+val);
-          if(val.equals("new"))
-          {
-              
-              for(int j=0;j<ob.blocks.length;j++)
-            {
-
-              if(ob.blocks[j].imageId.equalsIgnoreCase("rect"))
-              {
-                  String found = ob.blocks[j].assign;
-                  if(found == null) found="";
-                  if(!found.equals(""))
-                  {
-                      AtomEvent event = new AtomEvent(owner, "TaskManager", "Assign User");
-                      event.setParameter("Task", ob.blocks[j].name);
-                    //  event.setParameter("Permission", "Write");
-                      event.setParameter("Who", found);
-                      FeedUtil.addEntry("", nomeFile, event);
-                  }
-                  String delimiter = ",";
-                  String[] links;
-                  links = ob.blocks[j].link.split(delimiter);
-                  for(int i=0;i<links.length;i++)
-                  {
-                     AtomEvent event = new AtomEvent(owner, "TaskManager", "Link");
-                      event.setParameter("Task", ob.blocks[j].name);
-                    //  event.setParameter("Permission", "Write");
-                     URL link = new URL(links[i]);
-                     
-
-
-                     event.setParameter("link",link.toExternalForm());
-                     event.setParameter("link",link.toString());
-
-
-
-                      FeedUtil.addEntry("", nomeFile, event);
-                  }
-              }
-
-             }
-
-          }
-          else if(val.equals("notnew"))
-          {
-              dg.createChangeEvents(nomeFile,owner);
-            /*  if(loadjson!=null){
-
-              Gson gsonLoad = new Gson();
-              Grafico ob2 = gsonLoad.fromJson(loadjson, Grafico.class);
-              int newsize = ob.blocks.length;
-              int oldsize = ob2.blocks.length;
-              int newconnections = ob.connections.length;
-              int oldconnections = ob2.connections.length;
-              if(newsize < oldsize || newsize > oldsize)
-              {
-
-                  AtomEvent event = new AtomEvent();
-                  event.setActivity("Number of blocks is changed");
-                     // event.setParameter("assigners",found);
-                   FeedUtil.addEntry("",nomeFile, event);
-              }
-              if(newconnections < oldconnections || newconnections > oldconnections)
-              {
-
-                  AtomEvent event = new AtomEvent();
-                  event.setActivity("Number of connections is changed");
-                     // event.setParameter("assigners",found);
-                   FeedUtil.addEntry("",nomeFile, event);
-              }
-              for(int j=0;j<newsize;j++)
-              {
-                  if(ob.blocks[j].imageId.equalsIgnoreCase("rect"))
-                  {
-                      String id = ob.blocks[j].id;
-                      String newstatus = ob.blocks[j].type;
-                      if(newstatus == null) newstatus="";
-                      String newassign = ob.blocks[j].assign;
-                      if(newassign == null) newassign = "";
-                      for(int i=0;i<oldsize;i++)
-                      {
-                          if(ob2.blocks[i].id.equals(id))
-                          {
-                              String oldstatus = ob2.blocks[i].type;
-                              if(oldstatus == null) oldstatus = "";
-                              String oldassign = ob2.blocks[i].assign;
-                              if(oldassign == null) oldassign = "";
-                              if(!newstatus.equals(oldstatus))
-                              {
-
-                                  AtomEvent event = new AtomEvent(owner, "TaskManager", "Change Status of Task");
-                                  event.setParameter("Task", ob.blocks[j].name);
-                                //  event.setParameter("Permission", "Write");
-                                  event.setParameter("New Status", newstatus);
-                                  FeedUtil.addEntry("", nomeFile, event);
-                              }
-                              if(!newassign.equals(oldassign))
-                              {
-                                  AtomEvent event = new AtomEvent(owner, "TaskManager", "Change Users assigned to Task");
-                                  event.setParameter("Task", ob.blocks[j].name);
-                                //  event.setParameter("Permission", "Write");
-                                  event.setParameter("New Assigned users", newassign);
-                                  FeedUtil.addEntry("", nomeFile, event);
-                              }
-                          }
-                      }
-                  }
-              }
-              //System.err.println(length);
-          }*/
-              //System.err.println(size);
-          }
-       //   AtomEvent event = new AtomEvent();
-
-      //    FeedUtil.addEntry(nomeFile, event);
-
-          new TestPub().testPublisher("http://localhost:8080",FeedUtil.SubFeedName(nomeFile));
-
-    
+            String val = GoDoc.saveDiagram(owner, nomeFile, publish, gson.toJson(ob), users, writers);
+            out.println("new or old ?  " + val);
+            if (val.equals("new")) {
+                ob.createNewEvents(nomeFile, owner);
+            } else if (val.equals("notnew")) {
+                dg.createChangeEvents(nomeFile, owner);
+            }
+            new TestPub().testPublisher("http://localhost:8080", FeedUtil.SubFeedName(nomeFile));
             new TestPub().testPublisher("", FeedUtil.SubFeedName(nomeFile));
-           try {
-			SunFtpWrapper ftp = new SunFtpWrapper();
-			String serverName = "ftp.d1036477.xoomers.virgilio.it";
-			ftp.openServer(serverName);
-			if (ftp.serverIsOpen()) {
-				System.out.println("Connected to " + serverName);
-				try {
-					ftp.login("fabriziotorretta", "sync09fr");
-					System.out.println("Welcome message:\n" + ftp.welcomeMsg);
-					System.out.println("Current Directory: " + ftp.pwd());
-					System.out.println("Results of a raw LIST command:\n" + ftp.listRaw());
-
-					ftp.ascii();
-					//
-                                  //      ftp.deleteFile("/Flow/abc.txt.xml");
-                                        String path = "/var/www/Flow/";
-                                        String nome = nomeFile;
-                                        String xml = ".xml";
-                                        String local = path+nome+xml;
-                                        String path1 = "/webspace/httpdocs/Flow/";
-                                        String remote = path1+nome+xml;
-
-                                     //   ftp.downloadFile("index.html", path+"index.html");
-                                        ftp.uploadFile(local, remote);
-                                 //       ftp.uploadFile("/rules.log", "/index2.log");
-				} catch (Exception ftpe) {
-					ftpe.printStackTrace();
-				} finally {
-					ftp.closeServer();
-				}
-			} else {
-				System.out.println("Unable to connect to" + serverName);
-			}
-			System.out.println("Finished");
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-
-
+            SunFtpWrapper ftp = new SunFtpWrapper();
+            ftp.uploadFeed(nomeFile);
             out.print("pubblicato evento");
-
         } catch (Exception ex) {
             ex.printStackTrace();
-        } /*   */ finally {
+        } finally {
             out.close();
         }
 
+    }
 
-    }// <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
      * @param request servlet request

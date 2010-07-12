@@ -14,7 +14,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
         <title>Jalava : Web-based Diagram Editor</title>
         <script language="JavaScript" src="./js/Jalava.js"></script>
-       
+
         <script language="JavaScript">
         
             // pezzo timer
@@ -113,7 +113,7 @@
                 // alert(param != 0);
                 //   }
                 // var url1 = "http://marinoflow.appspot.com/nuovastr.txt";
-               // alert(rect);
+                // alert(rect);
                 c = 1;
                 var jsonString = Jalava.diagram.persist();
                 var persisted = JSON.parse(jsonString);
@@ -128,10 +128,10 @@
                 if(startcount != 1) {alert("You must have only one Start Element");return};
                 if(endcount == 0) {alert("No End Element: at least one");return};
                 var diagramName = document.getElementById('area').value;
-             //   alert(param);
-               // var diagramName = param;
-             //   if(diagramName.indexOf(".txt") == -1) diagramName = diagramName + ".txt";
-              //  alert(diagramName);
+                //   alert(param);
+                // var diagramName = param;
+                //   if(diagramName.indexOf(".txt") == -1) diagramName = diagramName + ".txt";
+                //  alert(diagramName);
                 var owner = document.getElementById('owner').value;
                 var users = document.getElementById('users').value;
                 var writers = document.getElementById('writers').value;
@@ -145,34 +145,36 @@
 
                 }
                 try{
-                var url1 = "./SaveServlet";
+                    var url1 = "./SaveServlet";
               
-                var a = loadjson.substring(0, 4000);
-                var b = loadjson.substring(4000, loadjson.length);
-                var old = a+b;
+                    var a = loadjson.substring(0, 4000);
+                    var b = loadjson.substring(4000, loadjson.length);
+                    var old = a+b;
               
-                objXml = new XMLHttpRequest();
+                    objXml = new XMLHttpRequest();
                 
-                objXml.open("POST",url1,false);
+                    objXml.open("POST",url1,false);
                 
-                objXml.setRequestHeader('Content-Type', "text/plain;charset=UTF-8");
+                    objXml.setRequestHeader('Content-Type', "text/plain;charset=UTF-8");
 
-                objXml.setRequestHeader('filenamemio',diagramName);
-                objXml.setRequestHeader('owner',owner);
-                objXml.setRequestHeader('users',users);
-                objXml.setRequestHeader('writers',writers);
-                objXml.setRequestHeader('public', param);
-           //     objXml.setRequestHeader('a',a);
-           //     objXml.setRequestHeader('b',b);
+                    objXml.setRequestHeader('filenamemio',diagramName);
+                    objXml.setRequestHeader('owner',owner);
+                    objXml.setRequestHeader('users',users);
+                    objXml.setRequestHeader('writers',writers);
+                    if (!param == "false") {
+                        objXml.setRequestHeader('publish', "true");
+                    }
+                    //     objXml.setRequestHeader('a',a);
+                    //     objXml.setRequestHeader('b',b);
 
-              //  objXml.setRequestHeader('blocks',rect);
-            //    objXml.setRequestHeader('loadjson',loadjson);
+                    //  objXml.setRequestHeader('blocks',rect);
+                    //    objXml.setRequestHeader('loadjson',loadjson);
                 
         
-                var deltaString = primoPezzo + versioneOriginale + secondoPezzo + jsonString + terzoPezzo;
-                objXml.send(deltaString);
-                str = objXml.responseText;
-                confirm("RISP from server: " +str);
+                    var deltaString = primoPezzo + versioneOriginale + secondoPezzo + jsonString + terzoPezzo;
+                    objXml.send(deltaString);
+                    str = objXml.responseText;
+                    confirm("RISP from server: " +str);
                 }catch(e){alert(e.message);}
             }
 
@@ -198,10 +200,10 @@
                 if(endcount == 0) {alert("No End Element: at least one");return};
                 var diagramName = document.getElementById('area').value;
                 diagramName = "template_" + diagramName;
-             //   alert(param);
-               // var diagramName = param;
-             //   if(diagramName.indexOf(".txt") == -1) diagramName = diagramName + ".txt";
-              //  alert(diagramName);
+                //   alert(param);
+                // var diagramName = param;
+                //   if(diagramName.indexOf(".txt") == -1) diagramName = diagramName + ".txt";
+                //  alert(diagramName);
                 var owner = document.getElementById('owner').value;
                 var users = document.getElementById('users').value;
                 var writers = document.getElementById('writers').value;
@@ -215,34 +217,34 @@
 
                 }
                 try{
-                var url1 = "./SaveServlet";
+                    var url1 = "./SaveServlet";
 
-                var a = loadjson.substring(0, 4000);
-                var b = loadjson.substring(4000, loadjson.length);
-                var old = a+b;
+                    var a = loadjson.substring(0, 4000);
+                    var b = loadjson.substring(4000, loadjson.length);
+                    var old = a+b;
 
-                objXml = new XMLHttpRequest();
+                    objXml = new XMLHttpRequest();
 
-                objXml.open("POST",url1,false);
+                    objXml.open("POST",url1,false);
 
-                objXml.setRequestHeader('Content-Type', "text/plain;charset=UTF-8");
+                    objXml.setRequestHeader('Content-Type', "text/plain;charset=UTF-8");
 
-                objXml.setRequestHeader('filenamemio',diagramName);
-                objXml.setRequestHeader('owner',owner);
-                objXml.setRequestHeader('users',users);
-                objXml.setRequestHeader('writers',writers);
-                objXml.setRequestHeader('public', param);
-           //     objXml.setRequestHeader('a',a);
-           //     objXml.setRequestHeader('b',b);
+                    objXml.setRequestHeader('filenamemio',diagramName);
+                    objXml.setRequestHeader('owner',owner);
+                    objXml.setRequestHeader('users',users);
+                    objXml.setRequestHeader('writers',writers);
+                    objXml.setRequestHeader('public', param);
+                    //     objXml.setRequestHeader('a',a);
+                    //     objXml.setRequestHeader('b',b);
 
-              //  objXml.setRequestHeader('blocks',rect);
-            //    objXml.setRequestHeader('loadjson',loadjson);
+                    //  objXml.setRequestHeader('blocks',rect);
+                    //    objXml.setRequestHeader('loadjson',loadjson);
 
 
-                var deltaString = primoPezzo + versioneOriginale + secondoPezzo + jsonString + terzoPezzo;
-                objXml.send(deltaString);
-                str = objXml.responseText;
-                confirm("RISP from server: " +str);
+                    var deltaString = primoPezzo + versioneOriginale + secondoPezzo + jsonString + terzoPezzo;
+                    objXml.send(deltaString);
+                    str = objXml.responseText;
+                    confirm("RISP from server: " +str);
                 }catch(e){alert(e.message);}
 
             }
@@ -301,9 +303,9 @@
         
 
             function loadDiagram(param){
-              //  alert(param);
-              //  var diagramName = document.getElementById('area').value;
-              var diagramName = param;
+                //  alert(param);
+                //  var diagramName = document.getElementById('area').value;
+                var diagramName = param;
                 if (diagramName.length ==0) {
                     alert("Missing diagram name");
                     return;
@@ -320,11 +322,11 @@
                         if(objXml.status  == 200) {
                             try{
                            
-                            str = objXml.responseText;
-                            loadjson = str;
-                            people = objXml.getResponseHeader("people");
-                            writers = objXml.getResponseHeader("writers");
-                            if(str=="DIAGRAMMA NON TROVATO") {alert("DIAGRAMMA NON TROVATO");return}
+                                str = objXml.responseText;
+                                loadjson = str;
+                                people = objXml.getResponseHeader("people");
+                                writers = objXml.getResponseHeader("writers");
+                                if(str=="DIAGRAMMA NON TROVATO") {alert("DIAGRAMMA NON TROVATO");return}
                             
                     
                                 document.getElementById('users').value =  people;
@@ -332,7 +334,7 @@
 
                                
 
-                           versioneOriginale = str;
+                                versioneOriginale = str;
                                 update(str);
                             }catch(e){alert("Non hai i permessi necessari per il Load");}
                         } else {}
@@ -380,7 +382,7 @@
                 objXml.send(jsonString);
                 str = objXml.responseText;
                 confirm("RISP from server: " +str);
-               // confirm(jsonString);
+                // confirm(jsonString);
             }
 
 
@@ -405,19 +407,19 @@
             Jalava.start(initJalava);
 
 
- function closeIt()
-{
-  if(c==0) {
-     // var aa = 1000;
-    //  saveDiagram(aa);
-      return "You should save your diagram before exit";
-  }
-  if(c==1)
-  {
-      return "Diagramma gia' salvato";
-  }
-}
-window.onbeforeunload = closeIt;
+            function closeIt()
+            {
+                if(c==0) {
+                    // var aa = 1000;
+                    //  saveDiagram(aa);
+                    return "You should save your diagram before exit";
+                }
+                if(c==1)
+                {
+                    return "Diagramma gia' salvato";
+                }
+            }
+            window.onbeforeunload = closeIt;
 
         </script>
 
@@ -426,10 +428,10 @@ window.onbeforeunload = closeIt;
     <%
 
 
-             //   String email = request.getParameter("email");
-                   String email = "fabrizio.torretta@gmail.com";
+                //   String email = request.getParameter("email");
+                String email = "fabrizio.torretta@gmail.com";
 
-               
+
                 String passWord = request.getParameter("passWord");
 
     %>
@@ -439,7 +441,7 @@ window.onbeforeunload = closeIt;
         <textarea rows="1" cols="5" name="area" id="area"> </textarea>
         <input type="button" value="Save temp Copy" name="buttonSave" onClick=" saveDiagram('false');"/>
         <!--INPUT type="button" value="provalocale" name="buttonprova" onClick="dada();"-->
-       
+
         <input type="text" id="diagramName" name ="diagramName" value=""    />
         <input type="button" value="Start count!" onClick="doTimer();"/>
         <input type="text" id="txt" />
@@ -451,9 +453,9 @@ window.onbeforeunload = closeIt;
         <input type="text" id="writers" name="writers" value= "" disabled="disabled" />
         <a href="#" onclick="childWindow=open('/addpriv.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="add" name="add" >Change privileges of users </a>
         <br>
-         <a href="#" onclick="childWindow=open('/docs.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="add" name="add" >LoadDiagram </a>
-         
-          
+        <a href="#" onclick="childWindow=open('/docs.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="add" name="add" >LoadDiagram </a>
+
+
 
 
 

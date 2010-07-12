@@ -142,7 +142,7 @@ public class SaveTemplate extends HttpServlet {
 
 
 
-            String val = GoDoc.saveDiagram(login, valorefile, gson.toJson(ob), users, writers);
+            String val = GoDoc.saveDiagram(login, valorefile, true, gson.toJson(ob), users, writers);
 
 
 
