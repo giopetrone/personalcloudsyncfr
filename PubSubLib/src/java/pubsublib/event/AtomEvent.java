@@ -5,8 +5,11 @@
 package pubsublib.event;
 
 import com.thoughtworks.xstream.XStream;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  *
@@ -21,7 +24,6 @@ public class AtomEvent {
     private String activity = "";
     private String context = "";
     private ArrayList<String> parameters = new ArrayList();
-
     private static long serial = 0;
 
     public AtomEvent() {
@@ -32,9 +34,11 @@ public class AtomEvent {
     public AtomEvent(String user, String application, String activity) {
         id = "" + serial++;
         time = "" + System.currentTimeMillis();
-        this.user = user != null? user: "NULLUSER";
-        this.application = application != null? application: "NULLAPLLICATION";;
-        this.activity = activity != null? activity: "NULLACTIVITY";;
+        this.user = user != null ? user : "NULLUSER";
+        this.application = application != null ? application : "NULLAPLLICATION";
+        ;
+        this.activity = activity != null ? activity : "NULLACTIVITY";
+        ;
     }
 
     public String toString(boolean corto) {
@@ -52,7 +56,7 @@ public class AtomEvent {
             ret += " PAR(";
             for (int i = 0; i < parameters.size(); i += 2) {
                 ret += parameters.get(i) + "=" + parameters.get(i + 1);
-                if (i + 2 < parameters.size() ) {
+                if (i + 2 < parameters.size()) {
                     ret += ", ";
                 }
             }
@@ -62,15 +66,54 @@ public class AtomEvent {
             if (!time.isEmpty()) {
                 Calendar cal = Calendar.getInstance();
                 cal.setTimeInMillis(Long.parseLong(time));
-                ret += " Time(" + cal.toString()+ ")";
+                ret += " Time(" + cal.toString() + ")";
             }
-               if (!id.isEmpty()) {
+            if (!id.isEmpty()) {
                 ret += " Id(" + id + ")";
             }
             if (!context.isEmpty()) {
                 ret += " Context(" + context + ")";
             }
         }
+        return ret;
+    }
+
+    private String unaRiga(String par1, String par2) {
+        String ret = "";
+        if (!par2.isEmpty()) {
+            ret += "<tr><td align=\"left\">";
+            ret += par1 + "  </td> <td align=\"right\">" + par2 + " </td></tr> \n";
+            ;
+        }
+        return ret;
+    }
+
+    public String toHtml(boolean corto) {
+        String ret = "Event </P> <table border=\"1\">  ";
+        ret += unaRiga("user", user);
+        ret += unaRiga("application", application);
+        ret += unaRiga("activity", activity);
+        if (!parameters.isEmpty()) {
+            ret += "<table border=\"1\"><caption>Parameters</caption><tr> <th>Name</th><th>Value</th> </tr>";
+            for (int i = 0; i < parameters.size(); i += 2) {
+                ret += unaRiga(parameters.get(i), parameters.get(i + 1));
+
+            }
+            ret += "</table>";
+        }
+        if (!corto) {
+            if (!time.isEmpty()) {
+                Calendar cal = Calendar.getInstance();
+                cal.setTimeInMillis(Long.parseLong(time));
+                Date dat = cal.getTime();
+                String hhh = DateFormat.getDateTimeInstance(DateFormat.FULL,DateFormat.FULL,Locale.ITALIAN).format(dat);
+                ret += unaRiga(hhh, time);
+            }
+            ret += unaRiga("id", id);
+            ret += unaRiga("context", context);
+        }
+        ret += unaRiga("Link","<a href=\"http://www.youtube.com\">Link di prova youtube!</a> ");
+        ret += "</table>";
         return ret;
     }
 
