@@ -171,7 +171,7 @@ public class SunFtpWrapper extends FtpClient {
         try {
 
             SunFtpWrapper ftp = new SunFtpWrapper();
-            String serverName = "ftp.utenti.multimania.it";
+            String serverName = "ftp.d1036477.xoomers.virgilio.it";
             ftp.openServer(serverName);
             if (ftp.serverIsOpen()) {
 
@@ -182,10 +182,19 @@ public class SunFtpWrapper extends FtpClient {
                     System.out.println("Welcome message:\n" + ftp.welcomeMsg);
                     System.out.println("Current Directory: " + ftp.pwd());
                     System.out.println("Results of a raw LIST command:\n" + ftp.listRaw());
-                    System.out.println("Downloading file robots.txt");
+                   
                     ftp.ascii();
+                    String path = "/var/www/Flow/";
+                    String nome = nameFeed;
+                    String xml = ".xml";
+                    String local = path+nome+xml;
+                    String path1 = "/webspace/httpdocs/Flow/";
+                    String remote = path1+nome+xml;
+
+                                     //   ftp.downloadFile("index.html", path+"index.html");
+                    ftp.uploadFile(local, remote);
                     //ftp.downloadFile("/Flow/abc", "/var/www/index.html");
-                    ftp.uploadFile("/var/www/Flow/" + nameFeed + ".xml", "/Flow/" + nameFeed + ".xml");
+                  //  ftp.uploadFile("/var/www/Flow/" + nameFeed + ".xml", "/Flow/" + nameFeed + ".xml");
                 } catch (Exception ftpe) {
                     ftpe.printStackTrace();
                 } finally {

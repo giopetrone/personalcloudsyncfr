@@ -98,15 +98,20 @@ public class Grafico {
                 }
                 String delimiter = ",";
                 String[] links;
+                if(blocks[j].link!= null)
+                {
                 links = blocks[j].link.split(delimiter);
+                
                 for (int i = 0; i < links.length; i++) {
-                    AtomEvent event = new AtomEvent(owner, "TaskManager", "Link");
-                    event.setParameter("Task", blocks[j].name);
-                    //  event.setParameter("Permission", "Write");
-                    URL link = new URL(links[i]);
-                    event.setParameter("link", link.toExternalForm());
-                    event.setParameter("link", link.toString());
-                    FeedUtil.addEntry("", nomeFile, event);
+                    
+                        AtomEvent event = new AtomEvent(owner, "TaskManager", "Link");
+                        event.setParameter("Task", blocks[j].name);
+                        //  event.setParameter("Permission", "Write");
+                        URL link = new URL(links[i]);
+                        event.setParameter("link", link.toExternalForm());
+                        event.setParameter("link", link.toString());
+                        FeedUtil.addEntry("", nomeFile, event);
+                    }
                 }
             }
         }
