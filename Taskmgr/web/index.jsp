@@ -108,7 +108,7 @@
                 }
             }
             // fine pezzo timer
-            function saveDiagram(param){
+            function saveDiagram(publish){
                 // if (window.event.type == "click") {
                 // alert(param != 0);
                 //   }
@@ -161,7 +161,7 @@
                     objXml.setRequestHeader('owner',owner);
                     objXml.setRequestHeader('users',users);
                     objXml.setRequestHeader('writers',writers);
-                    if (!param == "false") {
+                    if (publish == "true") {
                         objXml.setRequestHeader('publish', "true");
                     }
                     //     objXml.setRequestHeader('a',a);
@@ -388,19 +388,25 @@
 
             // initialise Jalava here
             function initJalava(){
-                Jalava.diagram = new Diagram(220, 100, "550", "600");
-                var palette = new Palette(new FlowChartPaletteFactory(), 0, 100, 200);
+                Jalava.diagram = new Diagram(220, 50, "550", "600");
+                var palette = new Palette(new FlowChartPaletteFactory(), 0, 50, 200,"","Digram Palette");
                 palette.addItem("rect", "Task",  Palette.DRAG_TOOL, "./img/rect.gif");
                 palette.addItem("connection", "Connection",  Palette.CLICK_TOOL, "./img/line.gif");
                 palette.addItem("diamond", "Decision", Palette.DRAG_TOOL, "./img/diamond.gif");
                 palette.addItem("parallel", "Input/Output", Palette.DRAG_TOOL, "./img/parallel.gif");
                 palette.addItem("ellipse", "And/Or", Palette.DRAG_TOOL, "./img/ellipse.gif");
                 palette.addItem("rounded", "Start/End", Palette.DRAG_TOOL, "./img/ellipse.gif");
-                Jalava.propertyPage = new FlowChartPropertyPage(0, 290, 10);
+                Jalava.propertyPage = new FlowChartPropertyPage(0, 240, 10);
+                var palette2 = new Palette(new FlowChartPaletteFactory(), 780, 50, 200,"","Task Status");
+
+                palette2.addItem("Task Status", "Task Done", Palette.CLICK_TOOL, "./img/quadratino_grigio.gif");
+                palette2.addItem("Task Status", "Task Not Enabled", Palette.CLICK_TOOL, "./img/redquad.jpeg");
+                palette2.addItem("Task Status", "Task Enabled", Palette.CLICK_TOOL, "./img/quadratino_verde.jpg");
             }
 
             // start Jalava
             Jalava.addModule("FlowChartPaletteFactory");
+         //   Jalava.addModule("MyPaletteFactory");
             Jalava.addModule("FlowChartPropertyPage");
             Jalava.addModule("UrlGradientBlock");
 
@@ -424,7 +430,8 @@
         </script>
 
     </head>
-    <body onload="carica();"/>
+
+    <body onload="carica();doTimer();" style="background-color: #99CCFF"/>
     <%
 
 
@@ -435,27 +442,46 @@
                 String passWord = request.getParameter("passWord");
 
     %>
+   
+    <div style="font-size: 13px"> <a href="#" onclick="childWindow=open('/docs2.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="add" name="add" >Save Diagram </a> |  <a href="#" onClick=" saveDiagram('false');">Save Draft</a> | <a href="#" onclick="childWindow=open('/docs.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="add" name="add" >LoadDiagram </a>  | <a href="#" onclick="childWindow=open('/shared.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800');">Share</a>
+        | <a href="#" onClick=" saveTemplate('false');">Save as Template</a> |           
+        <%=email%> | <u>Settings</u>  |<a href="#" onclick="childWindow=open('/addpriv.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="add" name="add" >Change privileges of users </a>| <a target=_blank href="http://docs.google.com/support/?hl=en" class=gb4>Help</a> | <a href="/logout?hl=it&amp;continue=http://docs.google.com/?tab%3Dmo%26pli%3D1" class=gb4>Sign out</a> </div>
+   
 
+
+
+
+    
+    
     <form name="saveandload" id="saveandload" >
-        <a href="#" onclick="childWindow=open('/docs2.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="add" name="add" >SaveDiagram </a>
-        <textarea rows="1" cols="5" name="area" id="area"> </textarea>
-        <input type="button" value="Save temp Copy" name="buttonSave" onClick=" saveDiagram('false');"/>
-        <!--INPUT type="button" value="provalocale" name="buttonprova" onClick="dada();"-->
+       
+        <input type="hidden"  name="area" id="area"/>
+       
+      
 
-        <input type="text" id="diagramName" name ="diagramName" value=""    />
+        
+  
+
+
+      
+    
+       
+        
+        <input type="hidden" id="owner" name="owner" value= '<%=email%>' disabled="disabled" />
+        <input type="hidden" id="users" name="users" value= "" disabled="disabled" />
+        <input type="hidden" id="writers" name="writers" value= "" disabled="disabled" />
+        <!--
         <input type="button" value="Start count!" onClick="doTimer();"/>
-        <input type="text" id="txt" />
-        <input type="button" value="See JSON" onclick="dado();TextEdit.check();TextEdit.setOwner();"/>
-        <input type="button" value="Share" onclick="childWindow=open('/shared.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800');"/>
-        <input type="button" value="saveTemplate" name="buttonTemplate" onClick=" saveTemplate('false');"/>
-        <input type="text" id="owner" name="owner" value= '<%=email%>' disabled="disabled" />
-        <input type="text" id="users" name="users" value= "" disabled="disabled" />
-        <input type="text" id="writers" name="writers" value= "" disabled="disabled" />
+          <input type="text" id="txt" />
+         <input type="button" value="Share" onclick="childWindow=open('/shared.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800');"/>
+         <a href="#" onclick="childWindow=open('/docs2.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="add" name="add" >SaveDiagram </a>
+            <input type="button" value="See JSON" onclick="dado();TextEdit.check();TextEdit.setOwner();"/>
+        <input type="text" id="diagramName" name ="diagramName" value=""    />
         <a href="#" onclick="childWindow=open('/addpriv.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="add" name="add" >Change privileges of users </a>
         <br>
         <a href="#" onclick="childWindow=open('/docs.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="add" name="add" >LoadDiagram </a>
 
-
+ -->
 
 
 

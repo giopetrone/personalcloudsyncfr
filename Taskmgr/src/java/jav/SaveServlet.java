@@ -44,7 +44,7 @@ public class SaveServlet extends HttpServlet {
             users = "";
         }
         String writers = request.getHeader("writers");
-        publish = true; // PER PROVA
+        //publish = true; // PER PROVA
         Gson gson = new Gson();
         //   vecchia versione Grafico ob = gson.fromJson(flowSource, Grafico.class);
         DeltaGrafico dg = gson.fromJson(flowSource, DeltaGrafico.class);

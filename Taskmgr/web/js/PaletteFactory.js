@@ -18,6 +18,7 @@ PaletteFactory.prototype.createConnectionObject = function(id) {
 
 PaletteFactory.prototype.defaultText = "&nbsp;";
 
+
 /*
  * This method is invoked when the user clicks on a palette tool 
  * of type CLICK_TOOL

@@ -2,7 +2,7 @@
 
 // 201208: support for multiple CLICK_TOOLs in activate()
 
-function Palette(factory, x, y, width, height) {
+function Palette(factory, x, y, width, height,name) {
 
   Palette.factory = factory;
   
@@ -25,7 +25,8 @@ function Palette(factory, x, y, width, height) {
   row = DOM.createElement("tr", "title");
   thead.appendChild(row);
   cell = row.insertCell(-1);
-  cell.innerHTML = "Palette";
+//  cell.innerHTML = "Palette";
+ cell.innerHTML = name;
 
 
   thead.onmousedown = function(event) {
