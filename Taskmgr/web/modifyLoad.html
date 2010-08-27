@@ -5,7 +5,7 @@
 <head>
 
 <title>
-Task Properties
+Task Properties On Load
 </title>
 
 <!-- Meta Tags -->
@@ -213,7 +213,59 @@ function getLinks()
          parent.TextEdit.setLinks(links);
          
      }
- 
+  function appendCalendar()
+  {
+      var date = document.myform.theDate.value;
+      var user = window.parent.TextEdit.getUser();
+      var pwd = window.parent.TextEdit.getPwd();
+      var name = document.myform.nome.value;
+      
+      if(date != null && date !="" && date!="Choose a Date(Optional)")
+      {
+         
+          saveCalendar(user,pwd,date,name);
+          
+          
+      }
+      else
+      {
+          
+          alert("You must choose a date");
+          alert(pwd);
+         
+      }
+      
+  }
+
+
+  function saveCalendar(user,pwd,duedate,name)
+  {
+      try{
+          
+
+                    var url1 = "./CalendarServlet";
+                    
+
+
+
+                    objXml = new XMLHttpRequest();
+
+                    objXml.open("POST",url1,false);
+
+                    objXml.setRequestHeader('Content-Type', "text/plain;charset=UTF-8");
+
+
+                    objXml.setRequestHeader('user',user);
+                    objXml.setRequestHeader('pwd',pwd);
+                    objXml.setRequestHeader('name',name);
+                    objXml.setRequestHeader('duedate',duedate);
+                    
+
+                    objXml.send(null);
+                    str = objXml.responseText;
+                    confirm("RISP from server: " +str);
+                }catch(e){alert(e.message);
+  }}
 
 
 
@@ -226,7 +278,7 @@ function getLinks()
 </script>
 </head>
 
-<body id="public" onload="getLinks();initStatus(document.forms[0], 'status');initForm(document.forms[0], 'nome');initDate(document.forms[0], 'theDate');initCat(document.forms[0], 'category');initShare(document.forms[0], 'share');initAssign(document.forms[0],'assign');initDesc(document.forms[0],'elm1');go();">
+<body id="public" onload="getLinks();initStatus(document.forms[0], 'status');initForm(document.forms[0], 'nome');initDate(document.forms[0], 'theDate');initCat(document.forms[0], 'category');initShare(document.forms[0], 'share');initAssign(document.forms[0],'assign');initDesc(document.forms[0],'elm1');go();"  style="background-color: #add8e6">
 <div id="container">
 
 
@@ -247,7 +299,7 @@ function getLinks()
 		Name
 			</label>
 	<div>
-		<input id ="nome" name="nome" type="text"/>
+		<input id ="nome" name="nome" type="text" onclick="document.myform.name.value=''"/>
 			</div>
 	</li>
 
@@ -324,12 +376,12 @@ function getLinks()
 	</li>
 
 
-<li id="foli2" 		class="date      ">
+<li id="lidate" 		class="date      " name="lidate">
 	<label class="desc" id="title2" for="Field2">
 		Due Date
 			</label>
-	<input type="text" value="dd/mm/yy" id="theDate" name="theDate" onclick="displayCalendar(document.forms[0].theDate,'yyyy/mm/dd',this)"/>
-
+	<input type="text"  id="theDate" name="theDate" onclick="displayCalendar(document.forms[0].theDate,'yyyy-mm-dd',this)"/>
+        <a href="#" onclick="appendCalendar();" >Add a reminder on Google Calendar </a>
 	</li>
 
 

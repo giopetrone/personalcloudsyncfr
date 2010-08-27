@@ -86,6 +86,13 @@ public class Grafico {
         for (int j = 0; j < blocks.length; j++) {
             if (blocks[j].imageId.equalsIgnoreCase("rect")) {
                 String found = blocks[j].assign;
+                String duedate = blocks[j].date;
+                      if(! duedate.equals("Choose a Date(Optional)") && duedate != null && !duedate.equals(""))
+                      {
+                          String taskname = blocks[j].name;
+                          CalendarCall.insertInCalendar(duedate,taskname);
+
+                      }
                 if (found == null) {
                     found = "";
                 }
@@ -98,8 +105,10 @@ public class Grafico {
                 }
                 String delimiter = ",";
                 String[] links;
-                if(blocks[j].link!= null)
+                if(blocks[j].link == null) blocks[j].link = "";
+                if(!blocks[j].link.equals(""))
                 {
+
                 links = blocks[j].link.split(delimiter);
                 
                 for (int i = 0; i < links.length; i++) {

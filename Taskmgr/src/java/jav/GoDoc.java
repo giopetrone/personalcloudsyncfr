@@ -55,6 +55,8 @@ public class GoDoc {
     //static String docMakerPasswd = "micio11";
     static String docMakerLogin = "fabrizio.torretta@gmail.com";  // fino a che  ???  auth funziona
     static String docMakerPasswd = "gregorio";
+
+
     //fine Anna gio
 
     public GoDoc(DocsService service) {
@@ -97,13 +99,97 @@ public class GoDoc {
     int newreaders = 0;
 
      */
+    public void saveNewDiagram(String login, String documentName,String s, String users, String writers )
+    {
+                try{
+                    DocumentListEntry documentEntry = findEntry(documentName);
+                    System.out.println("DocumentEntry null");
+                    documentEntry = uploadFile(s, documentName);
+                    AtomEvent eventSave = new AtomEvent(login, "TaskManager", "Save New Diagram");
+                    String link = documentEntry.getDocumentLink().getHref();
+                    eventSave.setParameter("File", documentName);
+                    eventSave.setParameter("Link", link);
+                    FeedUtil.addEntry("", documentName, eventSave);
+                    String[] tempwriter;
+                    String delimiter = ",";
+                    //     if(writers == null) writers = "";
+                    if (users != null && writers != null) {
+                        String[] tempusers;
+
+                        tempusers = users.split(delimiter);
+
+                        for (int i = 0; i < tempusers.length; i++) {
+                            if (!tempusers[i].equals("")) {
+
+                                System.out.println("Reader " + tempusers[i]);
+                                addReaders(documentEntry, tempusers[i]);
+                                AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
+                                event.setParameter("File", documentName);
+                                event.setParameter("Permission", "Read");
+                                event.setParameter("Who", tempusers[i]);
+                                FeedUtil.addEntry("", documentName, event);
+                                new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
+
+
+                            }
+
+                        }
+                        tempwriter = writers.split(delimiter);
+                        for (int j = 0; j < tempwriter.length; j++) {
+                            boolean check = false;
+
+                            for (int i = 0; i < tempusers.length; i++) {
+                                if (tempusers[i].equals(tempwriter[j])) {
+                                    check = true;
+                                    System.out.println("true");
+                                }
+
+                            }
+                            if (check == false) {
+                                System.out.println("Writer " + tempwriter[j] + check);
+                                addWriting(documentEntry, tempwriter[j]);
+                                AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
+                                event.setParameter("File", documentName);
+                                event.setParameter("Permission", "Write");
+                                event.setParameter("Who", tempwriter[j]);
+                                FeedUtil.addEntry("", documentName, event);
+                                new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
+                            }
+                        }
+
+                    } else {
+                        /* tempwriter = writers.split(delimiter);
+                        for (int j = 0; j < tempwriter.length; j++) {
+                        addWriting(documentEntry, tempwriter[j]);
+                        AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
+                        event.setParameter("File", documentName);
+                        event.setParameter("Permission", "Write");
+                        event.setParameter("Who", tempwriter[j]);
+                        FeedUtil.addEntry("", documentName, event);
+                        new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
+                        }*/
+
+                    }
+
+                      
+                    }catch(Exception ex)
+                    {
+                         System.out.println(ex.toString());
+                        
+                    }
+
+
+
+    }
     public String saveDoc(String login, String documentName, String s, String users, String writers) {
 
         try {
             DocumentListEntry documentEntry = findEntry(documentName);
 
             if (documentEntry == null) {
-
+               
+               saveNewDiagram(login,documentName,s,users,writers);
+/*
                 System.out.println("DocumentEntry null");
                 documentEntry = uploadFile(s, documentName);
                 AtomEvent eventSave = new AtomEvent(login, "TaskManager", "Save New Diagram");
@@ -168,9 +254,9 @@ public class GoDoc {
                     event.setParameter("Who", tempwriter[j]);
                     FeedUtil.addEntry("", documentName, event);
                     new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
-                    }*/
+                    }
                 }
-
+*/
                 return "new";
 
             } else {
@@ -614,4 +700,7 @@ public class GoDoc {
         }
         return ret;
     }
+
+
+
 }

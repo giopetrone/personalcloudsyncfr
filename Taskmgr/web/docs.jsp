@@ -43,10 +43,13 @@
              opener.loadDiagram(diagram);
         }
 
+        
+
 
                  </script>
     </head>
-    <body>
+    <body style="background-color: #add8e6">
+        
         <h1>Load a diagram</h1>
         <form id="myform" name="myform">
 

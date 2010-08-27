@@ -11,7 +11,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Load a diagram</title>
+        <title>Save the diagram</title>
         <script type="text/javascript">
         function get(){
         var diagram;
@@ -58,8 +58,10 @@
 
 
                  </script>
+
+        
     </head>
-    <body>
+    <body style="background-color: #add8e6">
         <h1>Save the diagram</h1>
         <form id="myform" name="myform">
         <input type="text" id="name" name="name" value="Inserisci nome" onclick="document.myform.name.value=''"/>
@@ -75,7 +77,7 @@
             String doc = diagramdocs[i];
             if(doc.contains(".txt")){
 %>
-<input type="radio" id='radiogroup' name="radiogroup" value='<%=doc%>' /><%=doc%>
+<input type="radio" id='radiogroup' name="radiogroup" value='<%=doc%>' onClick="document.myform.name.value='<%=doc%>'"/><%=doc%>
 <br>
 <%}}%>
         </form>

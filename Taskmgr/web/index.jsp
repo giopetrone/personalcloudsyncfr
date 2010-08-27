@@ -431,15 +431,16 @@
 
     </head>
 
-    <body onload="carica();doTimer();" style="background-color: #99CCFF"/>
+    <body onload="carica();doTimer();" style="background-color: #add8e6"/>
     <%
 
 
-                //   String email = request.getParameter("email");
-                String email = "fabrizio.torretta@gmail.com";
+                   String email = request.getParameter("email");
+          //      String email = "fabrizio.torretta@gmail.com";
 
 
-                String passWord = request.getParameter("passWord");
+                String pwd = request.getParameter("pwd");
+           //     String pwd = "gregorio";
 
     %>
    
@@ -470,6 +471,7 @@
         <input type="hidden" id="owner" name="owner" value= '<%=email%>' disabled="disabled" />
         <input type="hidden" id="users" name="users" value= "" disabled="disabled" />
         <input type="hidden" id="writers" name="writers" value= "" disabled="disabled" />
+        <input type="hidden" id="pwd" name="pwd" value='<%=pwd%>' disabled="disabled" />
         <!--
         <input type="button" value="Start count!" onClick="doTimer();"/>
           <input type="text" id="txt" />

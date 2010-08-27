@@ -6,6 +6,7 @@
 package jav;
 
 import pubsublib.event.AtomEvent;
+import jav.CalendarCall;
 
 /**
  *
@@ -22,6 +23,9 @@ public class DeltaGrafico {
         int oldsize = vecchio.blocks.length;
         int newconnections = nuovo.connections.length;
         int oldconnections = vecchio.connections.length;
+
+
+
         if(newsize < oldsize || newsize > oldsize)
         {
             AtomEvent event = new AtomEvent();
@@ -43,6 +47,13 @@ public class DeltaGrafico {
                   {
                       String id = nuovo.blocks[j].id;
                       String newstatus = nuovo.blocks[j].type;
+                      String duedate = nuovo.blocks[j].date;
+                      if(! duedate.equals("Choose a Date(Optional)") && duedate != null && !duedate.equals(""))
+                      {
+                          String taskname = nuovo.blocks[j].name;
+                          CalendarCall.insertInCalendar(duedate,taskname);
+
+                      }
                       if(newstatus == null) newstatus="";
                       String newassign = nuovo.blocks[j].assign;
                       if(newassign == null) newassign = "";

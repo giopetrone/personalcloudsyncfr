@@ -126,6 +126,21 @@ TextEdit.setTarget = function(element) {
   TextEdit.target = element;
 }
 
+TextEdit.getUser = function()
+{
+     var user = parent.document.getElementById("owner").value;
+    
+     return user;
+}
+
+
+TextEdit.getPwd = function()
+{
+
+     var pwd = parent.document.getElementById("pwd").value;
+     return pwd;
+}
+
 TextEdit.showframe = function() {
 
   // add a translucent cover to prevent user access
