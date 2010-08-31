@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package maillib;
 
 /**
@@ -32,33 +31,84 @@ Next to run the program, execute it as follows,
 SendMailUsingAuthentication authProg = new SendMailUsingAuthentication();
 
  */
-
-import javax.mail.*;
-import javax.mail.internet.*;
-import java.util.*;
+import java.io.InputStream;
+import java.util.Properties;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
+import javax.mail.*;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+import javax.naming.InitialContext;
 
 public class SendMail {
 
-   //  private static final String SMTP_HOST_NAME = "pianeta.di.unito.it";
-//  private static final String SMTP_AUTH_USER = "giovanna";
-//  private static final String SMTP_AUTH_PWD  = "mer06ia";
+
     private static final String SMTP_HOST_NAME = "smtp.gmail.com";
-    private static final String SMTP_AUTH_USER = "gio.petrone@gmail.com";
-    private static final String SMTP_AUTH_PWD = "mer20ia05";
+private static final String SMTP_PORT = "465";
+
+  //  private static final String SMTP_HOST_NAME = "smtp.gmail.com";
+    private static final String SMTP_AUTH_USER = "sgnmrn@gmail.com";
+    private static final String SMTP_AUTH_PWD = "micio11";
     private static final String emailMsgTxt = "Online Order Confirmation Message. Also include the Tracking Number.";
     private static final String emailSubjectTxt = "Order Confirmation Subject";
 //  private static final String emailFromAddress = "giovanna@di.unito.it";
-    private static final String emailFromAddress = "gio.petrone@gmail.com";
+    private static final String emailFromAddress = "sgnmrn@gmail.com";
     // Add List of Email address to who email needs to be sent to
     private static final String[] emailList = {"giovanna@di.unito.it"};
 
     public static void main(String args[]) throws Exception {
         SendMail smtpMailSender = new SendMail();
         smtpMailSender.postMail(emailList, emailSubjectTxt, emailMsgTxt, emailFromAddress);
+    //    smtpMailSender.getMailMessages();
         System.out.println("Sucessfully Sent mail to All Users");
+    }
+
+    public void getMailMessages() {
+        try {
+            System.out.println("uno");
+            InitialContext ic = new InitialContext();
+            System.out.println("due");                      
+            Properties properties = System.getProperties();
+             System.out.println("tre");
+            Authenticator auth = new ImapAuthenticator();
+            Session session = Session.getDefaultInstance(properties, auth);
+            System.out.println("quattro");
+            Store store = session.getStore("imaps");
+            System.out.println("5");
+          //  store.connect("imap.gmail.com", "gio.petrone@gmail.com", "mer20ia05");
+             store.connect("imap.gmail.com", "annamaria.goy@gmail.com", "tex_willer");
+           
+            System.out.println("6");
+            Folder folder = store.getFolder("INBOX");
+            folder.open(Folder.READ_ONLY);
+            System.out.println("7");
+            Message[] messages = folder.getMessages();
+            // Display message.
+            for (int i = 0; i < messages.length; i++) {
+
+                System.out.println("------------ Message " + (i + 1) + " ------------");
+
+                System.out.println("SentDate : " + messages[i].getSentDate());
+                System.out.println("From : " + messages[i].getFrom()[0]);
+                System.out.println("Subject : " + messages[i].getSubject());
+                System.out.print("Message : " );
+                System.out.print(messages[i].getContent().toString());
+//                InputStream stream = messages[i].getInputStream();
+//                while (stream.available() != 0) {
+//                    System.out.print((char) stream.read());
+//                }
+                System.out.println();
+            }
+
+            folder.close(true);
+            store.close();
+        } catch (Exception ex) {
+            /* The size of the HTTP request body exceeds the limit */
+        }
     }
 
     public void postMail(String recipients[], String subject,
@@ -162,4 +212,14 @@ public class SendMail {
         }
     }
 
+    private class ImapAuthenticator extends Authenticator {
+
+        public PasswordAuthentication getPasswordAuthentication() {
+            String username, password;
+
+            username = "giovanna@di.unito.it";
+            password = "mer06ia";
+            return new PasswordAuthentication(username, password);
+        }
+    }
 }
