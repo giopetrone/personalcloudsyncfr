@@ -113,17 +113,17 @@ public class NotifCallbackServlet extends HttpServlet {
                     // save new feed content; at next refresh call it will be given to client
                     getServletContext().setAttribute("atomo", s);
                     sendGMsg(s);
- //DA rendere parametrico -- GIO
+                    //DA rendere parametrico -- GIO
                     String SMTP_HOST_NAME = "smtp.gmail.com";
-  String SMTP_PORT = "465";
-  String emailMsgTxt = "Test Message Contents";
-  String emailSubjectTxt = "A test from gmail";
-  String emailFromAddress = "sgnmrn@gmail.com";
- String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
-  String[] sendTo = { "gio.petrone@gmail.com", "fabrizio.torretta@gmail.com"};
+                    String SMTP_PORT = "465";
+                    String emailMsgTxt = "Test Message Contents";
+                    String emailSubjectTxt = "A test from gmail";
+                    String emailFromAddress = "sgnmrn@gmail.com";
+                    String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
+                    String[] sendTo = {"gio.petrone@gmail.com", "fabrizio.torretta@gmail.com"};
 
 
-                    new SendMailCl().sendSSLMessage(sendTo, emailSubjectTxt, emailMsgTxt, emailFromAddress);
+                    new SendMailCl(sendTo, emailSubjectTxt, emailMsgTxt, emailFromAddress).sendSSLMessage();
                     List<AtomEvent> notifications = FeedUtil.createAtom(s);
                     if (!notifications.isEmpty()) {
                         System.err.println("notifMgr new feed content");
