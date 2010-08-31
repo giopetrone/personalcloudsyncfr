@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package jav;
 
 import googlecontacts.ContactCall;
@@ -17,6 +16,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import pubsublib.event.AtomEvent;
+import maillib.SendMailCl;
 
 /**
  *
@@ -25,7 +25,8 @@ import pubsublib.event.AtomEvent;
 public class NotifCallbackServlet extends HttpServlet {
 
     ChatClient chClient = new ChatClient();
-    /** 
+
+    /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      * @param request servlet request
      * @param response servlet response
@@ -33,7 +34,7 @@ public class NotifCallbackServlet extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
 
         // ricordare che deploy di callabck e' sotto  <CallbackServlett>/subscribe/pippo
 
@@ -112,6 +113,17 @@ public class NotifCallbackServlet extends HttpServlet {
                     // save new feed content; at next refresh call it will be given to client
                     getServletContext().setAttribute("atomo", s);
                     sendGMsg(s);
+ //DA rendere parametrico -- GIO
+                    String SMTP_HOST_NAME = "smtp.gmail.com";
+  String SMTP_PORT = "465";
+  String emailMsgTxt = "Test Message Contents";
+  String emailSubjectTxt = "A test from gmail";
+  String emailFromAddress = "sgnmrn@gmail.com";
+ String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
+  String[] sendTo = { "gio.petrone@gmail.com", "fabrizio.torretta@gmail.com"};
+
+
+                    new SendMailCl().sendSSLMessage(sendTo, emailSubjectTxt, emailMsgTxt, emailFromAddress);
                     List<AtomEvent> notifications = FeedUtil.createAtom(s);
                     if (!notifications.isEmpty()) {
                         System.err.println("notifMgr new feed content");
@@ -191,7 +203,6 @@ public class NotifCallbackServlet extends HttpServlet {
         return cCallTmp;
     }
 
-
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /** 
      * Handles the HTTP <code>GET</code> method.
@@ -202,9 +213,9 @@ public class NotifCallbackServlet extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         processRequest(request, response);
-    } 
+    }
 
     /** 
      * Handles the HTTP <code>POST</code> method.
@@ -215,7 +226,7 @@ public class NotifCallbackServlet extends HttpServlet {
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         processRequest(request, response);
     }
 
@@ -227,5 +238,4 @@ public class NotifCallbackServlet extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
 }
