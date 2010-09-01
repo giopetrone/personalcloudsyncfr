@@ -28,12 +28,14 @@ public class LoadServlet extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-           String valorefile = request.getHeader("filenamemio");
-           String owner = request.getHeader("owner");
-           String val = null;
+        System.out.println("%%%% IN LOAD SERVLET %%%");
+        String valorefile = request.getHeader("filenamemio");
+        String owner = request.getHeader("owner");
+        String pwd = request.getHeader("pwd");
+        String val = null;
         response.setContentType("text/plain");
         PrintWriter out = response.getWriter();
-        List<String> list = GoDoc.loadDiagram(valorefile, request.getHeader("refresh") != null,owner);
+        List<String> list = GoDoc.loadDiagram(valorefile, request.getHeader("refresh") != null,owner,pwd);
         
         if(list.isEmpty())
         {

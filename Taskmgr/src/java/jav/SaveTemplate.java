@@ -52,6 +52,7 @@ public class SaveTemplate extends HttpServlet {
         String owner = request.getHeader("owner");
         String users = request.getHeader("users");
         String login = request.getHeader("login");
+        String pwd = request.getHeader("pwd");
         if (users == null) {
             users = "";
         }
@@ -142,7 +143,7 @@ public class SaveTemplate extends HttpServlet {
 
 
 
-            String val = GoDoc.saveDiagram(login, valorefile, true, gson.toJson(ob), users, writers);
+            String val = GoDoc.saveDiagram(login, valorefile, true, gson.toJson(ob), users, writers,pwd);
 
 
 

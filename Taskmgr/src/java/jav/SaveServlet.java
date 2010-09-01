@@ -36,6 +36,7 @@ public class SaveServlet extends HttpServlet {
         BufferedReader re = request.getReader();
         String flowSource = re.readLine();
         String owner = request.getHeader("owner");
+        String pwd = request.getHeader("pwd");
         String users = request.getHeader("users");
         //     String loadjson = request.getHeader("loadjson");
         boolean publish = request.getHeader("publish") != null;
@@ -62,18 +63,23 @@ public class SaveServlet extends HttpServlet {
             } else {
                 users = ob.setUsers(owner, writers, users);
             }
-            String val = GoDoc.saveDiagram(owner, nomeFile, publish, gson.toJson(ob), users, writers);
-            out.println("new or old ?  " + val);
+            String val = GoDoc.saveDiagram(owner, nomeFile, publish, gson.toJson(ob), users, writers,pwd);
+        //    out.println("new or old ?  " + val);
             if (val.equals("new")) {
                 ob.createNewEvents(nomeFile, owner);
             } else if (val.equals("notnew")) {
                 dg.createChangeEvents(nomeFile, owner);
             }
-            new TestPub().testPublisher("http://localhost:8080", FeedUtil.SubFeedName(nomeFile));
-            new TestPub().testPublisher("", FeedUtil.SubFeedName(nomeFile));
-            SunFtpWrapper ftp = new SunFtpWrapper();
-            ftp.uploadFeed(nomeFile);
-            out.print("pubblicato evento");
+            if(!nomeFile.contains("template"))
+            {
+                new TestPub().testPublisher("http://localhost:8080", FeedUtil.SubFeedName(nomeFile));
+                new TestPub().testPublisher("", FeedUtil.SubFeedName(nomeFile));
+                SunFtpWrapper ftp = new SunFtpWrapper();
+                ftp.uploadFeed(nomeFile);}
+         //       String urlfeed = "http://taskmanagerunito.xoom.it/Flow/"+nomeFile+".xml";
+                out.println(nomeFile);
+            
+         
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {

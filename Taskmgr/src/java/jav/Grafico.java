@@ -83,6 +83,7 @@ public class Grafico {
     }
 
     public void createNewEvents(String nomeFile, String owner) throws Exception {
+        try{
         for (int j = 0; j < blocks.length; j++) {
             if (blocks[j].imageId.equalsIgnoreCase("rect")) {
                 String found = blocks[j].assign;
@@ -124,5 +125,5 @@ public class Grafico {
                 }
             }
         }
-    }
+    }catch(Exception ex){System.out.println(ex.getMessage());}}
 }

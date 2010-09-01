@@ -14,6 +14,7 @@
         <title>Load a diagram</title>
         <script type="text/javascript">
         function get(){
+        try{
         var diagram;
      //   alert(document.myform.radiogroup.length);
         for (var i=0; i<document.myform.radiogroup.length; i++){
@@ -23,8 +24,11 @@
 
                     
                 }}
-            // alert(diagram);
+            
              opener.document.getElementById('area').value = diagram;
+              opener.loadDiagram(diagram);
+         }
+         catch(e){alert("Choose a Diagram to Load");}
         }
 
         function get2()
@@ -40,35 +44,79 @@
                 }}
             // alert(diagram);
              opener.document.getElementById('area').value = diagram;
+
              opener.loadDiagram(diagram);
         }
 
-        
+
+
+
+function getDocs(){
+  try{
+                    var url1 = "./PrendiDocs";
+                    var email = opener.document.getElementById('owner').value;
+                    var pwd = opener.document.getElementById('pwd').value
+
+
+                    objXml = new XMLHttpRequest();
+
+                    objXml.open("POST",url1,false);
+
+                    objXml.setRequestHeader('Content-Type', "text/plain;charset=UTF-8");
+
+
+                    objXml.setRequestHeader('email',email);
+                    objXml.setRequestHeader('pwd',pwd);
+                    objXml.send(null);
+                    str = objXml.responseText;
+                   // confirm("LISTA: " +str);
+                    var array = str.split(",");
+                    var size = array.length;
+                    var add = document.getElementById("menu");
+
+                    for(var i=0;i<size;i++)
+            {
+                 var cb = document.createElement( "input" );
+                 var value = array[i];
+                 if(value != "")
+                 {
+                     cb.type = "radio";
+                     cb.id = value;
+                     cb.value = value;
+                     cb.checked = false;
+                     cb.name = "radiogroup";
+                     var text = document.createTextNode( value);
+                     var br = document.createElement("br");
+
+                     add.appendChild(cb);
+                     add.appendChild(text);
+                     add.appendChild(br);
+                 }
+
+            }
+            }catch(e){alert(e.message);}}
+
+//window.onload=setCredentials;
+
 
 
                  </script>
     </head>
-    <body style="background-color: #add8e6">
+    <body style="background-color: #add8e6" onload="getDocs();"  >
         
-        <h1>Load a diagram</h1>
-        <form id="myform" name="myform">
+        <h1>Load a diagram </h1>
+        <form name="myform" id="myform" >
+        <div id="menu" name="menu">
 
-<%
-        String docs = jav.GoDoc.prendi();
-        String[] diagramdocs;
-        String delimiter = ",";
-        diagramdocs = docs.split(delimiter);
+            </div>
         
-        for(int i=0;i<diagramdocs.length;i++)
-        {
-            String doc = diagramdocs[i];
-            if(doc.contains(".txt")){
-%>
-<input type="radio" id='radiogroup' name="radiogroup" value='<%=doc%>' /><%=doc%>
-<br>
-<%}}%>
-        </form>
-<input type="button" onclick="get2();self.close();" value="Ok"/>
+       
+        
+
+   
+<input type="button" onclick="get();self.close();" value="Ok" />
+
+ </form>
      
     </body>
 </html>

@@ -48,7 +48,8 @@ public class DeltaGrafico {
                       String id = nuovo.blocks[j].id;
                       String newstatus = nuovo.blocks[j].type;
                       String duedate = nuovo.blocks[j].date;
-                      if(! duedate.equals("Choose a Date(Optional)") && duedate != null && !duedate.equals(""))
+                      if(duedate == null){}
+                      else if(! duedate.equals("Choose a Date(Optional)") && duedate != null && !duedate.equals(""))
                       {
                           String taskname = nuovo.blocks[j].name;
                           CalendarCall.insertInCalendar(duedate,taskname);

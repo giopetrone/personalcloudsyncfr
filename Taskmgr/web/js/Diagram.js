@@ -78,7 +78,7 @@ Diagram.prototype.persist = function() {
  * objects and adds them to the diagram.
  */
 Diagram.prototype.load = function(jsonString) {
-
+   
     var persisted = JSON.parse(jsonString);
 
     for (var i=0; i<persisted.blocks.length; i++) {
@@ -90,9 +90,9 @@ Diagram.prototype.load = function(jsonString) {
         var figure = Palette.factory.generateFigure(persisted.connections[j]);
         var seq = parseInt(figure.id.substring(6));
         if (!isNaN(seq)) this.sequence = Math.max(seq, this.sequence);
-    }
+   
 
-}
+}}
 
 /*
  * Generate a unique ID for figures
@@ -106,6 +106,7 @@ Diagram.prototype.generateId = function() {
  */
 Diagram.prototype.addFigure = function(figure, position) {
     //var id = "figure" + this.sequence++;
+     try{
     this.figures[(figure.id)] = figure;
     // DIOFFA E CHI SONO?
     if (position == "absolute") {
@@ -115,6 +116,7 @@ Diagram.prototype.addFigure = function(figure, position) {
     // da load non era settato!!!!!
     //  confirm (figure.id);
     this.container.appendChild(figure.element);
+     }catch(e){alert("DIAGRA.PRO.LOAD: "+e.messgage)}
 }
 
 /*

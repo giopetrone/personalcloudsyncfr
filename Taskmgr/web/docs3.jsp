@@ -11,7 +11,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Save the diagram</title>
+        <title>Save the diagram as a Template</title>
         <script type="text/javascript">
         function get(){
         var diagram;
@@ -32,7 +32,7 @@
             var diagram;
      //   alert(document.myform.radiogroup.length);
         var name = document.getElementById("name").value;
-     
+
         if(name == "Save as new" || name == "")
         {
            /* for (var i=0; i<document.myform.radiogroup.length; i++){
@@ -47,7 +47,7 @@
              opener.saveDiagram("true");
              */
             alert("Choose a name for the diagram");
-             
+
         }
         else
         {
@@ -61,24 +61,25 @@
         function getname()
         {
             var name =opener.sendname();
-            
-            if(name == "" || name == null) document.myform.name.value = "Save as new"
+
+            if(name == "" || name == null) document.myform.name.value = "Save as new template"
             else {
-                document.myform.name.value = name;
-               
+
+                if(name.indexOf("template")==-1) document.myform.name.value = "template_"+name;
+
             }
         }
 
 
                  </script>
 
-        
+
     </head>
     <body style="background-color: #add8e6" onload="getname();">
-        <h1>Save the diagram</h1>
+        <h1>Save the diagram as a Template</h1>
         <form id="myform" name="myform">
         <input type="text" id="name" name="name" value="" onclick="document.myform.name.value=''"/>
-        
+
 
         </form>
 <input type="button" onclick="get2();self.close();" value="Ok"/>

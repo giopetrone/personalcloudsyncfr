@@ -28,6 +28,18 @@
         <servlet-name>CalendarServlet</servlet-name>
         <servlet-class>jav.CalendarServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>NewServlet</servlet-name>
+        <servlet-class>jav.NewServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>getDocs</servlet-name>
+        <servlet-class>jav.GetDocs</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>PrendiDocs</servlet-name>
+        <servlet-class>jav.PrendiDocs</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>LoadServlet</servlet-name>
         <url-pattern>/LoadServlet</url-pattern>
@@ -55,6 +67,18 @@
     <servlet-mapping>
         <servlet-name>CalendarServlet</servlet-name>
         <url-pattern>/CalendarServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>NewServlet</servlet-name>
+        <url-pattern>/NewServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>getDocs</servlet-name>
+        <url-pattern>/getDocs</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PrendiDocs</servlet-name>
+        <url-pattern>/PrendiDocs</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
