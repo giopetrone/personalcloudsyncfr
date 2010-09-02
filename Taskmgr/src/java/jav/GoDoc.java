@@ -14,8 +14,10 @@ import com.google.gdata.data.acl.AclEntry;
 import com.google.gdata.data.acl.AclFeed;
 import com.google.gdata.data.acl.AclRole;
 import com.google.gdata.data.acl.AclScope;
+import com.google.gdata.data.docs.DocumentEntry;
 import com.google.gdata.data.docs.DocumentListEntry;
 import com.google.gdata.data.docs.DocumentListFeed;
+import com.google.gdata.data.docs.FolderEntry;
 import com.google.gdata.data.media.MediaByteArraySource;
 import com.google.gdata.data.media.MediaSource;
 import com.google.gdata.util.ServiceException;
@@ -30,6 +32,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import maillib.SendMailCl;
 import pubsublib.event.AtomEvent;
 import pubsublib.test.TestPub;
 
@@ -61,7 +64,7 @@ public class GoDoc {
 
     public GoDoc(DocsService service) {
         try {
-            documentListFeedUrl = new URL("http://docs.google.com/feeds/documents/private/full");
+            documentListFeedUrl = new URL("http://docs.google.com/feeds/documents/private/full/");
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -70,19 +73,57 @@ public class GoDoc {
     }
 
     public static void main(String[] args) throws MalformedURLException, IOException, ServiceException {
-        DocsService service = new DocsService("Document List Demo");
-        service.setUserCredentials(docMakerLogin, docMakerPasswd);
-        DocumentQuery query = new DocumentQuery(new URL("http://docs.google.com/feeds/documents/private/full/-/mine"));
+      //  DocsService service = new DocsService("Document List Demo");
+     //   service.setUserCredentials(docMakerLogin, docMakerPasswd);
+//
+     //   DocumentQuery query = new DocumentQuery(new URL("http://docs.google.com/feeds/documents/private/full/-/mine"));
 //DocumentListEntry documentEntry = findEntry("prova6.txt");
-        DocumentListFeed resultFeed = service.getFeed(query, DocumentListFeed.class);
-     //   System.out.println(prendi());
+      //  DocumentListFeed resultFeed = service.getFeed(query, DocumentListFeed.class);
+        try{
+            
+            DocsService service = new DocsService("Document List Demo");
+            service.setUserCredentials(docMakerLogin, docMakerPasswd);
+            URL feedUri = new URL("http://docs.google.com/feeds/documents/private/full/-/folder?showfolders=true");
+            DocumentListFeed feed = service.getFeed(feedUri, DocumentListFeed.class);
+            System.out.println("FEED :"+feed.toString());
+            printDocuments(feed);
+           // DocumentListEntry folder = createFolder("Prova");
+         //   String resid = folder.getResourceId();
+          //  System.out.println(resid);
+        }
+            catch(Exception e){System.out.println("ERRORE: "+e.getMessage());}
+
     }
 
+public static void printDocuments(DocumentListFeed feed) {
+  for (DocumentListEntry entry : feed.getEntries()) {
+    String resourceId = entry.getResourceId();
+    String boh =entry.getTitle().getPlainText();
+    System.out.println(" -- Document:" + boh);
+  }
+}
+
+
+
+public static DocumentListEntry createFolder(String title) throws IOException, ServiceException {
+
+    DocsService service = new DocsService("Document List Demo");
+    //service.setUserCredentials(docMakerLogin, docMakerPasswd);
+    DocumentListEntry newEntry = new FolderEntry();
+    newEntry.setTitle(new PlainTextConstruct(title));
+    URL Url = new URL("http://docs.google.com/feeds/documents/private/full");
+    return service.insert(Url, newEntry);
+
+}
+
+
     public static String prendi(String login, String pwd) {
+        
         DocsService service = new DocsService("Document List Demo");
         try {
+             
             service.setUserCredentials(login, pwd);
-          
+            
             //   return new GoDoc(service).saveTemplate("NULLUSER", "temp.txt", "ciao");
             return new GoDoc(service).showAllDocs();
         } catch (Exception ex) {
@@ -100,11 +141,38 @@ public class GoDoc {
     int newreaders = 0;
 
      */
-    public void saveNewDiagram(String login, String documentName,String s, String users, String writers )
+    public void saveNewDiagram(String login, String documentName,String s, String users, String writers,String pwd )
     {
                 try{
                     DocumentListEntry documentEntry = findEntry(documentName);
                     System.out.println("DocumentEntry null");
+                    /*
+                    URL feedUri = new URL("http://docs.google.com/feeds/documents/private/full/-/folder?showfolders=true");
+                    DocumentListFeed feed = service.getFeed(feedUri, DocumentListFeed.class);
+                    boolean folder = false;
+                    for (DocumentListEntry entry : feed.getEntries())
+                    {
+                        System.out.println("DENTRO FOR");
+                        String resourceId = entry.getResourceId();
+                        String name =entry.getTitle().getPlainText();
+                        if(name.equalsIgnoreCase("Flow"))
+                        {
+                            URL destFolderUri = new URL("http://docs.google.com/feeds/folders/private/full/" + resourceId);
+                            documentEntry = uploadFile(s, documentName, destFolderUri);
+                            folder = true;
+                        }
+                    }
+                    if (folder == false)
+                    {
+                        System.out.println("DENTRO IF");
+                        DocumentListEntry newEntry = new FolderEntry();
+                        newEntry.setTitle(new PlainTextConstruct("Flow"));
+                        URL Url = new URL("http://docs.google.com/feeds/documents/private/full");
+                        DocumentListEntry newfolder = service.insert(Url, newEntry);
+                        String resourceId = newfolder.getResourceId();
+                        URL destFolderUri = new URL("http://docs.google.com/feeds/folders/private/full/" + resourceId);
+                        documentEntry = uploadFile(s, documentName, destFolderUri);
+                    }*/
                     documentEntry = uploadFile(s, documentName);
                     AtomEvent eventSave = new AtomEvent(login, "TaskManager", "Save New Diagram");
                     String link = documentEntry.getDocumentLink().getHref();
@@ -113,6 +181,7 @@ public class GoDoc {
                     FeedUtil.addEntry("", documentName, eventSave);
                     String[] tempwriter;
                     String delimiter = ",";
+                    List<String> destinatari = new LinkedList();
                     //     if(writers == null) writers = "";
                     if (users != null && writers != null) {
                         String[] tempusers;
@@ -130,7 +199,7 @@ public class GoDoc {
                                 event.setParameter("Who", tempusers[i]);
                                 FeedUtil.addEntry("", documentName, event);
                                 new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
-
+                                destinatari.add(tempusers[i]);
 
                             }
 
@@ -155,8 +224,21 @@ public class GoDoc {
                                 event.setParameter("Who", tempwriter[j]);
                                 FeedUtil.addEntry("", documentName, event);
                                 new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
+                                destinatari.add(tempwriter[j]);
                             }
                         }
+                        destinatari.add(login);
+                      
+                        
+                        String dest = destinatari.toString();
+                        int length = dest.length();
+                        String destfinal = dest.substring(1, length - 1);
+                        sendMail(destfinal,login,pwd,documentName);
+                        
+
+                        
+
+                        
 
                     } else {
                         /* tempwriter = writers.split(delimiter);
@@ -332,14 +414,14 @@ public class GoDoc {
                 }
             }
 
-    public String saveDoc(String login, String documentName, String s, String users, String writers) {
+    public String saveDoc(String login, String documentName, String s, String users, String writers, String pwd) {
 
         try {
             DocumentListEntry documentEntry = findEntry(documentName);
 
             if (documentEntry == null) {
                
-               saveNewDiagram(login,documentName,s,users,writers);
+               saveNewDiagram(login,documentName,s,users,writers,pwd);
 /*
                 System.out.println("DocumentEntry null");
                 documentEntry = uploadFile(s, documentName);
@@ -780,20 +862,37 @@ public class GoDoc {
         try {
             //  Thread.currentThread().sleep(1000 * 121);
         } catch (Exception e) {
+            System.out.println("Dentro show all: "+e.getMessage());
             // }
         }
         return ret;
     }
 
-    public String printDocumentEntry(DocumentListEntry doc) {
+    public String printDocumentEntry(DocumentListEntry doc) throws MalformedURLException, IOException, ServiceException {
         String shortId = doc.getId().substring(doc.getId().lastIndexOf('/') + 1);
         DateTime date = doc.getPublished();
         DateTime date1 = doc.getUpdated();
         String versionId = doc.getVersionId();
         String resourceId = doc.getResourceId();
+        /*String resourceFolderId = "";
+        URL feedUri = new URL("http://docs.google.com/feeds/documents/private/full/-/folder?showfolders=true");
+        DocumentListFeed feed = service.getFeed(feedUri, DocumentListFeed.class);
+        for (DocumentListEntry entry : feed.getEntries())
+        {        String name =entry.getTitle().getPlainText();
+                 if(name.equalsIgnoreCase("Flow")){
+
+                            resourceFolderId = entry.getResourceId();
+
+                     }
+        }*/
         String title = "";
         if (doc.getTitle().getPlainText().contains(".txt")) {
             title = doc.getTitle().getPlainText();
+           /* URL url = new URL("http://docs.google.com/feeds/folders/private/full/"+resourceFolderId);
+            DocumentEntry newEntry = new DocumentEntry();
+            newEntry.setId(doc.getId());
+            service.insert(url, newEntry);*/
+
         }
         String docType = resourceId.substring(0, resourceId.lastIndexOf(':'));
 
@@ -809,7 +908,7 @@ public class GoDoc {
                 DocsService service = new DocsService("Document List Demo");
                 service.setUserCredentials(login, pwd);
                 if (users != null) {
-                    return new GoDoc(service).saveDoc(login, name, s, users, writers);
+                    return new GoDoc(service).saveDoc(login, name, s, users, writers,pwd);
                 } else {
                     return new GoDoc(service).saveDoc(login, name, s);
                 }
@@ -863,6 +962,59 @@ public class GoDoc {
             }
         }
         return ret;
+    }
+
+
+
+    public DocumentListEntry uploadFile(String content, String title, URL uri)
+        throws IOException, ServiceException  {
+      File file = new File("/tmp/" + title);
+      FileOutputStream of = new FileOutputStream(file);
+      of.write(content.getBytes(), 0, content.length());
+      of.close();
+      DocumentListEntry newDocument = new DocumentListEntry();
+      String mimeType = DocumentListEntry.MediaType.fromFileName(file.getName()).getMimeType();
+      newDocument.setFile(file, mimeType);;
+      newDocument.setTitle(new PlainTextConstruct(title));
+      DocumentListEntry ret = service.insert(uri, newDocument);
+      return ret;
+
+
+
+
+
+
+        
+
+
+
+    }
+
+
+
+    public void sendMail(String dest,String login,String pwd,String name)
+    {
+        try
+        {
+            System.out.println("%%%%LOGIN: "+login);
+            String SMTP_HOST_NAME = "smtp.gmail.com";
+            String SMTP_PORT = "465";
+
+            String text = "Hi, a new diagram is interested in you.\nGo to your task manager and load "+name+"\n";
+            String text2 ="Do not forget to subscribe your Notification Manager to this application!";
+            String emailMsgTxt = text+text2;
+            String emailSubjectTxt = "New Collaborative Workflow: "+name;
+            String emailFromAddress = login;
+            String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
+            String[] sendTo = dest.split(",");
+            new SendMailCl().sendSSLMessage(sendTo, emailSubjectTxt, emailMsgTxt, emailFromAddress,pwd);
+        }
+        catch(Exception ex)
+        {
+            System.out.println("In SendMail Method: "+ex.getMessage());
+        }
+
+
     }
 
 

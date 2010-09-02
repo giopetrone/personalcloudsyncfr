@@ -26,9 +26,9 @@
                 }}
             
              opener.document.getElementById('area').value = diagram;
-              opener.loadDiagram(diagram);
+             opener.loadDiagram(diagram);
          }
-         catch(e){alert("Choose a Diagram to Load");}
+         catch(e){alert(e.message);}
         }
 
         function get2()

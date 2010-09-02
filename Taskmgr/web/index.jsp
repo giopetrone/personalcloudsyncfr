@@ -80,7 +80,7 @@
                     {
                         if(objXml.status  == 200) {
                             str = objXml.responseText;
-                            alert(str);
+                            
                         } else {}
 
                     }

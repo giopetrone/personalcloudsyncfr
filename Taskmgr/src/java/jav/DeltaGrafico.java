@@ -23,7 +23,9 @@ public class DeltaGrafico {
         int oldsize = vecchio.blocks.length;
         int newconnections = nuovo.connections.length;
         int oldconnections = vecchio.connections.length;
-
+        int countDone = 0;
+        int countRect = 0;
+        String utenti ="";
 
 
         if(newsize < oldsize || newsize > oldsize)
@@ -45,8 +47,12 @@ public class DeltaGrafico {
               {
                   if(nuovo.blocks[j].imageId.equalsIgnoreCase("rect"))
                   {
+                      countRect ++;
+                      utenti = nuovo.blocks[j].shared+","+nuovo.blocks[j].writers+","+nuovo.blocks[j].owner;
                       String id = nuovo.blocks[j].id;
                       String newstatus = nuovo.blocks[j].type;
+                      if(newstatus == null) newstatus ="";
+                      if(newstatus.equalsIgnoreCase("Done")) countDone ++;
                       String duedate = nuovo.blocks[j].date;
                       if(duedate == null){}
                       else if(! duedate.equals("Choose a Date(Optional)") && duedate != null && !duedate.equals(""))
@@ -73,6 +79,10 @@ public class DeltaGrafico {
                                   event.setParameter("Task", nuovo.blocks[j].name);
                                 //  event.setParameter("Permission", "Write");
                                   event.setParameter("New Status", newstatus);
+                                  if(!nuovo.blocks[j].assign.equals("") && nuovo.blocks[j].assign !=null)
+                                  {
+                                      event.setParameter("Assigned To",nuovo.blocks[j].assign);
+                                  }
                                   FeedUtil.addEntry("", nomeFile, event);
                               }
                               if(!newassign.equals(oldassign))
@@ -87,6 +97,14 @@ public class DeltaGrafico {
                       }
                   }
               }
+        if(countRect == countDone)
+        {
+            AtomEvent event = new AtomEvent(owner, "TaskManager", "Workflow is Done");
+            event.setParameter("Workflow", nomeFile);
+            //  event.setParameter("Permission", "Write");
+            event.setParameter("All users", utenti);
+            FeedUtil.addEntry("", nomeFile, event);
+        }
 
 
 
