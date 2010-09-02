@@ -29,7 +29,7 @@
             // determine a return_to URL where your application will receive
             // the authentication responses from the OpenID provider
             // YOU SHOULD CHANGE THIS TO GO TO THE
-            String returnToUrl = "http://localhost:8080/OpenIdSpike/consumer_returnurl.jsp";
+            String returnToUrl = "http://localhost:8081/OpenIdSpike/consumer_returnurl.jsp";
 
 
             // perform discovery on the user-supplied identifier
