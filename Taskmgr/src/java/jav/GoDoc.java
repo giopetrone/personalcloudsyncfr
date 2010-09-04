@@ -146,6 +146,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                 try{
                     DocumentListEntry documentEntry = findEntry(documentName);
                     System.out.println("DocumentEntry null");
+                    //QUesta parte commentata fa vedere come cercare e creare folders
                     /*
                     URL feedUri = new URL("http://docs.google.com/feeds/documents/private/full/-/folder?showfolders=true");
                     DocumentListFeed feed = service.getFeed(feedUri, DocumentListFeed.class);
@@ -267,6 +268,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
 
     public void uploadDiagram(String login, String documentName, String users, String writers) throws Exception
     {
+        try{
        System.out.println("DocumentEntry NOT null");
                 DocumentListEntry documentEntry = findEntry(documentName);
                 AtomEvent eventUpdate = new AtomEvent(login, "TaskManager", "Update Diagram");
@@ -276,7 +278,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                 //    AclFeed aclFeed = service.getFeed(new URL(documentEntry.getAclFeedLink().getHref()), AclFeed.class);
                 //   for (AclEntry entry : aclFeed.getEntries()) entry.delete();
 
-                try {
+               
 
                     List<String> readers = new ArrayList();
                     List<String> collaborators = new ArrayList();
@@ -410,7 +412,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                     }
 
                 } catch (Exception ex) {
-                    System.out.println(ex.toString());
+                    System.out.println("DENTRO UPDATE DIAGRAM "+ex.getMessage());
                 }
             }
 
@@ -494,7 +496,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
 
             } else {
 
-
+                System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%");
                 uploadDiagram(login,documentName,users,writers);
                 service.getRequestFactory().setHeader("If-Match", "*");
             // documentEntry.setMediaSource(new MediaByteArraySource(s.getBytes(), "text/plain"));
@@ -654,9 +656,9 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
             
             //    return documentEntry.getDocumentLink().getHref();
         } catch (Exception ex) {
-            ex.printStackTrace();
-
-            return ex.toString();
+            System.out.println("Dentro SAVEDOC "+ex.getMessage());
+            if(ex.getMessage().equalsIgnoreCase("Could not convert document.")) return "notnew";
+            else return ex.toString();
         }
     }
 
@@ -738,7 +740,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
 
     public List<String> loadDoc(String valorefile, boolean refresh, String owner) {
         try {
-          //  System.out.println("-----------" +valorefile);
+            
             DocumentListEntry documentEntry = findEntry(valorefile);
             //   System.out.println(documentEntry.toString());
             List<String> list = new LinkedList();
@@ -760,7 +762,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
             String resourceId = documentEntry.getResourceId();
            
             String docType = resourceId.substring(0, resourceId.lastIndexOf(':'));
-            
+             
             String docId = resourceId.substring(resourceId.lastIndexOf(':') + 1);
             
             URL exportUrl = new URL("http://docs.google.com/feeds/download/" + docType
@@ -777,28 +779,42 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
             while ((c = inStream.read(b)) != -1) {
                 s += new String(b, 0, c);
             }
-      
+            
             s = findBody(s);
-        
+           
             String error = "Non hai i permessi";
             List<String> people = new ArrayList();
             List<String> collaborators = new ArrayList();
             List<String> readers = new ArrayList();
-            AclFeed aclFeed = service.getFeed(new URL(documentEntry.getAclFeedLink().getHref()), AclFeed.class);
+            System.out.println("Prima ciclo reader");
+            String docowner = "";
 
+            AclFeed aclFeed = service.getFeed(new URL(documentEntry.getAclFeedLink().getHref()), AclFeed.class);
+            int size = aclFeed.getEntries().size();
+            System.out.println("SIZE " +aclFeed.getEntries().size());
             for (AclEntry entry : aclFeed.getEntries()) {
+                
+                System.out.println("RUOLO "+entry.getRole().getValue());
                 if (entry.getRole().getValue().equals("reader")) {
+                    System.out.println("Trovato reader");
                     readers.add(entry.getScope().getValue());
                 }
-                people.add(entry.getScope().getValue());
-                if (entry.getRole().getValue().equals("writer")) {
+                
+                else if (entry.getRole().getValue().equals("writer")) {
+                    System.out.println("Trovato Writer");
                     collaborators.add(entry.getScope().getValue());
                 }
+                else if (entry.getRole().getValue().equals("owner"))
+                {
+                    docowner = entry.getScope().getValue();
+                }
+                people.add(entry.getScope().getValue());
 
 
             }
+            if(size == 1 && !owner.equals(docowner)){System.out.println("SIZE 1 e docowner"); readers.add(owner);people.add(owner);}
             String users = readers.toString();
-           
+
 
             String nousers = "";
             if (users.equals("[]")) {
@@ -806,7 +822,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
             } else {
                 users = users.substring(1, users.length() - 1);
             }
-            System.out.println(users);
+            System.out.println("USERS: "+users);
             String writers = collaborators.toString();
           
 
@@ -818,8 +834,9 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
             } else {
                 writers = writers.substring(1, writers.length() - 1);
             }
-            System.out.println(writers);
-
+            System.out.println("Writers "+writers);
+            System.out.println("People: "+people.toString());
+            System.out.println("Owner: "+owner);
 
             if (people.toString().contains(owner) == true) {
                 list.add(s);

@@ -69,6 +69,7 @@ public class SaveServlet extends HttpServlet {
             if (val.equals("new")) {
                 ob.createNewEvents(nomeFile, owner);
             } else if (val.equals("notnew")) {
+                System.out.println("NOT NEW in SAVE SERVLET");
                 dg.createChangeEvents(nomeFile, owner);
             }
             if(!nomeFile.contains("template"))
