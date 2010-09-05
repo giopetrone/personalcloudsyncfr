@@ -31,6 +31,7 @@ public class SaveServlet extends HttpServlet {
     //  String valore;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         System.out.println("in save servlet");
         String nomeFile = request.getHeader("filenamemio");
         BufferedReader re = request.getReader();
@@ -38,6 +39,10 @@ public class SaveServlet extends HttpServlet {
         String owner = request.getHeader("owner");
         String pwd = request.getHeader("pwd");
         String users = request.getHeader("users");
+        System.out.println("USERS: "+users);
+        String assignees = request.getHeader("assignees");
+        System.out.println("Assignees: "+assignees);
+        
         //     String loadjson = request.getHeader("loadjson");
         boolean publish = request.getHeader("publish") != null;
         String login = request.getHeader("login");
@@ -45,6 +50,7 @@ public class SaveServlet extends HttpServlet {
             users = "";
         }
         String writers = request.getHeader("writers");
+        System.out.println("Writers: "+writers);
        
         //publish = true; // PER PROVA
         Gson gson = new Gson();
@@ -64,7 +70,7 @@ public class SaveServlet extends HttpServlet {
             } else {
                 users = ob.setUsers(owner, writers, users);
             }
-            String val = GoDoc.saveDiagram(owner, nomeFile, publish, gson.toJson(ob), users, writers,pwd);
+            String val = GoDoc.saveDiagram(owner, nomeFile, publish, gson.toJson(ob), users, writers,pwd,assignees);
         //    out.println("new or old ?  " + val);
             if (val.equals("new")) {
                 ob.createNewEvents(nomeFile, owner);

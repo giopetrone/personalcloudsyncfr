@@ -141,11 +141,12 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
     int newreaders = 0;
 
      */
-    public void saveNewDiagram(String login, String documentName,String s, String users, String writers,String pwd )
+    public void saveNewDiagram(String login, String documentName,String s, String users, String writers,String pwd,String assignees )
     {
                 try{
+                  
                     DocumentListEntry documentEntry = findEntry(documentName);
-                    System.out.println("DocumentEntry null");
+                    System.out.println("DOCUMENTO NUOVO");
                     //QUesta parte commentata fa vedere come cercare e creare folders
                     /*
                     URL feedUri = new URL("http://docs.google.com/feeds/documents/private/full/-/folder?showfolders=true");
@@ -183,10 +184,26 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                     String[] tempwriter;
                     String delimiter = ",";
                     List<String> destinatari = new LinkedList();
-                    //     if(writers == null) writers = "";
-                    if (users != null && writers != null) {
-                        String[] tempusers;
+                    //if(writers == null) writers = "";
+                    if (users == null && writers == null && assignees ==null)  {
+                        System.out.println("NESSEUN UTENTE IN SHARING IN SAVE NEW DIAGRAM");
+                        /* tempwriter = writers.split(delimiter);
+                        for (int j = 0; j < tempwriter.length; j++) {
+                        addWriting(documentEntry, tempwriter[j]);
+                        AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
+                        event.setParameter("File", documentName);
+                        event.setParameter("Permission", "Write");
+                        event.setParameter("Who", tempwriter[j]);
+                        FeedUtil.addEntry("", documentName, event);
+                        new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
+                        }*/
 
+                    }
+                    else {
+                        String[] tempusers;
+                        if(writers == null) writers = "";
+                        if(users == null) users ="";
+                        if(assignees == null) assignees = "";
                         tempusers = users.split(delimiter);
 
                         for (int i = 0; i < tempusers.length; i++) {
@@ -228,6 +245,27 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                                 destinatari.add(tempwriter[j]);
                             }
                         }
+
+                        String [] tempassignees;
+                        tempassignees = assignees.split(delimiter);
+                        for (int j = 0; j < tempassignees.length; j++) {
+
+                            System.out.println("Assignees " + tempassignees[j]);
+                            if(!tempassignees[j].equalsIgnoreCase("") &&  tempassignees[j] !=null)
+                            {
+                                addWriting(documentEntry, tempassignees[j]);
+                                destinatari.add(tempassignees[j]);
+                            }
+                        //    AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
+                         //   event.setParameter("File", documentName);
+                        //    event.setParameter("Permission", "Write");
+                        //    event.setParameter("Who", tempassignees[j]);
+                        //    FeedUtil.addEntry("", documentName, event);
+                       //     new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
+                            
+
+                        }
+
                         destinatari.add(login);
                       
                         
@@ -241,24 +279,12 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
 
                         
 
-                    } else {
-                        /* tempwriter = writers.split(delimiter);
-                        for (int j = 0; j < tempwriter.length; j++) {
-                        addWriting(documentEntry, tempwriter[j]);
-                        AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
-                        event.setParameter("File", documentName);
-                        event.setParameter("Permission", "Write");
-                        event.setParameter("Who", tempwriter[j]);
-                        FeedUtil.addEntry("", documentName, event);
-                        new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
-                        }*/
+                    } 
 
-                    }
-
-                     System.out.println("DENTRO SAVENEW!") ;
+                    
                     }catch(Exception ex)
                     {
-                         System.out.println(ex.toString());
+                         System.out.println("IN SAVE NEW DIAGRAM "+ex.toString());
                         
                     }
 
@@ -266,10 +292,11 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
 
     }
 
-    public void uploadDiagram(String login, String documentName, String users, String writers) throws Exception
+    public String uploadDiagram(String login, String documentName, String users, String writers,String s,String assignees) throws Exception
     {
         try{
-       System.out.println("DocumentEntry NOT null");
+            DocsService service = new DocsService("Document List Demo");
+                System.out.println("DocumentEntry NOT null");
                 DocumentListEntry documentEntry = findEntry(documentName);
                 AtomEvent eventUpdate = new AtomEvent(login, "TaskManager", "Update Diagram");
                 eventUpdate.setParameter("File", documentName);
@@ -410,20 +437,46 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                             }
                         }
                     }
+                    if(assignees != null)
+                    {
+                       String[] tempassignes;
+                       tempassignes = assignees.split(",");
+                       for(int z =0;z<tempassignes.length;z++)
+                       {
+                           if(!tempassignes[z].equals(""))
+                           {
+                               addWriting(documentEntry, tempassignes[z]);
+                           }
+                       }
+                    }
+            service.getRequestFactory().setHeader("If-Match", "*");
+            // documentEntry.setMediaSource(new MediaByteArraySource(s.getBytes(), "text/plain"));
+           documentEntry.setMediaSource(new MediaByteArraySource(s.getBytes(), "text/plain"));
+
+            //         documentEntry.setContent(new PlainTextConstruct(s));
+            documentEntry.updateMedia(false);
+            return "notnew";
 
                 } catch (Exception ex) {
-                    System.out.println("DENTRO UPDATE DIAGRAM "+ex.getMessage());
+                    
+                    if(ex.getMessage().equalsIgnoreCase("This user already has access to the document."))
+                    {
+
+                        System.out.println("DENTRO If update diagram "+ex.getMessage());
+                        return "notnew";
+                    }
+                    else return "notnew";
                 }
             }
 
-    public String saveDoc(String login, String documentName, String s, String users, String writers, String pwd) {
+    public String saveDoc(String login, String documentName, String s, String users, String writers, String pwd,String assignees) {
 
         try {
             DocumentListEntry documentEntry = findEntry(documentName);
 
             if (documentEntry == null) {
                
-               saveNewDiagram(login,documentName,s,users,writers,pwd);
+               saveNewDiagram(login,documentName,s,users,writers,pwd,assignees);
 /*
                 System.out.println("DocumentEntry null");
                 documentEntry = uploadFile(s, documentName);
@@ -497,14 +550,17 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
             } else {
 
                 System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%");
-                uploadDiagram(login,documentName,users,writers);
+                String ret = uploadDiagram(login,documentName,users,writers,s,assignees);
+                System.out.println("RET: "+ret);
+               
                 service.getRequestFactory().setHeader("If-Match", "*");
             // documentEntry.setMediaSource(new MediaByteArraySource(s.getBytes(), "text/plain"));
             documentEntry.setMediaSource(new MediaByteArraySource(s.getBytes(), "text/plain"));
 
-            //         documentEntry.setContent(new PlainTextConstruct(s));
+        //    DocumentListEntry updatedEntry = documentEntry.updateMedia(true);
+               //    documentEntry.setContent(new PlainTextConstruct(s));
             documentEntry.updateMedia(false);
-            return "notnew";
+            return ret;
 
             }
                 /*
@@ -812,7 +868,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
 
 
             }
-            if(size == 1 && !owner.equals(docowner)){System.out.println("SIZE 1 e docowner"); readers.add(owner);people.add(owner);}
+            
             String users = readers.toString();
 
 
@@ -837,8 +893,16 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
             System.out.println("Writers "+writers);
             System.out.println("People: "+people.toString());
             System.out.println("Owner: "+owner);
-
-            if (people.toString().contains(owner) == true) {
+            if(size == 1 && !owner.equals(docowner))
+            {
+                System.out.println("SIZE 1 e docowner"); readers.add(owner);people.add(owner);
+                list.add(s);
+                list.add(users);
+                list.add(writers);
+                list.add("nosave");
+                return list;
+            }
+            else if (people.toString().contains(owner) == true) {
                 list.add(s);
                 list.add(users);
                 list.add(writers);
@@ -919,13 +983,13 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
         return title;
     }
 
-    public static String saveDiagram(String login, String name, boolean publish, String s, String users, String writers,String pwd) {
+    public static String saveDiagram(String login, String name, boolean publish, String s, String users, String writers,String pwd,String assignees) {
         try {
             if (publish) {
                 DocsService service = new DocsService("Document List Demo");
                 service.setUserCredentials(login, pwd);
                 if (users != null) {
-                    return new GoDoc(service).saveDoc(login, name, s, users, writers,pwd);
+                    return new GoDoc(service).saveDoc(login, name, s, users, writers,pwd,assignees);
                 } else {
                     return new GoDoc(service).saveDoc(login, name, s);
                 }
@@ -979,6 +1043,22 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
             }
         }
         return ret;
+    }
+
+
+    public static String checkid(String user, String pwd)
+    {
+        try
+        {
+            DocsService service = new DocsService("Document List Demo");
+            service.setUserCredentials(user, pwd);
+            return "checked";
+        }
+        catch(Exception e)
+        {
+            System.out.println("Checkid method: "+e.getMessage());
+            return "error";
+        }
     }
 
 

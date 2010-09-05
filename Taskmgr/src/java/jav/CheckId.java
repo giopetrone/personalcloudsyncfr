@@ -7,7 +7,6 @@ package jav;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -15,11 +14,11 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  *
- * @author marino
+ * @author fabrizio
  */
-public class LoadServlet extends HttpServlet {
-
-    /**
+public class CheckId extends HttpServlet {
+   
+    /** 
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      * @param request servlet request
      * @param response servlet response
@@ -28,55 +27,24 @@ public class LoadServlet extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        System.out.println("%%%% IN LOAD SERVLET %%%");
-        String valorefile = request.getHeader("filenamemio");
-        String owner = request.getHeader("owner");
-        String pwd = request.getHeader("pwd");
-        String val = null;
-        response.setContentType("text/plain");
+        response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        List<String> list = GoDoc.loadDiagram(valorefile, request.getHeader("refresh") != null,owner,pwd);
-        
-        if(list.isEmpty())
-        {
-            val = "DIAGRAMMA NON TROVATO";
-           
-        }
-        else if(list.size() == 3)
-        {
-            val= list.get(0);
-            String people = list.get(1);
-            String writers = list.get(2);
-
-            response.setHeader("people", people);
-            response.setHeader("writers",writers);
-           
-        }
-        else if(list.size() ==4)
-        {
-            System.out.println("LIST SIZE 4!!!!!!!!!!");
-            val= list.get(0);
-            String people = list.get(1);
-            String writers = list.get(2);
-            String nosave = list.get(3);
-            response.setHeader("people", people);
-            response.setHeader("writers",writers);
-            response.setHeader("nosave",nosave);
-        }
         try {
-            /* TODO output your page here */
-          //  out.println(val);
-          //  System.err.println(val);
-            out.print(val);
-          
-           
-        } finally {
+            System.out.println("Dentro IdentityChechekr servlet");
+             String pwd = request.getHeader("pwd");
+             String email = request.getHeader("email");
+             System.out.println(email+pwd);
+         //    String check = GoDoc.checkid(email, pwd);
+
+             System.out.println( GoDoc.checkid(email, pwd));
+             out.print( GoDoc.checkid(email, pwd));
+        } finally { 
             out.close();
         }
-    }
+    } 
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
+    /** 
      * Handles the HTTP <code>GET</code> method.
      * @param request servlet request
      * @param response servlet response
@@ -87,9 +55,9 @@ public class LoadServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         processRequest(request, response);
-    }
+    } 
 
-    /**
+    /** 
      * Handles the HTTP <code>POST</code> method.
      * @param request servlet request
      * @param response servlet response
@@ -102,7 +70,7 @@ public class LoadServlet extends HttpServlet {
         processRequest(request, response);
     }
 
-    /**
+    /** 
      * Returns a short description of the servlet.
      * @return a String containing servlet description
      */

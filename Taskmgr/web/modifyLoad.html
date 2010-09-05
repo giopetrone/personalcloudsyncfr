@@ -266,7 +266,173 @@ function getLinks()
                     confirm("RISP from server: " +str);
                 }catch(e){alert(e.message);
   }}
+ function setAssignees()
+ {
+     try
+     {
 
+     var checkassignees;
+     var assign = document.myform.assign.value;
+    // alert("Assign: "+assign);
+     var assignees = window.parent.TextEdit.getAssignees();
+     
+     var writers = window.parent.TextEdit.getWriters();
+     if(writers == null) writers ="";
+     if(assignees == null) assignees ="";
+
+
+
+     if(assignees != null && assignees != "" && writers != null && writers != "")
+     {
+           var assignees_array=assignees.split(",");
+           var assign_array=assign.split(",");
+           var countassign = 0;
+           var countcheck = 0;
+           var stop = "false";
+           for(var j=0;j<assign_array.length;j++)
+           {
+               var thisassigner = assign_array[j];
+               if(thisassigner != "" && thisassigner!= " ")
+               {
+                  
+                   for(var z=0;z<assignees_array.length;z++)
+                   {
+                       var oldassigner = assignees_array[z];
+                      
+                       if(oldassigner != "" && oldassigner != " ")
+                       {
+                            
+                            countcheck++;
+                            var check = oldassigner.match(thisassigner);
+                            if( check == null)
+                            {
+                                 countassign++;
+                                 var writers_array=writers.split(",");
+                                 for(var z=0;z<writers_array.length;z++)
+                                 {
+                                     var thiswriter = writers_array[z];
+                                  
+                                     var check = thiswriter.match(thisassigner);
+                                     if( check != null) stop = "true";
+
+
+
+
+                                }
+
+
+                            }
+                       }
+                     
+
+
+
+                   }
+                   if(countassign == countcheck && stop == "false")
+                   {
+                       assignees += thisassigner + ","; window.parent.TextEdit.setAssignees(assignees);
+                   }
+
+               }
+
+           }
+
+
+      }
+    
+      else if(writers != null && writers != "" && assignees == "")
+     {
+           var writers_array=writers.split(",");
+           var assign_array=assign.split(",");
+
+           for(var j=0;j<assign_array.length;j++)
+           {
+               var count = 0;
+               var count2 = 0;
+               var thisassigner = assign_array[j];
+               if(thisassigner != "" && thisassigner !=" ")
+               {
+                  
+                   for(var z=0;z<writers_array.length;z++)
+                   {
+                       var thiswriter = writers_array[z];
+                     
+                       var check = thiswriter.match(thisassigner);
+                       count2++;
+                       if( check == null) {count++;}
+
+
+
+                   }
+                   if(count == count2) {assignees += thisassigner + ","; window.parent.TextEdit.setAssignees(assignees);}
+
+               }
+               
+           }
+          
+          
+      }
+      else if(writers == "" && assignees != "")
+      {
+          
+           var assign_array=assign.split(",");
+           var assignees_array=assignees.split(",");
+           var contatore =0;
+           var contatore2 =0;
+           for(var j=0;j<assign_array.length;j++)
+           {
+               var thisassigner = assign_array[j];
+               if(thisassigner != "" && thisassigner!= " ")
+               {
+                   alert(thisassigner);
+                   for(var z=0;z<assignees_array.length;z++)
+                   {
+                       var oldassigner = assignees_array[z];
+
+                       if(oldassigner != "" && oldassigner != " ")
+                       {
+
+                            alert(oldassigner);
+                            var check = oldassigner.match(thisassigner);
+                            alert(check);
+                            if( check == null) contatore++;
+                            contatore2++;
+                        }
+                    }
+                    if(contatore == contatore2) {assignees += thisassigner + ","; window.parent.TextEdit.setAssignees(assignees);}
+                }
+                
+           }
+
+      }
+      else
+      {
+          var assign_array=assign.split(",");
+          for(var j=0;j<assign_array.length;j++)
+          {
+              var thisassigner = assign_array[j];
+              assignees += thisassigner + ",";
+              window.parent.TextEdit.setAssignees(assignees);
+          }
+
+
+      }
+     
+    
+    }catch(e){alert(e.message);}
+ }
+
+ function checkName()
+ {
+     var nome = document.myform.nome.value;
+     if ((nome == "") || (nome == "undefined")) {
+           alert("Name field could not be empty");
+           document.myform.nome.focus();
+           return false;
+        }
+        else return true;
+     
+ }
 
 
 
@@ -406,7 +572,7 @@ function getLinks()
 	<li class="buttons ">
 		<div>
 
-	<input type="button" name="ok" value="Ok"      onclick="mergelinks(),window.parent.TextEdit.setContent(document.myform.nome.value,document.myform.status.value,document.myform.theDate.value,document.myform.category.value,document.myform.share.value,document.myform.assign.value,tinyMCE.activeEditor.getContent())"/>
+	<input type="button" name="ok" value="Ok"      onclick="if(checkName()==true){setAssignees(),mergelinks(),window.parent.TextEdit.setContent(document.myform.nome.value,document.myform.status.value,document.myform.theDate.value,document.myform.category.value,document.myform.share.value,document.myform.assign.value,tinyMCE.activeEditor.getContent())}"/>
 	<input type="button" name="reset" value="Cancella" onclick="window.parent.TextEdit.cancel()"/>
 
 				</div>

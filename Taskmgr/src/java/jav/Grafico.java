@@ -77,7 +77,7 @@ public class Grafico {
                 }
             }
         }
-        users = users + assigner;
+       // users = users + assigner;
         //   System.out.println("USERS: "+users);
         return users;
     }
@@ -125,5 +125,5 @@ public class Grafico {
                 }
             }
         }
-    }catch(Exception ex){System.out.println(ex.getMessage());}}
+    }catch(Exception ex){System.out.println("DENTRO GRAFICO "+ex.getMessage());}}
 }

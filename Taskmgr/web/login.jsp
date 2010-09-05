@@ -55,6 +55,44 @@
               {pwd.focus();return false;}
           }
         }
+
+
+        function checkid()
+        {
+
+
+                    try{
+                           
+                            var url1 = "./CheckId";
+                            var email = document.getElementById('email').value;
+                            var pwd = document.getElementById('pwd').value
+                       //     var email = "fabrizio.torretta@gmail.com";
+                       //     var pwd = "gregorio";
+
+                            objXml = new XMLHttpRequest();
+
+                            objXml.open("POST",url1,false);
+
+                            objXml.setRequestHeader('Content-Type', "text/plain;charset=UTF-8");
+
+
+                            objXml.setRequestHeader('email',email);
+                            objXml.setRequestHeader('pwd',pwd);
+                            objXml.send(null);
+                            str = objXml.responseText;
+
+                        
+                            if(str == "checked")  document.loginform.submit();
+                            else {alert("Invalid Google Credentials. Try Again");}
+
+                    }catch(e){alert(e.message);}
+
+
+        }
+
+
+
+
 </script>
 
 
@@ -69,24 +107,24 @@
 
 <p>Please feel free to email us at <a href="mailto:fabrizio.torretta@gmail.com">Fabrizio Torretta</a> if you experience problems or have questions.</p>
 
- <form name="loginform"  action="index.jsp" onsubmit="return validate_form(this)"method="get">
+ <form name="loginform"  action="index.jsp" onsubmit="return validate_form(this)"method="post">
 <table summary="Demonstration form">
   <tbody>
 
   
   <tr>
     <td><label for="email">Your email:</label></td>
-    <td><input name="email" size="35" maxlength="30" type="text"></td>
+    <td><input name="email" id="email" size="35" maxlength="30" type="text"></td>
   </tr>
   <tr>
   <tr>
     <td><label for="pwd">Your password</label></td>
-    <td><input name="pwd" size="35" maxlength="25" type="password"></td>
+    <td><input name="pwd" id="pwd" size="35" maxlength="25" type="password"></td>
   </tr>
 
   <tr>
    
-    <td><input name="Submit" value="Login" type="submit" onclick="return validateFormOnSubmit(this)"/></td>
+    <td><input name="Submit" value="Login" type="button" onclick="checkid();"/></td>
    
   </tr>
   </tbody>

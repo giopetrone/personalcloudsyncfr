@@ -40,6 +40,14 @@
         <servlet-name>PrendiDocs</servlet-name>
         <servlet-class>jav.PrendiDocs</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>IdentityChecker</servlet-name>
+        <servlet-class>jav.IdentityChecker</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CheckId</servlet-name>
+        <servlet-class>jav.CheckId</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>LoadServlet</servlet-name>
         <url-pattern>/LoadServlet</url-pattern>
@@ -79,6 +87,14 @@
     <servlet-mapping>
         <servlet-name>PrendiDocs</servlet-name>
         <url-pattern>/PrendiDocs</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>IdentityChecker</servlet-name>
+        <url-pattern>/IdentityChecker</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CheckId</servlet-name>
+        <url-pattern>/CheckId</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

@@ -12,7 +12,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
-        <title>Jalava : Web-based Diagram Editor</title>
+        <title>Collaborative Task Manager</title>
         <script language="JavaScript" src="./js/Jalava.js"></script>
 
         <script language="JavaScript">
@@ -37,7 +37,7 @@
             var primoPezzo = "{\"vecchio\":";
             var secondoPezzo = ",\"nuovo\":";
             var terzoPezzo = "}";
-
+          
             function timedCount()
             {
                 document.getElementById('txt').value=c;
@@ -137,6 +137,7 @@
                 var users = document.getElementById('users').value;
                 var writers = document.getElementById('writers').value;
                 var pwd = document.getElementById('pwd').value;
+                var assignees = document.getElementById("assignees").value;
                 if (diagramName.length <= 1) {
                     alert("Missing diagram name");
                     return;
@@ -164,6 +165,7 @@
                     objXml.setRequestHeader('users',users);
                     objXml.setRequestHeader('writers',writers);
                     objXml.setRequestHeader('pwd',pwd);
+                    objXml.setRequestHeader('assignees', assignees)
                     if (publish == "true") {
                         objXml.setRequestHeader('publish', "true");
                     }
@@ -366,9 +368,10 @@
                                 loadjson = str;
                                 people = objXml.getResponseHeader("people");
                                 writers = objXml.getResponseHeader("writers");
+                                var nosave = objXml.getResponseHeader("nosave");
                                 if(str=="DIAGRAMMA NON TROVATO") {alert("DIAGRAMMA NON TROVATO");return}
                             
-                    
+                                
                                 document.getElementById('users').value =  people;
                                 document.getElementById('writers').value = writers;
 
@@ -376,15 +379,60 @@
 
                                 versioneOriginale = str;
                                 update(str);
+                                
                                 var add = document.getElementById("menu2");
-
+                                while(add.childNodes.length>=1)
+                                {
+                                    add.removeChild(add.firstChild);
+                                }
                                 var h4 = document.createElement("h4");
-                                var subtitle = document.createTextNode(diagramName);
+                                if(nosave != null && nosave !="") var subtitle = document.createTextNode(diagramName+" View only");
+                                else var subtitle = document.createTextNode(diagramName);
                                 h4.appendChild(subtitle);
                                 add.appendChild(h4);
                                 nome = diagramName;
+                                var sav = document.getElementById("savenew");
+                                var template = document.getElementById("savetemplate");
+                                var share = document.getElementById("share");
+                                var draft = document.getElementById("savedraft");
+                                var change = document.getElementById("changepriv");
                                 
-                            }catch(e){alert("Non hai i permessi necessari per il Load");}
+                                if(nosave != null && nosave !="")
+                                {
+                                    //alert("You can't modify and save this diagram");
+                                   
+                                    
+                                   // div.removeChild(sav);
+                                    sav.onclick = "";
+                                    draft.onclick = "";
+                                    share.onclick = "";
+                                    template.onclick = "";
+                                    change.onclick = "";
+                                    
+                                   
+                                }
+                                else if(nosave == null)
+                                {
+
+                                    var open = "childWindow=open('/docs2.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')"
+                                    sav.removeAttribute("onclick");
+                                    sav.setAttribute("onclick", open)
+                                    draft.removeAttribute("onclick");
+                                    draft.setAttribute("onclick","saveDiagram('false');")
+                                    share.removeAttribute("onclick");
+                                    open = "childWindow=open('/shared.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')";
+                                    share.setAttribute("onclick", open)
+                                    template.removeAttribute("onclick");
+                                    open = "childWindow=open('/docs3.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')";
+                                    template.setAttribute("onclick", open);
+                                    change.removeAttribute("onclick");
+                                    open = "childWindow=open('/changepriv.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')";
+                                    change.setAttribute("onclick",open);
+                                }
+                               
+
+                                
+                            }catch(e){alert(e.message);}
                         } else {}
 
                     }
@@ -497,9 +545,9 @@
     %>
    <h1>Collaborative Task Manager  </h1>
 
-    <div id="menu" style="font-size: 13px"> <a href="#" onclick="childWindow=open('/docs2.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="add" name="add" >Save Diagram </a> |  <a href="#" onClick=" saveDiagram('false');">Save Draft</a> | <a href="#" onclick="childWindow=open('/docs.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="add" name="add" >LoadDiagram </a>  | <a href="#" onclick="childWindow=open('/shared.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800');">Share</a>
-        | <a href="#" onclick="childWindow=open('/docs3.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')">Save as Template</a> |
-        <%=email%> | <u>Settings</u>  |<a href="#" onclick="childWindow=open('/addpriv.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="add" name="add" >Change privileges of users </a>| <a target=_blank href="http://docs.google.com/support/?hl=en" class=gb4>Help</a> | <a href="/logout?hl=it&amp;continue=http://docs.google.com/?tab%3Dmo%26pli%3D1" class=gb4>Sign out</a> </div>
+    <div id="menu" style="font-size: 13px"> <a href="#" onclick="childWindow=open('/docs2.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="savenew" name="savenew" >Save Diagram </a> |  <a href="#" onClick=" saveDiagram('false');" id="savedraft">Save Draft</a> | <a href="#" onclick="childWindow=open('/docs.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="load" name="load" >LoadDiagram </a>  | <a href="#" onclick="childWindow=open('/shared.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800');" id="share">Share</a>
+        | <a href="#" onclick="childWindow=open('/docs3.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="savetemplate">Save as Template</a> |
+        <%=email%> | <u>Settings</u>  |<a href="#" onclick="childWindow=open('/changepriv.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="changepriv" name="changepriv" disabled="disabled" >Change privileges of users </a>| <a target=_blank href="http://docs.google.com/support/?hl=en" class=gb4>Help</a> | <a href="/logout?hl=it&amp;continue=http://docs.google.com/?tab%3Dmo%26pli%3D1" class=gb4>Sign out</a> </div>
         <div id="menu2"></div>
 
     
@@ -522,6 +570,7 @@
         <input type="hidden" id="users" name="users" value= "" disabled="disabled" />
         <input type="hidden" id="writers" name="writers" value= "" disabled="disabled" />
         <input type="hidden" id="pwd" name="pwd" value='<%=pwd%>' disabled="disabled" />
+         <input type="hidden" id="assignees" name="assignees" value=''  />
         <!--
         <input type="button" value="Start count!" onClick="doTimer();"/>
           <input type="text" id="txt" />
