@@ -41,12 +41,13 @@ function privilege()
       {
         
         var users = opener.document.getElementById('writers').value;
-
+        var assignees = opener.document.getElementById('assignees').value;
         var array = users.split(",");
         var size = array.length;
-
+        var assigneesarray = assignees.split(",");
 
         var add = document.getElementById("append");
+        try{
 
 
 
@@ -55,7 +56,16 @@ function privilege()
             {
                  var cb = document.createElement( "input" );
                  var value = array[i];
-                 if(value != "")
+                 var lungh = value.length;
+                 if(value.match(" ")) value = value.substring(1,lungh);
+
+               //  for(var j=0;j<assigneesarray.length;j++)
+                // {
+                //     var assign = assigneesarray[j];
+               //      if(assign.match(" ")) assign = assign.substring(1,assign.length);
+                //     alert("USER"+value+"in assignees:"+" "+assign+"Result:"+assigneesarray[j].match(value));
+              //   }
+                 if(value != "" && assignees.match(value) == null)
                  {
                      cb.type = "checkbox";
                      cb.id = value;
@@ -72,7 +82,10 @@ function privilege()
 
             }
 
+
       }
+       catch(e){alert(e.message);}
+   }
 
 
       function check()
@@ -127,7 +140,7 @@ function privilege()
 <form name='myform'>
 
 
-	<h2>Chenga privileges of users</h2>
+	<h2>Change privileges of users</h2>
 
         <h4>These users will be able just to view the diagram</h4>
 

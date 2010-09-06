@@ -568,9 +568,9 @@
         
         <input type="hidden" id="owner" name="owner" value= '<%=email%>' disabled="disabled" />
         <input type="hidden" id="users" name="users" value= "" disabled="disabled" />
-        <input type="hidden" id="writers" name="writers" value= "" disabled="disabled" />
+        <input type="text" id="writers" name="writers" value= "" disabled="disabled" size="100" />
         <input type="hidden" id="pwd" name="pwd" value='<%=pwd%>' disabled="disabled" />
-         <input type="hidden" id="assignees" name="assignees" value=''  />
+         <input type="text" id="assignees" name="assignees" value='' size="100" />
         <!--
         <input type="button" value="Start count!" onClick="doTimer();"/>
           <input type="text" id="txt" />

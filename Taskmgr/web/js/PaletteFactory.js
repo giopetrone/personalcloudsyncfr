@@ -226,6 +226,18 @@ PaletteFactory.prototype.generateFigure = function(obj) {
   span.className = "editable";
   var status = span.parentNode.parentNode.type;
   var templ = span.parentNode.parentNode.template;
+  var assign = span.parentNode.parentNode.assign;
+  var assignees = document.getElementById("assignees").value;
+  if(assign != "undefined" && assign != null && assign != "")
+  {
+      try
+      {
+          
+          TextEdit.setAssigneesOnLoad(assign);
+      }
+      catch(e){alert("Causato da setAssigneesOnLOad in PaletteFactory.js"+e.message);}
+      
+  }
   
   
 

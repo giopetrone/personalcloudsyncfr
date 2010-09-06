@@ -72,19 +72,21 @@ function updateForm() {
  * Read the contents of the form into a mailto: URI and ask the browser to
  * go there, sending the mail message.
  */
-function share() {
+function share()
+{
   // Get form data
   
   
- try
- {
+     try
+     {
 
- opener.document.getElementById('share').value = document.getElementById('recipients').value;
- window.opener.setArray(emailRecipients);
+         opener.document.getElementById('share').value = document.getElementById('recipients').value;
+         
+         window.opener.setArray(emailRecipients);
 
- self.close();
- return false;
- }catch(e){e.message();}
+         self.close();
+         return false;
+     }catch(e){e.message();}
 }
 
 function get()

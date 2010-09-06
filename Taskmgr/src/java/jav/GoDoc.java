@@ -199,17 +199,20 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                         }*/
 
                     }
-                    else {
+                    else
+                    {
                         String[] tempusers;
                         if(writers == null) writers = "";
                         if(users == null) users ="";
                         if(assignees == null) assignees = "";
                         tempusers = users.split(delimiter);
 
-                        for (int i = 0; i < tempusers.length; i++) {
-                            if (!tempusers[i].equals("")) {
+                        for (int i = 0; i < tempusers.length; i++)
+                        {
+                            if (!tempusers[i].equals("") && !assignees.contains(tempusers[i]))
+                            {
 
-                                System.out.println("Reader " + tempusers[i]);
+                                System.out.println("%%% ASSEGNO Reader a %%%%%%%%% " + tempusers[i]);
                                 addReaders(documentEntry, tempusers[i]);
                                 AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
                                 event.setParameter("File", documentName);
@@ -229,12 +232,13 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                             for (int i = 0; i < tempusers.length; i++) {
                                 if (tempusers[i].equals(tempwriter[j])) {
                                     check = true;
-                                    System.out.println("true");
+                                   // System.out.println("true");
                                 }
 
                             }
-                            if (check == false) {
-                                System.out.println("Writer " + tempwriter[j] + check);
+                            if (check == false && !tempwriter[j].equals(""))
+                            {
+                                System.out.println("#####ASSEGNO Writer a #### " + tempwriter[j]);
                                 addWriting(documentEntry, tempwriter[j]);
                                 AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
                                 event.setParameter("File", documentName);
@@ -245,18 +249,41 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                                 destinatari.add(tempwriter[j]);
                             }
                         }
-
+                       
                         String [] tempassignees;
                         tempassignees = assignees.split(delimiter);
-                        for (int j = 0; j < tempassignees.length; j++) {
-
-                            System.out.println("Assignees " + tempassignees[j]);
-                            if(!tempassignees[j].equalsIgnoreCase("") &&  tempassignees[j] !=null)
+                        for (int j = 0; j < tempassignees.length; j++)
+                        {
+                            String thisassigner = tempassignees[j];
+                            try
                             {
-                                addWriting(documentEntry, tempassignees[j]);
-                                destinatari.add(tempassignees[j]);
+                                
+                                if(!tempassignees[j].equalsIgnoreCase("") &&  tempassignees[j] !=null && tempassignees[j]!=" ")
+                                {
+                                    System.out.println("Assignees " + tempassignees[j]);
+                                    addWriting(documentEntry, tempassignees[j]);
+                                    AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
+                                    event.setParameter("File", documentName);
+                                    event.setParameter("Permission", "Write");
+                                    event.setParameter("Who", tempassignees[j]);
+                                    FeedUtil.addEntry("", documentName, event);
+                                    new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
+                                    destinatari.add(tempassignees[j]);
+                                }
+                            }catch(Exception ex)
+                            {
+                                if(ex.getMessage().equalsIgnoreCase("This user already has access to the document."))
+                                {
+                                    System.out.println("DENTRO CATCH X  UTENTE: "+thisassigner);
+                                   // destinatari.add(login);
+                                  //  String dest = destinatari.toString();
+                                //    int length = dest.length();
+                               //     String destfinal = dest.substring(1, length - 1);
+                                //    sendMail(destfinal,login,pwd,documentName);
+                                }
+                                else System.out.println("Dentro CATCH X utente "+thisassigner+" "+ex.getMessage());
                             }
-                        //    AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
+                            //  AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
                          //   event.setParameter("File", documentName);
                         //    event.setParameter("Permission", "Write");
                         //    event.setParameter("Who", tempassignees[j]);
@@ -273,7 +300,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                         int length = dest.length();
                         String destfinal = dest.substring(1, length - 1);
                         sendMail(destfinal,login,pwd,documentName);
-                        
+                       
 
                         
 
@@ -284,7 +311,8 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                     
                     }catch(Exception ex)
                     {
-                         System.out.println("IN SAVE NEW DIAGRAM "+ex.toString());
+
+                         System.out.println("IN SAVE NEW DIAGRAM "+ex.getMessage());
                         
                     }
 
@@ -295,7 +323,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
     public String uploadDiagram(String login, String documentName, String users, String writers,String s,String assignees) throws Exception
     {
         try{
-            DocsService service = new DocsService("Document List Demo");
+              //  DocsService service = new DocsService("Document List Demo");
                 System.out.println("DocumentEntry NOT null");
                 DocumentListEntry documentEntry = findEntry(documentName);
                 AtomEvent eventUpdate = new AtomEvent(login, "TaskManager", "Update Diagram");
@@ -327,106 +355,134 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                     String[] tempwriter;
                     String delimiter = ",";
 
-                    if (users != null) {
+                    if (users != null)
+                    {
                         String[] tempusers;
-                        if (writers == null) {
+                        if (writers == null)
+                        {
                             writers = "";
+                        }
+                        if(assignees == null)
+                        {
+                            assignees ="";
                         }
                         tempusers = users.split(delimiter);
                         System.out.println("READERS SIZE: " + readers.size());
                         System.out.println("TEMPUSERS LENGTH: " + tempusers.length);
-                        for (int i = 0; i < tempusers.length; i++) {
-                            boolean check = false;
-                            System.out.println("-------------------------");
+                        try
+                        {
+                            for (int i = 0; i < tempusers.length; i++)
+                            {
+                                boolean check = false;
 
-                            if (!tempusers[i].equals("")) {
-                                System.out.println("TEMPUSER: " + tempusers[i] + " finisce qui");
-                                for (int z = 0; z < readers.size(); z++) {
-                                    System.out.println(readers.get(z));
-                                    if (tempusers[i].contains(readers.get(z))) {
-                                        check = true;
+                                System.out.println("Il reder e'' assignees? "+assignees.contains(tempusers[i]));
+                                if (!tempusers[i].equals("") && !assignees.contains(tempusers[i]))
+                                {
+                                    System.out.println("TEMPUSER: " + tempusers[i] + " finisce qui");
+                                    for (int z = 0; z < readers.size(); z++) {
+                                        System.out.println(readers.get(z));
+                                        if (tempusers[i].contains(readers.get(z))) {
+                                            check = true;
+                                        }
+
+                                        System.out.println("Check Reader: " + check);
                                     }
 
-                                    System.out.println("Check Reader: " + check);
-                                }
+                                    for (int z = 0; z < collaborators.size(); z++)
+                                    {
 
-                                for (int z = 0; z < collaborators.size(); z++) {
+                                     //   System.out.println("collaborators: " + collaborators.get(z));
+                                        if (tempusers[i].contains(collaborators.get(z))) 
+                                        {
+                                            System.out.println("%%%%% CAMBIO PERMESSI DI %%%% "+collaborators.get(z));
+                                            update(documentEntry, aclFeed, collaborators.get(z));
+                                            AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
+                                            event.setParameter("File", documentName);
+                                            event.setParameter("Change Permission", "From Write To Read");
+                                            event.setParameter("Who", collaborators.get(z));
+                                            FeedUtil.addEntry("", documentName, event);
+                                            new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
+                                       //     System.out.println("DOPO UPDATE");
+                                            check = true;
 
-                                    System.out.println("collaborators: " + collaborators.get(z));
-                                    if (tempusers[i].contains(collaborators.get(z))) {
-                                        update(documentEntry, aclFeed, collaborators.get(z));
+                                        }
+                                    }
+
+                                    if (check == false)
+                                    {
+                                        System.out.println("%%%%%%%%% ASSEGNO READER a %%%%% "+tempusers[i]);
+                                        addReaders(documentEntry, tempusers[i]);
                                         AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
                                         event.setParameter("File", documentName);
-                                        event.setParameter("Change Permission", "From Write To Read");
-                                        event.setParameter("Who", collaborators.get(z));
+                                        event.setParameter("Permission", "Read");
+                                        event.setParameter("Who", tempusers[i]);
                                         FeedUtil.addEntry("", documentName, event);
                                         new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
-                                        System.out.println("DOPO UPDATE");
-                                        check = true;
-
                                     }
-                                }
 
-                                if (check == false) {
-                                    System.out.println("QUI!");
-                                    addReaders(documentEntry, tempusers[i]);
-                                    AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
-                                    event.setParameter("File", documentName);
-                                    event.setParameter("Permission", "Read");
-                                    event.setParameter("Who", tempusers[i]);
-                                    FeedUtil.addEntry("", documentName, event);
-                                    new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
                                 }
-
                             }
-                        }
+                        }catch(Exception ex){System.out.println("Dentro for readers: "+ex.getMessage());}
                         tempwriter = writers.split(delimiter);
                         // System.out.println("tempwriter: "+tempwriter.length);
                         // System.out.println("Collaborators SIZE: "+collaborators.size());
-                        for (int j = 0; j < tempwriter.length; j++) {
-                            boolean check = false;
-                            System.out.println("-------------------------");
-                            System.out.println("TEMPWRITER: " + tempwriter[j]);
+                        try
+                        {
+                            for (int j = 0; j < tempwriter.length; j++)
+                            {
+                                boolean check = false;
+                           //     System.out.println("-------------------------");
+                           //     System.out.println("TEMPWRITER: " + tempwriter[j]);
 
-                            for (int i = 0; i < tempusers.length; i++) {
-                                // System.out.println("TEMPUSER: " + tempusers[i]);
-                                if (tempusers[i].equals(tempwriter[j])) {
-                                    check = true;
+                                for (int i = 0; i < tempusers.length; i++)
+                                {
+                                    // System.out.println("TEMPUSER: " + tempusers[i]);
+                                    if (tempusers[i].equals(tempwriter[j])) {
+                                        check = true;
+                                    }
+                                }
+                                for (int z = 0; z < collaborators.size(); z++) {
+                                    System.out.println("collaborators: " + collaborators.get(z));
+                                    if (collaborators.get(z).contains(tempwriter[j]) || tempwriter[j].contains(collaborators.get(z))) {
+                                   //     System.out.println("DENTRO IF");
+                                        check = true;
+                                    }
+                                }
+                               // System.out.println("Check Writer: " + check);
+                                if (check == false)
+                                {
+                                    System.out.println("%%%%%% Aggiungo a Writer%%%%% " + tempwriter[j]);
+                                    addWriting(documentEntry, tempwriter[j]);
+                                    AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
+                                    event.setParameter("File", documentName);
+                                    event.setParameter("Permission", "Write");
+                                    event.setParameter("Who", tempwriter[j]);
+                                    FeedUtil.addEntry("", documentName, event);
+                                    new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
                                 }
                             }
-                            for (int z = 0; z < collaborators.size(); z++) {
-                                System.out.println("collaborators: " + collaborators.get(z));
-                                if (collaborators.get(z).contains(tempwriter[j]) || tempwriter[j].contains(collaborators.get(z))) {
-                                    System.out.println("DENTRO IF");
-                                    check = true;
-                                }
-                            }
-                            System.out.println("Check Writer: " + check);
-                            if (check == false) {
-                                System.out.println("Writer " + tempwriter[j] + check);
-                                addWriting(documentEntry, tempwriter[j]);
-                                AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
-                                event.setParameter("File", documentName);
-                                event.setParameter("Permission", "Write");
-                                event.setParameter("Who", tempwriter[j]);
-                                FeedUtil.addEntry("", documentName, event);
-                                new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
-                            }
+                        }catch(Exception ex)
+                        {
+                            System.out.println("Dentro for Writers: "+ex.getMessage());
                         }
 
-                    } else {
+                    }
+                    else
+                    {
                         tempwriter = writers.split(delimiter);
-                        for (int j = 0; j < tempwriter.length; j++) {
+                        for (int j = 0; j < tempwriter.length; j++)
+                        {
                             boolean check = false;
                             for (int z = 0; z < collaborators.size(); z++) {
-                                System.out.println("collaborators: " + collaborators.get(z));
+                             //   System.out.println("collaborators: " + collaborators.get(z));
                                 if (collaborators.get(z).equals(tempwriter[j])) {
                                     check = true;
                                 }
                             }
-                            System.out.println("Check Writer: " + check);
-                            if (check == false) {
-                                System.out.println("Writer " + tempwriter[j] + check);
+                           // System.out.println("Check Writer: " + check);
+                            if (check == false)
+                            {
+                                System.out.println("%%%%%%% Aggiungo a Writer%%%%%% " + tempwriter[j]);
                                 addWriting(documentEntry, tempwriter[j]);
                                 AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
                                 event.setParameter("File", documentName);
@@ -443,11 +499,25 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                        tempassignes = assignees.split(",");
                        for(int z =0;z<tempassignes.length;z++)
                        {
-                           if(!tempassignes[z].equals(""))
+                           try
                            {
-                               addWriting(documentEntry, tempassignes[z]);
-                           }
+                               if(!tempassignes[z].equals(""))
+                               {
+                                   
+                                   addWriting(documentEntry, tempassignes[z]);
+                                   System.out.println("%%%% Diventa writer Assign%%%%%%% "+tempassignes[z]);
+                                   AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
+                                   event.setParameter("File", documentName);
+                                   event.setParameter("Permission", "Write");
+                                   event.setParameter("Who", tempassignes[z]);
+                                   FeedUtil.addEntry("", documentName, event);
+                                   new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
+
+                               }
+                           } catch(Exception ex){System.out.println("DENTRO FOR ASSIGNEES in Update DIagram X UTENTE "+tempassignes[z]+" "+ex.getMessage());}
                        }
+                      
+                       
                     }
             service.getRequestFactory().setHeader("If-Match", "*");
             // documentEntry.setMediaSource(new MediaByteArraySource(s.getBytes(), "text/plain"));
@@ -465,7 +535,11 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                         System.out.println("DENTRO If update diagram "+ex.getMessage());
                         return "notnew";
                     }
-                    else return "notnew";
+                    else 
+                    {
+                        System.err.println("DEntro Update diagram" +ex.getMessage());
+                        return ex.getMessage();
+                    }
                 }
             }
 

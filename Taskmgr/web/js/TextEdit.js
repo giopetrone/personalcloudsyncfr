@@ -46,12 +46,16 @@ TextEdit.invokeLoad= function(event)
        //     alert(user);
            // var readers = TextEdit.target.parentNode.parentNode.shared.value;
         //    var writers = TextEdit.target.parentNode.parentNode.writers;
-            alert(user);
+            
             var own = TextEdit.target.parentNode.parentNode.owner;
+            
             var assign = TextEdit.target.parentNode.parentNode.assign;
+            
+        
             if(assign == null) assign="";
             var writers = parent.document.getElementById("writers").value;
             var shared = parent.document.getElementById("users").value;
+           
           
             /*
             
@@ -65,17 +69,25 @@ TextEdit.invokeLoad= function(event)
           
  
   */
-  if(own == user  ||assign.indexOf(user)!=-1 ||writers.indexOf(user) !=-1 )
-  {
-      //Utente loggato  e' owner, assegnatario o writer'
-    //  alert("dentro if");
-      TextEdit.showframe();
-  }
- 
-  else if(shared.indexOf(user)!=-1){
-     //   alert("Solo details");
-        TextEdit.showframe3();
-  }
+      if(own == user  || assign.indexOf(user)!=-1)
+      {
+          //Utente loggato  e' owner, assegnatario o writer'
+          alert("You can edit the task");
+          TextEdit.showframe();
+      }
+
+      else if(assign == "" && writers.indexOf(user)!=-1)
+      {
+          alert("You can edit the task");
+          TextEdit.showframe();
+      }
+
+
+      else
+      {
+            alert("You can just see the details if task");
+            TextEdit.showframe3();
+      }
     }
 }
     catch(e){alert("DENTRO INVOKE LOAD "+e.message());}
@@ -133,6 +145,35 @@ TextEdit.getUser = function()
      return user;
 }
 
+TextEdit.getAllusers = function()
+{
+    var users = parent.document.getElementById("users").value;
+    return users;
+}
+
+TextEdit.getWriters = function()
+{
+    var writers = parent.document.getElementById("writers").value;
+    return writers;
+}
+
+TextEdit.setAssignees = function(assignees)
+{
+    parent.document.getElementById("assignees").value = assignees;
+    
+}
+
+TextEdit.setAssigneesOnLoad = function(loadassignees)
+{
+  
+    parent.document.getElementById("assignees").value += loadassignees;
+}
+
+TextEdit.getAssignees = function()
+{
+    var assignees =  parent.document.getElementById("assignees").value;
+    return assignees
+}
 
 TextEdit.getPwd = function()
 {

@@ -56,7 +56,24 @@ function setArray(recipients)
 
 function setUsers()
 {
-    opener.document.getElementById('writers').value = document.getElementById("share").value;
+    try
+    {
+
+        var chosenusers = document.getElementById("share").value;
+        var chosenusersarray = chosenusers.split(",");
+        var assignees = opener.document.getElementById("assignees").value;
+        for(var j=0;j<chosenusersarray.length;j++)
+        {
+            var value = chosenusersarray[j];
+            var lungh = value.length;
+            if(value.match(" ")) value = value.substring(1,lungh);
+            if(value != "" && assignees.match(value) == null)
+            {
+                opener.document.getElementById('writers').value += ","+value;
+            }
+        }
+    }catch(e){alert(e.message);}
+  //  opener.document.getElementById('writers').value = document.getElementById("share").value;
     opener.document.getElementById('users').value = "";
     self.close();
     return false;

@@ -30,13 +30,10 @@ public class CheckId extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
         try {
-            System.out.println("Dentro IdentityChechekr servlet");
+          
              String pwd = request.getHeader("pwd");
              String email = request.getHeader("email");
-             System.out.println(email+pwd);
-         //    String check = GoDoc.checkid(email, pwd);
-
-             System.out.println( GoDoc.checkid(email, pwd));
+         
              out.print( GoDoc.checkid(email, pwd));
         } finally { 
             out.close();

@@ -407,6 +407,7 @@ function getLinks()
       }
       else
       {
+          var assign = document.myform.assign.value;
           var assign_array=assign.split(",");
           for(var j=0;j<assign_array.length;j++)
           {
@@ -420,6 +421,25 @@ function getLinks()
      
     
     }catch(e){alert(e.message);}
+ }
+
+ function assigner()
+ {
+    
+     try
+     {
+         var assign = document.myform.assign.value;
+         var assign_array=assign.split(",");
+         var assignees = window.parent.TextEdit.getAssignees();
+         for(var j=0;j<assign_array.length;j++)
+         {
+              var thisassigner = assign_array[j];
+              assignees += thisassigner + ",";
+              window.parent.TextEdit.setAssignees(assignees);
+          }
+     }
+     catch(e){alert(e.message);}
+      
  }
 
  function checkName()
@@ -572,7 +592,7 @@ function getLinks()
 	<li class="buttons ">
 		<div>
 
-	<input type="button" name="ok" value="Ok"      onclick="if(checkName()==true){setAssignees(),mergelinks(),window.parent.TextEdit.setContent(document.myform.nome.value,document.myform.status.value,document.myform.theDate.value,document.myform.category.value,document.myform.share.value,document.myform.assign.value,tinyMCE.activeEditor.getContent())}"/>
+	<input type="button" name="ok" value="Ok"      onclick="if(checkName()==true){assigner(),mergelinks(),window.parent.TextEdit.setContent(document.myform.nome.value,document.myform.status.value,document.myform.theDate.value,document.myform.category.value,document.myform.share.value,document.myform.assign.value,tinyMCE.activeEditor.getContent())}"/>
 	<input type="button" name="reset" value="Cancella" onclick="window.parent.TextEdit.cancel()"/>
 
 				</div>

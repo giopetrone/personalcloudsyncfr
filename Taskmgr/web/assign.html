@@ -74,7 +74,9 @@ function updateForm() {
  */
 function share() {
   // Get form data
-  opener.document.getElementById('assign').value = document.getElementById('recipients').value;
+  var size = opener.document.getElementById('assign').value.length;
+  opener.document.getElementById('assign').value += ","+ document.getElementById('recipients').value;
+  //opener.document.getElementById('assign').value = opener.document.getElementById('assign').value.substring(1,size);
  // var formSubject = document.getElementById('subject').value;
  // var formMessage = document.getElementById('message').value;
  // window.location = 'mailto:' + formRecipients + '?subject=' + formSubject + '&body=' + formMessage;
