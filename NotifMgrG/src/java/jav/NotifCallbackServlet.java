@@ -103,7 +103,8 @@ public class NotifCallbackServlet extends HttpServlet {
                     + hubverify + " lease: "
                     + hublease + "\n");
                      */
-                } else {
+                } else
+                {
                     ServletInputStream inStream = request.getInputStream();
                     String s = "";
                     byte[] b = new byte[1024];
@@ -118,27 +119,54 @@ public class NotifCallbackServlet extends HttpServlet {
                     String dest="";
                     String workflow ="";
                     String allusers = "";
-                    boolean checksend = false;
-                    boolean workflowdone = false;
+                    String modifier = "";
                     getServletContext().setAttribute("atomo", s);
                     List<AtomEvent> notifications = FeedUtil.createAtom(s);
+                    System.err.println("NOTIFICATIONS: "+notifications.size());
                     if (!notifications.isEmpty()) {
                         System.err.println("new feed content");
                         for (AtomEvent cont : notifications) {
                             System.err.println("new feed content =\n " + cont.toString(true));
-
+                           
                             String activity = cont.getActivity();
-                            if(activity.equalsIgnoreCase("Change Status of Task")) {
+                            if(activity.equalsIgnoreCase("Change Status of Task"))
+                            {
                                 taskname = cont.getParameter("Task");
                                 newstatus = cont.getParameter("New Status");
                                 dest = cont.getParameter("Assigned To");
-                                if(!dest.equals("") )checksend = true;
+                                modifier = cont.getUser();
+                                if(!dest.equals("") )
+                                {
+
+                                    String emailSubjectTxt = "Update of task "+taskname+" status";
+
+                                    String[] sendTo =  dest.split(",");
+
+
+                       //gio per incomp param
+                   //     new SendMailCl().sendSSLMessage(sendTo, emailSubjectTxt, emailMsgTxt, emailFromAddress,pwd);
+                                    for(int i=0;i<sendTo.length;i++)
+                                    {
+                                        String destim = sendTo[i];
+                                        if(destim.contains("gmail.com") && !destim.equals("") && !destim.equalsIgnoreCase(modifier)) sendGMsg(emailSubjectTxt,destim);
+                                    }
+                                }
                             }
                             else if(activity.equalsIgnoreCase("Workflow is Done"))
                             {
                                 workflow = cont.getParameter("Workflow");
                                 allusers = cont.getParameter("All users");
-                                workflowdone = true;
+                                allusers = allusers.substring(1, allusers.length());
+                                String[] sendTo = allusers.split(",");
+                                String emailFromAddress = email;
+                                String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
+                                String SMTP_HOST_NAME = "smtp.gmail.com";
+                                String SMTP_PORT = "465";
+                                String emailMsgTxt = "The task "+taskname + " has changed status.\nThe new status is "+newstatus;
+                                String emailSubjectTxt ="The workflow "+workflow+" is completed";
+                                String link = "http://taskmanagerunito.xoom.it/Flow/"+workflow+".xml";
+                                String text = "The workflow "+workflow+" is completed.\nYou can see the feed at: "+link;
+                                new SendMailCl().sendSSLMessage(sendTo, emailSubjectTxt, text, email,pwd);
                             }
                         }
                     }
@@ -146,6 +174,7 @@ public class NotifCallbackServlet extends HttpServlet {
 
                   
  //DA rendere parametrico -- GIO
+                    /*
                     if(checksend==true)
                     {
 
@@ -175,9 +204,9 @@ public class NotifCallbackServlet extends HttpServlet {
                         String link = "http://taskmanagerunito.xoom.it/Flow/"+workflow+".xml";
                         String text = "The workflow "+workflow+" is completed.\nYou can see the feed at: "+link;
                     //gio per incomp param
-                        //    new SendMailCl().sendSSLMessage(sendTo, emailSubjectTxt, text, email,pwd);
+                            
 
-                    }
+                    }*/
                     
                 }
             }

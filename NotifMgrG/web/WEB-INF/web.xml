@@ -12,6 +12,10 @@
         <servlet-name>PrendiDocs</servlet-name>
         <servlet-class>jav.PrendiDocs</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>IdentityChecker</servlet-name>
+        <servlet-class>jav.IdentityChecker</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>SubscribeServlet</servlet-name>
         <url-pattern>/SubscribeServlet</url-pattern>
@@ -23,6 +27,10 @@
     <servlet-mapping>
         <servlet-name>PrendiDocs</servlet-name>
         <url-pattern>/PrendiDocs</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>IdentityChecker</servlet-name>
+        <url-pattern>/IdentityChecker</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
