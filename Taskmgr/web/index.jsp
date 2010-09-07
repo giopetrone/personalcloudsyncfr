@@ -10,9 +10,32 @@
 
 
 <html>
+    <%
+
+
+                String email = request.getParameter("email");
+          //      String email = "fabrizio.torretta@gmail.com";
+
+
+                String pwd = request.getParameter("pwd");
+                String flow = request.getParameter("Flow");
+                String sessuser =(String) session.getAttribute("email");
+                String sesspwd = (String) session.getAttribute("pwd");
+             
+                if(sessuser == null)
+                {
+           //     String pwd = "gregorio";
+
+    %>
+
+    <jsp:forward page="/login.jsp">
+        <jsp:param name = "Flow" value='<%=flow%>' />
+    </jsp:forward>
+    <%}%>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
         <title>Collaborative Task Manager</title>
+
         <script language="JavaScript" src="./js/Jalava.js"></script>
 
         <script language="JavaScript">
@@ -116,6 +139,7 @@
                 // var url1 = "http://marinoflow.appspot.com/nuovastr.txt";
                 // alert(rect);
                 c = 1;
+               
                 var jsonString = Jalava.diagram.persist();
                 var persisted = JSON.parse(jsonString);
                 var blocks = persisted.blocks;
@@ -458,7 +482,228 @@
 
 
 
+function setCondition()
+{
+    try{
 
+       // TextEdit.target = DOM.getEventTarget(event, "mytextarea");
+        var jsonString = Jalava.diagram.persist();
+        //var id = TextEdit.target.parentNode.parentNode.id;
+       
+        var persisted = JSON.parse(jsonString);
+        var blocks = persisted.blocks.length;
+        var connections = persisted.connections.length;
+        var y=0;
+        for(var i=0;i<blocks;i++)
+        {
+
+            var imageId = persisted.blocks[i].imageId;
+            if(imageId == "ellipse")
+            {
+
+               var blockid = persisted.blocks[i].id;
+               var andor =  persisted.blocks[i].type;
+               var list = new Array;
+               for(var j=0;j<connections;j++)
+               {
+                   var target = persisted.connections[j].target;
+                   if(blockid == target)
+                   {
+                       var source = persisted.connections[j].source;
+                       for(var l=0;l<blocks;l++)
+                       {
+                           var blockid2 = persisted.blocks[l].id;
+                           if(blockid2 == source)
+                           {
+                               var type = persisted.blocks[l].type;
+                               list[y] = type;
+                               y++;
+                           }
+                       }
+                   }
+               }
+               if(andor=="And")
+               {
+                   var done = new Array();
+                   var x=0;
+                   for(var h=0;h<list.length;h++)
+                   {
+                       var check = list[h];
+                       if(check == "Done") {done[x]=check;x++}
+                   }
+                   if(done.length != list.length || list.length == 0)
+                   {
+                       for(var z=0;z<connections;z++)
+                       {
+                           var source2 = persisted.connections[z].source;
+                           if(blockid == source2){
+                               var target2 = persisted.connections[z].target;
+                               for(var g=0;g<blocks;g++)
+                               {
+                                   var id3 = persisted.blocks[g].id;
+                                   if(target2 == id3)
+                                   {
+
+                                       var children= TextEdit.target.parentNode.parentNode.parentNode.childNodes.length;
+
+                                       for(var r=20;r<children;r++)
+                                       {
+                                              // alert(TextEdit.target.parentNode.parentNode.parentNode.childNodes[h].shared)
+                                           var id4 = TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].id;
+
+                                           if(id3 == id4)
+                                           {
+
+                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].childNodes[0].childNodes[0].style.color = "red";
+                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].type = "Not Enabled";
+                                              // TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].childNodes[0].childNodes[7].value = "false";
+                                           }
+                                       }
+                                   }
+                               }
+                           }
+                       }
+                   }else if(done.length == list.length && done.length != 0)
+                   {
+                           for(var z=0;z<connections;z++)
+                       {
+                           var source2 = persisted.connections[z].source;
+                           if(blockid == source2){
+                               var target2 = persisted.connections[z].target;
+                               for(var g=0;g<blocks;g++)
+                               {
+                                   var id3 = persisted.blocks[g].id;
+                                   if(target2 == id3)
+                                   {
+
+                                       var children2= TextEdit.target.parentNode.parentNode.parentNode.childNodes.length;
+
+                                       for(var s=20;s<children2;s++)
+                                       {
+                                              // alert(TextEdit.target.parentNode.parentNode.parentNode.childNodes[h].shared)
+                                           var id5 = TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].id;
+
+                                           if(id3 == id5)
+                                           {
+                                             //  alert(TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].childNodes[0].style.color);
+                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].childNodes[0].childNodes[0].childNodes[0].style.color = "green";
+                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].type = "Enabled";
+                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].childNodes[0].childNodes[0].childNodes[8].value = "true";
+                                           }
+                                       }
+                                   }
+                               }
+                           }
+                       }
+
+
+
+
+
+
+
+                   }
+
+               }
+               else if(andor=="Or") {
+                   var done = new Array();
+                   var x=0;
+                   for(var h=0;h<list.length;h++)
+                   {
+                       var check = list[h];
+                       if(check == "Done") {done[x]=check;x++}
+                   }
+                   if(done.length >=1)
+                   {
+                       for(var z=0;z<connections;z++)
+                       {
+                           var source2 = persisted.connections[z].source;
+                           if(blockid == source2){
+                               var target2 = persisted.connections[z].target;
+                               for(var g=0;g<blocks;g++)
+                               {
+                                   var id3 = persisted.blocks[g].id;
+                                   if(target2 == id3)
+                                   {
+
+                                       var children= TextEdit.target.parentNode.parentNode.parentNode.childNodes.length;
+
+                                       for(var r=20;r<children;r++)
+                                       {
+                                              // alert(TextEdit.target.parentNode.parentNode.parentNode.childNodes[h].shared)
+                                           var id4 = TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].id;
+
+                                           if(id3 == id4)
+                                           {
+                                               var nome = TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].childNodes[0].childNodes[0];
+                                               nome.style.color = "green";
+                                            //   TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].style.color = "green";
+                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].type = "Enabled";
+                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].childNodes[0].childNodes[8].value = "true";
+                                           }
+                                       }
+                                   }
+                               }
+                           }
+                       }
+                   }else
+                   {
+                           for(var q=0;q<connections;q++)
+                           {
+                           var source3 = persisted.connections[q].source;
+                           if(blockid == source3){
+                               var target3 = persisted.connections[q].target;
+                               for(var d=0;d<blocks;d++)
+                               {
+                                   var id6 = persisted.blocks[d].id;
+                                   if(target3 == id6)
+                                   {
+
+                                       var children3= TextEdit.target.parentNode.parentNode.parentNode.childNodes.length;
+                                       //alert(children);
+                                       for(var p=20;p<children3;p++)
+                                       {
+                                              // alert(TextEdit.target.parentNode.parentNode.parentNode.childNodes[h].shared)
+                                           var id7 = TextEdit.target.parentNode.parentNode.parentNode.childNodes[p].id;
+
+                                           if(id6 == id7)
+                                           {
+                                               var nome = TextEdit.target.parentNode.parentNode.parentNode.childNodes[p].childNodes[0].childNodes[0].childNodes[0];
+                                               nome.style.color = "red";
+                                           //    TextEdit.target.parentNode.parentNode.parentNode.childNodes[p].childNodes[0].style.color = "red";
+                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[p].type = "Not Enabled";
+                                           }
+                                       }
+                                   }
+                               }
+                           }
+                       }
+
+
+
+
+
+
+
+                   }
+
+               }
+
+
+
+
+
+
+
+            }
+        }
+
+
+
+
+    }
+    catch(e){alert("Dentro check "+e.message)}
+}
 
 
 
@@ -530,24 +775,17 @@
         </script>
 
     </head>
-
+    
     <body onload="carica();doTimer();" style="background-color: #add8e6"/>
-    <%
-
-
-                   String email = request.getParameter("email");
-          //      String email = "fabrizio.torretta@gmail.com";
-
-
-                String pwd = request.getParameter("pwd");
-           //     String pwd = "gregorio";
-
-    %>
+    
    <h1>Collaborative Task Manager  </h1>
+
+  
+
 
     <div id="menu" style="font-size: 13px"> <a href="#" onclick="childWindow=open('/docs2.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="savenew" name="savenew" >Save Diagram </a> |  <a href="#" onClick=" saveDiagram('false');" id="savedraft">Save Draft</a> | <a href="#" onclick="childWindow=open('/docs.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="load" name="load" >LoadDiagram </a>  | <a href="#" onclick="childWindow=open('/shared.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800');" id="share">Share</a>
         | <a href="#" onclick="childWindow=open('/docs3.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="savetemplate">Save as Template</a> |
-        <%=email%> | <u>Settings</u>  |<a href="#" onclick="childWindow=open('/changepriv.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="changepriv" name="changepriv" disabled="disabled" >Change privileges of users </a>| <a target=_blank href="http://docs.google.com/support/?hl=en" class=gb4>Help</a> | <a href="/logout?hl=it&amp;continue=http://docs.google.com/?tab%3Dmo%26pli%3D1" class=gb4>Sign out</a> </div>
+        <%=sessuser%> | <u>Settings</u>  |<a href="#" onclick="childWindow=open('/changepriv.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="changepriv" name="changepriv" disabled="disabled" >Change privileges of users </a>| <a target=_blank href="http://docs.google.com/support/?hl=en" class=gb4>Help</a> | <a href="logout.jsp" class=gb4 >Log out </a> </div>
         <div id="menu2"></div>
 
     
@@ -566,13 +804,14 @@
     
        
         
-        <input type="hidden" id="owner" name="owner" value= '<%=email%>' disabled="disabled" />
+        <input type="hidden" id="owner" name="owner" value= '<%=sessuser%>' disabled="disabled" />
         <input type="hidden" id="users" name="users" value= "" disabled="disabled" />
-        <input type="text" id="writers" name="writers" value= "" disabled="disabled" size="100" />
-        <input type="hidden" id="pwd" name="pwd" value='<%=pwd%>' disabled="disabled" />
-         <input type="text" id="assignees" name="assignees" value='' size="100" />
+        <input type="hidden" id="writers" name="writers" value= "" disabled="disabled" size="100" />
+        <input type="hidden" id="pwd" name="pwd" value='<%=sesspwd%>' disabled="disabled" />
+         <input type="hidden" id="assignees" name="assignees" value='' size="100" />
+       
         <!--
-        <input type="button" value="Start count!" onClick="doTimer();"/>
+         <input type="button" value="Start count!" onClick="setCondition();"/>
           <input type="text" id="txt" />
          <input type="button" value="Share" onclick="childWindow=open('/shared.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800');"/>
          <a href="#" onclick="childWindow=open('/docs2.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="add" name="add" >SaveDiagram </a>

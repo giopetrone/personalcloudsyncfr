@@ -4,11 +4,33 @@
     Author     : fabrizio
 --%>
 
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page contentType="text/html" pageEncoding="UTF-8" import="jav.GoDoc"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
    "http://www.w3.org/TR/html4/loose.dtd">
 
 <html>
+     <%
+
+
+               //    String email = request.getParameter("email");
+          //      String email = "fabrizio.torretta@gmail.com";
+
+
+            //    String pwd = request.getParameter("pwd");
+                String sessuser =(String) session.getAttribute("email");
+                String sesspwd = (String) session.getAttribute("pwd");
+                String flow = request.getParameter("Flow");
+               
+                if(sessuser != null)
+                {
+           //     String pwd = "gregorio";
+
+    %>
+
+    <jsp:forward page="index.jsp"/>
+
+    <%}%>
+      
     <head>
          <script type="text/javascript">
          function validate_required(field,alerttxt)
@@ -82,7 +104,11 @@
                             str = objXml.responseText;
 
                         
-                            if(str == "checked")  document.loginform.submit();
+                            if(str == "checked")  
+                            {
+
+                                document.loginform.submit();
+                            }
                             else {alert("Invalid Google Credentials. Try Again");}
 
                     }catch(e){alert(e.message);}
@@ -100,14 +126,14 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Task Manager Login Page</title>
     </head>
-    <body>
+    <body style="background-color: #add8e6">
 
 <h1>Welcome to Task Manager Login Page.</h1>
 <p>If you are new to the Content Community, please <a href="register.html"><strong>register now</strong></a></p>
 
 <p>Please feel free to email us at <a href="mailto:fabrizio.torretta@gmail.com">Fabrizio Torretta</a> if you experience problems or have questions.</p>
 
- <form name="loginform"  action="index.jsp" onsubmit="return validate_form(this)"method="post">
+ <form name="loginform"  action="forwarder.jsp" onsubmit="return validate_form(this)"method="post">
 <table summary="Demonstration form">
   <tbody>
 
@@ -129,6 +155,7 @@
   </tr>
   </tbody>
 </table>
+     <input type="hidden" name="flow" id="flow" value='<%=flow%>'/>
 </form>
 
 

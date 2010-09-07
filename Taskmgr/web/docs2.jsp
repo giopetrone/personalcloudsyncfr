@@ -53,6 +53,7 @@
         {
             if(name.indexOf(".txt") == -1) name = name +".txt";
             opener.document.getElementById('area').value  = name;
+            opener.setCondition();
             opener.saveDiagram("true");
         }
 

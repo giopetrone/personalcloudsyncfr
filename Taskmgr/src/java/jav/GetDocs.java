@@ -36,7 +36,7 @@ public class GetDocs extends HttpServlet {
         try {
             String pwd = request.getHeader("pwd");
             String email = request.getHeader("email");
-            System.out.print("DIO PORCO");
+           
             String docs = GoDoc.prendi(email, pwd);
             System.out.println("DOCS: "+docs);
           

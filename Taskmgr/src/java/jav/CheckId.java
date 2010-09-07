@@ -11,6 +11,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -29,13 +30,18 @@ public class CheckId extends HttpServlet {
     throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        try {
-          
-             String pwd = request.getHeader("pwd");
+        try 
+        {
+            //HttpSession session = request.getSession(true);
+            String pwd = request.getHeader("pwd");
              String email = request.getHeader("email");
-         
-             out.print( GoDoc.checkid(email, pwd));
-        } finally { 
+             String check = GoDoc.checkid(email, pwd);
+             out.print(check);
+        }
+        catch(Exception ex)
+        {
+            out.print(ex.getMessage());
+        }finally {
             out.close();
         }
     } 

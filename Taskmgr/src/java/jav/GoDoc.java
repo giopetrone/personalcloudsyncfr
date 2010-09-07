@@ -299,7 +299,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                         String dest = destinatari.toString();
                         int length = dest.length();
                         String destfinal = dest.substring(1, length - 1);
-                        sendMail(destfinal,login,pwd,documentName);
+                        if(destinatari.size() != 1) sendMail(destfinal,login,pwd,documentName);
                        
 
                         
@@ -1170,10 +1170,11 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
             System.out.println("%%%%LOGIN: "+login);
             String SMTP_HOST_NAME = "smtp.gmail.com";
             String SMTP_PORT = "465";
-
-            String text = "Hi, a new diagram is interested in you.\nGo to your task manager and load "+name+"\n";
+            String url = "http://localhost:8081/index.jsp?Flow="+name;
+            String text = "Hi, a new diagram is interested in you.\nGo and check this workflow "+url+"\n";
             String text2 ="Do not forget to subscribe your Notification Manager to this application!";
             String emailMsgTxt = text+text2;
+            
             String emailSubjectTxt = "New Collaborative Workflow: "+name;
             String emailFromAddress = login;
             String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
