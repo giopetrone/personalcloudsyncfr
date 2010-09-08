@@ -9,6 +9,25 @@
    "http://www.w3.org/TR/html4/loose.dtd">
 
 <html>
+     <%
+
+
+               //    String email = request.getParameter("email");
+          //      String email = "fabrizio.torretta@gmail.com";
+
+
+            //    String pwd = request.getParameter("pwd");
+                String sessuser =(String) session.getAttribute("email");
+                String sesspwd = (String) session.getAttribute("pwd");
+                if(sessuser != null)
+                {
+           //     String pwd = "gregorio";
+
+    %>
+
+    <jsp:forward page="index.jsp"/>
+
+    <%}%>
     <head>
          <script type="text/javascript">
          function validate_required(field,alerttxt)
@@ -124,8 +143,6 @@
   </tbody>
 </table>
 
-     <input name="hiddenemail" id="hiddenemail" size="35" maxlength="30" type="hidden">
-     <input name="hiddenpwd" id="hiddenpwd" size="35" maxlength="30" type="hidden">
 </form>
 
 

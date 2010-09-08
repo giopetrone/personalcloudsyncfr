@@ -54,7 +54,7 @@ public class SubscribeServlet extends HttpServlet {
                 if (casoSubscribe.equals("start")) {
                     for(int i=0;i<feeds.length;i++)
                     {
-                        new TestSub().testSubscriber(FeedUtil.SubFeedName(feeds[i]), "http://localhost:8081/NotifMgr/NotifCallbackServlet", "");
+                        new TestSub().testSubscriber(FeedUtil.SubFeedName(feeds[i]), "http://localhost:8081/NotifMgrG/NotifCallbackServlet", "");
                     }
                     
                     System.err.println("subscribe di Notift  3");

@@ -49,7 +49,7 @@ public class NotifCallbackServlet extends HttpServlet {
         }
         System.err.println("\n");
          * */
-// System.err.println("inzio in callback di notif");
+        System.err.println("$$$$$$$$$$$$$$$$$ inzio in callback di notif $$$$$$$$$$$$$$$");
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
         try {
@@ -162,7 +162,7 @@ public class NotifCallbackServlet extends HttpServlet {
                                 String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
                                 String SMTP_HOST_NAME = "smtp.gmail.com";
                                 String SMTP_PORT = "465";
-                                String emailMsgTxt = "The task "+taskname + " has changed status.\nThe new status is "+newstatus;
+                               
                                 String emailSubjectTxt ="The workflow "+workflow+" is completed";
                                 String link = "http://taskmanagerunito.xoom.it/Flow/"+workflow+".xml";
                                 String text = "The workflow "+workflow+" is completed.\nYou can see the feed at: "+link;

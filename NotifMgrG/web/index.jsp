@@ -1,14 +1,30 @@
-<%--
-    Document   : index
-    Created on : Jun 17, 2010, 11:03:34 AM
-    Author     : giovanna
---%>
+
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
    "http://www.w3.org/TR/html4/loose.dtd">
 
 <html>
+     <%
+
+
+                  String email = request.getParameter("email");
+          //      String email = "fabrizio.torretta@gmail.com";
+
+
+                String pwd = request.getParameter("pwd");
+              //  String sessionemail =(String) session.getAttribute("email");
+               // String sessionpwd = (String) session.getAttribute("pwd");
+             //   if(sessionemail == null)
+          //      {
+           //     String pwd = "gregorio";
+               // <jsp:forward page="login.jsp"/>
+
+    %>
+
+    
+
+    
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Notification Manager</title>
@@ -98,8 +114,8 @@ function getDocs(){
 
                     }
                 };
-
-
+                
+                   
                     objXml.open("GET",url2,true);
                     objXml.setRequestHeader('Content-Type',"text/plain");
                     objXml.setRequestHeader('notifica',"start");
@@ -116,21 +132,11 @@ function getDocs(){
     </head>
     <body onload="getDocs();" style="background-color: #add8e6"/>
         <h1>Notification Settings</h1>
-          <%
-
-
-                   String email = request.getParameter("email");
-          //      String email = "fabrizio.torretta@gmail.com";
-
-
-                String pwd = request.getParameter("pwd");
-           //     String pwd = "gregorio";
-
-    %>
+   
   <form name="myform" id="myform" >
         <input type="hidden" id="owner" name="owner" value= '<%=email%>' disabled="disabled" />
         <input type="hidden" id="pwd" name="pwd" value='<%=pwd%>' disabled="disabled" />
-        <input type="text" value="" name="name" id="name">
+        <input type="text" value='' name="name" id="name">
         <div id="menu">
 
 
@@ -138,6 +144,7 @@ function getDocs(){
 
 
 <input type="button" onclick="get();" value="Ok" />
+<a href="logout.jsp"  >Log out </a>
 
     </form>
     </body>
