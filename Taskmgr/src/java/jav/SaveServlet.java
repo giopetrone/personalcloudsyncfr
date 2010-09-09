@@ -81,9 +81,10 @@ public class SaveServlet extends HttpServlet {
             if(!nomeFile.contains("template"))
             {
                 new TestPub().testPublisher("http://localhost:8080", FeedUtil.SubFeedName(nomeFile));
-                new TestPub().testPublisher("", FeedUtil.SubFeedName(nomeFile));
+            //    new TestPub().testPublisher("", "http://localhost/Atomi/marinofeed.xml");
                 SunFtpWrapper ftp = new SunFtpWrapper();
-                ftp.uploadFeed(nomeFile);}
+                ftp.uploadFeed(nomeFile);
+            }
          //       String urlfeed = "http://taskmanagerunito.xoom.it/Flow/"+nomeFile+".xml";
                 out.println(nomeFile);
             

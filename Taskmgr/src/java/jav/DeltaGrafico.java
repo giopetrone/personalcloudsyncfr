@@ -7,6 +7,8 @@ package jav;
 
 import pubsublib.event.AtomEvent;
 import jav.CalendarCall;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -25,6 +27,7 @@ public class DeltaGrafico {
         int oldconnections = vecchio.connections.length;
         int countDone = 0;
         int countRect = 0;
+        List<AtomEvent> listaeventi = new ArrayList();
         String utenti ="";
 
 
@@ -33,15 +36,16 @@ public class DeltaGrafico {
             AtomEvent event = new AtomEvent();
             event.setActivity("Number of blocks is changed");
             // event.setParameter("assigners",found);
-            FeedUtil.addEntry("",nomeFile, event);
+           // FeedUtil.addEntry("",nomeFile, event);
+            listaeventi.add(event);
         }
         if(newconnections < oldconnections || newconnections > oldconnections)
         {
 
             AtomEvent event = new AtomEvent();
             event.setActivity("Number of connections is changed");
-                 // event.setParameter("assigners",found);
-            FeedUtil.addEntry("",nomeFile, event);
+           // FeedUtil.addEntry("",nomeFile, event);
+            listaeventi.add(event);
         }
         for(int j=0;j<newsize;j++)
               {
@@ -106,7 +110,7 @@ public class DeltaGrafico {
             FeedUtil.addEntry("", nomeFile, event);
         }
 
-
+        FeedUtil.addEntries("",nomeFile,listaeventi);
 
 
 

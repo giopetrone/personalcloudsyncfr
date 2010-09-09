@@ -4,13 +4,8 @@
  */
 package jav;
 
-import com.sun.syndication.feed.synd.SyndContent;
-import com.sun.syndication.feed.synd.SyndEntry;
-import com.sun.syndication.feed.synd.SyndFeed;
-import com.sun.syndication.io.SyndFeedInput;
 import java.io.IOException;
 
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.List;
 import javax.servlet.ServletException;
@@ -37,7 +32,7 @@ public class CallbackServlet extends HttpServlet {
             throws ServletException, IOException {
 
         // ricordare che deploy di callabck e' sotto  <CallbackServlett>/subscribe/pippo
-
+         System.err.println("$$$$$$$$$$$$$$$$Dentro callbackServlet$$$$$$$$$$$$$$$$$");
         /*
         System.err.println("headers richiesta:");
         Enumeration e = request.getHeaderNames();
@@ -54,9 +49,11 @@ public class CallbackServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         try {
             String refresh = request.getHeader("notifica");
+           
             if (refresh != null) {
                 //ciclic ajax call from UI
                 String notif = (String) getServletContext().getAttribute("atomo");
+                out.print("Notif: "+notif);
                 if (notif != null) {  // we have received new feed content
                     out.println(notif); // send it to client
                     // set new feed content to nul to avoid duplicate notifications
