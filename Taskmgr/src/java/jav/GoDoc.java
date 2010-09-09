@@ -1182,7 +1182,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
             new SendMailCl().sendSSLMessage(sendTo, emailSubjectTxt, emailMsgTxt, emailFromAddress,pwd);
         }
         catch(Exception ex)
-        {
+        { 
             System.out.println("In SendMail Method: "+ex.getMessage());
         }
 

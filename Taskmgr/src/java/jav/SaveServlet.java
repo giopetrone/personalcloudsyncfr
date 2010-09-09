@@ -39,19 +39,20 @@ public class SaveServlet extends HttpServlet {
         String owner = request.getHeader("owner");
         String pwd = request.getHeader("pwd");
         String users = request.getHeader("users");
-        System.out.println("USERS: "+users);
+        System.out.println("USERS: " + users);
         String assignees = request.getHeader("assignees");
-        System.out.println("Assignees: "+assignees);
-        
+        System.out.println("Assignees: " + assignees);
+
         //     String loadjson = request.getHeader("loadjson");
         boolean publish = request.getHeader("publish") != null;
         String login = request.getHeader("login");
         if (users == null) {
             users = "";
         }
+        publish = true; // PER PROVA
         String writers = request.getHeader("writers");
-        System.out.println("Writers: "+writers);
-       
+        System.out.println("Writers: " + writers);
+
         //publish = true; // PER PROVA
         Gson gson = new Gson();
         //   vecchia versione Grafico ob = gson.fromJson(flowSource, Grafico.class);
@@ -70,25 +71,27 @@ public class SaveServlet extends HttpServlet {
             } else {
                 users = ob.setUsers(owner, writers, users);
             }
-            String val = GoDoc.saveDiagram(owner, nomeFile, publish, gson.toJson(ob), users, writers,pwd,assignees);
-        //    out.println("new or old ?  " + val);
+            String val = GoDoc.saveDiagram(owner, nomeFile, publish, gson.toJson(ob), users, writers, pwd, assignees);
+            //    out.println("new or old ?  " + val);
             if (val.equals("new")) {
                 ob.createNewEvents(nomeFile, owner);
             } else if (val.equals("notnew")) {
                 System.out.println("NOT NEW in SAVE SERVLET");
                 dg.createChangeEvents(nomeFile, owner);
             }
-            if(!nomeFile.contains("template"))
-            {
+            if (!nomeFile.contains("template")) {
                 new TestPub().testPublisher("http://localhost:8080", FeedUtil.SubFeedName(nomeFile));
-            //    new TestPub().testPublisher("", "http://localhost/Atomi/marinofeed.xml");
+
                 SunFtpWrapper ftp = new SunFtpWrapper();
                 ftp.uploadFeed(nomeFile);
+                //  versione con thread:
+                //   FtpThread fp = new FtpThread(nomeFile);
+                //   fp.start();
             }
-         //       String urlfeed = "http://taskmanagerunito.xoom.it/Flow/"+nomeFile+".xml";
-                out.println(nomeFile);
-            
-         
+            //       String urlfeed = "http://taskmanagerunito.xoom.it/Flow/"+nomeFile+".xml";
+            out.println(nomeFile);
+
+
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
