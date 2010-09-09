@@ -112,6 +112,7 @@ public class NotifCallbackServlet extends HttpServlet {
                     while ((c = inStream.read(b)) != -1) {
                         s += new String(b, 0, c);
                     }
+                    System.err.println("notifcallbackservlet, string notified=" +s);
                     //   System.err.println("session put =" + getServletContext());
                     // save new feed content; at next refresh call it will be given to client
                     String taskname = "";
@@ -120,6 +121,9 @@ public class NotifCallbackServlet extends HttpServlet {
                     String workflow ="";
                     String allusers = "";
                     String modifier = "";
+                    String vecchia = (String) getServletContext().getAttribute("atomo");
+                    if(vecchia == null) System.err.println("Vecchia null");
+                    else System.err.println("VECCHIA NOT NULL: "+vecchia);
                     getServletContext().setAttribute("atomo", s);
                     List<AtomEvent> notifications = FeedUtil.createAtom(s);
                     System.err.println("NOTIFICATIONS: "+notifications.size());

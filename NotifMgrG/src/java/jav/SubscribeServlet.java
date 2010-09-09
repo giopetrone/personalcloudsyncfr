@@ -55,9 +55,9 @@ public class SubscribeServlet extends HttpServlet {
                     for(int i=0;i<feeds.length;i++)
                     {
                         new TestSub().testSubscriber(FeedUtil.SubFeedName(feeds[i]), "http://localhost:8081/NotifMgrG/NotifCallbackServlet", "");
-                    }
+                //  new TestSub().testSubscriber(FeedUtil.SubFeedName(feeds[i]), "http://localhost:8081/NotifCallbackServlet", "");
                     
-                    System.err.println("subscribe di Notift  3");
+                    System.err.println("subscribe di Notift  feed= " + feeds[i]);}
             out.println("fatta subscribe");
                     out.close();
                 } else {
