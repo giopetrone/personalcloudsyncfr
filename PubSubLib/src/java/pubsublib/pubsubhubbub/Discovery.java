@@ -14,6 +14,7 @@ import java.util.Iterator;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -39,7 +40,12 @@ public class Discovery {
 		HttpClient httpclient = new DefaultHttpClient();
 		HttpGet httpget = new HttpGet(feed);
 		ResponseHandler<String> responseHandler = new BasicResponseHandler();
-		String responseBody = httpclient.execute(httpget, responseHandler);
+                String responseBody = null;
+                try {
+		 responseBody = httpclient.execute(httpget, responseHandler);
+                } catch (HttpResponseException ex) {
+                    ex.printStackTrace();
+                }
 		response = (responseBody);
 
 		httpclient.getConnectionManager().shutdown();
