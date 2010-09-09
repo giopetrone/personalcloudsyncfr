@@ -1,4 +1,4 @@
-/*
+/*/*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
@@ -34,6 +34,7 @@ import pubsublib.event.AtomEvent;
 public class FeedUtil {
 
     public static String SubFeedName(String flowName) {
+
         return "http://localhost" + "/Flow/" + flowName + ".xml";
     }
 
@@ -83,7 +84,9 @@ public class FeedUtil {
             link.setRel("alternate");
             links.add(link);
             link = new SyndLinkImpl();
+            // HUB PER VERSIONE LOCALE
             link.setHref("http://localhost:8080");
+       //     link.setHref("http://pubsubhubbub.appspot.com");
             link.setRel("hub");
             links.add(link);
             feed.setLinks(links);
@@ -140,7 +143,7 @@ public class FeedUtil {
             entry.setTitle("Flow (specificare meglio)");
             // set links to google documents; maybe could be link
             // taskmanager with http://localhost:8081?Flow=filename.txt
-            //  addLink(entry, editLink);
+         //     addLink(entry, editLink);
             addLink(entry, "http://localhost:8081/index.jsp?Flow=" + flowName);
             //  entry.setPublishedDate(DATE_PARSER.parse("2009-07-" + i));
             entry.setPublishedDate(Calendar.getInstance().getTime());
@@ -158,6 +161,51 @@ public class FeedUtil {
         }
         return true;
     }
+
+
+    static boolean addEntries(String editLink, String flowName,List<AtomEvent> event) {
+        if (!FeedWriteOk(flowName)) {  // crea feed se non esiste
+            CreateFeedFile(flowName);
+        }
+        SyndFeed feed = new SyndFeedImpl();
+        try {
+            String fileName = FileFeedName(flowName);
+            final SyndFeedInput input = new SyndFeedInput();
+            File f = new File(fileName);
+            feed = input.build(new XmlReader(f));
+            List entries = feed.getEntries();
+            for(int i=0;i<event.size();i++)
+            {
+
+                SyndEntry entry;
+                    SyndContent description;
+                    AtomEvent singlevent = event.get(i);
+                    entry = new SyndEntryImpl();
+                    entry.setTitle("Flow (specificare meglio)");
+                    entry.setUri("http://localhost:8081/index.jsp?Flow=" + flowName+i);
+                    // set links to google documents; maybe could be link
+                    // taskmanager with http://localhost:8081?Flow=filename.txt
+                 //     addLink(entry, editLink);
+                    addLink(entry, "http://localhost:8081/index.jsp?Flow=" + flowName);
+                    //  entry.setPublishedDate(DATE_PARSER.parse("2009-07-" + i));
+                    entry.setPublishedDate(Calendar.getInstance().getTime());
+                   setDescription(entry, singlevent, "text/plain");
+                  //    setDescription(entry, event, "text/html");
+                    entries.add(entry);
+            }
+
+            feed.setEntries(entries);
+            Writer writer = new FileWriter(fileName);
+            SyndFeedOutput output = new SyndFeedOutput();
+            output.output(feed, writer);
+            writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
 
     static void setDescription(SyndEntry entry, AtomEvent event, String style) {
         SyndContent description = new SyndContentImpl();
@@ -209,7 +257,7 @@ public class FeedUtil {
             String value = description.getValue();
             retEvent = AtomEvent.fromXml(value);
             if (retEvent != null) {
-                System.err.println("utente evento: " + retEvent.getUser());
+                System.err.println(" utente evento: " + retEvent.getUser());
             }
         } catch (Exception ex) {
             ex.printStackTrace();
