@@ -9,6 +9,7 @@ import googlecontacts.ContactsExampleParameters;
 import googletalkclient.ChatClient;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
@@ -121,6 +122,7 @@ public class NotifCallbackServlet extends HttpServlet {
                     String workflow ="";
                     String allusers = "";
                     String modifier = "";
+                    String nomeFile = "";
                     String vecchia = (String) getServletContext().getAttribute("atomo");
                     if(vecchia == null) System.err.println("Vecchia null");
                     else System.err.println("VECCHIA NOT NULL: "+vecchia);
@@ -136,10 +138,11 @@ public class NotifCallbackServlet extends HttpServlet {
                             if(activity.equalsIgnoreCase("Change Status of Task"))
                             {
                                 taskname = cont.getParameter("Task");
-                                newstatus = cont.getParameter("New Status");
+                                nomeFile = cont.getParameter("File");
                                 dest = cont.getParameter("Assigned To");
+                                if(dest == null) dest="";
                                 modifier = cont.getUser();
-                                if(!dest.equals("") )
+                                if(!dest.equals("") && dest != null)
                                 {
 
                                     String emailSubjectTxt = "Update of task "+taskname+" status";
@@ -152,7 +155,12 @@ public class NotifCallbackServlet extends HttpServlet {
                                     for(int i=0;i<sendTo.length;i++)
                                     {
                                         String destim = sendTo[i];
-                                        if(destim.contains("gmail.com") && !destim.equals("") && !destim.equalsIgnoreCase(modifier)) sendGMsg(emailSubjectTxt,destim);
+                                        //Controllo se il destinatario si e' iscritto alle notifiche
+                                        if(destim.contains("gmail.com") && !destim.equals("") && !destim.equalsIgnoreCase(modifier)) 
+                                        {
+                                           String sub = WriterPermission.checkNotifications(destim, nomeFile,"Changestatusoftask");
+                                           if(sub.equalsIgnoreCase("subscribed")) sendGMsg(emailSubjectTxt,destim);
+                                        }
                                     }
                                 }
                             }
@@ -162,16 +170,25 @@ public class NotifCallbackServlet extends HttpServlet {
                                 allusers = cont.getParameter("All users");
                                 allusers = allusers.substring(1, allusers.length());
                                 String[] sendTo = allusers.split(",");
+                                List destinatari = new ArrayList();
+                                for(int j=0;j<sendTo.length;j++)
+                                {
+                                    String sub = WriterPermission.checkNotifications(sendTo[j],workflow,"workflowisdone");
+                                    System.out.println("SUB: "+sub);
+                                    if(sub.equalsIgnoreCase("subscribed") && sub !=null) destinatari.add(sendTo[j]);
+
+                                }
                                 String emailFromAddress = email;
                                 String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
                                 String SMTP_HOST_NAME = "smtp.gmail.com";
                                 String SMTP_PORT = "465";
-                               
+                                String[] destinatarifinali = (String[]) destinatari.toArray(new String[0]);
                                 String emailSubjectTxt ="The workflow "+workflow+" is completed";
                                 String link = "http://taskmanagerunito.xoom.it/Flow/"+workflow+".xml";
                                 String text = "The workflow "+workflow+" is completed.\nYou can see the feed at: "+link;
-                                new SendMailCl().sendSSLMessage(sendTo, emailSubjectTxt, text, email,pwd);
+                                new SendMailCl().sendSSLMessage(destinatarifinali, emailSubjectTxt, text, email,pwd);
                             }
+
                         }
                     }
 
@@ -215,6 +232,7 @@ public class NotifCallbackServlet extends HttpServlet {
                 }
             }
         } catch (Exception ex) {
+            System.out.println("DENTRO CALLBACK SERVLET: "+ex.getMessage());
             ex.printStackTrace();
         } finally {
             out.close();

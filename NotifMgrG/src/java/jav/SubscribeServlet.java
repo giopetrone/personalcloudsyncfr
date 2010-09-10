@@ -46,26 +46,55 @@ public class SubscribeServlet extends HttpServlet {
             response.setContentType("text/html");
             casoSubscribe = request.getHeader("notifica");
             String nomeFile = request.getHeader("filenamemio");
+            String user = request.getHeader("email");
+            if(nomeFile == null) nomeFile ="";
             String[] feeds = nomeFile.split(" ");
             System.err.println("subscribe di Notift  1");
+            String url = "http://taskmanagerunito.xoom.it/Flow/";
+            String feederrati = "";
+
             if (casoSubscribe != null) {
                    System.err.println("caso =" + casoSubscribe);
 
-                if (casoSubscribe.equals("start")) {
+                if (casoSubscribe.equals("start") && !nomeFile.equals(""))
+                {
+                    int count = 0;
                     for(int i=0;i<feeds.length;i++)
                     {
-                        new TestSub().testSubscriber(FeedUtil.SubFeedName(feeds[i]), "http://localhost:8081/NotifMgrG/NotifCallbackServlet", "");
+                        int find = feeds[i].indexOf("/");
+                        String nomeDoc = feeds[i].substring(0, find);
+                        System.out.println("Doc: "+nomeDoc);
+                        String notiftype = feeds[i].substring(find+1, feeds[i].length());
+                        System.out.println("Notification: "+notiftype);
+                        String feed = url+nomeDoc+".xml";
+                        String risp ="";
+                        String writerisp ="";
+                        risp =   new TestSub().testSubscriber(feed, "http://localhost:8081/NotifMgrG/NotifCallbackServlet", "");
                 //  new TestSub().testSubscriber(FeedUtil.SubFeedName(feeds[i]), "http://localhost:8081/NotifCallbackServlet", "");
-                    
-                    System.err.println("subscribe di Notift  feed= " + feeds[i]);}
-            out.println("fatta subscribe");
-                    out.close();
-                } else {
+                        WriterPermission.writeNotifications(user, nomeDoc, notiftype);
+                        System.err.println("subscribe al feed= " + feed+" "+risp);
+                        if(risp.equalsIgnoreCase("done")) count++;
+                        else feederrati += " "+feeds[i];
+
+                     }
+                     if(count == feeds.length) out.println("Fatta subscribe");
+                     else out.println("Errore nei feeds:"+feederrati);
+
+                            //out.close();
+                     
+                     
+
+                } else
+                {
+                       out.println("Nome Feed Vuoto");
                 }
             }
-        } catch (Exception ex) {
+        } catch (Exception ex)
+        {
+           
             ex.printStackTrace();
         } finally {
+            
             out.close();
         }
     }
