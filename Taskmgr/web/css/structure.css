@@ -11,10 +11,23 @@ html{
 }
 body{
 	margin:17px 0 15px 0;
-	padding:0;
+	padding:0px;
 	text-align:center;
 	font-size:small;
 	font-family:"Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
+        background-color: #add8e6;
+}
+
+label
+{
+    font-size: 15px;
+ 
+    font-weight: bold;
+}
+
+li
+{
+    padding: 2px;
 }
 
 #container{

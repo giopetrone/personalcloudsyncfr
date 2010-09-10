@@ -119,11 +119,10 @@ form li.complex div span.right{
 	width:48%;
 }
 form li.complex div span.full input, 
-form li.complex div span.full select, 
+ 
 form li.complex div span.left input, 
-form li.complex div span.right input,
-form li.complex div span.left select,
-form li.complex div span.right select{
+form li.complex div span.right input
+{
 	width:100%;
 }
 
@@ -143,7 +142,7 @@ form li.complex div span.right select{
 
 .rtl .info h2, .rtl .info div, .rtl label.desc, .rtl label.choice, 
 .rtl div label, .rtl span label, .rtl input.text, 
-.rtl textarea.textarea, .rtl select.select, .rtl p.instruct, 
+.rtl textarea.textarea,  .rtl p.instruct, 
 .rtl .section h3, .rtl .section div, .rtl input.btTxt{
 	direction:rtl;
 }
@@ -221,7 +220,7 @@ form li div label .currently{
 
 /* ----- FIELDS ----- */
 
-input.text, input.search, input.file, textarea.textarea, select.select{
+input.text, input.search, input.file, textarea.textarea{
 	font-family:"Lucida Grande", Tahoma, Arial, sans-serif;
 	font-size:100%;
 	color:#333;
@@ -235,9 +234,7 @@ input.text, input.search, textarea.textarea{
 	border-bottom:1px solid #ddd;
 	background:#fff url(/images/fieldbg.gif) repeat-x top;
 }
-select.select{
-	padding:1px 0 0 0;
-}
+
 input.search{
 	-webkit-border-radius:10px;
 	-moz-border-radius:10px;
@@ -254,16 +251,8 @@ input.other{
 	margin:0 0 8px 25px;
 }
 
-.safari select.select{
-	font-size:120% !important;
-	margin:0 0 1px 0;
-}
-* html select.select{
-	margin:1px 0;
-}
-*+html select.select{
-	margin:1px 0;
-}
+
+
 
 .center, 
 form li span.center input.text, form li span.center label,
@@ -273,9 +262,7 @@ form li.phone input.text, form li.phone span label,
 form li.time input.text, form li.time span label{
 	text-align:center;
 }
-form li.time select.select{
-	margin-left:5px;
-}
+
 form li.price .right{
 	text-align:right;
 }
@@ -292,31 +279,10 @@ form li.price .right{
 	width:100% !important;
 }
 
-input.small, select.small{
-	width:25%;
-}
-input.medium, select.medium{
-	width:50%;
-}
-input.large, select.large, textarea.textarea{
-	width:100%;
-}
 
-.msie select.ieSelectFix{
-	width:auto;
-}
-.msie6 select.ieSelectFix, .msie7 select.ieSelectFix{
-	width:100%;
-}
-.msie select.ieSelectFix.small{
-	min-width:25%;
-}
-.msie select.ieSelectFix.medium{
-	min-width:50%;
-}
-.msie select.ieSelectFix.large{
-	width:100%;
-}
+
+
+
 
 
 textarea.small{
