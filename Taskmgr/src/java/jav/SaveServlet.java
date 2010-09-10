@@ -80,15 +80,17 @@ public class SaveServlet extends HttpServlet {
                 dg.createChangeEvents(nomeFile, owner);
             }
             if (!nomeFile.contains("template")) {
-                new TestPub().testPublisher("http://localhost:8080", FeedUtil.SubFeedName(nomeFile));
+               
 
                 SunFtpWrapper ftp = new SunFtpWrapper();
                 ftp.uploadFeed(nomeFile);
+           //     new TestPub().testPublisher("","http://taskmanagerunito.xoom.it/Flow/today.txt.xml");
+                new TestPub().testPublisher("http://localhost:8080", "http://taskmanagerunito.xoom.it/Flow/"+nomeFile+".xml");
                 //  versione con thread:
                 //   FtpThread fp = new FtpThread(nomeFile);
                 //   fp.start();
             }
-            //       String urlfeed = "http://taskmanagerunito.xoom.it/Flow/"+nomeFile+".xml";
+            //       
             out.println(nomeFile);
 
 

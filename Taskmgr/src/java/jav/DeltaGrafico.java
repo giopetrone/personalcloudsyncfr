@@ -58,13 +58,15 @@ public class DeltaGrafico {
                       if(newstatus == null) newstatus ="";
                       if(newstatus.equalsIgnoreCase("Done")) countDone ++;
                       String duedate = nuovo.blocks[j].date;
-                      if(duedate == null){}
-                      else if(! duedate.equals("Choose a Date(Optional)") && duedate != null && !duedate.equals(""))
-                      {
-                          String taskname = nuovo.blocks[j].name;
-                          CalendarCall.insertInCalendar(duedate,taskname);
 
-                      }
+                      // PARTE PER AGGIUNGERE UN REMINDER SU GCALENDAR AL SAVE
+                    //  if(duedate == null){}
+                      //else if(! duedate.equals("Choose a Date(Optional)") && duedate != null && !duedate.equals(""))
+                      //{
+                      //    String taskname = nuovo.blocks[j].name;
+                      //    CalendarCall.insertInCalendar(duedate,taskname);
+
+                     // }
                       if(newstatus == null) newstatus="";
                       String newassign = nuovo.blocks[j].assign;
                       if(newassign == null) newassign = "";
@@ -81,13 +83,14 @@ public class DeltaGrafico {
 
                                   AtomEvent event = new AtomEvent(owner, "TaskManager", "Change Status of Task");
                                   event.setParameter("Task", nuovo.blocks[j].name);
-                                //  event.setParameter("Permission", "Write");
+                                  event.setParameter("Permission", "Write");
                                   event.setParameter("New Status", newstatus);
                                   if(!nuovo.blocks[j].assign.equals("") && nuovo.blocks[j].assign !=null)
                                   {
                                       event.setParameter("Assigned To",nuovo.blocks[j].assign);
+                                      event.setParameter("File",nomeFile);
                                   }
-                                  FeedUtil.addEntry("", nomeFile, event);
+                                   listaeventi.add(event);
                               }
                               if(!newassign.equals(oldassign))
                               {
@@ -95,7 +98,8 @@ public class DeltaGrafico {
                                   event.setParameter("Task", nuovo.blocks[j].name);
                                 //  event.setParameter("Permission", "Write");
                                   event.setParameter("New Assigned users", newassign);
-                                  FeedUtil.addEntry("", nomeFile, event);
+                                  //FeedUtil.addEntry("", nomeFile, event);
+                                   listaeventi.add(event);
                               }
                           }
                       }
@@ -107,7 +111,8 @@ public class DeltaGrafico {
             event.setParameter("Workflow", nomeFile);
             //  event.setParameter("Permission", "Write");
             event.setParameter("All users", utenti);
-            FeedUtil.addEntry("", nomeFile, event);
+           // FeedUtil.addEntry("", nomeFile, event);
+             listaeventi.add(event);
         }
 
         FeedUtil.addEntries("",nomeFile,listaeventi);

@@ -5,6 +5,7 @@
 package jav;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import pubsublib.event.AtomEvent;
@@ -84,16 +85,17 @@ public class Grafico {
 
     public void createNewEvents(String nomeFile, String owner) throws Exception {
         try{
+             List<AtomEvent> listaeventi = new ArrayList();
         for (int j = 0; j < blocks.length; j++) {
             if (blocks[j].imageId.equalsIgnoreCase("rect")) {
                 String found = blocks[j].assign;
                 String duedate = blocks[j].date;
-                      if(! duedate.equals("Choose a Date(Optional)") && duedate != null && !duedate.equals(""))
-                      {
-                          String taskname = blocks[j].name;
-                          CalendarCall.insertInCalendar(duedate,taskname);
+                    //  if(! duedate.equals("Choose a Date(Optional)") && duedate != null && !duedate.equals(""))
+                   //   {
+                   //       String taskname = blocks[j].name;
+                  //        CalendarCall.insertInCalendar(duedate,taskname);
 
-                      }
+                   //   }
                 if (found == null) {
                     found = "";
                 }
@@ -102,7 +104,7 @@ public class Grafico {
                     event.setParameter("Task", blocks[j].name);
                     //  event.setParameter("Permission", "Write");
                     event.setParameter("Who", found);
-                    FeedUtil.addEntry("", nomeFile, event);
+                    listaeventi.add(event);
                 }
                 String delimiter = ",";
                 String[] links;
@@ -120,10 +122,11 @@ public class Grafico {
                         URL link = new URL(links[i]);
                         event.setParameter("link", link.toExternalForm());
                         event.setParameter("link", link.toString());
-                        FeedUtil.addEntry("", nomeFile, event);
+                       listaeventi.add(event);
                     }
                 }
             }
         }
+     FeedUtil.addEntries("",nomeFile,listaeventi);
     }catch(Exception ex){System.out.println("DENTRO GRAFICO "+ex.getMessage());}}
 }

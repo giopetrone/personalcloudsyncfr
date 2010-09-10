@@ -147,6 +147,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                   
                     DocumentListEntry documentEntry = findEntry(documentName);
                     System.out.println("DOCUMENTO NUOVO");
+                    List<AtomEvent> listaeventi = new ArrayList();
                     //QUesta parte commentata fa vedere come cercare e creare folders
                     /*
                     URL feedUri = new URL("http://docs.google.com/feeds/documents/private/full/-/folder?showfolders=true");
@@ -180,7 +181,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                     String link = documentEntry.getDocumentLink().getHref();
                     eventSave.setParameter("File", documentName);
                     eventSave.setParameter("Link", link);
-                    FeedUtil.addEntry("", documentName, eventSave);
+                    listaeventi.add(eventSave);
                     String[] tempwriter;
                     String delimiter = ",";
                     List<String> destinatari = new LinkedList();
@@ -218,8 +219,8 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                                 event.setParameter("File", documentName);
                                 event.setParameter("Permission", "Read");
                                 event.setParameter("Who", tempusers[i]);
-                                FeedUtil.addEntry("", documentName, event);
-                                new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
+                                listaeventi.add(event);
+                              //  new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
                                 destinatari.add(tempusers[i]);
 
                             }
@@ -244,8 +245,8 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                                 event.setParameter("File", documentName);
                                 event.setParameter("Permission", "Write");
                                 event.setParameter("Who", tempwriter[j]);
-                                FeedUtil.addEntry("", documentName, event);
-                                new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
+                                listaeventi.add(event);
+                               // new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
                                 destinatari.add(tempwriter[j]);
                             }
                         }
@@ -255,10 +256,14 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                         for (int j = 0; j < tempassignees.length; j++)
                         {
                             String thisassigner = tempassignees[j];
-                            try
+                            int count0 = thisassigner.indexOf("@");
+                            int count1 = thisassigner.lastIndexOf("@");
+                            boolean checkchiocciola = false;
+                            if(count0 > 0 && count0 == count1) checkchiocciola = true;
+                            if(!tempassignees[j].equalsIgnoreCase("") &&  tempassignees[j] !=null && !tempassignees[j].equals(" ") && checkchiocciola == true)
                             {
-                                
-                                if(!tempassignees[j].equalsIgnoreCase("") &&  tempassignees[j] !=null && tempassignees[j]!=" ")
+
+                                try
                                 {
                                     System.out.println("Assignees " + tempassignees[j]);
                                     addWriting(documentEntry, tempassignees[j]);
@@ -266,23 +271,21 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                                     event.setParameter("File", documentName);
                                     event.setParameter("Permission", "Write");
                                     event.setParameter("Who", tempassignees[j]);
-                                    FeedUtil.addEntry("", documentName, event);
-                                    new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
+                                    listaeventi.add(event);
+                                    //new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
                                     destinatari.add(tempassignees[j]);
-                                }
-                            }catch(Exception ex)
-                            {
-                                if(ex.getMessage().equalsIgnoreCase("This user already has access to the document."))
+                                }catch(Exception ex)
                                 {
+                                    if(ex.getMessage().equalsIgnoreCase("This user already has access to the document."))
+                                    {
                                     System.out.println("DENTRO CATCH X  UTENTE: "+thisassigner);
-                                   // destinatari.add(login);
-                                  //  String dest = destinatari.toString();
-                                //    int length = dest.length();
-                               //     String destfinal = dest.substring(1, length - 1);
-                                //    sendMail(destfinal,login,pwd,documentName);
+
+                                    }
+                                    else System.out.println("Dentro CATCH X utente "+thisassigner+" "+ex.getMessage());
                                 }
-                                else System.out.println("Dentro CATCH X utente "+thisassigner+" "+ex.getMessage());
                             }
+                    
+                            
                             //  AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
                          //   event.setParameter("File", documentName);
                         //    event.setParameter("Permission", "Write");
@@ -301,7 +304,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                         String destfinal = dest.substring(1, length - 1);
                         if(destinatari.size() != 1) sendMail(destfinal,login,pwd,documentName);
                        
-
+                        FeedUtil.addEntries("",documentName,listaeventi);
                         
 
                         
@@ -489,20 +492,26 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                                 event.setParameter("Permission", "Write");
                                 event.setParameter("Who", tempwriter[j]);
                                 FeedUtil.addEntry("", documentName, event);
-                                new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
+                              //  new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
                             }
                         }
                     }
                     if(assignees != null)
                     {
                        String[] tempassignes;
+                       String thisassigner;
                        tempassignes = assignees.split(",");
                        for(int z =0;z<tempassignes.length;z++)
                        {
-                           try
+                           thisassigner = tempassignes[z];
+                           int count0 = thisassigner.indexOf("@");
+                           int count1 = thisassigner.lastIndexOf("@");
+                           boolean checkchiocciola = false;
+                           if(count0 > 0 && count0 == count1) checkchiocciola = true;
+                           if(!tempassignes[z].equals("") && checkchiocciola == true)
                            {
-                               if(!tempassignes[z].equals(""))
-                               {
+                               
+                               try{
                                    
                                    addWriting(documentEntry, tempassignes[z]);
                                    System.out.println("%%%% Diventa writer Assign%%%%%%% "+tempassignes[z]);
@@ -511,10 +520,10 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                                    event.setParameter("Permission", "Write");
                                    event.setParameter("Who", tempassignes[z]);
                                    FeedUtil.addEntry("", documentName, event);
-                                   new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
+                                //   new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
 
-                               }
-                           } catch(Exception ex){System.out.println("DENTRO FOR ASSIGNEES in Update DIagram X UTENTE "+tempassignes[z]+" "+ex.getMessage());}
+                               }catch(Exception ex){System.out.println("DENTRO FOR ASSIGNEES in Update DIagram X UTENTE "+tempassignes[z]+" "+ex.getMessage());}
+                           } 
                        }
                       
                        
@@ -1171,8 +1180,9 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
             String SMTP_HOST_NAME = "smtp.gmail.com";
             String SMTP_PORT = "465";
             String url = "http://localhost:8081/index.jsp?Flow="+name;
+            String url2 = "http://localhost:8081/NotifMgrG/index.jsp?Flow="+name;
             String text = "Hi, a new diagram is interested in you.\nGo and check this workflow "+url+"\n";
-            String text2 ="Do not forget to subscribe your Notification Manager to this application!";
+            String text2 ="Do not forget to subscribe your Notification Manager to this application: "+url2+"\n";
             String emailMsgTxt = text+text2;
             
             String emailSubjectTxt = "New Collaborative Workflow: "+name;
