@@ -1,10 +1,10 @@
-<%-- 
+<%--
     Document   : login
     Created on : May 27, 2010, 3:13:25 PM
     Author     : fabrizio
 --%>
 
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page contentType="text/html" pageEncoding="UTF-8" import="jav.GoDoc"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
    "http://www.w3.org/TR/html4/loose.dtd">
 
@@ -18,7 +18,9 @@
 
             //    String pwd = request.getParameter("pwd");
                 String sessuser =(String) session.getAttribute("email");
-                String sesspwd = (String) session.getAttribute("pwd");
+             
+                String flow = request.getParameter("Flow");
+
                 if(sessuser != null)
                 {
            //     String pwd = "gregorio";
@@ -28,7 +30,6 @@
     <jsp:forward page="index.jsp"/>
 
     <%}%>
-    <head>
          <script type="text/javascript">
          function validate_required(field,alerttxt)
             {
@@ -111,7 +112,7 @@
 
 
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Notification Managewr Login Page</title>
+        <title>Notification Manager Login Page</title>
     </head>
     <body style="background-color: #add8e6">
 
@@ -120,7 +121,7 @@
 
 <p>Please feel free to email us at <a href="mailto:fabrizio.torretta@gmail.com">Fabrizio Torretta</a> if you experience problems or have questions.</p>
 
- <form name="loginform" id="loginform"  action="index.jsp" onsubmit="return validate_form(this)"method="post">
+ <form name="loginform" id="loginform"  action="forwarder.jsp" onsubmit="return validate_form(this)"method="post">
 <table summary="Demonstration form">
   <tbody>
 
@@ -137,12 +138,12 @@
 
   <tr>
    
-    <td><input name="Submit" value="Login" type="button" onclick="checkid();"/></td>
+    <td><input name="Button" value="Login" type="button" onclick="checkid();"/></td>
    
   </tr>
   </tbody>
 </table>
-
+<input type="hidden" name="flow" id="flow" value='<%=flow%>'/>
 </form>
 
 

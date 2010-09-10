@@ -1,4 +1,4 @@
-<%-- 
+<%--
     Document   : home3
     Created on : Sep 7, 2010, 10:28:18 AM
     Author     : fabrizio
@@ -12,6 +12,8 @@
 <%
     String email = request.getParameter("email");
     String pwd = request.getParameter("pwd");
+    String flow = request.getParameter("flow");
+
     session.setAttribute("email", email);
     session.setAttribute("pwd",pwd);
 %>
@@ -21,8 +23,10 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Login with sucessfull</title>
     </head>
-     <body onLoad="window.location.href='index.jsp'">
-      
-        <A HREF="index.jsp">Continue....</A>
+    <%if(flow.equals("null") || flow == null || flow.equals("")){  %>
+    <body onLoad="window.location.href='index.jsp'">
+    <%}else{String url = "index.jsp?Flow="+flow;%>
+    <body onLoad="window.location.href='<%=url%>'">
+        <%}%>
     </body>
 </html>
