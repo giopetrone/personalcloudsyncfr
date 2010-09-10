@@ -103,19 +103,25 @@
                     {
                         if(objXml.status  == 200) {
                             str = objXml.responseText;
-                            
+                            alert(str);
                         } else {}
 
                     }
                 };
                 if (notifica ==0) {
-                    notifica = 1;
+                    
                     var diagramName = document.getElementById('area').value;
-                    objXml.open("GET",url2,true);
-                    objXml.setRequestHeader('Content-Type',"text/plain");
-                    objXml.setRequestHeader('notifica',"start");
-                    objXml.setRequestHeader('filenamemio',diagramName);
-                } else {
+                    if(diagramName != "" && diagramName != null)
+                    {
+                        notifica = 1;
+                        objXml.open("GET",url2,true);
+                        objXml.setRequestHeader('Content-Type',"text/plain");
+                        objXml.setRequestHeader('notifica',"start");
+                        objXml.setRequestHeader('filenamemio',diagramName);
+                }
+                } else 
+                {
+
                     objXml.open("GET",url3,true);
                     objXml.setRequestHeader('Content-Type',"text/plain");
                     objXml.setRequestHeader('notifica',"refresh");
@@ -776,8 +782,11 @@ function setCondition()
 
     </head>
     
-    <body onload="carica();doTimer();" style="background-color: #add8e6"/>
-    
+    <body onload="carica();" style="background-color: #add8e6"/>
+
+    <!-- in onload c'era questo doTimer(); -->
+
+
    <h1>Collaborative Task Manager  </h1>
 
   
@@ -792,15 +801,15 @@ function setCondition()
     
     <form name="saveandload" id="saveandload" name="saveandload" >
        
-        <input type="hidden"  name="area" id="area"/>
+        <input type="hidden"  name="area" id="area" value=""/>
        
-      
+       
 
         
-  
+ 
 
 
-      
+       
     
        
         
@@ -809,15 +818,15 @@ function setCondition()
         <input type="hidden" id="writers" name="writers" value= "" disabled="disabled" size="100" />
         <input type="hidden" id="pwd" name="pwd" value='<%=sesspwd%>' disabled="disabled" />
          <input type="hidden" id="assignees" name="assignees" value='' size="100" />
-       
+      
         <!--
-         <input type="button" value="Start count!" onClick="setCondition();"/>
-          <input type="text" id="txt" />
+         
+         <input type="text" id="txt" />
          <input type="button" value="Share" onclick="childWindow=open('/shared.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800');"/>
          <a href="#" onclick="childWindow=open('/docs2.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="add" name="add" >SaveDiagram </a>
             <input type="button" value="See JSON" onclick="dado();TextEdit.check();TextEdit.setOwner();"/>
         <input type="text" id="diagramName" name ="diagramName" value=""    />
-        <a href="#" onclick="childWindow=open('/addpriv.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="add" name="add" >Change privileges of users </a>
+        
         <br>
         <a href="#" onclick="childWindow=open('/docs.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="add" name="add" >LoadDiagram </a>
 

@@ -12,9 +12,9 @@ Task Properties On Load
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="Wufoo.com" />
 
-<!-- CSS -->
+<!-- CSS <link rel="stylesheet" href="./css/form.css" type="text/css" /> -->
 <link rel="stylesheet" href="./css/structure.css" type="text/css" />
-<link rel="stylesheet" href="./css/form.css" type="text/css" />
+
 <link type="text/css" rel="stylesheet" href="./css/dhtmlgoodies_calendar.css?random=20051112" media="screen"></link>
 <!-- JavaScript -->
 <script type="text/javascript" src="./scripts/wufoo.js"></script>
@@ -435,6 +435,7 @@ function getLinks()
          {
               var thisassigner = assign_array[j];
               assignees += thisassigner + ",";
+
               window.parent.TextEdit.setAssignees(assignees);
           }
      }
@@ -472,16 +473,16 @@ function getLinks()
 <form name='myform'>
 
 
-	<h2>Task Properties</h2>
+    <h2 align="center">Task Properties</h2>
 
 
 
-<ul>
+        <ul style="list-style:none">
 
 
 
 <li id="foli106" 		class="     ">
-	<label class="desc" id="title106" for="Field106">
+    <label class="desc" id="title106" for="Field106" >
 		Name
 			</label>
 	<div>
@@ -494,7 +495,7 @@ function getLinks()
 		class="     ">
 
 
-	<label class="desc" id="title107" for="Field107">
+	<label class="desc" id="title107" for="Field107" >
 		Description of task
 			</label>
 
