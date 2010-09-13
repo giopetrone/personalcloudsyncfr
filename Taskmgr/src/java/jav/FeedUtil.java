@@ -1,4 +1,4 @@
-/*/*
+/*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
@@ -35,7 +35,7 @@ public class FeedUtil {
 
     public static String SubFeedName(String flowName) {
 
-        return "http://localhost" + "/Flow/" + flowName + ".xml";
+        return "http://taskmanagerunito.xoom.it/Flow/"+flowName+".xml";
     }
 
      public static String RemoteFeedName(String flowName) {
@@ -86,7 +86,7 @@ public class FeedUtil {
             link = new SyndLinkImpl();
             // HUB PER VERSIONE LOCALE
             link.setHref("http://localhost:8080");
-       //     link.setHref("http://pubsubhubbub.appspot.com");
+         //   link.setHref("http://pubsubhubbub.appspot.com");
             link.setRel("hub");
             links.add(link);
             feed.setLinks(links);
