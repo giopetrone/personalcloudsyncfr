@@ -48,6 +48,10 @@
         <servlet-name>CheckId</servlet-name>
         <servlet-class>jav.CheckId</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>CheckVersion</servlet-name>
+        <servlet-class>jav.CheckVersion</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>LoadServlet</servlet-name>
         <url-pattern>/LoadServlet</url-pattern>
@@ -95,6 +99,10 @@
     <servlet-mapping>
         <servlet-name>CheckId</servlet-name>
         <url-pattern>/CheckId</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CheckVersion</servlet-name>
+        <url-pattern>/CheckVersion</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
