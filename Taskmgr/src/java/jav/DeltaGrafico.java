@@ -20,7 +20,7 @@ public class DeltaGrafico {
 
     public void createChangeEvents(String nomeFile,String owner) {
 
-
+     
         int newsize = nuovo.blocks.length;
         int oldsize = vecchio.blocks.length;
         int newconnections = nuovo.connections.length;

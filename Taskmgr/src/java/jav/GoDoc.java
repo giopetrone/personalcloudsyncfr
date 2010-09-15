@@ -5,7 +5,6 @@
 package jav;
 
 //import com.google.appengine.repackaged.com.google.protobuf.ServiceException;
-import com.google.gdata.client.DocumentQuery;
 import com.google.gdata.client.docs.DocsService;
 import com.google.gdata.data.DateTime;
 import com.google.gdata.data.MediaContent;
@@ -14,10 +13,10 @@ import com.google.gdata.data.acl.AclEntry;
 import com.google.gdata.data.acl.AclFeed;
 import com.google.gdata.data.acl.AclRole;
 import com.google.gdata.data.acl.AclScope;
-import com.google.gdata.data.docs.DocumentEntry;
 import com.google.gdata.data.docs.DocumentListEntry;
 import com.google.gdata.data.docs.DocumentListFeed;
 import com.google.gdata.data.docs.FolderEntry;
+
 import com.google.gdata.data.media.MediaByteArraySource;
 import com.google.gdata.data.media.MediaSource;
 import com.google.gdata.util.ServiceException;
@@ -41,6 +40,8 @@ import pubsublib.test.TestPub;
  * @author marino
  */
 public class GoDoc {
+
+   
     /*
      * To change this template, choose Tools | Templates
      * and open the template in the editor.
@@ -51,6 +52,7 @@ public class GoDoc {
     static HashMap<String, DateTime> documentVersions = new HashMap();
     private boolean printed = false;
     boolean one = false;
+
     //anna gio
     //   static String docMakerLogin = "annamaria.goy@gmail.com";  // fino a che  ???  auth funziona
     //   static String docMakerPasswd = "tex_willer";
@@ -83,8 +85,10 @@ public class GoDoc {
             
             DocsService service = new DocsService("Document List Demo");
             service.setUserCredentials(docMakerLogin, docMakerPasswd);
-            URL feedUri = new URL("http://docs.google.com/feeds/documents/private/full/-/folder?showfolders=true");
-            DocumentListFeed feed = service.getFeed(feedUri, DocumentListFeed.class);
+            URL listFeedUrl = new URL("http://docs.google.com/feeds/documents/private/full/");
+        //    URL feedUri = new URL("http://docs.google.com/feeds/documents/private/full/-/folder?showfolders=true");
+         //   DocumentListFeed feed = service.getFeed(feedUri, DocumentListFeed.class);
+            DocumentListFeed feed = service.getFeed(listFeedUrl, DocumentListFeed.class);
             System.out.println("FEED :"+feed.toString());
             printDocuments(feed);
            // DocumentListEntry folder = createFolder("Prova");
@@ -95,11 +99,28 @@ public class GoDoc {
 
     }
 
-public static void printDocuments(DocumentListFeed feed) {
+public static void printDocuments(DocumentListFeed feed)
+{
   for (DocumentListEntry entry : feed.getEntries()) {
     String resourceId = entry.getResourceId();
     String boh =entry.getTitle().getPlainText();
-    System.out.println(" -- Document:" + boh);
+    String versionId = entry.getVersionId();
+    String time = entry.getUpdated().toString();
+
+
+    String modified = entry.getLastModifiedBy().getName();
+    if(boh.contains(".txt"))
+    {
+    //    System.out.println("Doc: "+boh);
+   //     System.out.println("Version ID "+versionId);
+   //     System.out.println("LAST MOD "+modified);
+    }
+
+
+    
+
+
+    
   }
 }
 
@@ -1038,6 +1059,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
         DateTime date1 = doc.getUpdated();
         String versionId = doc.getVersionId();
         String resourceId = doc.getResourceId();
+        String modified = doc.getLastModifiedBy().getName();
         /*String resourceFolderId = "";
         URL feedUri = new URL("http://docs.google.com/feeds/documents/private/full/-/folder?showfolders=true");
         DocumentListFeed feed = service.getFeed(feedUri, DocumentListFeed.class);
@@ -1062,7 +1084,8 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
 
         //   System.out.println(" -- Document(" + shortId + "/" + doc.getTitle().getPlainText() + ")" + date.toString() +" ver. "+ versionId);
         String s = " " + doc.getTitle().getPlainText() + "C: " + date.toString() + " U: " + date1.toString();
-        // System.out.println(s);
+     //   System.out.println("S "+s);
+
         return title;
     }
 
@@ -1180,7 +1203,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
             String SMTP_HOST_NAME = "smtp.gmail.com";
             String SMTP_PORT = "465";
             String url = "http://localhost:8081/index.jsp?Flow="+name;
-            String url2 = "http://localhost:8081/NotifMgrG/index.jsp?Flow="+name;
+            String url2 = "http://localhost:8081/NotifMgrG/settings.jsp?Flow="+name;
             String text = "Hi, a new diagram is interested in you.\nGo and check this workflow "+url+"\n";
             String text2 ="Do not forget to subscribe your Notification Manager to this application: "+url2+"\n";
             String emailMsgTxt = text+text2;
@@ -1197,6 +1220,52 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
         }
 
 
+    }
+
+    public static String checkNew(String nomeFile,String user,String pwd)
+    {
+        try
+        {
+            DocsService service = new DocsService("Document List Demo");
+            service.setUserCredentials(user, pwd);
+            return new GoDoc(service).findNewVersion(nomeFile);
+            
+
+        }
+        catch(Exception ex)
+        {
+            System.out.println("ERRORE IN CHECKNEW: "+ex.getMessage());
+            return "error";
+        }
+
+
+    }
+
+    public String findNewVersion(String nomeFile) 
+    {
+        try
+        {
+            DocumentListEntry documentEntry = findEntry(nomeFile);
+            DateTime last = documentEntry.getUpdated();
+            DateTime curr = documentVersions.get(nomeFile);
+            System.out.println("LAST: "+last.getValue());
+            System.out.println("CURR: "+curr.getValue());
+            if (curr == null || curr.getValue() == last.getValue())
+            {
+
+                    return "old";
+            }
+            else
+            {
+                documentVersions.put(nomeFile, last); // update current version
+                return "new";
+            }
+       }catch(Exception ex)
+       {
+           System.out.println("ERRORE IN FIND NEW VERSION "+ex.getMessage());
+           return "error";
+       }
+        
     }
 
 
