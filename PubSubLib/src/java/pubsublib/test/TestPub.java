@@ -22,15 +22,17 @@ public class TestPub {
             feed = "http://localhost/Atomi/marinofeed.xml";
         }
         int status = publisher.execute(hub, feed);
-        System.out.println("Return status : " + status);
+        System.out.println("Return status in Test PUB : " + status);
     }
 
     public static void main(String[] args) {
         try {
-            new TestPub().testPublisher("http://localhost:8080","http://localhost/Atomi/marinofeed.xml");
+      //      new TestPub().testPublisher("http://localhost:8080","http://taskmanagerunito.xoom.it/Flow/today.txt.xml");
    //       new TestPub().testPublisher("http://pubsubhubbub.appspot.com","http://localhost/Atomi/marinofeed.xml");
            Discovery discovery = new Discovery();
-            System.out.println("in test publisher trovo hub: " + discovery.getHub("http://localhost/Atomi/marinofeed.xml"));
+         
+         
+           // System.out.println("in test publisher trovo hub: " + discovery.getHub("http://taskmanagerunito.xoom.it/Flow/perfabri.txt.xml"));
         } catch (Exception e) {
             e.printStackTrace();
         }
