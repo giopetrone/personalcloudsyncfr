@@ -25,7 +25,7 @@
     </head>
     <%if(flow.equals("null") || flow == null || flow.equals("")){  %>
     <body onLoad="window.location.href='index.jsp'">
-    <%}else{String url = "index.jsp?Flow="+flow;%>
+    <%}else{String url = "settings.jsp?Flow="+flow;%>
     <body onLoad="window.location.href='<%=url%>'">
         <%}%>
     </body>

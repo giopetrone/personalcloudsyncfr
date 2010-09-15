@@ -41,6 +41,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Notification Manager</title>
                 <script language="JavaScript">
+
 function getDocs(){
   try{
                     var url1 = "./PrendiDocs";
@@ -63,7 +64,7 @@ function getDocs(){
                    // confirm("LISTA: " +str);
                     var array = str.split(",");
                     var size = array.length;
-                    var add = document.getElementById("menu");
+                    var add = document.getElementById("add");
 
             for(var i=0;i<size;i++)
             {
@@ -94,10 +95,28 @@ function getDocs(){
                      var idname = "select"+i;
                      select.setAttribute("id", idname);
                      select.setAttribute("name",idname);
-                     add.appendChild(cb);
-                     add.appendChild(text);
-                     add.appendChild(select);
+                     var link = document.createElement("a");
+                     var idhidden = "hidden"+value;
+                     link.setAttribute("id", "link"+value);
+                     var open = "open(url,'_blank','status=1,toolbar=1,scrollbars=1,width=900,height=1200')";
+                     var text2 = document.createTextNode("Settings for this flow");
+                     var hidden = document.createElement("input");
+                     hidden.setAttribute("type","hidden");
+                     hidden.setAttribute("id",idhidden);
+                     
+
+                     var url = "settings.jsp?Flow="+value;
+            
+                     link.setAttribute("href",url);
+                //    link.setAttribute("onclick", open)
+                     link.appendChild(text);
+                 //    add.appendChild(cb);
+                 //    add.appendChild(text);
+                    // add.appendChild(select);
+                     add.appendChild(link);
+                   //  add.appendChild(hidden);
                      add.appendChild(br);
+                     
                  }
 
             }
@@ -176,10 +195,11 @@ function getDocs(){
             function carica(){
                 
                 nomeFile = gup("Flow");
+             //   var allSettings = gup("allSettings");
                 
                 if (nomeFile != null && nomeFile !="undefined" && nomeFile != "") {
                   //  document.getElementById('name').value = nomeFile ;
-                    loadNotifiche(nomeFile);
+                    loadNotifiche(nomeFile+"/"+nomeSettings);
                     return true;
                 }
                 else return false;
@@ -189,21 +209,24 @@ function getDocs(){
             </script>
 
     </head>
-    <body onload="if(carica()==false){getDocs();};" style="background-color: #add8e6"/>
+    <body onload="getDocs();" style="background-color: #add8e6"/>
+        
+         <div id="menu" style="font-size: 13px">
+
+        <%=sessuser%> | <u>Settings</u> | <a target=_blank href="http://docs.google.com/support/?hl=en" class=gb4>Help</a> | <a href="logout.jsp" class=gb4 >Log out </a> </div>
         <h1>Notification Settings</h1>
-   
   <form name="myform" id="myform" >
         <input type="hidden" id="owner" name="owner" value= '<%=sessuser%>' disabled="disabled" />
         <input type="hidden" id="pwd" name="pwd" value='<%=sesspwd%>' disabled="disabled" />
         <input type="text" value='' name="name" id="name">
-        <div id="menu">
+        <div id="add" style="font-size: 13px">
 
 
         </div>
 
 
-<input type="button" onclick="get();" value="Ok" />
-<a href="logout.jsp">Log out </a>
+
+
 
     </form>
     </body>
