@@ -173,7 +173,7 @@ public class NotifCallbackServlet extends HttpServlet {
                                 List destinatari = new ArrayList();
                                 for(int j=0;j<sendTo.length;j++)
                                 {
-                                    String sub = WriterPermission.checkNotifications(sendTo[j],workflow,"workflowisdone");
+                                    String sub = WriterPermission.checkNotifications(sendTo[j],workflow,"Workflowisdone");
                                     System.out.println("SUB: "+sub);
                                     if(sub.equalsIgnoreCase("subscribed") && sub !=null) destinatari.add(sendTo[j]);
 
@@ -182,11 +182,15 @@ public class NotifCallbackServlet extends HttpServlet {
                                 String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
                                 String SMTP_HOST_NAME = "smtp.gmail.com";
                                 String SMTP_PORT = "465";
-                                String[] destinatarifinali = (String[]) destinatari.toArray(new String[0]);
-                                String emailSubjectTxt ="The workflow "+workflow+" is completed";
-                                String link = "http://taskmanagerunito.xoom.it/Flow/"+workflow+".xml";
-                                String text = "The workflow "+workflow+" is completed.\nYou can see the feed at: "+link;
-                                new SendMailCl().sendSSLMessage(destinatarifinali, emailSubjectTxt, text, email,pwd);
+                                if(!destinatari.isEmpty())
+                                {
+                                    String[] destinatarifinali = (String[]) destinatari.toArray(new String[0]);
+                                    String emailSubjectTxt ="The workflow "+workflow+" is completed";
+                                    String link = "http://taskmanagerunito.xoom.it/Flow/"+workflow+".xml";
+                                    String text = "The workflow "+workflow+" is completed.\nYou can see the feed at: "+link;
+                                    new SendMailCl().sendSSLMessage(destinatarifinali, emailSubjectTxt, text, email,pwd);
+                                }
+                                
                             }
 
                         }

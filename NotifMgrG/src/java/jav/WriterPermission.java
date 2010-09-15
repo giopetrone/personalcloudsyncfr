@@ -149,7 +149,11 @@ public class WriterPermission {
                          {
                              verification = true;
                          }
-                         else if(s.contains(toverify)) verification = true;
+                         else if(s.contains(docname+"/"))
+                         {
+                             if(s.contains(notification)) verification = true;
+
+                         }
 
                      }
                      fr.close();
