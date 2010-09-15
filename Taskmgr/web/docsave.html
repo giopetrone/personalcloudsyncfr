@@ -1,0 +1,145 @@
+
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Save the diagram</title>
+        <script type="text/javascript">
+       
+        var diagram;
+    
+        function get2()
+        {
+        var diagram;
+     //   alert(document.myform.radiogroup.length);
+        var name = document.getElementById("name").value;
+
+
+        if(name == "Save as new" || name == "")
+        {
+           /* for (var i=0; i<document.myform.radiogroup.length; i++){
+
+                if (document.myform.radiogroup[i].checked==true){
+                   diagram = document.myform.radiogroup[i].value;
+                   document.getElementById("name").value = diagram;
+
+
+                }}
+            opener.document.getElementById('area').value  = diagram;
+             opener.saveDiagram("true");
+             */
+            alert("Choose a name for the diagram");
+            return false;
+
+        }
+        else
+        {
+           
+            if(name.indexOf(".txt") == -1) name = name +".txt";
+            document.all.pleasewaitScreen.style.pixelTop = (document.body.scrollTop + 50);
+
+            document.all.pleasewaitScreen.style.visibility="visible";
+            do_totals1();
+            function3();
+            
+            opener.document.getElementById('area').value  = name;
+            opener.setCondition();
+           
+            opener.saveDiagram("true");
+            
+
+
+            return true;
+        }
+
+        }
+
+        function getname()
+        {
+            var name =opener.sendname();
+
+            if(name == "" || name == null) document.myform.name.value = "Save as new"
+            else {
+                document.myform.name.value = name;
+
+            }
+        }
+
+
+        function do_totals1()
+
+		{
+
+                
+
+		document.all.pleasewaitScreen.style.pixelTop = (document.body.scrollTop + 50);
+
+		document.all.pleasewaitScreen.style.visibility="visible";
+
+	
+
+		}
+
+
+                function do_totals2()
+
+		{
+
+		
+		document.all.pleasewaitScreen.style.visibility="hidden";
+
+		}
+
+
+        	
+
+
+                 </script>
+
+
+    </head>
+    <body style="background-color: #add8e6;" onload="getname();" >
+        <script language="JavaScript">
+
+    function function3() {
+        document.all.Layer1.style.cursor = "wait";
+        document.all.name.style.cursor = "wait";
+        document.all.button.style.cursor = "wait";
+    }
+</script>
+        	<DIV ID="pleasewaitScreen" STYLE="position:absolute;z-index:5;visibility:hidden">
+
+			<TABLE style="  filter:alpha(opacity = 50); -moz-opacity:0.5; opacity: 0.5;border: 1px solid black;" CELLPADDING="0" CELLSPACING="0" HEIGHT="200" WIDTH="320" ID="Table1">
+
+				<TR>
+
+					<TD WIDTH="100%" HEIGHT="100%" BGCOLOR="silver"ALIGN="CENTER" >
+
+						<FONT FACE="Arial" SIZE="6" COLOR="black"><B>
+
+								Please Wait....</B></FONT>
+
+					</TD>
+
+				</TR>
+
+			</TABLE>
+
+		</DIV>
+        <div id="Layer1"
+     style="
+            visibility:visible;
+
+
+            ">
+        <h1>Save the diagram</h1>
+
+        <form id="myform" name="myform">
+        <input type="text" id="name" name="name" value="" onclick="document.myform.name.value=''"  />
+
+
+        </form>
+        <input type="button" onclick="if(get2() == true){self.close();}" id="button" value="Save"/>
+      
+        </div>
+    </body>
+</html>

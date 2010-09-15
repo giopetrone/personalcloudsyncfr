@@ -4,7 +4,7 @@
     Author     : Fabrizio
 --%>
 
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page contentType="text/html" pageEncoding="UTF-8" import="jav.GoDoc;"%>
 
 
 
@@ -65,11 +65,65 @@
             {
                 document.getElementById('txt').value=c;
                 nuovaVersione = 1;
-                loadDiagram(null);
-                loadNotifiche();
+              //  loadDiagram(null);
+               // loadNotifiche();
+                checkVersion();
                 c=c+1;
                 t=setTimeout("timedCount()",20000);
             }
+
+            function checkVersion()
+            {
+
+                var url = "./CheckVersion";
+                objXml = new XMLHttpRequest();
+                objXml.onreadystatechange  = function()
+                {
+                    if(objXml.readyState  == 4)
+                    {
+                        if(objXml.status  == 200) {
+                            str = objXml.responseText;
+
+                           
+                            if(str == "new")
+                            {
+                                confirm("Do you want a new version?");
+                                if(confirm)
+                                {
+                                    loadDiagram(document.getElementById('area').value);
+                                }
+                            }
+                        } else {}
+
+                    }
+                };
+                
+                var diagramName = document.getElementById('area').value;
+
+                var user = document.getElementById('owner').value;
+                var pwd = document.getElementById('pwd').value;
+                if(diagramName != "" && diagramName != null)
+                {
+                    objXml.open("GET",url,true);
+                    objXml.setRequestHeader('Content-Type',"text/plain");
+                    objXml.setRequestHeader('user',user);
+                    objXml.setRequestHeader('filenamemio',diagramName);
+                    objXml.setRequestHeader('pwd',pwd);
+
+
+                }
+
+                objXml.send(null);
+
+
+
+
+
+
+
+            }
+
+
             function setArray(recipients)
             {
 
@@ -207,11 +261,14 @@
                 
         
                     var deltaString = primoPezzo + versioneOriginale + secondoPezzo + jsonString + terzoPezzo;
+                    
                     objXml.send(deltaString);
+                    
                     str = objXml.responseText;
                     confirm("Salvato il grafico: " +str);
+                    document.body.style.cursor = "default";
                     var link = document.createElement("a");
-                    
+                    var link2 = document.createElement("a");
                     var add = document.getElementById("menu2");
                     var h4 = document.createElement("h4");
                     var subtitle = document.createTextNode(str+" ");
@@ -223,17 +280,35 @@
                     add.appendChild(h4);
                     
                     var urlfeed = "http://taskmanagerunito.xoom.it/Flow/"+str+".xml";
+                    var urlnotif = "http://localhost:8081/NotifMgrG/settings.jsp?Flow="+str;
                     link.setAttribute('href',urlfeed);
                     link.setAttribute('target', '_blank');
+                    link2.setAttribute('href',urlnotif);
+                    link2.setAttribute('target', '_blank');
 
-                    var text = document.createTextNode("Vai al Feed");
+                    var text = document.createTextNode("Vai al Feed ");
+                    var text2 = document.createTextNode(" Notifications settings for this flow");
                    
                     
                    if(str.indexOf("template") == -1)
                    {
+                       
+                       var palette3 = document.getElementById("LinkNotif");
+                       while(palette3.childNodes.length>=1)
+                       {
+                           palette3.removeChild(palette3.firstChild);
+                       }
+                       var palette4 = document.getElementById("LinkFeed");
+                       while(palette4.childNodes.length>=1)
+                       {
+                           palette4.removeChild(palette4.firstChild);
+                       }
                        link.appendChild(text);
-                   
-                       h4.appendChild(link);
+                       link2.appendChild(text2);
+                       palette4.appendChild(link);
+                       palette3.appendChild(link2);
+                       
+                    
                     }
                    
                   
@@ -334,14 +409,14 @@
                     if (str.length == 0) {
                         return;
                     }
-                    var answer = confirm("vuoi nuova versione?");
-                    if (answer){
-                        crepa();
+                  //  var answer = confirm("vuoi nuova versione?");
+                //    if (answer){
+                 //       crepa();
                         Jalava.diagram.load(str);
-                    }
+                 //   }
                 } else {
                     crepa();
-                    alert(str);
+                   // alert(str);
                     Jalava.diagram.load(str);
                 }
             }catch(e){alert("DENTRO UPDATE "+e.message);}
@@ -365,6 +440,7 @@
 
             function carica(){
                 //  alert("in carica");
+                
                 nomeFile = gup("Flow");
                 if (nomeFile != null) {
                     document.getElementById('area').value = nomeFile ;
@@ -382,7 +458,7 @@
                     alert("Missing diagram name");
                     return;
                 }
-
+           
                 //  confirm("ciclico? "+ param == null);
                
                 var url1 = "./LoadServlet";
@@ -426,7 +502,34 @@
                                 var share = document.getElementById("share");
                                 var draft = document.getElementById("savedraft");
                                 var change = document.getElementById("changepriv");
-                                
+                                var urlfeed = "http://taskmanagerunito.xoom.it/Flow/"+diagramName+".xml";
+                                var urlnotif = "http://localhost:8081/NotifMgrG/settings.jsp?Flow="+diagramName;
+                                var link = document.createElement("a");
+                                var link2 = document.createElement("a");
+                                link.setAttribute('href',urlfeed);
+                                link.setAttribute('target', '_blank');
+                                link2.setAttribute('href',urlnotif);
+                                link2.setAttribute('target', '_blank');
+
+                                var text = document.createTextNode("Vai al Feed ");
+                                var text2 = document.createTextNode(" Notifications settings for this flow");
+                                var palette3 = document.getElementById("LinkNotif");
+                                while(palette3.childNodes.length>=1)
+                                {
+                                    palette3.removeChild(palette3.firstChild);
+                                }
+                                var palette4 = document.getElementById("LinkFeed");
+                                while(palette4.childNodes.length>=1)
+                                {
+                                    palette4.removeChild(palette4.firstChild);
+                                }
+                                link.appendChild(text);
+                                link2.appendChild(text2);
+                                palette4.appendChild(link);
+                                palette3.appendChild(link2);
+                                document.getElementById("area").value = diagramName;
+                                doTimer();
+                               
                                 if(nosave != null && nosave !="")
                                 {
                                     //alert("You can't modify and save this diagram");
@@ -444,7 +547,7 @@
                                 else if(nosave == null)
                                 {
 
-                                    var open = "childWindow=open('/docs2.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')"
+                                    var open = "childWindow=open('/docsave.html','_blank','status=1,toolbar=1,scrollbars=1,width=400,height=200')"
                                     sav.removeAttribute("onclick");
                                     sav.setAttribute("onclick", open)
                                     draft.removeAttribute("onclick");
@@ -752,7 +855,10 @@ function setCondition()
                 palette2.addItem("Task Status", "Task Done", Palette.CLICK_TOOL, "./img/quadratino_grigio.gif");
                 palette2.addItem("Task Status", "Task Not Enabled", Palette.CLICK_TOOL, "./img/redquad.jpeg");
                 palette2.addItem("Task Status", "Task Enabled", Palette.CLICK_TOOL, "./img/quadratino_verde.jpg");
-
+                Jalava.propertyPage = new FlowChartPropertyPage(0, 320, 10);
+                var palette3 = new Palette(new FlowChartPaletteFactory(), 780, 240, 200,"","Links");
+                palette3.addItem("LinkFeed","", palette.Click_TOOl,"");
+                palette3.addItem("LinkNotif","", palette.Click_TOOl,"");
             }
 
             // start Jalava
@@ -792,9 +898,9 @@ function setCondition()
   
 
 
-    <div id="menu" style="font-size: 13px"> <a href="#" onclick="childWindow=open('/docs2.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="savenew" name="savenew" >Save Diagram </a> |  <a href="#" onClick=" saveDiagram('false');" id="savedraft">Save Draft</a> | <a href="#" onclick="childWindow=open('/docs.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="load" name="load" >LoadDiagram </a>  | <a href="#" onclick="childWindow=open('/shared.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800');" id="share">Share</a>
+    <div id="menu" style="font-size: 13px"> <a href="#" onclick="childWindow=open('/docsave.html','_blank','status=1,toolbar=1,scrollbars=1,width=400,height=200')" id="savenew" name="savenew" >Save Diagram </a> |  <a href="#" onClick=" saveDiagram('false');" id="savedraft">Save Draft</a> | <a href="#" onclick="childWindow=open('/docs.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="load" name="load" >LoadDiagram </a>  | <a href="#" onclick="childWindow=open('/shared.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800');" id="share">Share</a>
         | <a href="#" onclick="childWindow=open('/docs3.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="savetemplate">Save as Template</a> |
-        <%=sessuser%> | <u>Settings</u>  |<a href="#" onclick="childWindow=open('/changepriv.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="changepriv" name="changepriv" disabled="disabled" >Change privileges of users </a>| <a target=_blank href="http://docs.google.com/support/?hl=en" class=gb4>Help</a> | <a href="logout.jsp" class=gb4 >Log out </a> </div>
+        <%=sessuser%> |<a href="http://localhost:8081/NotifMgrG/index.jsp"  target ="_blank" id="settings" name="settings"> <u>Notification settings</u> </a> |<a href="#" onclick="childWindow=open('/changepriv.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="changepriv" name="changepriv" disabled="disabled" >Change privileges of users </a>| <a target=_blank href="http://docs.google.com/support/?hl=en" class=gb4>Help</a> | <a href="logout.jsp" class=gb4 >Log out </a> </div>
         <div id="menu2"></div>
 
     
@@ -806,8 +912,8 @@ function setCondition()
        
 
         
+ <input type="hidden" id="txt" />
  
-
 
        
     
@@ -821,12 +927,12 @@ function setCondition()
       
         <!--
          
-         <input type="text" id="txt" />
+         
          <input type="button" value="Share" onclick="childWindow=open('/shared.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800');"/>
          <a href="#" onclick="childWindow=open('/docs2.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="add" name="add" >SaveDiagram </a>
             <input type="button" value="See JSON" onclick="dado();TextEdit.check();TextEdit.setOwner();"/>
         <input type="text" id="diagramName" name ="diagramName" value=""    />
-        
+        <input type="button" value="Do TImer" onclick="doTimer();"/>
         <br>
         <a href="#" onclick="childWindow=open('/docs.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="add" name="add" >LoadDiagram </a>
 

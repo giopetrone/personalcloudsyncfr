@@ -106,7 +106,7 @@ function getDocs(){
         
         <h1>Load a diagram </h1>
         <form name="myform" id="myform" >
-        <div id="menu" name="menu">
+        <div id="menu" name="menu" style="font-size: 13px">
 
             </div>
         
