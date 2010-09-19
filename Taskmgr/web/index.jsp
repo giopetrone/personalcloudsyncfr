@@ -14,7 +14,7 @@
 
 
                 String email = request.getParameter("email");
-          //      String email = "fabrizio.torretta@gmail.com";
+         
 
 
                 String pwd = request.getParameter("pwd");
@@ -24,7 +24,7 @@
              
                 if(sessuser == null)
                 {
-           //     String pwd = "gregorio";
+          
 
     %>
 
@@ -90,7 +90,10 @@
                                 confirm("Do you want a new version?");
                                 if(confirm)
                                 {
-                                    loadDiagram(document.getElementById('area').value);
+                                    var diagname = document.getElementById('area').value;
+                                    var link = "http://localhost:8081/login.jsp?Flow="+diagname;
+                                    //loadDiagram(document.getElementById('area').value);
+                                    window.location = link;
                                 }
                             }
                         } else {}
@@ -222,6 +225,7 @@
                 var writers = document.getElementById('writers').value;
                 var pwd = document.getElementById('pwd').value;
                 var assignees = document.getElementById("assignees").value;
+                var notification = document.getElementById("notification").value;
                 if (diagramName.length <= 1) {
                     alert("Missing diagram name");
                     return;
@@ -249,7 +253,8 @@
                     objXml.setRequestHeader('users',users);
                     objXml.setRequestHeader('writers',writers);
                     objXml.setRequestHeader('pwd',pwd);
-                    objXml.setRequestHeader('assignees', assignees)
+                    objXml.setRequestHeader('assignees', assignees);
+                    objXml.setRequestHeader('notification', notification);
                     if (publish == "true") {
                         objXml.setRequestHeader('publish', "true");
                     }
@@ -411,7 +416,7 @@
                     }
                   //  var answer = confirm("vuoi nuova versione?");
                 //    if (answer){
-                 //       crepa();
+                        crepa();
                         Jalava.diagram.load(str);
                  //   }
                 } else {
@@ -419,7 +424,8 @@
                    // alert(str);
                     Jalava.diagram.load(str);
                 }
-            }catch(e){alert("DENTRO UPDATE "+e.message);}
+            }catch(e){//alert("DENTRO UPDATE "+e.message);
+            }
             }
 
             function gup( name )
@@ -855,7 +861,7 @@ function setCondition()
                 palette2.addItem("Task Status", "Task Done", Palette.CLICK_TOOL, "./img/quadratino_grigio.gif");
                 palette2.addItem("Task Status", "Task Not Enabled", Palette.CLICK_TOOL, "./img/redquad.jpeg");
                 palette2.addItem("Task Status", "Task Enabled", Palette.CLICK_TOOL, "./img/quadratino_verde.jpg");
-                Jalava.propertyPage = new FlowChartPropertyPage(0, 320, 10);
+               
                 var palette3 = new Palette(new FlowChartPaletteFactory(), 780, 240, 200,"","Links");
                 palette3.addItem("LinkFeed","", palette.Click_TOOl,"");
                 palette3.addItem("LinkNotif","", palette.Click_TOOl,"");
@@ -900,7 +906,17 @@ function setCondition()
 
     <div id="menu" style="font-size: 13px"> <a href="#" onclick="childWindow=open('/docsave.html','_blank','status=1,toolbar=1,scrollbars=1,width=400,height=200')" id="savenew" name="savenew" >Save Diagram </a> |  <a href="#" onClick=" saveDiagram('false');" id="savedraft">Save Draft</a> | <a href="#" onclick="childWindow=open('/docs.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="load" name="load" >LoadDiagram </a>  | <a href="#" onclick="childWindow=open('/shared.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800');" id="share">Share</a>
         | <a href="#" onclick="childWindow=open('/docs3.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="savetemplate">Save as Template</a> |
-        <%=sessuser%> |<a href="http://localhost:8081/NotifMgrG/index.jsp"  target ="_blank" id="settings" name="settings"> <u>Notification settings</u> </a> |<a href="#" onclick="childWindow=open('/changepriv.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="changepriv" name="changepriv" disabled="disabled" >Change privileges of users </a>| <a target=_blank href="http://docs.google.com/support/?hl=en" class=gb4>Help</a> | <a href="logout.jsp" class=gb4 >Log out </a> </div>
+        <%=sessuser%> |<a href="http://localhost:8081/NotifMgrG/index.jsp"  target ="_blank" id="settings" name="settings"> <u>Notification settings</u> </a> |<a href="#" onclick="childWindow=open('/changepriv.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="changepriv" name="changepriv" disabled="disabled" >Change privileges of users </a>| <a target=_blank href="http://docs.google.com/support/?hl=en" class=gb4>Help</a>
+        | <select name="notification" id="notification" >
+
+
+                    <option value="local">Local</option>
+
+                    <option value="remote">Remote</option>
+
+
+
+	    </select> | <a href="logout.jsp" class=gb4 >Log out </a> </div>
         <div id="menu2"></div>
 
     
@@ -923,7 +939,9 @@ function setCondition()
         <input type="hidden" id="users" name="users" value= "" disabled="disabled" />
         <input type="hidden" id="writers" name="writers" value= "" disabled="disabled" size="100" />
         <input type="hidden" id="pwd" name="pwd" value='<%=sesspwd%>' disabled="disabled" />
-         <input type="hidden" id="assignees" name="assignees" value='' size="100" />
+        <input type="hidden" id="assignees" name="assignees" value='' size="100" />
+
+       
       
         <!--
          
