@@ -12,7 +12,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
+import pubsublib.pubsubhubbub.Discovery;
 import pubsublib.test.TestPub;
 
 /**
@@ -20,6 +20,7 @@ import pubsublib.test.TestPub;
  * @author marino
  */
 public class SaveServlet extends HttpServlet {
+    public static String notification = "";
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
@@ -42,6 +43,7 @@ public class SaveServlet extends HttpServlet {
         System.out.println("USERS: " + users);
         String assignees = request.getHeader("assignees");
         System.out.println("Assignees: " + assignees);
+        notification = request.getHeader("notification");
 
         //     String loadjson = request.getHeader("loadjson");
         boolean publish = request.getHeader("publish") != null;
@@ -84,9 +86,22 @@ public class SaveServlet extends HttpServlet {
 
                 SunFtpWrapper ftp = new SunFtpWrapper();
                 ftp.uploadFeed(nomeFile);
-           //     new TestPub().testPublisher("","http://taskmanagerunito.xoom.it/Flow/today.txt.xml");
-                new TestPub().testPublisher("http://localhost:8080", "http://taskmanagerunito.xoom.it/Flow/"+nomeFile+".xml");
-                //  versione con thread:
+         
+                if(val.equals("new"))
+                {
+                    if(notification.equals("local"))  new TestPub().testPublisher("http://localhost:8080", "http://taskmanagerunito.xoom.it/Flow/"+nomeFile+".xml");
+                    else if(notification.equalsIgnoreCase("remote"))  new TestPub().testPublisher("http://pubsubhubbub.appspot.com", "http://taskmanagerunito.xoom.it/Flow/"+nomeFile+".xml");
+                }
+                else if(val.equalsIgnoreCase("notnew"))
+                {
+                    Discovery discovery = new Discovery();
+                    String hub =  discovery.getHub("http://taskmanagerunito.xoom.it/Flow/"+nomeFile+".xml");
+                   
+                    System.out.println("PUBBLICO SU HUB: "+hub);
+                    new TestPub().testPublisher(hub, "http://taskmanagerunito.xoom.it/Flow/"+nomeFile+".xml");
+
+               }
+                 //  versione con thread:
                 //   FtpThread fp = new FtpThread(nomeFile);
                 //   fp.start();
             }
@@ -102,6 +117,16 @@ public class SaveServlet extends HttpServlet {
 
     }
 
+
+    public static String getTypeNotification()
+    {
+        return notification;
+    }
+
+    public static void setTypeNotification(String hub)
+    {
+        notification = hub;
+    }
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
