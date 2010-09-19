@@ -602,8 +602,8 @@ TextEdit.close = function() {
  TextEdit.createFrame = function() {
   TextEdit.frame = document.createElement("IFRAME");
   TextEdit.frame.src = "/blank.html";
-  TextEdit.frame.style.width = "420px";
-  TextEdit.frame.style.height = "340px";
+  TextEdit.frame.style.width = "650px";
+  TextEdit.frame.style.height = "650px";
   TextEdit.frame.style.position = "absolute";
   TextEdit.frame.style.display = "none";
   TextEdit.frame.style.border = "1px solid #888888";
@@ -888,8 +888,8 @@ TextEdit.checkDecision = function(target)
                            {
                               
                          
-                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].childNodes[0].childNodes[5].style.color = "green";
-                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].childNodes[0].childNodes[5].innerHTML = "\nApproved\n";
+                             //  TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].childNodes[0].childNodes[5].style.color = "green";
+                             //  TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].childNodes[0].childNodes[5].innerHTML = "\nApproved\n";
                               
                            
                            }
@@ -912,7 +912,7 @@ TextEdit.checkDecision = function(target)
                                            {
 
                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[z].childNodes[2].style.color = "green";
-                                              TextEdit.target.parentNode.parentNode.parentNode.childNodes[z].childNodes[2].innerHTML = "Yes";
+                                              TextEdit.target.parentNode.parentNode.parentNode.childNodes[z].childNodes[2].innerHTML = "This way!";
 
                                            }
                                       }
@@ -928,7 +928,7 @@ TextEdit.checkDecision = function(target)
                                            {
 
                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[x].childNodes[2].style.color = "red";
-                                              TextEdit.target.parentNode.parentNode.parentNode.childNodes[x].childNodes[2].innerHTML = "No";
+                                              TextEdit.target.parentNode.parentNode.parentNode.childNodes[x].childNodes[2].innerHTML = "Not this way!";
 
                                            }
                                       }
@@ -949,8 +949,8 @@ TextEdit.checkDecision = function(target)
                            {
                                
                               
-                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[f].childNodes[0].childNodes[0].childNodes[5].style.color = "red";
-                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[f].childNodes[0].childNodes[0].childNodes[5].innerHTML = "\nRejected\n";
+                              // TextEdit.target.parentNode.parentNode.parentNode.childNodes[f].childNodes[0].childNodes[0].childNodes[5].style.color = "red";
+                              // TextEdit.target.parentNode.parentNode.parentNode.childNodes[f].childNodes[0].childNodes[0].childNodes[5].innerHTML = "\nRejected\n";
                              
                            
                               
