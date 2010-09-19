@@ -16,6 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import pubsublib.pubsubhubbub.Discovery;
 import pubsublib.test.TestSub;
 
 /**
@@ -68,10 +69,19 @@ public class SubscribeServlet extends HttpServlet {
                         System.out.println("Notification: "+notiftype);
                         String feed = url+nomeDoc+".xml";
                         String risp ="";
-                        String writerisp ="";
+                        int index = user.indexOf("@");
+                        user = user.substring(0, index);
+                        if(user.contains(".")) user = user.replace(".","_");
+                        user +=".txt";
+                        String permissionName = "";
+                        Discovery discovery = new Discovery();
+                        String hub = discovery.getHub(feed);
+                        if(hub.equals("http://pubsubhubbub.appspot.com"))
+                        {
+                            risp = new TestSub().testSubscriber(feed, "http://taskmgrunito.appspot.com/NotifCallbackServlet","");
+                        }
                         risp =   new TestSub().testSubscriber(feed, "http://localhost:8081/NotifMgrG/NotifCallbackServlet", "");
-                //  new TestSub().testSubscriber(FeedUtil.SubFeedName(feeds[i]), "http://localhost:8081/NotifCallbackServlet", "");
-                        WriterPermission.writeNotifications(user, nomeDoc, notiftype);
+                        GoDoc.savePermissions(user, nomeDoc, notiftype);
                         System.err.println("subscribe al feed= " + feed+" "+risp);
                         if(risp.equalsIgnoreCase("done")) count++;
                         else feederrati += " "+feeds[i];
@@ -80,8 +90,7 @@ public class SubscribeServlet extends HttpServlet {
                      if(count == feeds.length) out.println("Fatta subscribe");
                      else out.println("Errore nei feeds:"+feederrati);
 
-                            //out.close();
-                     
+                      
                      
 
                 } else

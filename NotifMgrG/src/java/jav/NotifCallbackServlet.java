@@ -113,9 +113,8 @@ public class NotifCallbackServlet extends HttpServlet {
                     while ((c = inStream.read(b)) != -1) {
                         s += new String(b, 0, c);
                     }
-                    System.err.println("notifcallbackservlet, string notified=" +s);
-                    //   System.err.println("session put =" + getServletContext());
-                    // save new feed content; at next refresh call it will be given to client
+                    //System.err.println("notifcallbackservlet, string notified=" +s);
+               
                     String taskname = "";
                     String newstatus = "";
                     String dest="";
@@ -123,16 +122,14 @@ public class NotifCallbackServlet extends HttpServlet {
                     String allusers = "";
                     String modifier = "";
                     String nomeFile = "";
-                    String vecchia = (String) getServletContext().getAttribute("atomo");
-                    if(vecchia == null) System.err.println("Vecchia null");
-                    else System.err.println("VECCHIA NOT NULL: "+vecchia);
+                   
                     getServletContext().setAttribute("atomo", s);
                     List<AtomEvent> notifications = FeedUtil.createAtom(s);
                     System.err.println("NOTIFICATIONS: "+notifications.size());
                     if (!notifications.isEmpty()) {
-                        System.err.println("new feed content");
+                       // System.err.println("new feed content");
                         for (AtomEvent cont : notifications) {
-                            System.err.println("new feed content =\n " + cont.toString(true));
+                         //   System.err.println("new feed content =\n " + cont.toString(true));
                            
                             String activity = cont.getActivity();
                             if(activity.equalsIgnoreCase("Change Status of Task"))
@@ -149,17 +146,18 @@ public class NotifCallbackServlet extends HttpServlet {
 
                                     String[] sendTo =  dest.split(",");
 
-
-                       //gio per incomp param
-                   //     new SendMailCl().sendSSLMessage(sendTo, emailSubjectTxt, emailMsgTxt, emailFromAddress,pwd);
                                     for(int i=0;i<sendTo.length;i++)
                                     {
                                         String destim = sendTo[i];
                                         //Controllo se il destinatario si e' iscritto alle notifiche
                                         if(destim.contains("gmail.com") && !destim.equals("") && !destim.equalsIgnoreCase(modifier)) 
                                         {
-                                           String sub = WriterPermission.checkNotifications(destim, nomeFile,"Changestatusoftask");
-                                           if(sub.equalsIgnoreCase("subscribed")) sendGMsg(emailSubjectTxt,destim);
+
+                                            String nomeDoc = extractPermission(destim);
+                                            System.out.println("nomeDoc: "+nomeDoc);
+                                            String sub = GoDoc.checkPermission(nomeDoc, nomeFile, "Changestatusoftask");
+                                            System.out.println("SUB STATUS: "+sub);
+                                            if(sub.equalsIgnoreCase("subscribe")) sendGMsg(emailSubjectTxt,destim);
                                         }
                                     }
                                 }
@@ -169,19 +167,24 @@ public class NotifCallbackServlet extends HttpServlet {
                                 workflow = cont.getParameter("Workflow");
                                 allusers = cont.getParameter("All users");
                                 allusers = allusers.substring(1, allusers.length());
-                                String[] sendTo = allusers.split(",");
+                                String[] destinators = allusers.split(",");
                                 List destinatari = new ArrayList();
-                                for(int j=0;j<sendTo.length;j++)
+                                for(int j=0;j<destinators.length;j++)
                                 {
-                                    String sub = WriterPermission.checkNotifications(sendTo[j],workflow,"Workflowisdone");
-                                    System.out.println("SUB: "+sub);
-                                    if(sub.equalsIgnoreCase("subscribed") && sub !=null) destinatari.add(sendTo[j]);
+                                    if(destinators[j].contains("@"))
+                                    {
+                                        String nomeDoc = extractPermission(destinators[j]);
+                                        if(nomeDoc.contains(" ")) nomeDoc = nomeDoc.replace(" ","");
+                                        System.out.println("Nome doc x workflowdone: "+nomeDoc);
+                                        String sub = GoDoc.checkPermission(nomeDoc, workflow, "Workflowisdone");
+                                        System.out.println("SUB: "+sub);
+                                        if(sub.equalsIgnoreCase("subscribe") && sub !=null) destinatari.add(destinators[j]);
+                                    }
+                                   // String sub = WriterPermission.checkNotifications(sendTo[j],workflow,"Workflowisdone");
+                                    
 
                                 }
-                                String emailFromAddress = email;
-                                String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
-                                String SMTP_HOST_NAME = "smtp.gmail.com";
-                                String SMTP_PORT = "465";
+                              
                                 if(!destinatari.isEmpty())
                                 {
                                     String[] destinatarifinali = (String[]) destinatari.toArray(new String[0]);
@@ -196,42 +199,6 @@ public class NotifCallbackServlet extends HttpServlet {
                         }
                     }
 
-
-                  
- //DA rendere parametrico -- GIO
-                    /*
-                    if(checksend==true)
-                    {
-
-                        String SMTP_HOST_NAME = "smtp.gmail.com";
-                        String SMTP_PORT = "465";
-                        String emailMsgTxt = "The task "+taskname + " has changed status.\nThe new status is "+newstatus;
-                        String emailSubjectTxt = "Update of task "+taskname+" status";
-                        String emailFromAddress = email;
-                        String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
-                        String[] sendTo =  dest.split(",");
-
-                          
-                       //gio per incomp param
-                   //     new SendMailCl().sendSSLMessage(sendTo, emailSubjectTxt, emailMsgTxt, emailFromAddress,pwd);
-                        for(int i=0;i<sendTo.length;i++)
-                        {
-                            String destim = sendTo[i];
-                            if(destim.contains("gmail.com") && !destim.equals("")) sendGMsg(emailSubjectTxt,destim);
-                        }
-                    }
-                    if(workflowdone==true)
-                    {
-                        allusers = allusers.substring(1, allusers.length());
-                        String[] sendTo = allusers.split(",");
-                       
-                        String emailSubjectTxt ="The workflow "+workflow+" is completed";
-                        String link = "http://taskmanagerunito.xoom.it/Flow/"+workflow+".xml";
-                        String text = "The workflow "+workflow+" is completed.\nYou can see the feed at: "+link;
-                    //gio per incomp param
-                            
-
-                    }*/
                     
                 }
             }
@@ -307,6 +274,17 @@ public class NotifCallbackServlet extends HttpServlet {
             System.out.println("error");
         }
         return cCallTmp;
+    }
+
+
+    private String extractPermission(String user)
+    {
+
+        int index = user.indexOf("@");
+        String nomeDoc = user.substring(0,index);
+        if(nomeDoc.contains(".")) nomeDoc = nomeDoc.replace(".", "_");
+        nomeDoc += ".txt";
+        return nomeDoc;
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
