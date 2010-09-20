@@ -85,8 +85,55 @@ public class FeedUtil {
             links.add(link);
             link = new SyndLinkImpl();
             // HUB PER VERSIONE LOCALE
-            link.setHref("http://localhost:8080");
-         //   link.setHref("http://pubsubhubbub.appspot.com");
+            String  hub = SaveServlet.getTypeNotification();
+            if(hub == null || hub.equals("") || hub.equalsIgnoreCase("local")) link.setHref("http://localhost:8080");
+            else link.setHref("http://pubsubhubbub.appspot.com");
+            link.setRel("hub");
+            links.add(link);
+            feed.setLinks(links);
+            // <link rel="hub" href="http://pubsubhubbub.appspot.com"/>
+            Writer writer = new FileWriter(fileName);
+            SyndFeedOutput output = new SyndFeedOutput();
+            output.output(feed, writer);
+            writer.close();
+            System.err.println("The feed has been written to the file [" + fileName + "]");
+            ok = true;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.out.println("ERROR: " + ex.getMessage());
+        }
+        return ok;
+    }
+
+
+
+    static boolean CreateFeedFile(String flowName,String type) {
+        DateFormat DATE_PARSER = new SimpleDateFormat("yyyy-MM-dd");
+
+        SyndFeed feed = new SyndFeedImpl();
+        List entries = new ArrayList();
+        String fileName = FileFeedName(flowName);
+        File f = new File(fileName);
+        if (f.exists()) {
+            return false;
+        }
+        boolean ok = false;
+
+        try {
+            feed.setFeedType("atom_1.0");
+            feed.setTitle("Feed for flow: " + flowName + " (created with ROME)");
+            feed.setDescription("This feed has been created using ROME (Java syndication utilities");
+
+            List links = new ArrayList();
+            SyndLinkImpl link = new SyndLinkImpl();
+            link.setHref("http://rome.dev.java.net");
+            link.setRel("alternate");
+            links.add(link);
+            link = new SyndLinkImpl();
+            // HUB PER VERSIONE LOCALE
+            if(type.equals("local"))  link.setHref("http://localhost:8080");
+            else if(type.equals("remote")) link.setHref("http://pubsubhubbub.appspot.com");
+            else link.setHref(type);
             link.setRel("hub");
             links.add(link);
             feed.setLinks(links);
