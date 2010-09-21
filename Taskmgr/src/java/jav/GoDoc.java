@@ -192,8 +192,8 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                     String link = documentEntry.getDocumentLink().getHref();
                     eventSave.setParameter("File", documentName);
                     eventSave.setParameter("Link", link);
-                    //listaeventi.add(eventSave);
-                    FeedUtil.addEntry("", documentName, eventSave);
+                    listaeventi.add(eventSave);
+                  //  FeedUtil.addEntries("", documentName, listaeventi);
                     String[] tempwriter;
                     String delimiter = ",";
                     List<String> destinatari = new LinkedList();
@@ -330,7 +330,8 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                 if(hub.equalsIgnoreCase("http://localhost:8080")) typeNotif = "local";
                 else if(hub.equals("http://pubsubhubbub.appspot.com")) typeNotif = "remote";
                 SaveServlet.setTypeNotification(typeNotif);
-                FeedUtil.addEntry("", documentName, eventUpdate);
+                List<AtomEvent> listaeventi = new ArrayList();
+                listaeventi.add(eventUpdate);
                 
                     List<String> readers = new ArrayList();
                     List<String> collaborators = new ArrayList();
@@ -397,8 +398,8 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                                             event.setParameter("File", documentName);
                                             event.setParameter("Change Permission", "From Write To Read");
                                             event.setParameter("Who", collaborators.get(z));
-                                            FeedUtil.addEntry("", documentName, event);
-                                            new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
+                                            listaeventi.add(event);
+                                            //new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
                                        //     System.out.println("DOPO UPDATE");
                                             check = true;
 
@@ -413,8 +414,8 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                                         event.setParameter("File", documentName);
                                         event.setParameter("Permission", "Read");
                                         event.setParameter("Who", tempusers[i]);
-                                        FeedUtil.addEntry("", documentName, event);
-                                        new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
+                                        listaeventi.add(event);
+                                      //  new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
                                     }
 
                                 }
@@ -454,8 +455,8 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                                     event.setParameter("File", documentName);
                                     event.setParameter("Permission", "Write");
                                     event.setParameter("Who", tempwriter[j]);
-                                    FeedUtil.addEntry("", documentName, event);
-                                    new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
+                                    listaeventi.add(event);
+                                   // new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
                                 }
                             }
                         }catch(Exception ex)
@@ -485,7 +486,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                                 event.setParameter("File", documentName);
                                 event.setParameter("Permission", "Write");
                                 event.setParameter("Who", tempwriter[j]);
-                                FeedUtil.addEntry("", documentName, event);
+                                listaeventi.add(event);
                               //  new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
                             }
                         }
@@ -513,7 +514,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                                    event.setParameter("File", documentName);
                                    event.setParameter("Permission", "Write");
                                    event.setParameter("Who", tempassignes[z]);
-                                   FeedUtil.addEntry("", documentName, event);
+                                   listaeventi.add(event);
                                 //   new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
 
                                }catch(Exception ex){System.out.println("DENTRO FOR ASSIGNEES in Update DIagram X UTENTE "+tempassignes[z]+" "+ex.getMessage());}
@@ -522,13 +523,15 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                       
                        
                     }
-            service.getRequestFactory().setHeader("If-Match", "*");
-            // documentEntry.setMediaSource(new MediaByteArraySource(s.getBytes(), "text/plain"));
-           documentEntry.setMediaSource(new MediaByteArraySource(s.getBytes(), "text/plain"));
+                    FeedUtil.addEntries("", documentName, listaeventi);
 
-            //         documentEntry.setContent(new PlainTextConstruct(s));
-            documentEntry.updateMedia(false);
-            return "notnew";
+                    service.getRequestFactory().setHeader("If-Match", "*");
+                    // documentEntry.setMediaSource(new MediaByteArraySource(s.getBytes(), "text/plain"));
+                   documentEntry.setMediaSource(new MediaByteArraySource(s.getBytes(), "text/plain"));
+
+                    //         documentEntry.setContent(new PlainTextConstruct(s));
+                    documentEntry.updateMedia(false);
+                    return "notnew";
 
                 } catch (Exception ex) {
                     
