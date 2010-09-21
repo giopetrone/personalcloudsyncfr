@@ -36,10 +36,6 @@ public class PrendiDocs extends HttpServlet {
             System.out.println("DENTRO PRENDIDOCS NOTIF");
             String pwd = request.getHeader("pwd");
              String email = request.getHeader("email");
-//            String email = "iceMgr09";
-//            String pwd = "sync09fr"; //????
-
-
             // GIO: modificare prendi: far restituire solo i doc che sono shared da "owner"
             String docs = GoDoc.prendi(email, pwd);
             System.out.println("DOCS "+docs);

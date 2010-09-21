@@ -80,7 +80,7 @@ public class SubscribeServlet extends HttpServlet {
                         {
                             risp = new TestSub().testSubscriber(feed, "http://taskmgrunito.appspot.com/NotifCallbackServlet","");
                         }
-                        risp =   new TestSub().testSubscriber(feed, "http://localhost:8081/NotifMgrG/NotifCallbackServlet", "");
+                        else risp =   new TestSub().testSubscriber(feed, "http://localhost:8081/NotifMgrG/NotifCallbackServlet", "");
                         GoDoc.savePermissions(user, nomeDoc, notiftype);
                         System.err.println("subscribe al feed= " + feed+" "+risp);
                         if(risp.equalsIgnoreCase("done")) count++;

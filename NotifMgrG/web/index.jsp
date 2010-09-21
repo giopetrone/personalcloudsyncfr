@@ -47,9 +47,7 @@ function getDocs(){
                     var url1 = "./PrendiDocs";
                     var email = document.getElementById('owner').value;
                     var pwd = document.getElementById('pwd').value
-               //     var email = "fabrizio.torretta@gmail.com";
-               //     var pwd = "gregorio";
-
+            
                     objXml = new XMLHttpRequest();
 
                     objXml.open("POST",url1,false);
@@ -108,13 +106,11 @@ function getDocs(){
                      var url = "settings.jsp?Flow="+value;
             
                      link.setAttribute("href",url);
-                //    link.setAttribute("onclick", open)
+            
                      link.appendChild(text);
-                 //    add.appendChild(cb);
-                 //    add.appendChild(text);
-                    // add.appendChild(select);
+                
                      add.appendChild(link);
-                   //  add.appendChild(hidden);
+             
                      add.appendChild(br);
                      
                  }

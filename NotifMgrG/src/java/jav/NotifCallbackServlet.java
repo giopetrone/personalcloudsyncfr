@@ -83,27 +83,7 @@ public class NotifCallbackServlet extends HttpServlet {
                     }
                     response.setStatus(HttpServletResponse.SC_OK);
                     out.print(hubchallenge);
-                    /*
-                    String hubtopic = "";
-                    String hublease = "";
-                    String hubverify = "";
-                    if (request.getParameter("hub.topic") != null) {
-                    hubtopic = request.getParameter("hub.topic");
-                    }
-                    if (request.getParameter("hub.lease") != null) {
-                    hublease = request.getParameter("hub.lease");
-                    }
-                    if (request.getParameter("hub.verify") != null) {
-                    hubverify = request.getParameter("hub.verify");
-                    }
-
-                    System.err.println("\nin callback for hub request mode: "
-                    + hubmode + " topic: "
-                    + hubtopic + "challenge: "
-                    + hubchallenge + " verify: "
-                    + hubverify + " lease: "
-                    + hublease + "\n");
-                     */
+              
                 } else
                 {
                     ServletInputStream inStream = request.getInputStream();
@@ -115,30 +95,24 @@ public class NotifCallbackServlet extends HttpServlet {
                     }
                     //System.err.println("notifcallbackservlet, string notified=" +s);
                
-                    String taskname = "";
-                    String newstatus = "";
-                    String dest="";
-                    String workflow ="";
-                    String allusers = "";
-                    String modifier = "";
-                    String nomeFile = "";
-                   
                     getServletContext().setAttribute("atomo", s);
                     List<AtomEvent> notifications = FeedUtil.createAtom(s);
                     System.err.println("NOTIFICATIONS: "+notifications.size());
                     if (!notifications.isEmpty()) {
                        // System.err.println("new feed content");
-                        for (AtomEvent cont : notifications) {
+                        for (AtomEvent cont : notifications) 
+                        {
                          //   System.err.println("new feed content =\n " + cont.toString(true));
                            
                             String activity = cont.getActivity();
+                            /*
                             if(activity.equalsIgnoreCase("Change Status of Task"))
                             {
-                                taskname = cont.getParameter("Task");
-                                nomeFile = cont.getParameter("File");
-                                dest = cont.getParameter("Assigned To");
+                                String taskname = cont.getParameter("Task");
+                                String nomeFile = cont.getParameter("File");
+                                String dest = cont.getParameter("Assigned To");
                                 if(dest == null) dest="";
-                                modifier = cont.getUser();
+                                String modifier = cont.getUser();
                                 if(!dest.equals("") && dest != null)
                                 {
 
@@ -154,7 +128,7 @@ public class NotifCallbackServlet extends HttpServlet {
                                         {
 
                                             String nomeDoc = extractPermission(destim);
-                                            System.out.println("nomeDoc: "+nomeDoc);
+                                            System.out.println("nomeDoc x change status: "+nomeDoc);
                                             String sub = GoDoc.checkPermission(nomeDoc, nomeFile, "Changestatusoftask");
                                             System.out.println("SUB STATUS: "+sub);
                                             if(sub.equalsIgnoreCase("subscribe")) sendGMsg(emailSubjectTxt,destim);
@@ -162,41 +136,89 @@ public class NotifCallbackServlet extends HttpServlet {
                                     }
                                 }
                             }
-                            else if(activity.equalsIgnoreCase("Workflow is Done"))
+                            else*/
+                            if(activity.equalsIgnoreCase("a task has been deleted"))
                             {
-                                workflow = cont.getParameter("Workflow");
-                                allusers = cont.getParameter("All users");
-                                allusers = allusers.substring(1, allusers.length());
-                                String[] destinators = allusers.split(",");
-                                List destinatari = new ArrayList();
-                                for(int j=0;j<destinators.length;j++)
+                                String taskdeletedname = cont.getParameter("Task");
+                                String filename = cont.getParameter("File");
+                                String assigned = cont.getParameter("Assigned To");
+                                if(assigned == null) assigned="";
+                                String modifier2 = cont.getUser();
+                                if(!assigned.equals("") && assigned != null)
                                 {
-                                    if(destinators[j].contains("@"))
+
+
+                                    List destinators = new ArrayList();
+                                    String[] receivers =  assigned.split(",");
+
+                                    for(int i=0;i<receivers.length;i++)
                                     {
-                                        String nomeDoc = extractPermission(destinators[j]);
-                                        if(nomeDoc.contains(" ")) nomeDoc = nomeDoc.replace(" ","");
-                                        System.out.println("Nome doc x workflowdone: "+nomeDoc);
-                                        String sub = GoDoc.checkPermission(nomeDoc, workflow, "Workflowisdone");
+                                        String destinator = receivers[i];
+                                        //Controllo se il destinatario si e' iscritto alle notifiche
+                                        if(!destinator.equals("") && !destinator.equalsIgnoreCase(modifier2))
+                                        {
+
+                                            String userDoc = extractPermission(destinator);
+                                            System.out.println("File Name in delete: "+userDoc);
+                                            String emailSubjectTxt = "A task assigned to you: "+taskdeletedname+"has been deleted";
+                                            String sub = GoDoc.checkPermission(userDoc, filename, "Deletetask");
+                                            System.out.println("SUB STATUS IN DELETE: "+sub);
+                                            if(sub.equalsIgnoreCase("subscribe") && sub !=null) sendGMsg(emailSubjectTxt,destinator);
+                                        }
+                                    }
+                                    /*
+                                    if(!destinators.isEmpty())
+                                    {
+                                        String[] destinatarifinali = (String[]) destinators.toArray(new String[0]);
+                                        String emailSubjectTxt = "A task assigned to you: "+taskdeletedname+"has been deleted";
+                                        String link = "http://taskmanagerunito.xoom.it/Flow/"+filename+".xml";
+                                        String text = "The task "+taskdeletedname+" has been deleted.\nYou can see the feed at: "+link;
+                                        new SendMailCl().sendSSLMessage(destinatarifinali, emailSubjectTxt, text, email,pwd);
+                                        System.out.println("%%%% SEND MAIL IN DELETE TASK %%%%%");
+                                    }*/
+                                }
+
+                            }
+                            if(activity.equalsIgnoreCase("Workflow is Done"))
+                            {
+                                String workflow = cont.getParameter("Workflow");
+                                String allusers = cont.getParameter("All users");
+                                System.out.println("USERS prima di substring: "+allusers);
+                                //allusers = allusers.substring(1, allusers.length());
+                                
+                                String[] destemail = allusers.split(",");
+                                List destemaildone = new ArrayList();
+                                for(int j=0;j<destemail.length;j++)
+                                {
+                                    if(destemail[j].contains("@"))
+                                    {
+                                        String userPermissionDoc = extractPermission(destemail[j]);
+                                        if(userPermissionDoc.contains(" ")) userPermissionDoc = userPermissionDoc.replace(" ","");
+                                        System.out.println("Nome doc x workflowdone: "+userPermissionDoc);
+                                        String sub = GoDoc.checkPermission(userPermissionDoc, workflow, "Workflowisdone");
                                         System.out.println("SUB: "+sub);
-                                        if(sub.equalsIgnoreCase("subscribe") && sub !=null) destinatari.add(destinators[j]);
+                                        if(sub.equalsIgnoreCase("subscribe") && sub !=null)
+                                        {
+                                            String[] toSend = {destemail[j]};
+                                            String emailSubjectTxt ="The workflow "+workflow+" is completed";
+                                            String link = "http://taskmanagerunito.xoom.it/Flow/"+workflow+".xml";
+                                            String text = "The workflow "+workflow+" is completed.\nYou can see the feed at: "+link;
+                                        //    new SendMailCl().sendSSLMessage(toSend, emailSubjectTxt, text, email,pwd);
+                                        }
+
                                     }
                                    // String sub = WriterPermission.checkNotifications(sendTo[j],workflow,"Workflowisdone");
                                     
 
                                 }
                               
-                                if(!destinatari.isEmpty())
-                                {
-                                    String[] destinatarifinali = (String[]) destinatari.toArray(new String[0]);
-                                    String emailSubjectTxt ="The workflow "+workflow+" is completed";
-                                    String link = "http://taskmanagerunito.xoom.it/Flow/"+workflow+".xml";
-                                    String text = "The workflow "+workflow+" is completed.\nYou can see the feed at: "+link;
-                                    new SendMailCl().sendSSLMessage(destinatarifinali, emailSubjectTxt, text, email,pwd);
-                                }
+                                
                                 
                             }
 
                         }
+                      //  String[] to = {"fabrizio.torretta@gmail.com"};
+                      //  new SendMailCl().sendSSLMessage(to,"Prova", "text", email,pwd);
                     }
 
                     
