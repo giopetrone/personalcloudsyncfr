@@ -51,6 +51,7 @@
             }
 
         }
+   
         diagramName = flowname+"/"+notif;
         document.getElementById('name').value = diagramName;
         loadNotifiche(diagramName);
@@ -144,6 +145,14 @@
 		NAME	= "settingsgroup"
 		VALUE	= "Changestatusoftask">
 			   Change of Task
+    </th>
+
+
+    <th align=left>
+	<INPUT	TYPE	= "checkbox"
+		NAME	= "settingsgroup"
+		VALUE	= "Deletetask">
+			   Deletion of Task
     </th>
   </tr>
 </table>
