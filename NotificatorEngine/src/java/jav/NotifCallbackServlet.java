@@ -99,6 +99,8 @@ public class NotifCallbackServlet extends HttpServlet {
                         s += new String(b, 0, c);
                         
                     }
+                    getServletContext().setAttribute("atomo", s);
+                    System.err.println("DOPO CONTEXT");
                     s = s.replaceAll("&gt;", ">");
                     s = s.replaceAll("&lt;", "<");
                     String modifier = "";
@@ -164,6 +166,37 @@ public class NotifCallbackServlet extends HttpServlet {
                                 }
                             }
                         }
+                    }
+                    for(int i=0;i<entries.length;i++)
+                    {
+                        if(entries[i].contains("A task has been deleted"))
+                        {
+                            taskname = getTaskName(entries[i]);
+                            assignees = getAssignees(entries[i]);
+                        }
+                        if(assignees != null && !assignees.equals("") && !assignees.equalsIgnoreCase(modifier))
+                            {
+                                String[] destinatarifinali = assignees.split(",");
+                                for(int j=0;j<destinatarifinali.length;j++)
+                                {
+                                    if(destinatarifinali[j] != null && !destinatarifinali[j].equals(""))
+                                    {
+                                        String permissionFile = extractPermission(destinatarifinali[j]);
+                                        String subscribe = GoDoc.checkPermission(permissionFile, nomeFile+".txt","Dletetask");
+                                        if(subscribe.equals("subscribe"))
+                                        {
+                                            String emailSubjectTxt ="The task: "+taskname+" has been deleted";
+                                            String[] destinatario = {destinatarifinali[j]};
+                                            String text = "The task: "+taskname+" in the workflow "+nomeFile+" has been deleted";
+                                            new SendMailCl().sendSSLMessage(destinatario, emailSubjectTxt, text, email,pwd);
+
+                                        }
+
+
+                                    }
+
+                                }
+                            }
                     }
 
 
