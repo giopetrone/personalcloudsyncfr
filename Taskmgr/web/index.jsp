@@ -312,6 +312,10 @@
                        link2.appendChild(text2);
                        palette4.appendChild(link);
                        palette3.appendChild(link2);
+                       var diagname = document.getElementById('area').value;
+                       var link = "http://localhost:8081/login.jsp?Flow="+diagname;
+                       //loadDiagram(document.getElementById('area').value);
+                       window.location = link;
                        
                     
                     }
@@ -888,6 +892,12 @@ function setCondition()
                     return "Diagramma gia' salvato";
                 }
             }
+
+            function dado()
+            {
+                var jsonString = Jalava.diagram.persist();
+                alert(jsonString);
+            }
             window.onbeforeunload = closeIt;
 
         </script>
@@ -940,7 +950,7 @@ function setCondition()
         <input type="hidden" id="writers" name="writers" value= "" disabled="disabled" size="100" />
         <input type="hidden" id="pwd" name="pwd" value='<%=sesspwd%>' disabled="disabled" />
         <input type="hidden" id="assignees" name="assignees" value='' size="100" />
-
+<input type="button" value="See JSON" onclick="dado();"/>
        
       
         <!--
