@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import pubsublib.pubsubhubbub.Discovery;
 import pubsublib.test.TestPub;
+import pubsublib.test.TestSub;
 
 /**
  *
@@ -89,8 +90,20 @@ public class SaveServlet extends HttpServlet {
          
                 if(val.equals("new"))
                 {
-                    if(notification.equals("local"))  new TestPub().testPublisher("http://localhost:8080", "http://taskmanagerunito.xoom.it/Flow/"+nomeFile+".xml");
-                    else if(notification.equalsIgnoreCase("remote"))  new TestPub().testPublisher("http://pubsubhubbub.appspot.com", "http://taskmanagerunito.xoom.it/Flow/"+nomeFile+".xml");
+                    if(notification.equals("remote"))
+                    {
+                        String url = "http://taskmanagerunito.xoom.it/Flow/"+nomeFile+".xml";
+                        
+                        new TestSub().testSubscriber(url, "http://taskmgrunito.appspot.com/NotifCallbackServlet","");
+                       // new TestPub().testPublisher("http://pubsubhubbub.appspot.com", "http://taskmanagerunito.xoom.it/Flow/"+nomeFile+".xml");
+                    }
+                    else if(notification.equalsIgnoreCase("local"))
+                    {
+                        String url = "http://taskmanagerunito.xoom.it/Flow/"+nomeFile+".xml";
+                     //   new TestPub().testPublisher("http://localhost:8080", url);
+                        
+                        new TestSub().testSubscriber(url, "http://localhost:8081/NotifMgrG/NotifCallbackServlet", "");
+                    }
                 }
                 else if(val.equalsIgnoreCase("notnew"))
                 {

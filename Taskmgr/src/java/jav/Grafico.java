@@ -127,6 +127,6 @@ public class Grafico {
                 }
             }
         }
-     FeedUtil.addEntries("",nomeFile,listaeventi);
+    // FeedUtil.addEntries("",nomeFile,listaeventi);
     }catch(Exception ex){System.out.println("DENTRO GRAFICO "+ex.getMessage());}}
 }

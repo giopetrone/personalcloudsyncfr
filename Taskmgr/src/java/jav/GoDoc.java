@@ -187,13 +187,14 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                     DocumentListEntry documentEntry = findEntry(documentName);
                     System.out.println("DOCUMENTO NUOVO");
                     List<AtomEvent> listaeventi = new ArrayList();
+                    List<AtomEvent> listasave = new ArrayList();
                     documentEntry = uploadFile(s, documentName);
                     AtomEvent eventSave = new AtomEvent(login, "TaskManager", "Save New Diagram");
                     String link = documentEntry.getDocumentLink().getHref();
                     eventSave.setParameter("File", documentName);
                     eventSave.setParameter("Link", link);
-                    listaeventi.add(eventSave);
-                  //  FeedUtil.addEntries("", documentName, listaeventi);
+                    listasave.add(eventSave);
+                    FeedUtil.addEntries("", documentName, listasave);
                     String[] tempwriter;
                     String delimiter = ",";
                     List<String> destinatari = new LinkedList();
@@ -297,7 +298,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                         String destfinal = dest.substring(1, length - 1);
                         if(destinatari.size() != 1) sendMail(destfinal,login,pwd,documentName);
                        
-                        FeedUtil.addEntries("",documentName,listaeventi);
+                     //   FeedUtil.addEntries("",documentName,listaeventi);
                         
 
                         
@@ -332,6 +333,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                 SaveServlet.setTypeNotification(typeNotif);
                 List<AtomEvent> listaeventi = new ArrayList();
                 listaeventi.add(eventUpdate);
+               // FeedUtil.addEntries("", documentName, listaeventi);
                 
                     List<String> readers = new ArrayList();
                     List<String> collaborators = new ArrayList();
@@ -523,7 +525,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                       
                        
                     }
-                    FeedUtil.addEntries("", documentName, listaeventi);
+                  //  FeedUtil.addEntries("", documentName, listaeventi);
 
                     service.getRequestFactory().setHeader("If-Match", "*");
                     // documentEntry.setMediaSource(new MediaByteArraySource(s.getBytes(), "text/plain"));
