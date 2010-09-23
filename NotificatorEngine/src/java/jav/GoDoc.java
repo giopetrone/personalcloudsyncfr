@@ -118,6 +118,10 @@ public class GoDoc
                 boolean subscribe = false;
                 if(s.contains(flowName+"/"+"All")) subscribe = true;
                 else if(s.contains(flowName+"/"+notification)) subscribe = true;
+                else if(s.contains(flowName+"/"))
+                {
+                    // DA FARE
+                }
 
                 if(subscribe == true) return "subscribe";
                 else return "none";

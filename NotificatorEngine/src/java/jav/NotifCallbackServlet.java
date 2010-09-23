@@ -103,46 +103,64 @@ public class NotifCallbackServlet extends HttpServlet {
                     System.err.println("DOPO CONTEXT");
                     s = s.replaceAll("&gt;", ">");
                     s = s.replaceAll("&lt;", "<");
-                    String modifier = "";
-                    String nomeFile = "";
-                    System.err.println("@@@@@@@@@@@@@@@@@@@@@@@@@@");
-                    System.err.println(s);
-                    System.err.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+                    
+                   
+                 //   System.err.println("@@@@@@@@@@@@@@@@@@@@@@@@@@");
+                 //   System.err.println(s);
+                  //  System.err.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@");
                     String[] entries = s.split("<entry>");
                     String taskname = "";
                     String newstatus = "";
                     String assignees="";
-                    String workflow ="";
                     String allusers = "";
+                    String modifier = "";
                     for(int i=0;i<entries.length;i++)
                     {
                         System.out.println("%%%%%%%%%%%%%%%%%%%%%%%");
                         System.err.println(entries[i]);
-                        
-                        if(entries[i].contains("Update Diagram"))
-                        {
-                               modifier = getUser(entries[i]);
-                               nomeFile = getFlowName(entries[i]);
-                            
-                        }
-                        else if(entries[i].contains("Workflow is Done"))
+                        if(entries[i].contains("Workflow is Done"))
                         {
                             allusers = getAllUsers(entries[i]);
+                            if(allusers != null && !allusers.equals(""))
+                            {
+                                if(allusers.contains(" ")) allusers = allusers.replace(" ", "");
+                                String[] destinatarifinali = allusers.split(",");
+                                for(int j=0;j<destinatarifinali.length;j++)
+                                {
+                                    System.err.println("DESTINATARIO FINALE: "+destinatarifinali[j]);
+                                    if(destinatarifinali[j].contains("@") && destinatarifinali[j] !=null)
+                                    {
+                                        String permissionFile = extractPermission(destinatarifinali[j]);
+                                        System.err.println("$$$$$$$$$$ "+permissionFile);
+                                        String workflowName = getWorkflowDone(entries[i]);
+                                        String subscribe = GoDoc.checkPermission(permissionFile, workflowName,"Workflowisdone");
+                                        if(subscribe.equals("subscribe"))
+                                        {
+                                            String emailSubjectTxt ="The workflow: "+workflowName+" is completed";
+                                            String[] destinatario = {destinatarifinali[j]};
+                                            String link = "http://taskmanagerunito.xoom.it/Flow/"+workflowName+".txt.xml";
+                                            String text = "The workflow is completed.\nYou can see the feed at: "+link;
+                                            new SendMailCl().sendSSLMessage(destinatario, emailSubjectTxt, text, email,pwd);
+
+                                        }
+
+                                    }
+
+                                }
+
+                            }
                         }
-                        
-                      
-                    }
-                    for(int i=0;i<entries.length;i++)
-                    {
-                        if(entries[i].contains("Change Status of Task"))
+                        else if(entries[i].contains("Change Status of Task"))
                         {
                             taskname = getTaskName(entries[i]);
-                            if(entries[i].contains("Assigned To"))  
+                            String utente = getUser(entries[i]);
+                            if(entries[i].contains("Assigned To"))
                             {
                                 System.err.println("C'e' ASSIGNED TO");
                                 assignees = getAssignees(entries[i]);
+                                
                             }
-                            if(assignees != null && !assignees.equals("") && !assignees.equalsIgnoreCase(modifier))
+                            if(assignees != null && !assignees.equals("") && !assignees.equalsIgnoreCase(utente))
                             {
                                 String[] destinatarifinali = assignees.split(",");
                                 for(int j=0;j<destinatarifinali.length;j++)
@@ -150,12 +168,14 @@ public class NotifCallbackServlet extends HttpServlet {
                                     if(destinatarifinali[j] != null && !destinatarifinali[j].equals(""))
                                     {
                                         String permissionFile = extractPermission(destinatarifinali[j]);
-                                        String subscribe = GoDoc.checkPermission(permissionFile, nomeFile+".txt","Changestatusoftask");
+                                        String flowName = getFlowName(entries[i]);
+                                        String subscribe = GoDoc.checkPermission(permissionFile, flowName,"Changestatusoftask");
+                                        System.err.println("SUBSCRIBE: "+subscribe);
                                         if(subscribe.equals("subscribe"))
                                         {
                                             String emailSubjectTxt ="The task: "+taskname+" has changed status";
                                             String[] destinatario = {destinatarifinali[j]};
-                                            String text = "The task: "+taskname+" in the workflow "+nomeFile+" has changed status";
+                                            String text = "The task: "+taskname+" in the workflow "+flowName+" has changed status";
                                             new SendMailCl().sendSSLMessage(destinatario, emailSubjectTxt, text, email,pwd);
 
                                         }
@@ -166,15 +186,14 @@ public class NotifCallbackServlet extends HttpServlet {
                                 }
                             }
                         }
-                    }
-                    for(int i=0;i<entries.length;i++)
-                    {
-                        if(entries[i].contains("A task has been deleted"))
+                        else if(entries[i].contains("A task has been deleted"))
                         {
                             taskname = getTaskName(entries[i]);
                             assignees = getAssignees(entries[i]);
-                        }
-                        if(assignees != null && !assignees.equals("") && !assignees.equalsIgnoreCase(modifier))
+                            String utente = getUser(entries[i]);
+                            String flowName = getFlowName(entries[i]);
+
+                            if(assignees != null && !assignees.equals("") && !assignees.equalsIgnoreCase(utente))
                             {
                                 String[] destinatarifinali = assignees.split(",");
                                 for(int j=0;j<destinatarifinali.length;j++)
@@ -182,12 +201,13 @@ public class NotifCallbackServlet extends HttpServlet {
                                     if(destinatarifinali[j] != null && !destinatarifinali[j].equals(""))
                                     {
                                         String permissionFile = extractPermission(destinatarifinali[j]);
-                                        String subscribe = GoDoc.checkPermission(permissionFile, nomeFile+".txt","Dletetask");
+                                        String subscribe = GoDoc.checkPermission(permissionFile, flowName,"Deletetask");
+                                        System.err.println("SUBSCRIBE?: "+subscribe);
                                         if(subscribe.equals("subscribe"))
                                         {
                                             String emailSubjectTxt ="The task: "+taskname+" has been deleted";
                                             String[] destinatario = {destinatarifinali[j]};
-                                            String text = "The task: "+taskname+" in the workflow "+nomeFile+" has been deleted";
+                                            String text = "The task: "+taskname+" in the workflow "+flowName+" has been deleted";
                                             new SendMailCl().sendSSLMessage(destinatario, emailSubjectTxt, text, email,pwd);
 
                                         }
@@ -197,37 +217,14 @@ public class NotifCallbackServlet extends HttpServlet {
 
                                 }
                             }
-                    }
 
-
-
-                    DocsService service = null;
-                    if(allusers != null && !allusers.equals("") && !nomeFile.equals("") )
-                    {
-                        if(allusers.contains(" ")) allusers = allusers.replace(" ", "");
-                        String[] destinatarifinali = allusers.split(",");
-                        for(int j=0;j<destinatarifinali.length;j++)
-                        {
-                            if(destinatarifinali[j] != null && !destinatarifinali[j].equals(""))
-                            {
-                                String permissionFile = extractPermission(destinatarifinali[j]);
-                                System.err.println("$$$$$$$$$$ "+permissionFile);
-                                String subscribe = GoDoc.checkPermission(permissionFile, nomeFile+".txt","Workflowisdone");
-                                if(subscribe.equals("subscribe"))
-                                {
-                                    String emailSubjectTxt ="The workflow: "+nomeFile+" is completed";
-                                    String[] destinatario = {destinatarifinali[j]};
-                                    String link = "http://taskmanagerunito.xoom.it/Flow/"+nomeFile+".txt.xml";
-                                    String text = "The workflow is completed.\nYou can see the feed at: "+link;
-                                    new SendMailCl().sendSSLMessage(destinatario, emailSubjectTxt, text, email,pwd);
-
-                                }
-
-                            }
-
-                        }
                         
-                    }
+                      
+                    }}
+                      
+                   
+
+                    
            
 }}}
                     catch(Exception ex){System.err.println("Error: "+ex.getMessage());}
@@ -303,11 +300,11 @@ public class NotifCallbackServlet extends HttpServlet {
     {
         try
         {
-
-            int userindex = entry.indexOf("<user>");
-            int userindex2 = entry.indexOf("</user>");
-            String user = entry.substring(userindex+6, userindex2);
-            System.err.println("MODIFIER: "+user);
+            String[] split = entry.split("</time>");
+            int userindex = split[1].indexOf("<user>");
+            int userindex2 = split[1].indexOf("</user>");
+            String user = split[1].substring(userindex+6, userindex2);
+            System.err.println("USER: "+user);
             return user;
         }catch(Exception ex)
         {
@@ -322,7 +319,26 @@ public class NotifCallbackServlet extends HttpServlet {
         String nomeDoc = user.substring(0,index);
         if(nomeDoc.contains(".")) nomeDoc = nomeDoc.replace(".", "_");
         nomeDoc += ".txt";
+        System.err.println("PERMISSION FILE:"+nomeDoc);
         return nomeDoc;
+    }
+
+    private String getWorkflowDone(String entry)
+    {
+        try
+        {
+            String[] workflowarray = entry.split("Workflow</string>");
+            String workflow = workflowarray[1];
+            int index = workflow.indexOf("<string>");
+            int indexFile2 = workflow.indexOf("</string>");
+            String flow = workflow.substring(index+8,indexFile2);
+            System.err.println("Workflow Name: "+flow);
+            return flow;
+        }catch(Exception ex)
+        {
+            System.err.println("errore in get flow: "+ex.getMessage());
+            return ex.toString();
+        }
     }
 
 
@@ -331,9 +347,11 @@ public class NotifCallbackServlet extends HttpServlet {
     {
         try
         {
-            int indexFile = entry.indexOf("File");
-            int indexFile2 = entry.indexOf(".txt</string>");
-            String flow = entry.substring(indexFile+26,indexFile2);
+            String[] split = entry.split("File</string>");
+            String tofind = split[1];
+            int index = tofind.indexOf("<string>");
+            int index2 = tofind.indexOf("</string>");
+            String flow = tofind.substring(index+8, index2);
             System.err.println("Flow Name: "+flow);
             return flow;
         }catch(Exception ex)
