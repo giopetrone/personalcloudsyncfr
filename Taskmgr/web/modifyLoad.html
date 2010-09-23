@@ -413,6 +413,7 @@ function getLinks()
           {
               var thisassigner = assign_array[j];
               assignees += thisassigner + ",";
+              if(assignees.indexOF(",") != 0) assignees = ","+assignees;
               window.parent.TextEdit.setAssignees(assignees);
           }
 
