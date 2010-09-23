@@ -105,7 +105,7 @@ public class NotifCallbackServlet extends HttpServlet {
                          //   System.err.println("new feed content =\n " + cont.toString(true));
                            
                             String activity = cont.getActivity();
-                            /*
+                            
                             if(activity.equalsIgnoreCase("Change Status of Task"))
                             {
                                 String taskname = cont.getParameter("Task");
@@ -136,8 +136,7 @@ public class NotifCallbackServlet extends HttpServlet {
                                     }
                                 }
                             }
-                            else*/
-                            if(activity.equalsIgnoreCase("a task has been deleted"))
+                            else if(activity.equalsIgnoreCase("a task has been deleted"))
                             {
                                 String taskdeletedname = cont.getParameter("Task");
                                 String filename = cont.getParameter("File");
@@ -197,14 +196,15 @@ public class NotifCallbackServlet extends HttpServlet {
                                         System.out.println("Nome doc x workflowdone: "+userPermissionDoc);
                                         String sub = GoDoc.checkPermission(userPermissionDoc, workflow, "Workflowisdone");
                                         System.out.println("SUB: "+sub);
-                                        if(sub.equalsIgnoreCase("subscribe") && sub !=null)
-                                        {
-                                            String[] toSend = {destemail[j]};
-                                            String emailSubjectTxt ="The workflow "+workflow+" is completed";
-                                            String link = "http://taskmanagerunito.xoom.it/Flow/"+workflow+".xml";
-                                            String text = "The workflow "+workflow+" is completed.\nYou can see the feed at: "+link;
+                                         String emailSubjectTxt ="The workflow "+workflow+" is completed";
+                                        if(sub.equalsIgnoreCase("subscribe") && sub !=null) sendGMsg(emailSubjectTxt,destemail[j]);
+                                    //    {
+                                      //      String[] toSend = {destemail[j]};
+                                           
+                                        //    String link = "http://taskmanagerunito.xoom.it/Flow/"+workflow+".xml";
+                                          //  String text = "The workflow "+workflow+" is completed.\nYou can see the feed at: "+link;
                                         //    new SendMailCl().sendSSLMessage(toSend, emailSubjectTxt, text, email,pwd);
-                                        }
+                                       // }
 
                                     }
                                    // String sub = WriterPermission.checkNotifications(sendTo[j],workflow,"Workflowisdone");

@@ -76,27 +76,29 @@ public class SubscribeServlet extends HttpServlet {
                         String permissionName = "";
                         Discovery discovery = new Discovery();
                         String hub = discovery.getHub(feed);
-                        if(hub.equals("http://pubsubhubbub.appspot.com"))
-                        {
-                            risp = new TestSub().testSubscriber(feed, "http://taskmgrunito.appspot.com/NotifCallbackServlet","");
-                        }
-                        else risp =   new TestSub().testSubscriber(feed, "http://localhost:8081/NotifMgrG/NotifCallbackServlet", "");
-                        GoDoc.savePermissions(user, nomeDoc, notiftype);
-                        System.err.println("subscribe al feed= " + feed+" "+risp);
-                        if(risp.equalsIgnoreCase("done")) count++;
-                        else feederrati += " "+feeds[i];
+                   //     if(hub.equals("http://pubsubhubbub.appspot.com"))
+                   //     {
+                   //         risp = new TestSub().testSubscriber(feed, "http://taskmgrunito.appspot.com/NotifCallbackServlet","");
+               //         }
+                //        else risp =   new TestSub().testSubscriber(feed, "http://localhost:8081/NotifMgrG/NotifCallbackServlet", "");
+                        String sub = GoDoc.savePermissions(user, nomeDoc, notiftype);
+                        System.out.println("DOPO SAVE PERMISSION: "+sub);
+                     //   System.err.println("subscribe al feed= " + feed+" "+risp);
+                      //  if(risp.equalsIgnoreCase("done")) count++;
+                      //  else feederrati += " "+feeds[i];
 
                      }
-                     if(count == feeds.length) out.println("Fatta subscribe");
-                     else out.println("Errore nei feeds:"+feederrati);
+                    out.println("Fatta subscribe");
+                   //  if(count == feeds.length)
+                   //  else out.println("Errore nei feeds:"+feederrati);
 
                       
                      
 
-                } else
-                {
-                       out.println("Nome Feed Vuoto");
-                }
+                } //else
+             //   {
+                  //     out.println("Nome Feed Vuoto");
+              //  }
             }
         } catch (Exception ex)
         {
