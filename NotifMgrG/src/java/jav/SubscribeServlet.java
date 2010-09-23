@@ -76,6 +76,10 @@ public class SubscribeServlet extends HttpServlet {
                         String permissionName = "";
                         Discovery discovery = new Discovery();
                         String hub = discovery.getHub(feed);
+                        if(hub.equalsIgnoreCase("http://localhost:8080"))
+                        {
+                            new TestSub().testSubscriber(feed, "http://localhost:8081/NotifMgrG/NotifCallbackServlet", "");
+                        }
                    //     if(hub.equals("http://pubsubhubbub.appspot.com"))
                    //     {
                    //         risp = new TestSub().testSubscriber(feed, "http://taskmgrunito.appspot.com/NotifCallbackServlet","");
