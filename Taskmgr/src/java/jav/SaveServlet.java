@@ -12,6 +12,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import maillib.SendMailCl;
 import pubsublib.pubsubhubbub.Discovery;
 import pubsublib.test.TestPub;
 import pubsublib.test.TestSub;
@@ -93,15 +94,15 @@ public class SaveServlet extends HttpServlet {
                     if(notification.equals("remote"))
                     {
                         String url = "http://taskmanagerunito.xoom.it/Flow/"+nomeFile+".xml";
-                        
+                     //   new TestPub().testPublisher("http://pubsubhubbub.appspot.com", "http://taskmanagerunito.xoom.it/Flow/"+nomeFile+".xml");
                         new TestSub().testSubscriber(url, "http://taskmgrunito.appspot.com/NotifCallbackServlet","");
-                       // new TestPub().testPublisher("http://pubsubhubbub.appspot.com", "http://taskmanagerunito.xoom.it/Flow/"+nomeFile+".xml");
+                       // 
                     }
                     else if(notification.equalsIgnoreCase("local"))
                     {
                         String url = "http://taskmanagerunito.xoom.it/Flow/"+nomeFile+".xml";
                      //   new TestPub().testPublisher("http://localhost:8080", url);
-                        
+                        // LA sottoscrizione viene fatta in NotifMgrG
                         new TestSub().testSubscriber(url, "http://localhost:8081/NotifMgrG/NotifCallbackServlet", "");
                     }
                 }
@@ -111,6 +112,7 @@ public class SaveServlet extends HttpServlet {
                     String hub =  discovery.getHub("http://taskmanagerunito.xoom.it/Flow/"+nomeFile+".xml");
                    
                     System.out.println("PUBBLICO SU HUB: "+hub);
+
                     new TestPub().testPublisher(hub, "http://taskmanagerunito.xoom.it/Flow/"+nomeFile+".xml");
 
                }
@@ -139,6 +141,34 @@ public class SaveServlet extends HttpServlet {
     public static void setTypeNotification(String hub)
     {
         notification = hub;
+    }
+
+
+    public void sendMail(String dest,String login,String pwd,String name)
+    {
+        try
+        {
+            System.out.println("%%%%LOGIN: "+login);
+            String SMTP_HOST_NAME = "smtp.gmail.com";
+            String SMTP_PORT = "465";
+            String url = "http://localhost:8081/index.jsp?Flow="+name;
+            String url2 = "http://localhost:8081/NotifMgrG/settings.jsp?Flow="+name;
+            String text = "Hi, a new diagram is interested in you.\nGo and check this workflow "+url+"\n";
+            String text2 ="Do not forget to subscribe your Notification Manager to this application: "+url2+"\n";
+            String emailMsgTxt = text+text2;
+
+            String emailSubjectTxt = "New Collaborative Workflow: "+name;
+            String emailFromAddress = login;
+            String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
+            String[] sendTo = dest.split(",");
+            new SendMailCl().sendSSLMessage(sendTo, emailSubjectTxt, emailMsgTxt, emailFromAddress,pwd);
+        }
+        catch(Exception ex)
+        {
+            System.out.println("In SendMail Method: "+ex.getMessage());
+        }
+
+
     }
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**

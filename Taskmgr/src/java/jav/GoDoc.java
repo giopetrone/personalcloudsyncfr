@@ -296,7 +296,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                         String dest = destinatari.toString();
                         int length = dest.length();
                         String destfinal = dest.substring(1, length - 1);
-                        if(destinatari.size() != 1) sendMail(destfinal,login,pwd,documentName);
+                        if(destinatari.size() != 1) sendMail(destfinal,"icemgr09@gmail.com","sync09fr",documentName);
                        
                      //   FeedUtil.addEntries("",documentName,listaeventi);
                         
