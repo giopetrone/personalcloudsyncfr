@@ -16,14 +16,28 @@
         function get(){
         try{
         var diagram;
-     //   alert(document.myform.radiogroup.length);
-        for (var i=0; i<document.myform.radiogroup.length; i++){
+        var add = document.getElementById("menu");
+            
+        if(document.myform.radiogroup.length == undefined)
+        {
+            
+            diagram = add.childNodes[1].value;
+            opener.document.getElementById('area').value = diagram;
+            opener.loadDiagram(diagram);
+
+        }
+        else
+        {
+            for (var i=0; i<document.myform.radiogroup.length; i++){
 
                 if (document.myform.radiogroup[i].checked==true){
                    diagram = document.myform.radiogroup[i].value;
 
-                    
+
                 }}
+        }
+      
+        
             
              opener.document.getElementById('area').value = diagram;
              opener.loadDiagram(diagram);
@@ -33,8 +47,9 @@
 
         function get2()
         {
+            try{
             var diagram;
-     //   alert(document.myform.radiogroup.length);
+            
         for (var i=0; i<document.myform.radiogroup.length; i++){
 
                 if (document.myform.radiogroup[i].checked==true){
@@ -42,10 +57,11 @@
 
 
                 }}
-            // alert(diagram);
+             alert(diagram);
              opener.document.getElementById('area').value = diagram;
 
-             opener.loadDiagram(diagram);
+             opener.loadDiagram(diagram);}
+         catch(e){alert(e.message)}
         }
 
 

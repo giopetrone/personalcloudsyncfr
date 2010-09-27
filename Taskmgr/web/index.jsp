@@ -461,7 +461,7 @@
         
 
             function loadDiagram(param){
-                //  alert(param);
+                
                 //  var diagramName = document.getElementById('area').value;
                 var diagramName = param;
                 if (diagramName.length ==0) {
@@ -600,66 +600,87 @@
 
 
 
-
+// METODO DI CONTROLLO SU AND OR
 function setCondition()
 {
     try{
 
-       // TextEdit.target = DOM.getEventTarget(event, "mytextarea");
+
+       // Variabile json del diagramma
         var jsonString = Jalava.diagram.persist();
-        //var id = TextEdit.target.parentNode.parentNode.id;
-       
+        
+       //persited: l'oggetto JSON'
         var persisted = JSON.parse(jsonString);
+        //Numero blocchi
         var blocks = persisted.blocks.length;
+        //Numero connessioni
         var connections = persisted.connections.length;
         var y=0;
+        //Cerca tra tutti i BLOCKS i nodi and/or
         for(var i=0;i<blocks;i++)
         {
-
+            //image id dice il tipo di immagine:tonda,rect,ecc..
             var imageId = persisted.blocks[i].imageId;
+            //se ellipse ---> AND/OR, Start/End Element
             if(imageId == "ellipse")
             {
-
+               //Prende id del blocco, e il tipo(and,or,start,end)
                var blockid = persisted.blocks[i].id;
                var andor =  persisted.blocks[i].type;
                var list = new Array;
+               //ciclo connections
                for(var j=0;j<connections;j++)
                {
+                   //target == dove punta la connession
                    var target = persisted.connections[j].target;
                    if(blockid == target)
                    {
+                       //se qui: abbiamo connessione che ENTRA dentro and/or, e prendiamo la source
                        var source = persisted.connections[j].source;
                        for(var l=0;l<blocks;l++)
                        {
+                           //id source
                            var blockid2 = persisted.blocks[l].id;
                            if(blockid2 == source)
                            {
+                               //in questo ciclo, per ogni source, prende il tipo, essendo source=task, il tipo == stato
                                var type = persisted.blocks[l].type;
+                               //aggiunge all'array lo stato di ogni task sorgente'
                                list[y] = type;
                                y++;
                            }
                        }
                    }
                }
+               //se l'ellipse e' AND entra in questo ciclo'
                if(andor=="And")
                {
+                   // array dove si memorizzano i task con status DONE
                    var done = new Array();
                    var x=0;
+                   //Ciclo per lunghezza list, cioe' numero di task sorgenti'
                    for(var h=0;h<list.length;h++)
                    {
                        var check = list[h];
+                       // se source == done, aggiunge a lista done
                        if(check == "Done") {done[x]=check;x++}
                    }
+                   //Se done e' diverso da list, condizione equivale a dire che NON TUTTI I padri sono DONE
                    if(done.length != list.length || list.length == 0)
                    {
                        for(var z=0;z<connections;z++)
                        {
+                           //TROVA la connessione tra AND e FIGLIO
                            var source2 = persisted.connections[z].source;
-                           if(blockid == source2){
+                           if(blockid == source2)
+                           {
+                               //Memorizza in target2 l'id del nodo/nodi figli'
                                var target2 = persisted.connections[z].target;
+
                                for(var g=0;g<blocks;g++)
                                {
                                    var id3 = persisted.blocks[g].id;
+                                   //se entra in questo if, troviamo il task figlio
                                    if(target2 == id3)
                                    {
 
@@ -672,6 +693,7 @@ function setCondition()
 
                                            if(id3 == id4)
                                            {
+                                               //DENTRO QUESTO IF metto lo status a NOT ENABLED, e COLORO di ROSSO LA SCRITTA
 
                                                TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].childNodes[0].childNodes[0].style.color = "red";
                                                TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].type = "Not Enabled";
@@ -682,6 +704,7 @@ function setCondition()
                                }
                            }
                        }
+                       //Il ciclo sotto se i genitori sono DONE
                    }else if(done.length == list.length && done.length != 0)
                    {
                            for(var z=0;z<connections;z++)
@@ -704,10 +727,18 @@ function setCondition()
 
                                            if(id3 == id5)
                                            {
-                                             //  alert(TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].childNodes[0].style.color);
-                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].childNodes[0].childNodes[0].childNodes[0].style.color = "green";
-                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].type = "Enabled";
-                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].childNodes[0].childNodes[0].childNodes[8].value = "true";
+                                               var check = TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].childNodes[0].childNodes[0].childNodes[8].value;
+                                               //alert(check);
+                                             //  alert(TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].childNodes[0].childNodes[0].childNodes[8].value);
+                                              if(check != "true")
+                                               {
+                                                    //METTO Il figlio/figli a Enabled
+                                                   TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].childNodes[0].childNodes[0].childNodes[0].style.color = "green";
+                                                   TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].type = "Enabled";
+                                                   TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].childNodes[0].childNodes[0].childNodes[8].value = "true";
+                                               }
+                                              
+                                               
                                            }
                                        }
                                    }
@@ -724,6 +755,7 @@ function setCondition()
                    }
 
                }
+               //INIZIA CONDIZIONE OR
                else if(andor=="Or") {
                    var done = new Array();
                    var x=0;
@@ -754,11 +786,16 @@ function setCondition()
 
                                            if(id3 == id4)
                                            {
-                                               var nome = TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].childNodes[0].childNodes[0];
-                                               nome.style.color = "green";
-                                            //   TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].style.color = "green";
-                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].type = "Enabled";
-                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].childNodes[0].childNodes[8].value = "true";
+                                                var check = TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].childNodes[0].childNodes[8].value;
+                                                if(check != "true")
+                                                {
+                                                    var nome = TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].childNodes[0].childNodes[0];
+                                                   nome.style.color = "green";
+                                                //   TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].style.color = "green";
+                                                   TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].type = "Enabled";
+                                                   TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].childNodes[0].childNodes[8].value = "true";
+                                                }
+                                               
                                            }
                                        }
                                    }
@@ -943,7 +980,7 @@ function setCondition()
  
 
        
-    
+     
        
         
         <input type="hidden" id="owner" name="owner" value= '<%=sessuser%>' disabled="disabled" />
@@ -955,7 +992,7 @@ function setCondition()
       
         <!--
          <input type="button" value="See JSON" onclick="dado();"/>
-
+ <input type="button" value="Check Condition" onclick="setCondition();"/>
          
          <input type="button" value="Share" onclick="childWindow=open('/shared.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800');"/>
          <a href="#" onclick="childWindow=open('/docs2.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="add" name="add" >SaveDiagram </a>
