@@ -874,7 +874,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                      }
         }*/
         String title = "";
-        if (doc.getTitle().getPlainText().contains(".txt")) {
+        if (doc.getTitle().getPlainText().contains("Flow_")) {
             title = doc.getTitle().getPlainText();
            /* URL url = new URL("http://docs.google.com/feeds/folders/private/full/"+resourceFolderId);
             DocumentEntry newEntry = new DocumentEntry();
