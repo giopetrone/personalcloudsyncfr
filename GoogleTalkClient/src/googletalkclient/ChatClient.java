@@ -125,7 +125,7 @@ public class ChatClient implements MessageListener {
         }
     }
 
-    public String sendGMsg(String s, String dest) {
+    public String sendGMsg(ChatClient chClient, String s, String dest) {
         // Do something interesting with 's' here on the server.
         try {
             connectChatClient(chClient, "icemgr09@gmail.com", "sync09fr");
@@ -145,7 +145,7 @@ public class ChatClient implements MessageListener {
     public static void main(String args[]) throws XMPPException, IOException {
         chClient = new ChatClient();
         //   chClient.sendGTalkMsg("gio.petrone@gmail.com", "sgnmrn@gmail.com", "micio11", "ciaoNew", true);
-        chClient.sendGMsg("ciao", "gio.petrone@gmail.com");
+        chClient.sendGMsg(chClient, "ciao", "gio.petrone@gmail.com");
     }
 
     public static void Oldmain(String args[]) throws XMPPException, IOException {
