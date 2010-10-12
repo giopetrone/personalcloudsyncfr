@@ -64,7 +64,8 @@ public class NotifThread extends Thread {
                                     System.out.println("SUB STATUS: " + sub);
                                     if (sub.equalsIgnoreCase("subscribe"))
                                     {
-                                        sendGMsg(emailSubjectTxt, destim);
+                                        //sendGMsg(emailSubjectTxt, destim);
+                                        chClient.sendGMsg(chClient,emailSubjectTxt, destim);
                                     }
                                 }
                             }
@@ -94,13 +95,13 @@ public class NotifThread extends Thread {
 
                                     String userDoc = extractPermission(destinator);
                                     System.out.println("File Name in delete: " + userDoc);
-                                    //String emailSubjectTxt = "A task assigned to you: " + taskdeletedname + "has been deleted";
+                                     String emailSubjectTxt = "A task assigned to you: " + taskdeletedname + "has been deleted";
                                     String sub = GoDoc.checkPermission(userDoc, filename, "Deletetask");
                                     System.out.println("SUB STATUS IN DELETE: " + sub);
                                     if (sub.equalsIgnoreCase("subscribe") && sub != null)
                                     {
                                         destinators.add(destinator);
-                                        //sendGMsg(emailSubjectTxt, destinator);
+                                         chClient.sendGMsg(chClient, emailSubjectTxt, destinator);
                                     }
                                 }
                             }
@@ -135,10 +136,10 @@ public class NotifThread extends Thread {
                                 System.out.println("Nome doc x workflowdone: " + userPermissionDoc);
                                 String sub = GoDoc.checkPermission(userPermissionDoc, workflow, "Workflowisdone");
                                 System.out.println("SUB: " + sub);
-                                //String emailSubjectTxt = "The workflow " + workflow + " is completed";
+                                String emailSubjectTxt = "The workflow " + workflow + " is completed";
                                 if (sub.equalsIgnoreCase("subscribe") && sub != null)
                                 {
-                                   // sendGMsg(emailSubjectTxt, destemail[j]);
+                                   chClient.sendGMsg(chClient, emailSubjectTxt, destemail[j]);
                                     destemaildone.add(destemail[j]);
                                 }
                              
@@ -185,69 +186,70 @@ Exception ex) {
     }
     // connettere il chat client ch, una sola volta, prima di cominciare
 // a mandare IMs (se no fallisce). Serve account google e password
-    private static void connectChatClient(ChatClient ch, String account, String password) {
-        try {
-            ch.login(account, password);
-        } catch (Exception e) {
-            System.err.println("Failed chatClient login: "
-                    + account + "; " + e.toString());
-        }
-    }
 
-// disconnettere il chat client al termine dello stream di IMs
-    private static void disconnectChatClient(ChatClient ch) {
-        try {
-            ch.disconnect();
-        } catch (Exception e) {
-            System.err.println("Failed ChatClient logout" + e.toString());
-        }
-    }
+//    private static void connectChatClient(ChatClient ch, String account, String password) {
+//        try {
+//            ch.login(account, password);
+//        } catch (Exception e) {
+//            System.err.println("Failed chatClient login: "
+//                    + account + "; " + e.toString());
+//        }
+//    }
+//
+//// disconnettere il chat client al termine dello stream di IMs
+//    private static void disconnectChatClient(ChatClient ch) {
+//        try {
+//            ch.disconnect();
+//        } catch (Exception e) {
+//            System.err.println("Failed ChatClient logout" + e.toString());
+//        }
+//    }
+//
+//// per mandare un IM ad un chat client
+//    private void genIM(ChatClient chClient, String receiver, String message) {
+//
+//        if (chClient != null) {
+//            try {
+//                chClient.sendMessage(message, receiver);
+//            } catch (Exception e) {
+//                System.err.println("Problem in IM - " + e.toString());
+//            }
+//        } else {
+//            System.err.println("NULL CHAT CLIENT!!");
+//        }
+//    }
+//
+//    // subscribe per tasks mgr
+//    private String sendGMsg(String s,String dest) {
+//        // Do something interesting with 's' here on the server.
+//        try {
+//            connectChatClient(chClient, "icemgr09@gmail.com", "sync09fr");
+//          //  connectChatClient(chClient, "sgnmrn@gmail.com", "micio11");
+//            //chClient.sendGTalkMsg("gio.petrone@gmail.com", "sgnmrn@gmail.com", "micio11", s, false);
+//
+//            genIM(chClient, dest, s);
+//             System.out.println("%%%%%%%%%%% DOPO IL SEND IM %%%%%%%%%%%%%");
+//            disconnectChatClient(chClient);
+//        } catch (Exception e) {
+//            System.err.println("ECCEZIONE chat: "+e.getMessage());
+//        }
+//        return "Server says: " + s;
+//    }
 
-// per mandare un IM ad un chat client
-    private void genIM(ChatClient chClient, String receiver, String message) {
-
-        if (chClient != null) {
-            try {
-                chClient.sendMessage(message, receiver);
-            } catch (Exception e) {
-                System.err.println("Problem in IM - " + e.toString());
-            }
-        } else {
-            System.err.println("NULL CHAT CLIENT!!");
-        }
-    }
-
-    // subscribe per tasks mgr
-    private String sendGMsg(String s,String dest) {
-        // Do something interesting with 's' here on the server.
-        try {
-            connectChatClient(chClient, "icemgr09@gmail.com", "sync09fr");
-          //  connectChatClient(chClient, "sgnmrn@gmail.com", "micio11");
-            //chClient.sendGTalkMsg("gio.petrone@gmail.com", "sgnmrn@gmail.com", "micio11", s, false);
-
-            genIM(chClient, dest, s);
-             System.out.println("%%%%%%%%%%% DOPO IL SEND IM %%%%%%%%%%%%%");
-            disconnectChatClient(chClient);
-        } catch (Exception e) {
-            System.err.println("ECCEZIONE chat: "+e.getMessage());
-        }
-        return "Server says: " + s;
-    }
-
-    private ContactCall connectContact(String userMail, String psswd) {
-        ContactCall cCallTmp = null;
-        try {
-            String[] myArg = {"--username=" + userMail, "--password=" + psswd, "-contactfeed", "--action=update"};  // OK
-            //   String[] myArg = {"--username=annamaria.goy@gmail.com", "--password=tex_willer", "-contactfeed", "--action=update"};  // OK
-            //String[] myArg = {"--username=" + iceMgrLogin, "--password=" + iceMgrPasswd, "-contactfeed", "--action=update"};  // OK
-            ContactsExampleParameters parameters = new ContactsExampleParameters(myArg); // X USAGE
-            cCallTmp = new ContactCall(parameters);
-            //FINE NUOVO
-        } catch (Exception e) {
-            System.out.println("error");
-        }
-        return cCallTmp;
-    }
+//    private ContactCall connectContact(String userMail, String psswd) {
+//        ContactCall cCallTmp = null;
+//        try {
+//            String[] myArg = {"--username=" + userMail, "--password=" + psswd, "-contactfeed", "--action=update"};  // OK
+//            //   String[] myArg = {"--username=annamaria.goy@gmail.com", "--password=tex_willer", "-contactfeed", "--action=update"};  // OK
+//            //String[] myArg = {"--username=" + iceMgrLogin, "--password=" + iceMgrPasswd, "-contactfeed", "--action=update"};  // OK
+//            ContactsExampleParameters parameters = new ContactsExampleParameters(myArg); // X USAGE
+//            cCallTmp = new ContactCall(parameters);
+//            //FINE NUOVO
+//        } catch (Exception e) {
+//            System.out.println("error");
+//        }
+//        return cCallTmp;
+//    }
 
 
     private String extractPermission(String user)
