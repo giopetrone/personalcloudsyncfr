@@ -39,7 +39,7 @@ public class TestPub {
      public  void testPublisherLocalhost(String hub, String feed) throws Exception {
         Publisher publisher = new Publisher();
         if (hub.equals("")) {
-            hub = "http://localhost:8080";
+            hub = "http://localhost:8080";          
         }
         if (feed.equals("")) {
             feed = "http://localhost/Atomi/marinofeed.xml";
