@@ -557,19 +557,19 @@
                                 else if(nosave == null)
                                 {
 
-                                    var open = "childWindow=open('/docsave.html','_blank','status=1,toolbar=1,scrollbars=1,width=400,height=200')"
+                                    var open = "childWindow=open('docsave.html','_blank','status=1,toolbar=1,scrollbars=1,width=400,height=200')"
                                     sav.removeAttribute("onclick");
                                     sav.setAttribute("onclick", open)
                                     draft.removeAttribute("onclick");
                                     draft.setAttribute("onclick","saveDiagram('false');")
                                     share.removeAttribute("onclick");
-                                    open = "childWindow=open('/shared.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')";
+                                    open = "childWindow=open('shared.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')";
                                     share.setAttribute("onclick", open)
                                     template.removeAttribute("onclick");
                                     open = "childWindow=open('/docs3.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')";
                                     template.setAttribute("onclick", open);
                                     change.removeAttribute("onclick");
-                                    open = "childWindow=open('/changepriv.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')";
+                                    open = "childWindow=open('changepriv.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')";
                                     change.setAttribute("onclick",open);
                                 }
                                
@@ -951,7 +951,7 @@ function setCondition()
   
 
 
-    <div id="menu" style="font-size: 13px"> <a href="#" onclick="childWindow=open('/docsave.html','_blank','status=1,toolbar=1,scrollbars=1,width=400,height=200')" id="savenew" name="savenew" >Save Diagram </a> |  <a href="#" onClick=" saveDiagram('false');" id="savedraft">Save Draft</a> | <a href="#" onclick="childWindow=open('docs.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="load" name="load" >LoadDiagram </a>  | <a href="#" onclick="childWindow=open('/shared.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800');" id="share">Share</a>
+    <div id="menu" style="font-size: 13px"> <a href="#" onclick="childWindow=open('docsave.html','_blank','status=1,toolbar=1,scrollbars=1,width=400,height=200')" id="savenew" name="savenew" >Save Diagram </a> |  <a href="#" onClick=" saveDiagram('false');" id="savedraft">Save Draft</a> | <a href="#" onclick="childWindow=open('docs.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="load" name="load" >LoadDiagram </a>  | <a href="#" onclick="childWindow=open('/shared.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800');" id="share">Share</a>
         | <a href="#" onclick="childWindow=open('/docs3.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="savetemplate">Save as Template</a> |
         <%=sessuser%> |<a href="http://localhost:8080/NotifMgrG/index.jsp"  target ="_blank" id="settings" name="settings"> <u>Notification settings</u> </a> |<a href="#" onclick="childWindow=open('/changepriv.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="changepriv" name="changepriv" disabled="disabled" >Change privileges of users </a>| <a target=_blank href="http://docs.google.com/support/?hl=en" class=gb4>Help</a>
         | <select name="notification" id="notification" >
