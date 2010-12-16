@@ -50,7 +50,7 @@ public class GoDoc {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
-   
+
     /*
      * To change this template, choose Tools | Templates
      * and open the template in the editor.
@@ -79,9 +79,9 @@ public class GoDoc {
     }
 
     public  static void main(String[] args) throws MalformedURLException, IOException, ServiceException {
-  
+
         try{
-            
+
             DocsService service = new DocsService("Document List Demo");
             service.setUserCredentials(docMakerLogin, docMakerPasswd);
             URL listFeedUrl = new URL("http://docs.google.com/feeds/documents/private/full/");
@@ -115,10 +115,10 @@ public class GoDoc {
                         System.out.println("PRIMA "+s);
                         s = new GoDoc(service).findFiles(s);
                         System.out.println("DOPO: "+s);
-                        
+
                         if(s.contains("ciao.txt")) s = s.replaceAll("ciao.txt","blabla");
                         else s += "\nciao.txt/All";
-                       
+
                          service.getRequestFactory().setHeader("If-Match", "*");
                          doc.setMediaSource(new MediaByteArraySource(s.getBytes(), "text/plain"));
                          doc.updateMedia(false);
@@ -141,15 +141,15 @@ public void printDocuments(DocumentListFeed feed) throws IOException, ServiceExc
     String documentName = "ilarialbano.txt";
         try {
             DocumentListEntry documentEntry = findEntry(documentName);
-        
+
         } catch (Exception ex) {
             Logger.getLogger(GoDoc.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-    
 
-    
-  
+
+
+
 }
 
 
@@ -167,10 +167,10 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
 
 
     public static String prendi(String login, String pwd) {
-        
+
         DocsService service = new DocsService("Document List Demo");
         try {
-             
+
             service.setUserCredentials(login, pwd);
             return new GoDoc(service).showAllDocs();
         } catch (Exception ex) {
@@ -183,7 +183,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
     public void saveNewDiagram(String login, String documentName,String s, String users, String writers,String pwd,String assignees)
     {
                 try{
-                  
+
                     DocumentListEntry documentEntry = findEntry(documentName);
                     System.out.println("DOCUMENTO NUOVO");
                     List<AtomEvent> listaeventi = new ArrayList();
@@ -253,7 +253,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                                 destinatari.add(tempwriter[j]);
                             }
                         }
-                       
+
                         String [] tempassignees;
                         tempassignees = assignees.split(delimiter);
                         for (int j = 0; j < tempassignees.length; j++)
@@ -287,30 +287,30 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                                     else System.out.println("Dentro CATCH X utente "+thisassigner+" "+ex.getMessage());
                                 }
                             }
-                    
+
                         }
 
                         destinatari.add(login);
-                      
-                        
+
+
                         String dest = destinatari.toString();
                         int length = dest.length();
                         String destfinal = dest.substring(1, length - 1);
                         if(destinatari.size() != 1) sendMail(destfinal,"icemgr09@gmail.com","sync09fr",documentName);
-                       
+
                      //   FeedUtil.addEntries("",documentName,listaeventi);
-                        
 
-                        
 
-                    } 
 
-                    
+
+                    }
+
+
                     }catch(Exception ex)
                     {
 
                          System.out.println("IN SAVE NEW DIAGRAM "+ex.getMessage());
-                        
+
                     }
 
 
@@ -333,8 +333,6 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                 SaveServlet.setTypeNotification(typeNotif);
                 List<AtomEvent> listaeventi = new ArrayList();
                 listaeventi.add(eventUpdate);
-               // FeedUtil.addEntries("", documentName, listaeventi);
-                
                     List<String> readers = new ArrayList();
                     List<String> collaborators = new ArrayList();
                     AclFeed aclFeed = service.getFeed(new URL(documentEntry.getAclFeedLink().getHref()), AclFeed.class);
@@ -392,7 +390,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                                     {
 
                                      //   System.out.println("collaborators: " + collaborators.get(z));
-                                        if (tempusers[i].contains(collaborators.get(z))) 
+                                        if (tempusers[i].contains(collaborators.get(z)))
                                         {
                                             System.out.println("%%%%% CAMBIO PERMESSI DI %%%% "+collaborators.get(z));
                                             update(documentEntry, aclFeed, collaborators.get(z));
@@ -507,9 +505,9 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                            if(count0 > 0 && count0 == count1) checkchiocciola = true;
                            if(!tempassignes[z].equals("") && checkchiocciola == true)
                            {
-                               
+
                                try{
-                                   
+
                                    addWriting(documentEntry, tempassignes[z]);
                               //     System.out.println("%%%% Diventa writer Assign%%%%%%% "+tempassignes[z]);
                                    AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
@@ -520,10 +518,10 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                                 //   new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
 
                                }catch(Exception ex){System.out.println("DENTRO FOR ASSIGNEES in Update DIagram X UTENTE "+tempassignes[z]+" "+ex.getMessage());}
-                           } 
+                           }
                        }
-                      
-                       
+
+
                     }
                   //  FeedUtil.addEntries("", documentName, listaeventi);
 
@@ -536,14 +534,14 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                     return "notnew";
 
                 } catch (Exception ex) {
-                    
+
                     if(ex.getMessage().equalsIgnoreCase("This user already has access to the document."))
                     {
 
                       //  System.out.println("DENTRO If update diagram "+ex.getMessage());
                         return "notnew";
                     }
-                    else 
+                    else
                     {
                         System.err.println("DEntro Update diagram" +ex.getMessage());
                         return ex.getMessage();
@@ -558,12 +556,12 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
             DocumentListEntry documentEntry = findEntry(documentName);
 
             if (documentEntry == null) {
-               
+
                saveNewDiagram(login,documentName,s,users,writers,pwd,assignees);
 
                 return "new";
 
-            } else 
+            } else
             {
              //   System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%");
                 String ret = uploadDiagram(login,documentName,users,writers,s,assignees);
@@ -583,7 +581,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
         }
     }
 
-   
+
 
     public DocumentListEntry uploadFile(String content, String title)
             throws IOException, ServiceException {
@@ -690,7 +688,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
 
     public List<String> loadDoc(String valorefile, boolean refresh, String owner) {
         try {
-            
+
             DocumentListEntry documentEntry = findEntry(valorefile);
             //   System.out.println(documentEntry.toString());
             List<String> list = new LinkedList();
@@ -710,17 +708,17 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
             }
             documentVersions.put(valorefile, last); // update current version
             String resourceId = documentEntry.getResourceId();
-           
+
             String docType = resourceId.substring(0, resourceId.lastIndexOf(':'));
-             
+
             String docId = resourceId.substring(resourceId.lastIndexOf(':') + 1);
-            
+
             URL exportUrl = new URL("http://docs.google.com/feeds/download/" + docType
                     + "s/Export?docID=" + docId + "&exportFormat=" + "html");
-            
+
             MediaContent mc = new MediaContent();
             mc.setUri(exportUrl.toString());
-            
+
             MediaSource ms = service.getMedia(mc);
             String s = "";
             byte[] b = new byte[1024];
@@ -729,9 +727,9 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
             while ((c = inStream.read(b)) != -1) {
                 s += new String(b, 0, c);
             }
-            
+
             s = findBody(s);
-           
+
             String error = "Non hai i permessi";
             List<String> people = new ArrayList();
             List<String> collaborators = new ArrayList();
@@ -743,13 +741,13 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
             int size = aclFeed.getEntries().size();
             System.out.println("SIZE " +aclFeed.getEntries().size());
             for (AclEntry entry : aclFeed.getEntries()) {
-                
+
                 System.out.println("RUOLO "+entry.getRole().getValue());
                 if (entry.getRole().getValue().equals("reader")) {
                     System.out.println("Trovato reader");
                     readers.add(entry.getScope().getValue());
                 }
-                
+
                 else if (entry.getRole().getValue().equals("writer")) {
                     System.out.println("Trovato Writer");
                     collaborators.add(entry.getScope().getValue());
@@ -762,7 +760,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
 
 
             }
-            
+
             String users = readers.toString();
 
 
@@ -774,7 +772,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
             }
             System.out.println("USERS: "+users);
             String writers = collaborators.toString();
-          
+
 
 
 
@@ -984,9 +982,9 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                 writer.close();
                 FileReader fr = new FileReader(f);
                 BufferedReader br = new BufferedReader(fr);
-             
+
                 String t ="";
-                
+
                 boolean subscribe = false;
                 while((t = br.readLine()) != null)
                 {
@@ -1044,7 +1042,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
                  String add = flowName+"/"+notification;
                  File f;
                  f=new File("/var/www/Permissions/prova.txt");
-                
+
                  if(!f.exists()) f.createNewFile();
                  FileWriter writer = new FileWriter(f);
                  writer.write(s);
@@ -1123,7 +1121,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
     public static List<String> loadDiagram(String valorefile, boolean refresh, String owner,String pwd) {
         DocsService service = new DocsService("Document List Demo");
         try {
-        
+
             service.setUserCredentials(owner, pwd);
 
             return new GoDoc(service).loadDoc(valorefile, refresh, owner);
@@ -1181,7 +1179,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
 
 
 
-        
+
 
 
 
@@ -1196,12 +1194,13 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
             System.out.println("%%%%LOGIN: "+login);
             String SMTP_HOST_NAME = "smtp.gmail.com";
             String SMTP_PORT = "465";
-            String url = "http://localhost:8081/index.jsp?Flow="+name;
-            String url2 = "http://localhost:8081/NotifMgrG/settings.jsp?Flow="+name;
+            String url = "http://localhost:8080/TaskMgr/index.jsp?Flow="+name;
+       //15-12-2010      String url = "http://localhost:8081/index.jsp?Flow="+name;
+            String url2 = "http://localhost:8080/NotifMgrG/settings.jsp?Flow="+name;
             String text = "Hi, a new diagram is interested in you.\nGo and check this workflow "+url+"\n";
             String text2 ="Do not forget to subscribe your Notification Manager to this application: "+url2+"\n";
             String emailMsgTxt = text+text2;
-            
+
             String emailSubjectTxt = "New Collaborative Workflow: "+name;
             String emailFromAddress = login;
             String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
@@ -1209,7 +1208,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
             new SendMailCl().sendSSLMessage(sendTo, emailSubjectTxt, emailMsgTxt, emailFromAddress,pwd);
         }
         catch(Exception ex)
-        { 
+        {
             System.out.println("In SendMail Method: "+ex.getMessage());
         }
 
@@ -1223,7 +1222,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
             DocsService service = new DocsService("Document List Demo");
             service.setUserCredentials(user, pwd);
             return new GoDoc(service).findNewVersion(nomeFile);
-            
+
 
         }
         catch(Exception ex)
@@ -1235,7 +1234,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
 
     }
 
-    public String findNewVersion(String nomeFile) 
+    public String findNewVersion(String nomeFile)
     {
         try
         {
@@ -1259,7 +1258,7 @@ public static DocumentListEntry createFolder(String title) throws IOException, S
            System.out.println("ERRORE IN FIND NEW VERSION "+ex.getMessage());
            return "error";
        }
-        
+
     }
 
 
