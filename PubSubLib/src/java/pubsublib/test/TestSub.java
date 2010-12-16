@@ -42,6 +42,17 @@ public class TestSub {
 
     public static void main(String[] args) {
         try {
+            new TestSub().testSubscriber("http://www.piemonte.di.unito.it/Atomi/marinofeed.xml", "", "");
+            //Discovery discovery = new Discovery();
+          //    new TestPub().testPublisher("http://pubsubhubbub.appspot.com/","http://taskmanagerunito.xoom.it/Flow/remote.txt.xml");
+            //System.out.println("in test subscriber trovo hub: " + discovery.getHub("http://localhost/Atomi/marinofeed.xml"));
+        //    System.out.println(discovery.getContents("http://taskmanagerunito.xoom.it/Flow/pubbl.txt.xml"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+     public static void mainOLD(String[] args) {
+        try {
             new TestSub().testSubscriber("http://taskmanagerunito.xoom.it/Flow/today.txt.xml", "http://localhost:8081/NotifMgrG/NotifCallbackServlet", "");
             //Discovery discovery = new Discovery();
           //    new TestPub().testPublisher("http://pubsubhubbub.appspot.com/","http://taskmanagerunito.xoom.it/Flow/remote.txt.xml");

@@ -36,7 +36,8 @@ import pubsublib.event.AtomEvent;
 public class FeedWriter {
 
     private DateFormat DATE_PARSER = new SimpleDateFormat("yyyy-MM-dd");
-    static String fileName = "/var/www/Atomi/marinofeed.xml";
+    static String fileName = "/var/www/html/Atomi/marinofeed.xml";
+    //static String fileName = "/var/www/Atomi/marinofeed.xml";
    // SyndFeed feed = new SyndFeedImpl();
    SyndFeed feed = new SyndFeedImpl();
     List entries = new ArrayList();
