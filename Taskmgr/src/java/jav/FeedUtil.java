@@ -43,7 +43,8 @@ public class FeedUtil {
     }
 
     public static String FileFeedName(String flowName) {
-        return "/var/www" + "/Flow/" + flowName + ".xml";
+        return "/var/www/html" + "/Flow/" + flowName + ".xml";
+    //    return "/var/www" + "/Flow/" + flowName + ".xml";
     //    return "http://taskmgrunito.x10.mx/" +flowName +".xml";
     }
 
@@ -191,7 +192,8 @@ public class FeedUtil {
             // set links to google documents; maybe could be link
             // taskmanager with http://localhost:8081?Flow=filename.txt
          //     addLink(entry, editLink);
-            addLink(entry, "http://localhost:8081/index.jsp?Flow=" + flowName);
+            addLink(entry, "http://localhost:8080/TaskMgr/index.jsp?Flow=" + flowName);
+         //     addLink(entry, "http://localhost:8081/index.jsp?Flow=" + flowName);
             //  entry.setPublishedDate(DATE_PARSER.parse("2009-07-" + i));
             entry.setPublishedDate(Calendar.getInstance().getTime());
            setDescription(entry, event, "text/plain");
@@ -229,11 +231,13 @@ public class FeedUtil {
                     AtomEvent singlevent = event.get(i);
                     entry = new SyndEntryImpl();
                     entry.setTitle("Flow (specificare meglio)");
-                    entry.setUri("http://localhost:8081/index.jsp?Flow=" + flowName+i);
+                    entry.setUri("http://localhost:8080/TaskMgr/index.jsp?Flow=" + flowName+i);
+       //                 entry.setUri("http://localhost:8081/index.jsp?Flow=" + flowName+i);
                     // set links to google documents; maybe could be link
                     // taskmanager with http://localhost:8081?Flow=filename.txt
                  //     addLink(entry, editLink);
-                    addLink(entry, "http://localhost:8081/index.jsp?Flow=" + flowName);
+                    addLink(entry, "http://localhost:8080/TaskMgr/index.jsp?Flow=" + flowName);
+            //        addLink(entry, "http://localhost:8081/index.jsp?Flow=" + flowName);
                     //  entry.setPublishedDate(DATE_PARSER.parse("2009-07-" + i));
                     entry.setPublishedDate(Calendar.getInstance().getTime());
                    setDescription(entry, singlevent, "text/plain");

@@ -108,8 +108,8 @@ TextEdit.invokeAndor = function(event){
           TextEdit.opaque = opaque;
 
           if (!TextEdit.frame) TextEdit.createFrame();
-          if(TextEdit.target.parentNode.parentNode.type =="decision" || content == "Decision") TextEdit.frame.src = '/decision.html';
-          else if(content=="Start" || content == "Start?End?" || content=="End") TextEdit.frame.src = '/startend.html'
+          if(TextEdit.target.parentNode.parentNode.type =="decision" || content == "Decision") TextEdit.frame.src = 'decision.html';
+          else if(content=="Start" || content == "Start?End?" || content=="End") TextEdit.frame.src = 'startend.html'
           else TextEdit.frame.src = '/andor.html';
               // centre the frame
           var h = document.body.clientHeight;
@@ -197,7 +197,7 @@ TextEdit.showframe = function() {
   TextEdit.opaque = opaque;
 
   if (!TextEdit.frame) TextEdit.createFrame();
-  TextEdit.frame.src = '/modifyLoad.html';
+  TextEdit.frame.src = 'modifyLoad.html';
 
   // centre the frame
   var h = document.body.clientHeight;
@@ -226,7 +226,7 @@ TextEdit.showframe2 = function() {
   TextEdit.opaque = opaque;
 
   if (!TextEdit.frame) TextEdit.createFrame();
-  TextEdit.frame.src = '/andor.html';
+  TextEdit.frame.src = 'andor.html';
 
   // centre the frame
   var h = document.body.clientHeight;
@@ -256,7 +256,7 @@ TextEdit.showframe3 = function() {
   TextEdit.opaque = opaque;
 
   if (!TextEdit.frame) TextEdit.createFrame();
-  TextEdit.frame.src = '/details.html';
+  TextEdit.frame.src = 'details.html';
 
   // centre the frame
   var h = document.body.clientHeight;
@@ -284,7 +284,7 @@ TextEdit.showframe4 = function() {
   TextEdit.opaque = opaque;
 
   if (!TextEdit.frame) TextEdit.createFrame();
-  TextEdit.frame.src = '/view.html';
+  TextEdit.frame.src = 'view.html';
 
   // centre the frame
   var h = document.body.clientHeight;
@@ -314,7 +314,7 @@ TextEdit.showframe6 = function() {
   TextEdit.opaque = opaque;
 
   if (!TextEdit.frame) TextEdit.createFrame();
-  TextEdit.frame.src = '/decision.html';
+  TextEdit.frame.src = 'decision.html';
 
   // centre the frame
   var h = document.body.clientHeight;

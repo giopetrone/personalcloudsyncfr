@@ -91,7 +91,7 @@
                                 if(confirm)
                                 {
                                     var diagname = document.getElementById('area').value;
-                                    var link = "http://localhost:8081/login.jsp?Flow="+diagname;
+                                    var link = "http://localhost:8080/login.jsp?Flow="+diagname;
                                     //loadDiagram(document.getElementById('area').value);
                                     window.location = link;
                                 }
@@ -285,7 +285,7 @@
                     add.appendChild(h4);
                     
                     var urlfeed = "http://taskmanagerunito.xoom.it/Flow/"+str+".xml";
-                    var urlnotif = "http://localhost:8081/NotifMgrG/settings.jsp?Flow="+str;
+                    var urlnotif = "http://localhost:8080/NotifMgrG/settings.jsp?Flow="+str;
                     link.setAttribute('href',urlfeed);
                     link.setAttribute('target', '_blank');
                     link2.setAttribute('href',urlnotif);
@@ -313,7 +313,7 @@
                        palette4.appendChild(link);
                        palette3.appendChild(link2);
                        var diagname = document.getElementById('area').value;
-                       var link = "http://localhost:8081/login.jsp?Flow="+diagname;
+                       var link = "http://localhost:8080/login.jsp?Flow="+diagname;
                        //loadDiagram(document.getElementById('area').value);
                        window.location = link;
                        
@@ -513,7 +513,7 @@
                                 var draft = document.getElementById("savedraft");
                                 var change = document.getElementById("changepriv");
                                 var urlfeed = "http://taskmanagerunito.xoom.it/Flow/"+diagramName+".xml";
-                                var urlnotif = "http://localhost:8081/NotifMgrG/settings.jsp?Flow="+diagramName;
+                                var urlnotif = "http://localhost:8080/NotifMgrG/settings.jsp?Flow="+diagramName;
                                 var link = document.createElement("a");
                                 var link2 = document.createElement("a");
                                 link.setAttribute('href',urlfeed);
@@ -951,9 +951,9 @@ function setCondition()
   
 
 
-    <div id="menu" style="font-size: 13px"> <a href="#" onclick="childWindow=open('/docsave.html','_blank','status=1,toolbar=1,scrollbars=1,width=400,height=200')" id="savenew" name="savenew" >Save Diagram </a> |  <a href="#" onClick=" saveDiagram('false');" id="savedraft">Save Draft</a> | <a href="#" onclick="childWindow=open('/docs.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="load" name="load" >LoadDiagram </a>  | <a href="#" onclick="childWindow=open('/shared.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800');" id="share">Share</a>
+    <div id="menu" style="font-size: 13px"> <a href="#" onclick="childWindow=open('/docsave.html','_blank','status=1,toolbar=1,scrollbars=1,width=400,height=200')" id="savenew" name="savenew" >Save Diagram </a> |  <a href="#" onClick=" saveDiagram('false');" id="savedraft">Save Draft</a> | <a href="#" onclick="childWindow=open('docs.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="load" name="load" >LoadDiagram </a>  | <a href="#" onclick="childWindow=open('/shared.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800');" id="share">Share</a>
         | <a href="#" onclick="childWindow=open('/docs3.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="savetemplate">Save as Template</a> |
-        <%=sessuser%> |<a href="http://localhost:8081/NotifMgrG/index.jsp"  target ="_blank" id="settings" name="settings"> <u>Notification settings</u> </a> |<a href="#" onclick="childWindow=open('/changepriv.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="changepriv" name="changepriv" disabled="disabled" >Change privileges of users </a>| <a target=_blank href="http://docs.google.com/support/?hl=en" class=gb4>Help</a>
+        <%=sessuser%> |<a href="http://localhost:8080/NotifMgrG/index.jsp"  target ="_blank" id="settings" name="settings"> <u>Notification settings</u> </a> |<a href="#" onclick="childWindow=open('/changepriv.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="changepriv" name="changepriv" disabled="disabled" >Change privileges of users </a>| <a target=_blank href="http://docs.google.com/support/?hl=en" class=gb4>Help</a>
         | <select name="notification" id="notification" >
 
 

@@ -51,7 +51,7 @@ public class Grafico {
         }
     }
 
-    public String setUsers(String owner, String writers, String users) {
+   public String setUsers(String owner, String writers, String users) {
 
         List<String> assign = new LinkedList();
         String ownerBlock = blocks[0].owner;

@@ -18,7 +18,7 @@ import pubsublib.test.TestSub;
  */
 public class SubscribeServlet extends HttpServlet {
 
-    /** 
+    /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      * @param request servlet request
      * @param response servlet response
@@ -39,7 +39,7 @@ public class SubscribeServlet extends HttpServlet {
             String nomeFile = request.getHeader("filenamemio");
             if (casoSubscribe != null) {
                 if (casoSubscribe.equals("start")) {
-                    new TestSub().testSubscriber(FeedUtil.SubFeedName(nomeFile), "http://localhost:8081/CallbackServlet", "");
+                    new TestSub().testSubscriber(FeedUtil.SubFeedName(nomeFile), "http://localhost:8080/CallbackServlet", "");
                     out.println("fatta subscribe");
                     out.close();
                 } else {
@@ -53,7 +53,7 @@ public class SubscribeServlet extends HttpServlet {
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /** 
+    /**
      * Handles the HTTP <code>GET</code> method.
      * @param request servlet request
      * @param response servlet response
@@ -66,7 +66,7 @@ public class SubscribeServlet extends HttpServlet {
         processRequest(request, response);
     }
 
-    /** 
+    /**
      * Handles the HTTP <code>POST</code> method.
      * @param request servlet request
      * @param response servlet response
@@ -79,7 +79,7 @@ public class SubscribeServlet extends HttpServlet {
         processRequest(request, response);
     }
 
-    /** 
+    /**
      * Returns a short description of the servlet.
      * @return a String containing servlet description
      */
