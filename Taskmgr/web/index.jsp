@@ -28,7 +28,7 @@
 
     %>
 
-    <jsp:forward page="/login.jsp">
+    <jsp:forward page="login.jsp">
         <jsp:param name = "Flow" value='<%=flow%>' />
     </jsp:forward>
     <%}%>
@@ -91,7 +91,8 @@
                                 if(confirm)
                                 {
                                     var diagname = document.getElementById('area').value;
-                                    var link = "http://localhost:8080/login.jsp?Flow="+diagname;
+                                   // var link = "http://localhost:8080/login.jsp?Flow="+diagname;
+                                     var link = "http://piemonte.di.unito.it/login.jsp?Flow="+diagname;
                                     //loadDiagram(document.getElementById('area').value);
                                     window.location = link;
                                 }
@@ -313,7 +314,8 @@
                        palette4.appendChild(link);
                        palette3.appendChild(link2);
                        var diagname = document.getElementById('area').value;
-                       var link = "http://localhost:8080/login.jsp?Flow="+diagname;
+                      // var link = "http://localhost:8080/login.jsp?Flow="+diagname;
+                      var link = "http://piemonte.di.unito.it/login.jsp?Flow="+diagname;
                        //loadDiagram(document.getElementById('area').value);
                        window.location = link;
                        
@@ -951,7 +953,7 @@ function setCondition()
   
 
 
-    <div id="menu" style="font-size: 13px"> <a href="#" onclick="childWindow=open('docsave.html','_blank','status=1,toolbar=1,scrollbars=1,width=400,height=200')" id="savenew" name="savenew" >Save Diagram </a> |  <a href="#" onClick=" saveDiagram('false');" id="savedraft">Save Draft</a> | <a href="#" onclick="childWindow=open('docs.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="load" name="load" >LoadDiagram </a>  | <a href="#" onclick="childWindow=open('/shared.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800');" id="share">Share</a>
+    <div id="menu" style="font-size: 13px"> <a href="#" onclick="childWindow=open('docsave.html','_blank','status=1,toolbar=1,scrollbars=1,width=400,height=200')" id="savenew" name="savenew" >Save Diagram </a> |  <a href="#" onClick=" saveDiagram('false');" id="savedraft">Save Draft</a> | <a href="#" onclick="childWindow=open('docs.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="load" name="load" >LoadDiagram </a>  | <a href="#" onclick="childWindow=open('shared.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800');" id="share">Share</a>
         | <a href="#" onclick="childWindow=open('/docs3.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="savetemplate">Save as Template</a> |
         <%=sessuser%> |<a href="http://localhost:8080/NotifMgrG/index.jsp"  target ="_blank" id="settings" name="settings"> <u>Notification settings</u> </a> |<a href="#" onclick="childWindow=open('/changepriv.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="changepriv" name="changepriv" disabled="disabled" >Change privileges of users </a>| <a target=_blank href="http://docs.google.com/support/?hl=en" class=gb4>Help</a>
         | <select name="notification" id="notification" >
@@ -994,7 +996,7 @@ function setCondition()
          <input type="button" value="See JSON" onclick="dado();"/>
  <input type="button" value="Check Condition" onclick="setCondition();"/>
          
-         <input type="button" value="Share" onclick="childWindow=open('/shared.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800');"/>
+         <input type="button" value="Share" onclick="childWindow=open('shared.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800');"/>
          <a href="#" onclick="childWindow=open('/docs2.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="add" name="add" >SaveDiagram </a>
             <input type="button" value="See JSON" onclick="dado();TextEdit.check();TextEdit.setOwner();"/>
         <input type="text" id="diagramName" name ="diagramName" value=""    />

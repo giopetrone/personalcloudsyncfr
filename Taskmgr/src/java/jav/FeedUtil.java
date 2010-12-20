@@ -38,6 +38,11 @@ public class FeedUtil {
         return "http://taskmanagerunito.xoom.it/Flow/"+flowName+".xml";
     }
 
+      public static String GetUrl() {
+
+        return "http://www.piemonte.di.unito.it/";
+    }
+
      public static String RemoteFeedName(String flowName) {
         return "/webspace/httpdocs" + "/Flow/" + flowName + ".xml";
     }

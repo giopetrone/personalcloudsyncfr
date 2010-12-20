@@ -184,7 +184,7 @@ public class SunFtpWrapper extends FtpClient {
                     System.out.println("Results of a raw LIST command:\n" + ftp.listRaw());
                    
                     ftp.ascii();
-                    String path = "/var/www/Flow/";
+                    String path = "/var/www/html/Flow/";  // x piemontehost
                     String nome = nameFeed;
                     String xml = ".xml";
                     String local = path+nome+xml;

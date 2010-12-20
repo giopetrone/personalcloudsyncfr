@@ -151,9 +151,9 @@ public class SaveServlet extends HttpServlet {
             System.out.println("%%%%LOGIN: "+login);
             String SMTP_HOST_NAME = "smtp.gmail.com";
             String SMTP_PORT = "465";
-            String url = "http://localhost:8080/TaskMgr/index.jsp?Flow="+name;
+            String url = FeedUtil.GetUrl() + "TaskMgr/index.jsp?Flow="+name;
             //15-12-2010 String url = "http://localhost:8081/index.jsp?Flow="+name;
-            String url2 = "http://localhost:8080/NotifMgrG/settings.jsp?Flow="+name;
+            String url2 = FeedUtil.GetUrl() + "NotifMgrG/settings.jsp?Flow="+name;
             String text = "Hi, a new diagram is interested in you.\nGo and check this workflow "+url+"\n";
             String text2 ="Do not forget to subscribe your Notification Manager to this application: "+url2+"\n";
             String emailMsgTxt = text+text2;
