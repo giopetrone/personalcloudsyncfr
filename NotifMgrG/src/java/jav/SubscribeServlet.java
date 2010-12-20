@@ -11,7 +11,7 @@ package jav;
 
 
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.PrintWriter; 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -78,7 +78,7 @@ public class SubscribeServlet extends HttpServlet {
                         String hub = discovery.getHub(feed);
                         if(hub.equalsIgnoreCase("http://localhost:8080"))
                         {
-                            new TestSub().testSubscriber(feed, "http://localhost:8081/NotifMgrG/NotifCallbackServlet", "");
+                            new TestSub().testSubscriber(feed, "http://localhost:8080/NotifMgrG/NotifCallbackServlet", "");
                         }
                    //     if(hub.equals("http://pubsubhubbub.appspot.com"))
                    //     {
