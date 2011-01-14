@@ -19,7 +19,7 @@ import org.jivesoftware.smack.XMPPException;
 public class ChatClient implements MessageListener {
 
     XMPPConnection connection;
-    static ChatClient chClient;
+
     String email = "icemgr09@gmail.com";
     String pwd = "sync09fr";
 
@@ -60,40 +60,7 @@ public class ChatClient implements MessageListener {
         }
     }
 
-    private void sendGTalkMsg(String receiver, String sender, String passwdSender, String mess, boolean test) throws XMPPException, IOException {
-        // declare variables
-
-        String msg;
-        // turn on the enhanced debugger
-        XMPPConnection.DEBUG_ENABLED = true;
-        // provide your login information here
-        // c.login("gio.petrone@gmail.com", "mer20ia05");
-        this.login(sender, passwdSender);
-        //this.displayBuddyList();
-        this.sendMessage(mess, receiver);
-        System.out.println("------------------------------- in sendGTalkMsg, dopo la send " + receiver);
-        if (test) {
-            this.displayBuddyList();
-            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-            System.out.println("-----");
-            System.out.println("-----\n");
-            while (!(msg = br.readLine()).equals("bye")) {
-                // your buddy's gmail address goes here
-                //c.sendMessage(msg, "sgnmrn@gmail.com");
-                //c.sendMessage(msg, "annamaria.goy@gmail.com");
-                this.sendMessage(msg, receiver);
-
-            }
-        }
-
-        this.disconnect();
-        //System.exit(0);
-    }
-
-    // nuove GIO
-    // connettere il chat client ch, una sola volta, prima di cominciare
-// a mandare IMs (se no fallisce). Serve account google e password
-    private static void connectChatClient(ChatClient ch, String account, String password) {
+ private  void connectChatClient(ChatClient ch, String account, String password) {
         try {
             ch.login(account, password);
         } catch (Exception e) {
@@ -103,7 +70,7 @@ public class ChatClient implements MessageListener {
     }
 
     // disconnettere il chat client al termine dello stream di IMs
-    private static void disconnectChatClient(ChatClient ch) {
+    private  void disconnectChatClient(ChatClient ch) {
         try {
             ch.disconnect();
         } catch (Exception e) {
@@ -112,11 +79,11 @@ public class ChatClient implements MessageListener {
     }
 
 // per mandare un IM ad un chat client
-    private void genIM(ChatClient chClient, String receiver, String message) {
+    private void genIM( String receiver, String message) {
 
-        if (chClient != null) {
+        if (this != null) {
             try {
-                chClient.sendMessage(message, receiver);
+                sendMessage(message, receiver);
             } catch (Exception e) {
                 System.err.println("Problem in IM - " + e.toString());
             }
@@ -125,16 +92,20 @@ public class ChatClient implements MessageListener {
         }
     }
 
-    public String sendGMsg(ChatClient chClient, String s, String dest) {
+    /**
+     *
+     * @param s  message
+     * @param dest email destination
+     * @return
+     */
+    public String sendGMsg(String s, String dest) {
         // Do something interesting with 's' here on the server.
         try {
-            connectChatClient(chClient, "icemgr09@gmail.com", "sync09fr");
-            //  connectChatClient(chClient, "sgnmrn@gmail.com", "micio11");
-            //chClient.sendGTalkMsg("gio.petrone@gmail.com", "sgnmrn@gmail.com", "micio11", s, false);
-
-            genIM(chClient, dest, s);
+            connectChatClient(this, email, pwd);
+                 
+            genIM(dest, s);
             System.out.println("%%%%%%%%%%% DOPO IL SEND IM %%%%%%%%%%%%%");
-            disconnectChatClient(chClient);
+            disconnectChatClient(this);
         } catch (Exception e) {
             System.err.println("ECCEZIONE chat: " + e.getMessage());
         }
@@ -143,40 +114,11 @@ public class ChatClient implements MessageListener {
 
     // end nuove GIO
     public static void main(String args[]) throws XMPPException, IOException {
-        chClient = new ChatClient();
+        ChatClient chClient = new ChatClient();
         //   chClient.sendGTalkMsg("gio.petrone@gmail.com", "sgnmrn@gmail.com", "micio11", "ciaoNew", true);
-        chClient.sendGMsg(chClient, "ciao", "gio.petrone@gmail.com");
+        chClient.sendGMsg("ciao", "gio.petrone@gmail.com");
     }
 
-    public static void Oldmain(String args[]) throws XMPPException, IOException {
-        // declare variables
-        chClient = new ChatClient();
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        String msg;
-
-
-        // turn on the enhanced debugger
-        XMPPConnection.DEBUG_ENABLED = true;
-
-
-        // provide your login information here
-        chClient.login("sgnmrn@gmail.com", "micio11");
-
-
-        chClient.displayBuddyList();
-        System.out.println("-----");
-        System.out.println("Enter your message in the console.");
-        System.out.println("All messages will be sent to annamaria.goy");
-        System.out.println("-----\n");
-
-        while (!(msg = br.readLine()).equals("bye")) {
-            // your buddy's gmail address goes here
-            //c.sendMessage(msg, "sgnmrn@gmail.com");
-            chClient.sendMessage(msg, "gio.petrone@gmail.com");
-        }
-
-        chClient.disconnect();
-        System.exit(0);
-    }
+    
 }
 
