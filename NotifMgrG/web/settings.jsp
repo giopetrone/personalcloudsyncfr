@@ -118,7 +118,7 @@
     <body style="background-color: #add8e6">
          <div id="menu" style="font-size: 13px">
 
-        <%=sessuser%> | <u>Settings</u> | <a target=_blank href="http://docs.google.com/support/?hl=en" class=gb4>Help</a> |<a href="http://localhost:8081/NotifMgrG/index.jsp" id="link">Home page</a>| <a href="logout.jsp" class=gb4 >Log out </a> </div>
+        <%=sessuser%> | <u>Settings</u> | <a target=_blank href="http://docs.google.com/support/?hl=en" class=gb4>Help</a> |<a href="http://localhost:8080/NotifMgrG/index.jsp" id="link">Home page</a>| <a href="logout.jsp" class=gb4 >Log out </a> </div>
         <h1>Settings of Flow: <%=flow%></h1>
         <form name="myform" method="get">
             <input type="hidden" value='' name="name" id="name"/>

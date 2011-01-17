@@ -31,7 +31,7 @@ public class NotifThread extends Thread {
     public void run() {
         try {
             
-            System.err.println("NOTIFICATIONS: " + eventi.size());
+            System.err.println("NotifThread.run : NOTIFICATIONS: " + eventi.size());
            
 
                 for (AtomEvent cont : eventi) {
@@ -65,7 +65,7 @@ public class NotifThread extends Thread {
                                     if (sub.equalsIgnoreCase("subscribe"))
                                     {
                                         //sendGMsg(emailSubjectTxt, destim);
-                                        chClient.sendGMsg(chClient,emailSubjectTxt, destim);
+                                        chClient.sendGMsg(emailSubjectTxt, destim);
                                     }
                                 }
                             }
@@ -101,7 +101,7 @@ public class NotifThread extends Thread {
                                     if (sub.equalsIgnoreCase("subscribe") && sub != null)
                                     {
                                         destinators.add(destinator);
-                                         chClient.sendGMsg(chClient, emailSubjectTxt, destinator);
+                                         chClient.sendGMsg(emailSubjectTxt, destinator);
                                     }
                                 }
                             }
@@ -110,7 +110,8 @@ public class NotifThread extends Thread {
                             {
                             String[] destinatarifinali = (String[]) destinators.toArray(new String[0]);
                             String emailSubjectTxt = "A task assigned to you: "+taskdeletedname+" has been deleted";
-                            String link = "http://taskmanagerunito.xoom.it/Flow/"+filename+".xml";
+                            String link = "http://www.piemonte.di.unito.it/Flow/"+filename+".xml";
+                         //     String link = "http://taskmanagerunito.xoom.it/Flow/"+filename+".xml";
                             String text = "The task "+taskdeletedname+" has been deleted.\nYou can see the feed at: "+link;
                             new SendMailCl().sendSSLMessage(destinatarifinali, emailSubjectTxt, text, email,pwd);
                             System.out.println("%%%% SEND MAIL IN DELETE TASK %%%%%");
@@ -139,7 +140,7 @@ public class NotifThread extends Thread {
                                 String emailSubjectTxt = "The workflow " + workflow + " is completed";
                                 if (sub.equalsIgnoreCase("subscribe") && sub != null)
                                 {
-                                   chClient.sendGMsg(chClient, emailSubjectTxt, destemail[j]);
+                                   chClient.sendGMsg(emailSubjectTxt, destemail[j]);
                                     destemaildone.add(destemail[j]);
                                 }
                              
@@ -152,7 +153,8 @@ public class NotifThread extends Thread {
                             {
                             String[] destinatarifinali = (String[]) destemaildone.toArray(new String[0]);
                             String emailSubjectTxt = "The Workflow : "+workflow+" has been completed";
-                            String link = "http://taskmanagerunito.xoom.it/Flow/"+workflow+".xml";
+                            String link = "http://www.piemonte.di.unito.it/Flow/"+workflow+".xml";
+                           //  String link = "http://taskmanagerunito.xoom.it/Flow/"+workflow+".xml";
                             String text = "The Workflow : "+workflow+" has been completed\nYou can see the feed at: "+link;
                             new SendMailCl().sendSSLMessage(destinatarifinali, emailSubjectTxt, text, email,pwd);
                             System.out.println("%%%% SEND MAIL IN Workflow done %%%%%");

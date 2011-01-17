@@ -58,9 +58,11 @@ public class NotifCallbackServlet extends HttpServlet {
             String pwd = "sync09fr";
             String email = "icemgr09@gmail.com";
             if (refresh != null) {
+                System.err.println("NofiCallB 1  ");
                 //ciclic ajax call from UI
                 String notif = (String) getServletContext().getAttribute("atomo");
                 if (notif != null) {  // we have received new feed content
+                    System.err.println("NofiCallB 2  ");
                     out.println(notif); // send it to client
                     // set new feed content to nul to avoid duplicate notifications
                     getServletContext().setAttribute("atomo", null);
@@ -70,22 +72,27 @@ public class NotifCallbackServlet extends HttpServlet {
                 }
                 out.close();
             } else {
+                System.err.println("NofiCallB 3  ");
                 // request from HUB: challenge or callback
                 String hubmode = "";
                 if (request.getParameter("hub.mode") != null) {
+                    System.err.println("NofiCallB 4  ");
                     hubmode = request.getParameter("hub.mode");
                 }
+                System.err.println("NofiCallB 5  ");
                 if (((hubmode.equals("subscribe")) || (hubmode.equals("unsubscribe")))
                         && (hubmode.length() > 0)) {
+                    System.err.println("NofiCallB 6  ");
                     String hubchallenge = "";
                     if (request.getParameter("hub.challenge") != null) {
                         hubchallenge = request.getParameter("hub.challenge");
+                        System.err.println("NofiCallB 7  ");
                     }
                     response.setStatus(HttpServletResponse.SC_OK);
                     out.print(hubchallenge);
-              
-                } else
-                {
+
+                } else {
+                    System.err.println("NofiCallB 8  ");
                     ServletInputStream inStream = request.getInputStream();
                     String s = "";
                     byte[] b = new byte[1024];
@@ -94,24 +101,25 @@ public class NotifCallbackServlet extends HttpServlet {
                         s += new String(b, 0, c);
                     }
                     //System.err.println("notifcallbackservlet, string notified=" +s);
-               
-                //    getServletContext().setAttribute("atomo", s);
-                    
-                    List<AtomEvent> notifications = FeedUtil.createAtom(s);
-                    System.err.println("NOTIFICATIONS: "+notifications.size());
 
+                    //    getServletContext().setAttribute("atomo", s);
+
+                    List<AtomEvent> notifications = FeedUtil.createAtom(s);
+                    System.err.println("NOTIFICATIONS: " + notifications.size());
+                    System.err.println("NofiCallB 9 " + notifications.size());
                     if (!notifications.isEmpty()) {
                         NotifThread thread = new NotifThread(notifications);
                         thread.start();
-                      
-                       
+                        // sendEvents(notifications);
+
+
                     }
 
-                    
+
                 }
             }
         } catch (Exception ex) {
-            System.out.println("DENTRO CALLBACK SERVLET: "+ex.getMessage());
+            System.out.println("DENTRO CALLBACK SERVLET: " + ex.getMessage());
             ex.printStackTrace();
         } finally {
             out.close();
@@ -120,55 +128,54 @@ public class NotifCallbackServlet extends HttpServlet {
 
     // connettere il chat client ch, una sola volta, prima di cominciare
 // a mandare IMs (se no fallisce). Serve account google e password
-    private static void connectChatClient(ChatClient ch, String account, String password) {
-        try {
-            ch.login(account, password);
-        } catch (Exception e) {
-            System.err.println("Failed chatClient login: "
-                    + account + "; " + e.toString());
-        }
-    }
-
-// disconnettere il chat client al termine dello stream di IMs
-    private static void disconnectChatClient(ChatClient ch) {
-        try {
-            ch.disconnect();
-        } catch (Exception e) {
-            System.err.println("Failed ChatClient logout" + e.toString());
-        }
-    }
-
-// per mandare un IM ad un chat client
-    private void genIM(ChatClient chClient, String receiver, String message) {
-
-        if (chClient != null) {
-            try {
-                chClient.sendMessage(message, receiver);
-            } catch (Exception e) {
-                System.err.println("Problem in IM - " + e.toString());
-            }
-        } else {
-            System.err.println("NULL CHAT CLIENT!!");
-        }
-    }
-
-    // subscribe per tasks mgr
-    private String sendGMsg(String s,String dest) {
-        // Do something interesting with 's' here on the server.
-        try {
-            connectChatClient(chClient, "icemgr09@gmail.com", "sync09fr");
-          //  connectChatClient(chClient, "sgnmrn@gmail.com", "micio11");
-            //chClient.sendGTalkMsg("gio.petrone@gmail.com", "sgnmrn@gmail.com", "micio11", s, false);
-           
-            genIM(chClient, dest, s);
-             System.out.println("%%%%%%%%%%% DOPO IL SEND IM %%%%%%%%%%%%%");
-            disconnectChatClient(chClient);
-        } catch (Exception e) {
-            System.err.println("ECCEZIONE chat: "+e.getMessage());
-        }
-        return "Server says: " + s;
-    }
-
+//    private static void connectChatClient(ChatClient ch, String account, String password) {
+//        try {
+//            ch.login(account, password);
+//        } catch (Exception e) {
+//            System.err.println("Failed chatClient login: "
+//                    + account + "; " + e.toString());
+//        }
+//    }
+//
+//// disconnettere il chat client al termine dello stream di IMs
+//    private static void disconnectChatClient(ChatClient ch) {
+//        try {
+//            ch.disconnect();
+//        } catch (Exception e) {
+//            System.err.println("Failed ChatClient logout" + e.toString());
+//        }
+//    }
+//
+//// per mandare un IM ad un chat client
+//    private void genIM(ChatClient chClient, String receiver, String message) {
+//
+//        if (chClient != null) {
+//            try {
+//                chClient.sendMessage(message, receiver);
+//            } catch (Exception e) {
+//                System.err.println("Problem in IM - " + e.toString());
+//            }
+//        } else {
+//            System.err.println("NULL CHAT CLIENT!!");
+//        }
+//    }
+//
+//    // subscribe per tasks mgr
+//    private String sendGMsg(String s, String dest) {
+//        // Do something interesting with 's' here on the server.
+//        try {
+//            connectChatClient(chClient, "icemgr09@gmail.com", "sync09fr");
+//            //  connectChatClient(chClient, "sgnmrn@gmail.com", "micio11");
+//            //chClient.sendGTalkMsg("gio.petrone@gmail.com", "sgnmrn@gmail.com", "micio11", s, false);
+//
+//            genIM(chClient, dest, s);
+//            System.out.println("%%%%%%%%%%% DOPO IL SEND IM %%%%%%%%%%%%%");
+//            disconnectChatClient(chClient);
+//        } catch (Exception e) {
+//            System.err.println("ECCEZIONE chat: " + e.getMessage());
+//        }
+//        return "Server says: " + s;
+//    }
     private ContactCall connectContact(String userMail, String psswd) {
         ContactCall cCallTmp = null;
         try {
@@ -184,17 +191,153 @@ public class NotifCallbackServlet extends HttpServlet {
         return cCallTmp;
     }
 
-
-    private String extractPermission(String user)
-    {
+    private String extractPermission(String user) {
 
         int index = user.indexOf("@");
-        String nomeDoc = user.substring(0,index);
-        if(nomeDoc.contains(".")) nomeDoc = nomeDoc.replace(".", "_");
+        String nomeDoc = user.substring(0, index);
+        if (nomeDoc.contains(".")) {
+            nomeDoc = nomeDoc.replace(".", "_");
+        }
         nomeDoc += ".txt";
         return nomeDoc;
     }
 
+    //GIO
+   /* private void sendEvents(List<AtomEvent> eventi) {
+
+
+    String email = "icemgr09@gmail.com";
+    String pwd = "sync09fr";
+    System.err.println("NOTIFICATIONS: " + eventi.size());
+    try {
+
+    for (AtomEvent cont : eventi) {
+    //   System.err.println("new feed content =\n " + cont.toString(true));
+
+    String activity = cont.getActivity();
+
+    if (activity.equalsIgnoreCase("Change Status of Task")) {
+    String taskname = cont.getParameter("Task");
+    String nomeFile = cont.getParameter("File");
+    String dest = cont.getParameter("Assigned To");
+    if (dest == null) {
+    dest = "";
+    }
+    String modifier = cont.getUser();
+    if (!dest.equals("") && dest != null) {
+
+    String emailSubjectTxt = "Update of task " + taskname + " status";
+
+    String[] sendTo = dest.split(",");
+
+    for (int i = 0; i < sendTo.length; i++) {
+    String destim = sendTo[i];
+    //Controllo se il destinatario si e' iscritto alle notifiche
+    if (destim.contains("gmail.com") && !destim.equals("") && !destim.equalsIgnoreCase(modifier)) {
+
+    String nomeDoc = extractPermission(destim);
+    System.out.println("nomeDoc x change status: " + nomeDoc);
+    String sub = GoDoc.checkPermission(nomeDoc, nomeFile, "Changestatusoftask");
+    System.out.println("SUB STATUS: " + sub);
+    if (sub.equalsIgnoreCase("subscribe")) {
+    //sendGMsg(emailSubjectTxt, destim);
+    chClient.sendGMsg(emailSubjectTxt, destim);
+    }
+    }
+    }
+    }
+    } else if (activity.equalsIgnoreCase("a task has been deleted")) {
+    String taskdeletedname = cont.getParameter("Task");
+    String filename = cont.getParameter("File");
+    String assigned = cont.getParameter("Assigned To");
+    if (assigned == null) {
+    assigned = "";
+    }
+    String modifier2 = cont.getUser();
+    if (!assigned.equals("") && assigned != null) {
+
+
+    List destinators = new ArrayList();
+    String[] receivers = assigned.split(",");
+
+    for (int i = 0; i < receivers.length; i++) {
+    String destinator = receivers[i];
+    //Controllo se il destinatario si e' iscritto alle notifiche
+    if (!destinator.equals("") && !destinator.equalsIgnoreCase(modifier2)) {
+
+    String userDoc = extractPermission(destinator);
+    System.out.println("File Name in delete: " + userDoc);
+    String emailSubjectTxt = "A task assigned to you: " + taskdeletedname + "has been deleted";
+    String sub = GoDoc.checkPermission(userDoc, filename, "Deletetask");
+    System.out.println("SUB STATUS IN DELETE: " + sub);
+    if (sub.equalsIgnoreCase("subscribe") && sub != null) {
+    destinators.add(destinator);
+    //  sendGMsg(emailSubjectTxt, destinator);
+    chClient.sendGMsg(emailSubjectTxt, destinator);
+    }
+    }
+    }
+
+    if (!destinators.isEmpty()) {
+    String[] destinatarifinali = (String[]) destinators.toArray(new String[0]);
+    String emailSubjectTxt = "A task assigned to you: " + taskdeletedname + " has been deleted";
+    String link = "http://www.piemonte.di.unito.it/Flow/" + filename + ".xml";
+    //     String link = "http://taskmanagerunito.xoom.it/Flow/"+filename+".xml";
+    String text = "The task " + taskdeletedname + " has been deleted.\nYou can see the feed at: " + link;
+    new SendMailCl().sendSSLMessage(destinatarifinali, emailSubjectTxt, text, email, pwd);
+    System.out.println("%%%% SEND MAIL IN DELETE TASK %%%%%");
+    }
+    }
+
+    } else if (activity.equalsIgnoreCase("Workflow is Done")) {
+    String workflow = cont.getParameter("Workflow");
+    String allusers = cont.getParameter("All users");
+    System.out.println("USERS prima di substring: " + allusers);
+    //allusers = allusers.substring(1, allusers.length());
+
+    String[] destemail = allusers.split(",");
+    List destemaildone = new ArrayList();
+    for (int j = 0; j < destemail.length; j++) {
+    if (destemail[j].contains("@")) {
+    String userPermissionDoc = extractPermission(destemail[j]);
+    if (userPermissionDoc.contains(" ")) {
+    userPermissionDoc = userPermissionDoc.replace(" ", "");
+    }
+    System.out.println("Nome doc x workflowdone: " + userPermissionDoc);
+    String sub = GoDoc.checkPermission(userPermissionDoc, workflow, "Workflowisdone");
+    System.out.println("SUB: " + sub);
+    String emailSubjectTxt = "The workflow " + workflow + " is completed";
+    if (sub.equalsIgnoreCase("subscribe") && sub != null) {
+    chClient.sendGMsg(emailSubjectTxt, destemail[j]);
+    destemaildone.add(destemail[j]);
+    }
+
+    }
+    // String sub = WriterPermission.checkNotifications(sendTo[j],workflow,"Workflowisdone");
+
+
+    }
+    if (!destemaildone.isEmpty()) {
+    String[] destinatarifinali = (String[]) destemaildone.toArray(new String[0]);
+    String emailSubjectTxt = "The Workflow : " + workflow + " has been completed";
+    String link = "http://www.piemonte.di.unito.it/Flow/" + workflow + ".xml";
+    //  String link = "http://taskmanagerunito.xoom.it/Flow/"+workflow+".xml";
+    String text = "The Workflow : " + workflow + " has been completed\nYou can see the feed at: " + link;
+    new SendMailCl().sendSSLMessage(destinatarifinali, emailSubjectTxt, text, email, pwd);
+    System.out.println("%%%% SEND MAIL IN Workflow done %%%%%");
+    }
+
+
+
+    }
+
+    }
+    } catch (Exception ex) {
+    ex.printStackTrace();
+    }
+    }
+
+     * */
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /** 
      * Handles the HTTP <code>GET</code> method.

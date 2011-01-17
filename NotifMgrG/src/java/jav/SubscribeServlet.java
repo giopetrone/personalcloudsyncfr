@@ -51,7 +51,8 @@ public class SubscribeServlet extends HttpServlet {
             if(nomeFile == null) nomeFile ="";
             String[] feeds = nomeFile.split(" ");
             System.err.println("subscribe di Notift  1");
-            String url = "http://taskmanagerunito.xoom.it/Flow/";
+            String url = "http://www.piemonte.di.unito.it/Flow/";
+         //   String url = "http://taskmanagerunito.xoom.it/Flow/";
             String feederrati = "";
 
             if (casoSubscribe != null) {
@@ -76,18 +77,22 @@ public class SubscribeServlet extends HttpServlet {
                         String permissionName = "";
                         Discovery discovery = new Discovery();
                         String hub = discovery.getHub(feed);
-                        if(hub.equalsIgnoreCase("http://localhost:8080"))
-                        {
-                            new TestSub().testSubscriber(feed, "http://localhost:8080/NotifMgrG/NotifCallbackServlet", "");
-                        }
+                       
+                        risp= new TestSub().testSubscriber(feed, "http://localhost:8080/NotifMgrG/NotifCallbackServlet", "");
+//risp= new TestSub().testSubscriber(feed, "http://piemonte.di.unito.it/NotifMgrG/NotifCallbackServlet", "");
+
+                       // if(hub.equalsIgnoreCase("http://localhost:8080"))
+                      //  {
+                          //  risp= new TestSub().testSubscriber(feed, "http://localhost:8080/NotifMgrG/NotifCallbackServlet", "");
+                       // }
                    //     if(hub.equals("http://pubsubhubbub.appspot.com"))
                    //     {
                    //         risp = new TestSub().testSubscriber(feed, "http://taskmgrunito.appspot.com/NotifCallbackServlet","");
                //         }
                 //        else risp =   new TestSub().testSubscriber(feed, "http://localhost:8081/NotifMgrG/NotifCallbackServlet", "");
                         String sub = GoDoc.savePermissions(user, nomeDoc, notiftype);
-                        System.out.println("DOPO SAVE PERMISSION: "+sub);
-                     //   System.err.println("subscribe al feed= " + feed+" "+risp);
+                        System.out.println("SubscribeServlet DOPO SAVE PERMISSION: "+sub);
+                       System.err.println("SubscribeServlet subscribe al feed= " + feed+" "+risp);
                       //  if(risp.equalsIgnoreCase("done")) count++;
                       //  else feederrati += " "+feeds[i];
 
