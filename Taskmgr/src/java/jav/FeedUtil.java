@@ -45,8 +45,21 @@ public class FeedUtil {
 
     public static String SubFeedName(String flowName) {
         if (localMode) {
-            System.out.println("SubFeedName = /var/www/Flow/" + flowName + ".xml");
+          //  System.out.println("SubFeedName = /var/www/Flow/" + flowName + ".xml");
+          //  return "/var/www/Flow/" + flowName + ".xml";
+             System.out.println("SubFeedName = http://localhost/Flow" + flowName + ".xml");
             return "/var/www/Flow/" + flowName + ".xml";
+        } else {
+            return "http://www.piemonte.di.unito.it/Flow/" + flowName + ".xml";
+        }
+
+        // return "http://taskmanagerunito.xoom.it/Flow/"+flowName+".xml";
+    }
+
+      public static String FeedUrl(String flowName) {
+        if (localMode) {
+            System.out.println("SubFeedName = http://localhost/Flow" + flowName + ".xml");
+            return "http://localhost/Flow/" + flowName + ".xml";
         } else {
             return "http://www.piemonte.di.unito.it/Flow/" + flowName + ".xml";
         }
@@ -117,7 +130,8 @@ public class FeedUtil {
             // HUB PER VERSIONE LOCALE
             String hub = SaveServlet.getTypeNotification();
             if (hub == null || hub.equals("") || hub.equalsIgnoreCase("local")) {
-                link.setHref("http://localhost:8080");
+              //  link.setHref("http://localhost:8080");
+                  link.setHref("http://localhost:9090");
             } else {
                 link.setHref("http://localhost:9090");
             }
@@ -165,7 +179,8 @@ public class FeedUtil {
             link = new SyndLinkImpl();
             // HUB PER VERSIONE LOCALE
             if (type.equals("local")) {
-                link.setHref("http://localhost:8080");
+               // link.setHref("http://localhost:8080");
+                link.setHref("http://localhost:9090");
             } else if (type.equals("remote")) {
                 link.setHref("http://localhost:9090");
             } //     else if(type.equals("remote")) link.setHref("http://www.piemonte.di.unito.it/Pubsubhub");

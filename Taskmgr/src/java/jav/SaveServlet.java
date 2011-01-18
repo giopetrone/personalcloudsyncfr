@@ -92,7 +92,10 @@ public class SaveServlet extends HttpServlet {
          
                 if(val.equals("new"))
                 {
-                    String url = FeedUtil.SubFeedName(nomeFile);
+                    String url = FeedUtil.FeedUrl(nomeFile);
+                      Discovery discovery = new Discovery();
+                       String hub  = discovery.getHub(url);
+                       System.err.println("2 sottoscrivo a:hub " +hub +", "+ url +", " + FeedUtil.GetUrl()+"NotifMgrG/NotifCallbackServlet");
                     new TestSub().testSubscriber(url,FeedUtil.GetUrl()+"NotifMgrG/NotifCallbackServlet", "");
 //                   
 //                    //if(notification.equals("remote"))
@@ -116,13 +119,15 @@ public class SaveServlet extends HttpServlet {
                 else if(val.equalsIgnoreCase("notnew"))
                 {
                     Discovery discovery = new Discovery();
-                    String hub =  discovery.getHub(FeedUtil.SubFeedName(nomeFile));
+                    String hub =  discovery.getHub(FeedUtil.FeedUrl(nomeFile));
+                 //   String hub =  discovery.getHub(FeedUtil.SubFeedName(nomeFile));
                   //  String hub =  discovery.getHub("http://www.piemonte.di.unito.it/Flow/"+nomeFile+".xml");
                     //   String hub =  discovery.getHub("http://taskmanagerunito.xoom.it/Flow/"+nomeFile+".xml");
                    
                     System.out.println("PUBBLICO SU HUB: "+hub);
 
-                    new TestPub().testPublisher(hub, FeedUtil.SubFeedName(nomeFile));
+                     new TestPub().testPublisher(hub, FeedUtil.FeedUrl(nomeFile));
+                 //   new TestPub().testPublisher(hub, FeedUtil.SubFeedName(nomeFile));
                  //  new TestPub().testPublisher(hub, "http://www.piemonte.di.unito.it/Flow/"+nomeFile+".xml");
                     //  new TestPub().testPublisher(hub, "http://taskmanagerunito.xoom.it/Flow/"+nomeFile+".xml");
 
