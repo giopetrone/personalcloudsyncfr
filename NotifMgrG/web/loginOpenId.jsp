@@ -30,7 +30,7 @@
                 // YOU SHOULD CHANGE THIS TO GO TO THE
                 //   String returnToUrl = "http://localhost:8081/OpenIdSpike/consumer_returnurl.jsp";
                 //per local
-                   String returnToUrl = "http://localhost:8080/NotifMgr/index.jsp";
+                   String returnToUrl = "http://localhost:8080/NotifMgrG/index.jsp";
                 
                 // PER REMOTE su Piemonte
                // String returnToUrl = "http://www.piemonte.di.unito.it/NotifMgrG/index.jsp";
