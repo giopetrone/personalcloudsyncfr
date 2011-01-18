@@ -168,6 +168,7 @@ public class SunFtpWrapper extends FtpClient {
 
     public void uploadFeed(String nameFeed) throws IOException {
 
+        System.out.println("SONO IN UPLOADFEED");
         try {
 
             SunFtpWrapper ftp = new SunFtpWrapper();

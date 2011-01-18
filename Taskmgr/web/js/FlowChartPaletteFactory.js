@@ -136,7 +136,7 @@ FlowChartPaletteFactory.prototype.createContent = function(objId, real) {
   }
 //confirm(objId);
   var img = new Image();
-	img.src = "/img/" + objId + ".gif";
+	img.src = "./img/" + objId + ".gif";
        // img.src = "./demo/african/Zebra32.gif";
 	img.style.width = "32px";
 	img.style.height = "32px";
@@ -177,8 +177,10 @@ FlowChartPaletteFactory.prototype.generateTemplate = function(objId) {
   var ele = this.createContent(objId, false);
   if (!ele) return;
 
-  this.templates[objId] = UrlGradientBlock.prototype.generateTemplate(ele, null, null, 100, 50, null, "/img/flowchart/" + objId + "_f0f0f0_w100h50.gif");
-  return this.templates[objId];
+  this.templates[objId] = UrlGradientBlock.prototype.generateTemplate(ele, null, null, 100, 50, null, "img/flowchart/" + objId + "_f0f0f0_w100h50.gif");
+// this.templates[objId] = UrlGradientBlock.prototype.generateTemplate(ele, null, null, 100, 50, null, "/img/flowchart/" + objId + "_f0f0f0_w100h50.gif");
+
+return this.templates[objId];
 
 }
 

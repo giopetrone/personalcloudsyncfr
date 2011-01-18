@@ -14,17 +14,16 @@
 
 
                 String email = request.getParameter("email");
-         
+
 
 
                 String pwd = request.getParameter("pwd");
                 String flow = request.getParameter("Flow");
-                String sessuser =(String) session.getAttribute("email");
+                String sessuser = (String) session.getAttribute("email");
                 String sesspwd = (String) session.getAttribute("pwd");
-             
-                if(sessuser == null)
-                {
-          
+
+                if (sessuser == null) {
+
 
     %>
 
@@ -65,8 +64,8 @@
             {
                 document.getElementById('txt').value=c;
                 nuovaVersione = 1;
-              //  loadDiagram(null);
-               // loadNotifiche();
+                //  loadDiagram(null);
+                // loadNotifiche();
                 checkVersion();
                 c=c+1;
                 t=setTimeout("timedCount()",20000);
@@ -91,10 +90,13 @@
                                 if(confirm)
                                 {
                                     var diagname = document.getElementById('area').value;
-                                   // var link = "http://localhost:8080/login.jsp?Flow="+diagname;
-                                     var link = "http://piemonte.di.unito.it/login.jsp?Flow="+diagname;
+                                    var notification = document.getElementById("notification").value;
+                                    if (notification == "remote") {
+                                        window.location = "http://www.piemonte.di.unito.it/TaskMgr/login.jsp?Flow="+diagname;}
+                                    else {  window.location = "http://localhost:8080/login.jsp?Flow="+diagname; }
+
                                     //loadDiagram(document.getElementById('area').value);
-                                    window.location = link;
+                                    //  window.location = link;
                                 }
                             }
                         } else {}
@@ -176,8 +178,8 @@
                         objXml.setRequestHeader('Content-Type',"text/plain");
                         objXml.setRequestHeader('notifica',"start");
                         objXml.setRequestHeader('filenamemio',diagramName);
-                }
-                } else 
+                    }
+                } else
                 {
 
                     objXml.open("GET",url3,true);
@@ -284,9 +286,17 @@
                     }
                     h4.appendChild(subtitle);
                     add.appendChild(h4);
-                    
-                    var urlfeed = "http://taskmanagerunito.xoom.it/Flow/"+str+".xml";
-                    var urlnotif = "http://localhost:8080/NotifMgrG/settings.jsp?Flow="+str;
+                    var notification = document.getElementById("notification").value;
+                    var urlfeed= "";
+                    var urlnotif = " ";
+                    if (notification == "remote") {
+                        urlfeed = "http://www.piemonte.di.unito.it/Flow/"+str+".xml";
+                        urlnotif = "http://www.piemonte.di.unito.it/NotifMgrG/settings.jsp?Flow="+str;}
+
+                    else {urlfeed = "/var/www/Flow/"+str+".xml";
+                        urlnotif = "http://localhost:8080/NotifMgrG/settings.jsp?Flow="+str;}
+                    //   var urlfeed = "http://taskmanagerunito.xoom.it/Flow/"+str+".xml";
+                    //var urlnotif = "http://localhost:8080/NotifMgrG/settings.jsp?Flow="+str;
                     link.setAttribute('href',urlfeed);
                     link.setAttribute('target', '_blank');
                     link2.setAttribute('href',urlnotif);
@@ -296,28 +306,32 @@
                     var text2 = document.createTextNode(" Notifications settings for this flow");
                    
                     
-                   if(str.indexOf("template") == -1)
-                   {
+                    if(str.indexOf("template") == -1)
+                    {
                        
-                       var palette3 = document.getElementById("LinkNotif");
-                       while(palette3.childNodes.length>=1)
-                       {
-                           palette3.removeChild(palette3.firstChild);
-                       }
-                       var palette4 = document.getElementById("LinkFeed");
-                       while(palette4.childNodes.length>=1)
-                       {
-                           palette4.removeChild(palette4.firstChild);
-                       }
-                       link.appendChild(text);
-                       link2.appendChild(text2);
-                       palette4.appendChild(link);
-                       palette3.appendChild(link2);
-                       var diagname = document.getElementById('area').value;
-                      // var link = "http://localhost:8080/login.jsp?Flow="+diagname;
-                      var link = "http://piemonte.di.unito.it/login.jsp?Flow="+diagname;
-                       //loadDiagram(document.getElementById('area').value);
-                       window.location = link;
+                        var palette3 = document.getElementById("LinkNotif");
+                        while(palette3.childNodes.length>=1)
+                        {
+                            palette3.removeChild(palette3.firstChild);
+                        }
+                        var palette4 = document.getElementById("LinkFeed");
+                        while(palette4.childNodes.length>=1)
+                        {
+                            palette4.removeChild(palette4.firstChild);
+                        }
+                        link.appendChild(text);
+                        link2.appendChild(text2);
+                        palette4.appendChild(link);
+                        palette3.appendChild(link2);
+                        var diagname = document.getElementById('area').value;
+                        // var link = "http://localhost:8080/login.jsp?Flow="+diagname;
+                        var notification = document.getElementById("notification").value;
+                        if (notification == "remote)")
+                            window.location = "http://www.piemonte.di.unito.it/TaskMgr/login.jsp?Flow="+diagname;
+
+                        else  window.location = "http://localhost:8080/login.jsp?Flow="+diagname;
+                        //loadDiagram(document.getElementById('area').value);
+                       // window.location = link;
                        
                     
                     }
@@ -336,43 +350,43 @@
             function saveTemplate(param){
 
                 try{
-                c = 1;
-                var jsonString = Jalava.diagram.persist();
-                var persisted = JSON.parse(jsonString);
-                var blocks = persisted.blocks;
-                var startcount = 0;
-                var endcount = 0;
-                for(var i=0;i<blocks.length;i++) {
-                    var type = blocks[i].type;
-                    if(type == "Start") startcount ++
-                    else if(type == "End") endcount ++
-                }
-                if(startcount != 1) {alert("You must have only one Start Element");return};
-                if(endcount == 0) {alert("No End Element: at least one");return};
-                var diagramName = document.getElementById('area').value;
-            //    if(diagramName == null || diagramName == "") { alert("Missing diagram name");return;}
+                    c = 1;
+                    var jsonString = Jalava.diagram.persist();
+                    var persisted = JSON.parse(jsonString);
+                    var blocks = persisted.blocks;
+                    var startcount = 0;
+                    var endcount = 0;
+                    for(var i=0;i<blocks.length;i++) {
+                        var type = blocks[i].type;
+                        if(type == "Start") startcount ++
+                        else if(type == "End") endcount ++
+                    }
+                    if(startcount != 1) {alert("You must have only one Start Element");return};
+                    if(endcount == 0) {alert("No End Element: at least one");return};
+                    var diagramName = document.getElementById('area').value;
+                    //    if(diagramName == null || diagramName == "") { alert("Missing diagram name");return;}
 
-           //     else diagramName = "template_" + diagramName;
+                    //     else diagramName = "template_" + diagramName;
                   
-                // var diagramName = param;
-                //   if(diagramName.indexOf(".txt") == -1) diagramName = diagramName + ".txt";
+                    // var diagramName = param;
+                    //   if(diagramName.indexOf(".txt") == -1) diagramName = diagramName + ".txt";
                 
-                var owner = document.getElementById('owner').value;
-                var users = document.getElementById('users').value;
-                var writers = document.getElementById('writers').value;
-                var pwd = document.getElementById('pwd').value;
+                    var owner = document.getElementById('owner').value;
+                    var users = document.getElementById('users').value;
+                    var writers = document.getElementById('writers').value;
+                    var pwd = document.getElementById('pwd').value;
                 
-                if (diagramName.length <= 1) {
+                    if (diagramName.length <= 1) {
                    
-                }
-                else if(diagramName.indexOf("template")==-1)
-                {
+                    }
+                    else if(diagramName.indexOf("template")==-1)
+                    {
 
 
-                }
+                    }
                
                     var url1 = "./SaveServlet";
-                     alert("In save Template");
+                    alert("In save Template");
                     var a = loadjson.substring(0, 4000);
                     var b = loadjson.substring(4000, loadjson.length);
                     var old = a+b;
@@ -415,23 +429,23 @@
                 //    var msg = "update nuova stringa ? ";
                 //    alert(msg + "|" + str + "|");
                 try{
-                if (nuovaVersione  == 1) {
-                    nuovaVersione = 0;
-                    if (str.length == 0) {
-                        return;
-                    }
-                  //  var answer = confirm("vuoi nuova versione?");
-                //    if (answer){
+                    if (nuovaVersione  == 1) {
+                        nuovaVersione = 0;
+                        if (str.length == 0) {
+                            return;
+                        }
+                        //  var answer = confirm("vuoi nuova versione?");
+                        //    if (answer){
                         crepa();
                         Jalava.diagram.load(str);
-                 //   }
-                } else {
-                    crepa();
-                   // alert(str);
-                    Jalava.diagram.load(str);
+                        //   }
+                    } else {
+                        crepa();
+                        //  alert(str);
+                        Jalava.diagram.load(str);
+                    }
+                }catch(e){ alert("DENTRO UPDATE "+e.message);
                 }
-            }catch(e){//alert("DENTRO UPDATE "+e.message);
-            }
             }
 
             function gup( name )
@@ -514,7 +528,15 @@
                                 var share = document.getElementById("share");
                                 var draft = document.getElementById("savedraft");
                                 var change = document.getElementById("changepriv");
-                                var urlfeed = "http://taskmanagerunito.xoom.it/Flow/"+diagramName+".xml";
+                                var diagname = document.getElementById('area').value;
+                                // var link = "http://localhost:8080/login.jsp?Flow="+diagname;
+                                var urlfeed ="";
+                                var notification = document.getElementById("notification").value;
+                                if (notification == "remote)")
+                                    urlfeed = "http://www.piemonte.di.unito.it/Flow/"+diagramName+".xml";
+                                else urlfeed = "/var/www/Flow/"+diagramName+".xml";
+                                //  var urlfeed = "http://taskmanagerunito.xoom.it/Flow/"+diagramName+".xml";
+                          
                                 var urlnotif = "http://localhost:8080/NotifMgrG/settings.jsp?Flow="+diagramName;
                                 var link = document.createElement("a");
                                 var link2 = document.createElement("a");
@@ -547,7 +569,7 @@
                                     //alert("You can't modify and save this diagram");
                                    
                                     
-                                   // div.removeChild(sav);
+                                    // div.removeChild(sav);
                                     sav.onclick = "";
                                     draft.onclick = "";
                                     share.onclick = "";
@@ -602,250 +624,240 @@
 
 
 
-// METODO DI CONTROLLO SU AND OR
-function setCondition()
-{
-    try{
-
-
-       // Variabile json del diagramma
-        var jsonString = Jalava.diagram.persist();
-        
-       //persited: l'oggetto JSON'
-        var persisted = JSON.parse(jsonString);
-        //Numero blocchi
-        var blocks = persisted.blocks.length;
-        //Numero connessioni
-        var connections = persisted.connections.length;
-        var y=0;
-        //Cerca tra tutti i BLOCKS i nodi and/or
-        for(var i=0;i<blocks;i++)
-        {
-            //image id dice il tipo di immagine:tonda,rect,ecc..
-            var imageId = persisted.blocks[i].imageId;
-            //se ellipse ---> AND/OR, Start/End Element
-            if(imageId == "ellipse")
+            // METODO DI CONTROLLO SU AND OR
+            function setCondition()
             {
-               //Prende id del blocco, e il tipo(and,or,start,end)
-               var blockid = persisted.blocks[i].id;
-               var andor =  persisted.blocks[i].type;
-               var list = new Array;
-               //ciclo connections
-               for(var j=0;j<connections;j++)
-               {
-                   //target == dove punta la connession
-                   var target = persisted.connections[j].target;
-                   if(blockid == target)
-                   {
-                       //se qui: abbiamo connessione che ENTRA dentro and/or, e prendiamo la source
-                       var source = persisted.connections[j].source;
-                       for(var l=0;l<blocks;l++)
-                       {
-                           //id source
-                           var blockid2 = persisted.blocks[l].id;
-                           if(blockid2 == source)
-                           {
-                               //in questo ciclo, per ogni source, prende il tipo, essendo source=task, il tipo == stato
-                               var type = persisted.blocks[l].type;
-                               //aggiunge all'array lo stato di ogni task sorgente'
-                               list[y] = type;
-                               y++;
-                           }
-                       }
-                   }
-               }
-               //se l'ellipse e' AND entra in questo ciclo'
-               if(andor=="And")
-               {
-                   // array dove si memorizzano i task con status DONE
-                   var done = new Array();
-                   var x=0;
-                   //Ciclo per lunghezza list, cioe' numero di task sorgenti'
-                   for(var h=0;h<list.length;h++)
-                   {
-                       var check = list[h];
-                       // se source == done, aggiunge a lista done
-                       if(check == "Done") {done[x]=check;x++}
-                   }
-                   //Se done e' diverso da list, condizione equivale a dire che NON TUTTI I padri sono DONE
-                   if(done.length != list.length || list.length == 0)
-                   {
-                       for(var z=0;z<connections;z++)
-                       {
-                           //TROVA la connessione tra AND e FIGLIO
-                           var source2 = persisted.connections[z].source;
-                           if(blockid == source2)
-                           {
-                               //Memorizza in target2 l'id del nodo/nodi figli'
-                               var target2 = persisted.connections[z].target;
+                try{
 
-                               for(var g=0;g<blocks;g++)
-                               {
-                                   var id3 = persisted.blocks[g].id;
-                                   //se entra in questo if, troviamo il task figlio
-                                   if(target2 == id3)
-                                   {
 
-                                       var children= TextEdit.target.parentNode.parentNode.parentNode.childNodes.length;
+                    // Variabile json del diagramma
+                    var jsonString = Jalava.diagram.persist();
+        
+                    //persited: l'oggetto JSON'
+                    var persisted = JSON.parse(jsonString);
+                    //Numero blocchi
+                    var blocks = persisted.blocks.length;
+                    //Numero connessioni
+                    var connections = persisted.connections.length;
+                    var y=0;
+                    //Cerca tra tutti i BLOCKS i nodi and/or
+                    for(var i=0;i<blocks;i++)
+                    {
+                        //image id dice il tipo di immagine:tonda,rect,ecc..
+                        var imageId = persisted.blocks[i].imageId;
+                        //se ellipse ---> AND/OR, Start/End Element
+                        if(imageId == "ellipse")
+                        {
+                            //Prende id del blocco, e il tipo(and,or,start,end)
+                            var blockid = persisted.blocks[i].id;
+                            var andor =  persisted.blocks[i].type;
+                            var list = new Array;
+                            //ciclo connections
+                            for(var j=0;j<connections;j++)
+                            {
+                                //target == dove punta la connession
+                                var target = persisted.connections[j].target;
+                                if(blockid == target)
+                                {
+                                    //se qui: abbiamo connessione che ENTRA dentro and/or, e prendiamo la source
+                                    var source = persisted.connections[j].source;
+                                    for(var l=0;l<blocks;l++)
+                                    {
+                                        //id source
+                                        var blockid2 = persisted.blocks[l].id;
+                                        if(blockid2 == source)
+                                        {
+                                            //in questo ciclo, per ogni source, prende il tipo, essendo source=task, il tipo == stato
+                                            var type = persisted.blocks[l].type;
+                                            //aggiunge all'array lo stato di ogni task sorgente'
+                                            list[y] = type;
+                                            y++;
+                                        }
+                                    }
+                                }
+                            }
+                            //se l'ellipse e' AND entra in questo ciclo'
+                            if(andor=="And")
+                            {
+                                // array dove si memorizzano i task con status DONE
+                                var done = new Array();
+                                var x=0;
+                                //Ciclo per lunghezza list, cioe' numero di task sorgenti'
+                                for(var h=0;h<list.length;h++)
+                                {
+                                    var check = list[h];
+                                    // se source == done, aggiunge a lista done
+                                    if(check == "Done") {done[x]=check;x++}
+                                }
+                                //Se done e' diverso da list, condizione equivale a dire che NON TUTTI I padri sono DONE
+                                if(done.length != list.length || list.length == 0)
+                                {
+                                    for(var z=0;z<connections;z++)
+                                    {
+                                        //TROVA la connessione tra AND e FIGLIO
+                                        var source2 = persisted.connections[z].source;
+                                        if(blockid == source2)
+                                        {
+                                            //Memorizza in target2 l'id del nodo/nodi figli'
+                                            var target2 = persisted.connections[z].target;
 
-                                       for(var r=20;r<children;r++)
-                                       {
-                                              // alert(TextEdit.target.parentNode.parentNode.parentNode.childNodes[h].shared)
-                                           var id4 = TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].id;
+                                            for(var g=0;g<blocks;g++)
+                                            {
+                                                var id3 = persisted.blocks[g].id;
+                                                //se entra in questo if, troviamo il task figlio
+                                                if(target2 == id3)
+                                                {
 
-                                           if(id3 == id4)
-                                           {
-                                               //DENTRO QUESTO IF metto lo status a NOT ENABLED, e COLORO di ROSSO LA SCRITTA
+                                                    var children= TextEdit.target.parentNode.parentNode.parentNode.childNodes.length;
 
-                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].childNodes[0].childNodes[0].style.color = "red";
-                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].type = "Not Enabled";
-                                              // TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].childNodes[0].childNodes[7].value = "false";
-                                           }
-                                       }
-                                   }
-                               }
-                           }
-                       }
-                       //Il ciclo sotto se i genitori sono DONE
-                   }else if(done.length == list.length && done.length != 0)
-                   {
-                           for(var z=0;z<connections;z++)
-                       {
-                           var source2 = persisted.connections[z].source;
-                           if(blockid == source2){
-                               var target2 = persisted.connections[z].target;
-                               for(var g=0;g<blocks;g++)
-                               {
-                                   var id3 = persisted.blocks[g].id;
-                                   if(target2 == id3)
-                                   {
+                                                    for(var r=20;r<children;r++)
+                                                    {
+                                                        // alert(TextEdit.target.parentNode.parentNode.parentNode.childNodes[h].shared)
+                                                        var id4 = TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].id;
 
-                                       var children2= TextEdit.target.parentNode.parentNode.parentNode.childNodes.length;
+                                                        if(id3 == id4)
+                                                        {
+                                                            //DENTRO QUESTO IF metto lo status a NOT ENABLED, e COLORO di ROSSO LA SCRITTA
 
-                                       for(var s=20;s<children2;s++)
-                                       {
-                                              // alert(TextEdit.target.parentNode.parentNode.parentNode.childNodes[h].shared)
-                                           var id5 = TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].id;
+                                                            TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].childNodes[0].childNodes[0].style.color = "red";
+                                                            TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].type = "Not Enabled";
+                                                            // TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].childNodes[0].childNodes[7].value = "false";
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    //Il ciclo sotto se i genitori sono DONE
+                                }else if(done.length == list.length && done.length != 0)
+                                {
+                                    for(var z=0;z<connections;z++)
+                                    {
+                                        var source2 = persisted.connections[z].source;
+                                        if(blockid == source2){
+                                            var target2 = persisted.connections[z].target;
+                                            for(var g=0;g<blocks;g++)
+                                            {
+                                                var id3 = persisted.blocks[g].id;
+                                                if(target2 == id3)
+                                                {
 
-                                           if(id3 == id5)
-                                           {
-                                               var check = TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].childNodes[0].childNodes[0].childNodes[8].value;
-                                               //alert(check);
-                                             //  alert(TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].childNodes[0].childNodes[0].childNodes[8].value);
-                                              if(check != "true")
-                                               {
-                                                    //METTO Il figlio/figli a Enabled
-                                                   TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].childNodes[0].childNodes[0].childNodes[0].style.color = "green";
-                                                   TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].type = "Enabled";
-                                                   TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].childNodes[0].childNodes[0].childNodes[8].value = "true";
-                                               }
+                                                    var children2= TextEdit.target.parentNode.parentNode.parentNode.childNodes.length;
+
+                                                    for(var s=20;s<children2;s++)
+                                                    {
+                                                        // alert(TextEdit.target.parentNode.parentNode.parentNode.childNodes[h].shared)
+                                                        var id5 = TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].id;
+
+                                                        if(id3 == id5)
+                                                        {
+                                                            var check = TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].childNodes[0].childNodes[0].childNodes[8].value;
+                                                            //alert(check);
+                                                            //  alert(TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].childNodes[0].childNodes[0].childNodes[8].value);
+                                                            if(check != "true")
+                                                            {
+                                                                //METTO Il figlio/figli a Enabled
+                                                                TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].childNodes[0].childNodes[0].childNodes[0].style.color = "green";
+                                                                TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].type = "Enabled";
+                                                                TextEdit.target.parentNode.parentNode.parentNode.childNodes[s].childNodes[0].childNodes[0].childNodes[8].value = "true";
+                                                            }
                                               
                                                
-                                           }
-                                       }
-                                   }
-                               }
-                           }
-                       }
-
-
-
-
-
-
-
-                   }
-
-               }
-               //INIZIA CONDIZIONE OR
-               else if(andor=="Or") {
-                   var done = new Array();
-                   var x=0;
-                   for(var h=0;h<list.length;h++)
-                   {
-                       var check = list[h];
-                       if(check == "Done") {done[x]=check;x++}
-                   }
-                   if(done.length >=1)
-                   {
-                       for(var z=0;z<connections;z++)
-                       {
-                           var source2 = persisted.connections[z].source;
-                           if(blockid == source2){
-                               var target2 = persisted.connections[z].target;
-                               for(var g=0;g<blocks;g++)
-                               {
-                                   var id3 = persisted.blocks[g].id;
-                                   if(target2 == id3)
-                                   {
-
-                                       var children= TextEdit.target.parentNode.parentNode.parentNode.childNodes.length;
-
-                                       for(var r=20;r<children;r++)
-                                       {
-                                              // alert(TextEdit.target.parentNode.parentNode.parentNode.childNodes[h].shared)
-                                           var id4 = TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].id;
-
-                                           if(id3 == id4)
-                                           {
-                                                var check = TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].childNodes[0].childNodes[8].value;
-                                                if(check != "true")
-                                                {
-                                                    var nome = TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].childNodes[0].childNodes[0];
-                                                   nome.style.color = "green";
-                                                //   TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].style.color = "green";
-                                                   TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].type = "Enabled";
-                                                   TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].childNodes[0].childNodes[8].value = "true";
+                                                        }
+                                                    }
                                                 }
+                                            }
+                                        }
+                                    }
+
+
+
+
+
+
+
+                                }
+
+                            }
+                            //INIZIA CONDIZIONE OR
+                            else if(andor=="Or") {
+                                var done = new Array();
+                                var x=0;
+                                for(var h=0;h<list.length;h++)
+                                {
+                                    var check = list[h];
+                                    if(check == "Done") {done[x]=check;x++}
+                                }
+                                if(done.length >=1)
+                                {
+                                    for(var z=0;z<connections;z++)
+                                    {
+                                        var source2 = persisted.connections[z].source;
+                                        if(blockid == source2){
+                                            var target2 = persisted.connections[z].target;
+                                            for(var g=0;g<blocks;g++)
+                                            {
+                                                var id3 = persisted.blocks[g].id;
+                                                if(target2 == id3)
+                                                {
+
+                                                    var children= TextEdit.target.parentNode.parentNode.parentNode.childNodes.length;
+
+                                                    for(var r=20;r<children;r++)
+                                                    {
+                                                        // alert(TextEdit.target.parentNode.parentNode.parentNode.childNodes[h].shared)
+                                                        var id4 = TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].id;
+
+                                                        if(id3 == id4)
+                                                        {
+                                                            var check = TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].childNodes[0].childNodes[8].value;
+                                                            if(check != "true")
+                                                            {
+                                                                var nome = TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].childNodes[0].childNodes[0];
+                                                                nome.style.color = "green";
+                                                                //   TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].style.color = "green";
+                                                                TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].type = "Enabled";
+                                                                TextEdit.target.parentNode.parentNode.parentNode.childNodes[r].childNodes[0].childNodes[0].childNodes[8].value = "true";
+                                                            }
                                                
-                                           }
-                                       }
-                                   }
-                               }
-                           }
-                       }
-                   }else
-                   {
-                           for(var q=0;q<connections;q++)
-                           {
-                           var source3 = persisted.connections[q].source;
-                           if(blockid == source3){
-                               var target3 = persisted.connections[q].target;
-                               for(var d=0;d<blocks;d++)
-                               {
-                                   var id6 = persisted.blocks[d].id;
-                                   if(target3 == id6)
-                                   {
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }else
+                                {
+                                    for(var q=0;q<connections;q++)
+                                    {
+                                        var source3 = persisted.connections[q].source;
+                                        if(blockid == source3){
+                                            var target3 = persisted.connections[q].target;
+                                            for(var d=0;d<blocks;d++)
+                                            {
+                                                var id6 = persisted.blocks[d].id;
+                                                if(target3 == id6)
+                                                {
 
-                                       var children3= TextEdit.target.parentNode.parentNode.parentNode.childNodes.length;
-                                       //alert(children);
-                                       for(var p=20;p<children3;p++)
-                                       {
-                                              // alert(TextEdit.target.parentNode.parentNode.parentNode.childNodes[h].shared)
-                                           var id7 = TextEdit.target.parentNode.parentNode.parentNode.childNodes[p].id;
+                                                    var children3= TextEdit.target.parentNode.parentNode.parentNode.childNodes.length;
+                                                    //alert(children);
+                                                    for(var p=20;p<children3;p++)
+                                                    {
+                                                        // alert(TextEdit.target.parentNode.parentNode.parentNode.childNodes[h].shared)
+                                                        var id7 = TextEdit.target.parentNode.parentNode.parentNode.childNodes[p].id;
 
-                                           if(id6 == id7)
-                                           {
-                                               var nome = TextEdit.target.parentNode.parentNode.parentNode.childNodes[p].childNodes[0].childNodes[0].childNodes[0];
-                                               nome.style.color = "red";
-                                           //    TextEdit.target.parentNode.parentNode.parentNode.childNodes[p].childNodes[0].style.color = "red";
-                                               TextEdit.target.parentNode.parentNode.parentNode.childNodes[p].type = "Not Enabled";
-                                           }
-                                       }
-                                   }
-                               }
-                           }
-                       }
-
-
-
-
-
-
-
-                   }
-
-               }
+                                                        if(id6 == id7)
+                                                        {
+                                                            var nome = TextEdit.target.parentNode.parentNode.parentNode.childNodes[p].childNodes[0].childNodes[0].childNodes[0];
+                                                            nome.style.color = "red";
+                                                            //    TextEdit.target.parentNode.parentNode.parentNode.childNodes[p].childNodes[0].style.color = "red";
+                                                            TextEdit.target.parentNode.parentNode.parentNode.childNodes[p].type = "Not Enabled";
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
 
 
 
@@ -853,15 +865,25 @@ function setCondition()
 
 
 
+                                }
+
+                            }
+
+
+
+
+
+
+
+                        }
+                    }
+
+
+
+
+                }
+                catch(e){alert("Dentro check "+e.message)}
             }
-        }
-
-
-
-
-    }
-    catch(e){alert("Dentro check "+e.message)}
-}
 
 
 
@@ -912,7 +934,7 @@ function setCondition()
 
             // start Jalava
             Jalava.addModule("FlowChartPaletteFactory");
-         //   Jalava.addModule("MyPaletteFactory");
+            //   Jalava.addModule("MyPaletteFactory");
             Jalava.addModule("FlowChartPropertyPage");
             Jalava.addModule("UrlGradientBlock");
 
@@ -942,15 +964,15 @@ function setCondition()
         </script>
 
     </head>
-    
+
     <body onload="carica();" style="background-color: #add8e6"/>
 
     <!-- in onload c'era questo doTimer(); -->
 
 
-   <h1>Collaborative Task Manager  </h1>
+    <h1>Collaborative Task Manager  </h1>
 
-  
+
 
 
     <div id="menu" style="font-size: 13px"> <a href="#" onclick="childWindow=open('docsave.html','_blank','status=1,toolbar=1,scrollbars=1,width=400,height=200')" id="savenew" name="savenew" >Save Diagram </a> |  <a href="#" onClick=" saveDiagram('false');" id="savedraft">Save Draft</a> | <a href="#" onclick="childWindow=open('docs.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="load" name="load" >LoadDiagram </a>  | <a href="#" onclick="childWindow=open('shared.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800');" id="share">Share</a>
@@ -959,43 +981,43 @@ function setCondition()
         | <select name="notification" id="notification" >
 
 
-                    
-                    <option value="local">Local</option>
-                    <option value="remote">Remote</option>
-                    
+
+
+            <option value="local">Local</option>
+            <option value="remote">Remote</option>
 
 
 
-	    </select> | <a href="logout.jsp" class=gb4 >Log out </a> </div>
-        <div id="menu2"></div>
+        </select> | <a href="logout.jsp" class=gb4 >Log out </a> </div>
+    <div id="menu2"></div>
 
-    
-    
+
+
     <form name="saveandload" id="saveandload" name="saveandload" >
-       
+
         <input type="hidden"  name="area" id="area" value=""/>
-       
-       
 
-        
- <input type="hidden" id="txt" />
- 
 
-       
-     
-       
-        
+
+
+        <input type="hidden" id="txt" />
+
+
+
+
+
+
         <input type="hidden" id="owner" name="owner" value= '<%=sessuser%>' disabled="disabled" />
         <input type="hidden" id="users" name="users" value= "" disabled="disabled" />
         <input type="hidden" id="writers" name="writers" value= "" disabled="disabled" size="100" />
         <input type="hidden" id="pwd" name="pwd" value='<%=sesspwd%>' disabled="disabled" />
         <input type="hidden" id="assignees" name="assignees" value='' size="100" />
 
-      
+
         <!--
          <input type="button" value="See JSON" onclick="dado();"/>
  <input type="button" value="Check Condition" onclick="setCondition();"/>
-         
+
          <input type="button" value="Share" onclick="childWindow=open('shared.html','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800');"/>
          <a href="#" onclick="childWindow=open('/docs2.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="add" name="add" >SaveDiagram </a>
             <input type="button" value="See JSON" onclick="dado();TextEdit.check();TextEdit.setOwner();"/>
@@ -1004,7 +1026,7 @@ function setCondition()
         <br>
         <a href="#" onclick="childWindow=open('/docs.jsp','_blank','status=1,toolbar=1,scrollbars=1,width=600,height=800')" id="add" name="add" >LoadDiagram </a>
 
- -->
+        -->
 
 
 

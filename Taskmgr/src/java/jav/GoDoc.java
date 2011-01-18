@@ -312,13 +312,25 @@ public class GoDoc {
             AtomEvent eventUpdate = new AtomEvent(login, "TaskManager", "Update Diagram");
             eventUpdate.setParameter("File", documentName);
             Discovery discovery = new Discovery();
-            String hub = discovery.getHub("http://taskmanagerunito.xoom.it/Flow/" + documentName + ".xml");
+            //  String hub = discovery.getHub("http://taskmanagerunito.xoom.it/Flow/" + documentName + ".xml");
+            String hub = null;
             String typeNotif = "";
-            if (hub.equalsIgnoreCase("http://localhost:8080")) {
-                typeNotif = "local";
-            } else if (hub.equals("http://pubsubhubbub.appspot.com")) {
-                typeNotif = "remote";
+            if (FeedUtil.isLocalMode()) {
+               // hub = discovery.getHub("/var/www/Flow/" + documentName + ".xml");
+                 hub = discovery.getHub(FeedUtil.SubFeedName(documentName));
+                 typeNotif = "local";
+            } else {
+                hub = discovery.getHub(FeedUtil.SubFeedName(documentName));
+                // hub = discovery.getHub("http://www.piemonte.di.unito.it/Flow/" + documentName + ".xml");
+                 typeNotif = "remote";
             }
+            
+//            if (hub.equalsIgnoreCase("http://localhost:8080")) {
+//                typeNotif = "local";
+//            } else if (hub.equals("http://www.piemonte.di.unito.it/Pubsubhub")) {
+//                //  } else if (hub.equals("http://pubsubhubbub.appspot.com")) {
+//                typeNotif = "remote";
+//            }
             SaveServlet.setTypeNotification(typeNotif);
             List<AtomEvent> listaeventi = new ArrayList();
             listaeventi.add(eventUpdate);
@@ -523,7 +535,8 @@ public class GoDoc {
     public String saveDoc(String login, String documentName, String s, String users, String writers, String pwd, String assignees) {
 
         try {
-
+            //System.out.println ("saveDiagram \n" + s );
+            //         System.out.println("-----");
             DocumentListEntry documentEntry = findEntry(documentName);
 
             if (documentEntry == null) {
@@ -663,7 +676,7 @@ public class GoDoc {
 
                 return list; //document not found
             }
-         //   System.out.println("1. documento trovato");
+            //   System.out.println("1. documento trovato");
             DateTime last = documentEntry.getUpdated();
             DateTime curr = documentVersions.get(valorefile);
             if (refresh) {
@@ -673,7 +686,7 @@ public class GoDoc {
             }
             documentVersions.put(valorefile, last); // update current version
             String resourceId = documentEntry.getResourceId();
-        //    System.out.println("2. resourceId" + resourceId);
+            //    System.out.println("2. resourceId" + resourceId);
             String docType = resourceId.substring(0, resourceId.lastIndexOf(':'));
 
             String docId = resourceId.substring(resourceId.lastIndexOf(':') + 1);
@@ -692,7 +705,7 @@ public class GoDoc {
             while ((c = inStream.read(b)) != -1) {
                 s += new String(b, 0, c);
             }
-       //     System.out.println("3. stringa" + s);
+            //     System.out.println("3. stringa" + s);
             s = findBody(s);
 //System.out.println("1. stringa" + s);
             String error = "Non hai i permessi";
@@ -778,10 +791,31 @@ public class GoDoc {
     }
 
     private String findBody(String r) {
+
+        r = r.replaceAll("&gt;", ">");
+        r = r.replaceAll("&lt;", "<");
+        r = r.replaceAll("&quot;", "\"");
+
         int ind1 = r.indexOf("connections");
-        int ind2 = r.indexOf("<br></body>");
-     //     int ind2 = r.indexOf("</body>");
+        int ind2 = r.indexOf("</span></p>");
+        // int ind2 = r.indexOf("<br></body>");
+        //     int ind2 = r.indexOf("</body>");
         r = r.substring(ind1 - 2, ind2);
+        //    System.out.println("findBody, doc: \n" + r);
+        //   System.out.println("---------------");
+
+        return r;
+    }
+
+    private String findBodyOLD(String r) {
+        System.out.println("findBody, doc: \n" + r);
+        System.out.println("---------------");
+        int ind1 = r.indexOf("connections");
+        int ind2 = r.indexOf("</p></body>");
+        // int ind2 = r.indexOf("<br></body>");
+        //     int ind2 = r.indexOf("</body>");
+        //  r = r.substring(ind1 - 2, ind2);
+        r = r.substring(ind1, ind2);
         r = r.replaceAll("&gt;", ">");
         r = r.replaceAll("&lt;", "<");
         return r;
@@ -972,6 +1006,7 @@ public class GoDoc {
 
     public void savePermissionsOnFile(String nomeFile, String flowName, String notification) {
         try {
+            System.out.println("GoDOc.savePermissionsOnfile 1");
             DocsService service = new DocsService("Document List Demo");
             service.setUserCredentials(docMakerLogin, docMakerPasswd);
             URL listFeedUrl = new URL("http://docs.google.com/feeds/documents/private/full/");
@@ -984,6 +1019,7 @@ public class GoDoc {
                 URL exportUrl = new URL("http://docs.google.com/feeds/download/" + docType
                         + "s/Export?docID=" + docId + "&exportFormat=" + "html");
                 MediaContent mc = new MediaContent();
+                System.out.println("GoDOc.savePermissionsOnfile 2");
                 mc.setUri(exportUrl.toString());
                 MediaSource ms = service.getMedia(mc);
                 String s = "";
@@ -995,12 +1031,14 @@ public class GoDoc {
                 }
                 s = new GoDoc(service).findFiles(s);
                 String add = flowName + "/" + notification;
+                System.out.println("GoDOc.savePermissionsOnfile 3");
                 File f;
-                f = new File("/var/www/Permissions/prova.txt");
+                f = new File("/var/www/html/Permissions/prova.txt");
 
                 if (!f.exists()) {
                     f.createNewFile();
                 }
+                System.out.println("GoDOc.savePermissionsOnfile 4");
                 FileWriter writer = new FileWriter(f);
                 writer.write(s);
                 writer.close();
@@ -1017,7 +1055,7 @@ public class GoDoc {
                     oldtext += t + "\r\n";
                 }
                 fr.close();
-                System.out.println("OLD: " + oldsetting);
+                System.out.println("GoDoc.savePermissionsonfile OLD: " + oldsetting);
                 if (!oldsetting.equals("")) {
                     s = oldtext.replaceAll(oldsetting, add);
                 } else {
@@ -1047,6 +1085,8 @@ public class GoDoc {
             }
 
             service.getRequestFactory().setHeader("If-Match", "*");
+            System.out.println("saveDiagram \n" + s);
+            System.out.println("-----");
             documentEntry.setMediaSource(new MediaByteArraySource(s.getBytes(), "text/plain"));
 
             //  documentEntry.setContent(new PlainTextConstruct(s));
@@ -1135,7 +1175,7 @@ public class GoDoc {
 
     public void sendMail(String dest, String login, String pwd, String name) {
         try {
-            System.out.println("%%%%LOGIN: " + login);
+            System.out.println(" sendMail LOGIN: " + login);
             String SMTP_HOST_NAME = "smtp.gmail.com";
             String SMTP_PORT = "465";
             String url = FeedUtil.GetUrl() + "TaskMgr/index.jsp?Flow=" + name;

@@ -33,24 +33,48 @@ import pubsublib.event.AtomEvent;
  */
 public class FeedUtil {
 
+    static boolean localMode = true;
+
+    public static boolean isLocalMode() {
+        return localMode;
+    }
+
+ public static void setLocalMode(boolean mode) {
+         localMode = mode;
+    }
+
     public static String SubFeedName(String flowName) {
+        if (localMode) {
+            System.out.println("SubFeedName = /var/www/Flow/" + flowName + ".xml");
+            return "/var/www/Flow/" + flowName + ".xml";
+        } else {
+            return "http://www.piemonte.di.unito.it/Flow/" + flowName + ".xml";
+        }
 
-        return "http://taskmanagerunito.xoom.it/Flow/"+flowName+".xml";
+        // return "http://taskmanagerunito.xoom.it/Flow/"+flowName+".xml";
     }
 
-      public static String GetUrl() {
-
-        return "http://www.piemonte.di.unito.it/";
+    public static String GetUrl() {
+        if (localMode) {
+            return "http://localhost:8080/";
+        } else {
+            return "http://www.piemonte.di.unito.it/";
+        }
     }
 
-     public static String RemoteFeedName(String flowName) {
+    public static String RemoteFeedName(String flowName) {
         return "/webspace/httpdocs" + "/Flow/" + flowName + ".xml";
     }
 
     public static String FileFeedName(String flowName) {
-        return "/var/www/html" + "/Flow/" + flowName + ".xml";
-    //    return "/var/www" + "/Flow/" + flowName + ".xml";
-    //    return "http://taskmgrunito.x10.mx/" +flowName +".xml";
+        if (localMode) {
+
+            return "/var/www" + "/Flow/" + flowName + ".xml";
+        } else {
+            return "/var/www/html" + "/Flow/" + flowName + ".xml";
+        }
+        //    return "/var/www" + "/Flow/" + flowName + ".xml";
+        //    return "http://taskmgrunito.x10.mx/" +flowName +".xml";
     }
 
     public static boolean FeedWriteOk(String flowName) {
@@ -91,9 +115,14 @@ public class FeedUtil {
             links.add(link);
             link = new SyndLinkImpl();
             // HUB PER VERSIONE LOCALE
-            String  hub = SaveServlet.getTypeNotification();
-            if(hub == null || hub.equals("") || hub.equalsIgnoreCase("local")) link.setHref("http://localhost:8080");
-            else link.setHref("http://pubsubhubbub.appspot.com");
+            String hub = SaveServlet.getTypeNotification();
+            if (hub == null || hub.equals("") || hub.equalsIgnoreCase("local")) {
+                link.setHref("http://localhost:8080");
+            } else {
+                link.setHref("http://localhost:9090");
+            }
+            //    else link.setHref("http://www.piemonte.di.unito.it/Pubsubhub");
+            // else link.setHref("http://pubsubhubbub.appspot.com");
             link.setRel("hub");
             links.add(link);
             feed.setLinks(links);
@@ -111,9 +140,7 @@ public class FeedUtil {
         return ok;
     }
 
-
-
-    static boolean CreateFeedFile(String flowName,String type) {
+    static boolean CreateFeedFile(String flowName, String type) {
         DateFormat DATE_PARSER = new SimpleDateFormat("yyyy-MM-dd");
 
         SyndFeed feed = new SyndFeedImpl();
@@ -137,9 +164,15 @@ public class FeedUtil {
             links.add(link);
             link = new SyndLinkImpl();
             // HUB PER VERSIONE LOCALE
-            if(type.equals("local"))  link.setHref("http://localhost:8080");
-            else if(type.equals("remote")) link.setHref("http://pubsubhubbub.appspot.com");
-            else link.setHref(type);
+            if (type.equals("local")) {
+                link.setHref("http://localhost:8080");
+            } else if (type.equals("remote")) {
+                link.setHref("http://localhost:9090");
+            } //     else if(type.equals("remote")) link.setHref("http://www.piemonte.di.unito.it/Pubsubhub");
+            //  else if(type.equals("remote")) link.setHref("http://pubsubhubbub.appspot.com");
+            else {
+                link.setHref(type);
+            }
             link.setRel("hub");
             links.add(link);
             feed.setLinks(links);
@@ -196,13 +229,13 @@ public class FeedUtil {
             entry.setTitle("Flow (specificare meglio)");
             // set links to google documents; maybe could be link
             // taskmanager with http://localhost:8081?Flow=filename.txt
-         //     addLink(entry, editLink);
+            //     addLink(entry, editLink);
             addLink(entry, "http://localhost:8080/TaskMgr/index.jsp?Flow=" + flowName);
-         //     addLink(entry, "http://localhost:8081/index.jsp?Flow=" + flowName);
+            //     addLink(entry, "http://localhost:8081/index.jsp?Flow=" + flowName);
             //  entry.setPublishedDate(DATE_PARSER.parse("2009-07-" + i));
             entry.setPublishedDate(Calendar.getInstance().getTime());
-           setDescription(entry, event, "text/plain");
-          //    setDescription(entry, event, "text/html");
+            setDescription(entry, event, "text/plain");
+            //    setDescription(entry, event, "text/html");
             entries.add(entry);
             feed.setEntries(entries);
             Writer writer = new FileWriter(fileName);
@@ -216,8 +249,7 @@ public class FeedUtil {
         return true;
     }
 
-
-    static boolean addEntries(String editLink, String flowName,List<AtomEvent> event) {
+    static boolean addEntries(String editLink, String flowName, List<AtomEvent> event) {
         if (!FeedWriteOk(flowName)) {  // crea feed se non esiste
             CreateFeedFile(flowName);
         }
@@ -228,26 +260,25 @@ public class FeedUtil {
             File f = new File(fileName);
             feed = input.build(new XmlReader(f));
             List entries = feed.getEntries();
-            for(int i=0;i<event.size();i++)
-            {
+            for (int i = 0; i < event.size(); i++) {
 
                 SyndEntry entry;
-                    SyndContent description;
-                    AtomEvent singlevent = event.get(i);
-                    entry = new SyndEntryImpl();
-                    entry.setTitle("Flow (specificare meglio)");
-                    entry.setUri("http://localhost:8080/TaskMgr/index.jsp?Flow=" + flowName+i);
-       //                 entry.setUri("http://localhost:8081/index.jsp?Flow=" + flowName+i);
-                    // set links to google documents; maybe could be link
-                    // taskmanager with http://localhost:8081?Flow=filename.txt
-                 //     addLink(entry, editLink);
-                    addLink(entry, "http://localhost:8080/TaskMgr/index.jsp?Flow=" + flowName);
-            //        addLink(entry, "http://localhost:8081/index.jsp?Flow=" + flowName);
-                    //  entry.setPublishedDate(DATE_PARSER.parse("2009-07-" + i));
-                    entry.setPublishedDate(Calendar.getInstance().getTime());
-                   setDescription(entry, singlevent, "text/plain");
-                  //    setDescription(entry, event, "text/html");
-                    entries.add(entry);
+                SyndContent description;
+                AtomEvent singlevent = event.get(i);
+                entry = new SyndEntryImpl();
+                entry.setTitle("Flow (specificare meglio)");
+                entry.setUri("http://localhost:8080/TaskMgr/index.jsp?Flow=" + flowName + i);
+                //                 entry.setUri("http://localhost:8081/index.jsp?Flow=" + flowName+i);
+                // set links to google documents; maybe could be link
+                // taskmanager with http://localhost:8081?Flow=filename.txt
+                //     addLink(entry, editLink);
+                addLink(entry, "http://localhost:8080/TaskMgr/index.jsp?Flow=" + flowName);
+                //        addLink(entry, "http://localhost:8081/index.jsp?Flow=" + flowName);
+                //  entry.setPublishedDate(DATE_PARSER.parse("2009-07-" + i));
+                entry.setPublishedDate(Calendar.getInstance().getTime());
+                setDescription(entry, singlevent, "text/plain");
+                //    setDescription(entry, event, "text/html");
+                entries.add(entry);
             }
 
             feed.setEntries(entries);
@@ -262,7 +293,6 @@ public class FeedUtil {
         return true;
     }
 
-
     static void setDescription(SyndEntry entry, AtomEvent event, String style) {
         SyndContent description = new SyndContentImpl();
         description.setType(style);
@@ -271,8 +301,8 @@ public class FeedUtil {
             entry.setDescription(description);
         } else if (style.equals("text/html")) {
             List cont = new ArrayList();
-        //    String content = "<H2>the event</H2> " +event.toXml() + "</P>";
-            String content = "<H2>here is the event</H2> " +event.toHtml(false) + "</P>";
+            //    String content = "<H2>the event</H2> " +event.toXml() + "</P>";
+            String content = "<H2>here is the event</H2> " + event.toHtml(false) + "</P>";
             description.setValue(content);
             entry.setDescription(description);
             description = new SyndContentImpl();

@@ -13,8 +13,10 @@ Jalava.copyPrototype(GradientBlock, Block);
 
 
 GradientBlock.prototype.generateImageUrl = function(id, color, width, height) {
-  return "img/" + id + "/" + id + "_" + GradientBlock.getColorIndex(color) + "_w400h200.gif";
- 
+ // return "./img/" + id + "/" + id + "_" + GradientBlock.getColorIndex(color) + "_w400h200.gif";
+// confirm("/img/" + id + "/" + id + "_" + GradientBlock.getColorIndex(color) + "_w400h200.gif" );
+ return "img/" + id + "/" + id + "_" + GradientBlock.getColorIndex(color) + "_w400h200.gif";
+
 }
 
 GradientBlock.getColorIndex = function(color) {

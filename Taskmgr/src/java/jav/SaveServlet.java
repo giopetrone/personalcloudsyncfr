@@ -46,6 +46,7 @@ public class SaveServlet extends HttpServlet {
         String assignees = request.getHeader("assignees");
         System.out.println("Assignees: " + assignees);
         notification = request.getHeader("notification");
+        FeedUtil.setLocalMode(notification.equals("local"));
 
         //     String loadjson = request.getHeader("loadjson");
         boolean publish = request.getHeader("publish") != null;
@@ -86,34 +87,44 @@ public class SaveServlet extends HttpServlet {
             if (!nomeFile.contains("template")) {
                
 
-                SunFtpWrapper ftp = new SunFtpWrapper();
-                ftp.uploadFeed(nomeFile);
+             /* FORSE INUTILE CON PIEMONTE   SunFtpWrapper ftp = new SunFtpWrapper();
+                ftp.uploadFeed(nomeFile); */
          
                 if(val.equals("new"))
                 {
-                    if(notification.equals("remote"))
-                    {
-                        String url = "http://taskmanagerunito.xoom.it/Flow/"+nomeFile+".xml";
-                     //   new TestPub().testPublisher("http://pubsubhubbub.appspot.com", "http://taskmanagerunito.xoom.it/Flow/"+nomeFile+".xml");
-                        new TestSub().testSubscriber(url, "http://taskmgrunito.appspot.com/NotifCallbackServlet","");
-                       // 
-                    }
-                    else if(notification.equalsIgnoreCase("local"))
-                    {
-                        String url = "http://taskmanagerunito.xoom.it/Flow/"+nomeFile+".xml";
-                     //   new TestPub().testPublisher("http://localhost:8080", url);
-                        // LA sottoscrizione viene fatta in NotifMgrG
-                        new TestSub().testSubscriber(url, "http://localhost:8080/NotifMgrG/NotifCallbackServlet", "");
-                    }
+                    String url = FeedUtil.SubFeedName(nomeFile);
+                    new TestSub().testSubscriber(url,FeedUtil.GetUrl()+"NotifMgrG/NotifCallbackServlet", "");
+//                   
+//                    //if(notification.equals("remote"))
+////                 //   {
+////                        String url = "http://www.piemonte.di.unito.it/Flow/"+nomeFile+".xml";
+////                 //        String url = "http://taskmanagerunito.xoom.it/Flow/"+nomeFile+".xml";
+////                     //   new TestPub().testPublisher("http://pubsubhubbub.appspot.com", "http://taskmanagerunito.xoom.it/Flow/"+nomeFile+".xml");
+////                        new TestSub().testSubscriber(url, "http://www.piemonte.di.unito.it/NotifMgrG/NotifCallbackServlet","");
+////                     //       new TestSub().testSubscriber(url, "http://taskmgrunito.appspot.com/NotifCallbackServlet","");
+////                       //
+////                    }
+////                    else if(notification.equalsIgnoreCase("local"))
+////                    {
+////                        String url = "http://www.piemonte.di.unito.it/Flow/"+nomeFile+".xml";
+////                     //   String url = "http://taskmanagerunito.xoom.it/Flow/"+nomeFile+".xml";
+////                     //   new TestPub().testPublisher("http://localhost:8080", url);
+////                        // LA sottoscrizione viene fatta in NotifMgrG
+////                        new TestSub().testSubscriber(url, "http://localhost:8080/NotifMgrG/NotifCallbackServlet", "");
+////                    }
                 }
                 else if(val.equalsIgnoreCase("notnew"))
                 {
                     Discovery discovery = new Discovery();
-                    String hub =  discovery.getHub("http://taskmanagerunito.xoom.it/Flow/"+nomeFile+".xml");
+                    String hub =  discovery.getHub(FeedUtil.SubFeedName(nomeFile));
+                  //  String hub =  discovery.getHub("http://www.piemonte.di.unito.it/Flow/"+nomeFile+".xml");
+                    //   String hub =  discovery.getHub("http://taskmanagerunito.xoom.it/Flow/"+nomeFile+".xml");
                    
                     System.out.println("PUBBLICO SU HUB: "+hub);
 
-                    new TestPub().testPublisher(hub, "http://taskmanagerunito.xoom.it/Flow/"+nomeFile+".xml");
+                    new TestPub().testPublisher(hub, FeedUtil.SubFeedName(nomeFile));
+                 //  new TestPub().testPublisher(hub, "http://www.piemonte.di.unito.it/Flow/"+nomeFile+".xml");
+                    //  new TestPub().testPublisher(hub, "http://taskmanagerunito.xoom.it/Flow/"+nomeFile+".xml");
 
                }
                  //  versione con thread:

@@ -162,8 +162,10 @@ PaletteFactory.prototype.generateTemplate = function(objId) {
   var ele = this.createContent(objId, false);
   if (!ele) return;
   
-  this.templates[objId] = GradientBlock.prototype.generateTemplate(ele, null, null, 100, 50, null, "/img/rect/rect_template.gif"); 	
-  return this.templates[objId];
+  this.templates[objId] = GradientBlock.prototype.generateTemplate(ele, null, null, 100, 50, null, "img/rect/rect_template.gif"); 	
+ //this.templates[objId] = GradientBlock.prototype.generateTemplate(ele, null, null, 100, 50, null, "/img/rect/rect_template.gif");
+
+ return this.templates[objId];
 
 }
 

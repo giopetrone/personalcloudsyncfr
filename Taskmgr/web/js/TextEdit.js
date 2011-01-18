@@ -256,7 +256,8 @@ TextEdit.showframe3 = function() {
   TextEdit.opaque = opaque;
 
   if (!TextEdit.frame) TextEdit.createFrame();
-  TextEdit.frame.src = 'details.html';
+  TextEdit.frame.src = 'details1.html';
+//  TextEdit.frame.src = 'details.html';
 
   // centre the frame
   var h = document.body.clientHeight;
