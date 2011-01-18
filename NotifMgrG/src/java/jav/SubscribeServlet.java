@@ -51,7 +51,7 @@ public class SubscribeServlet extends HttpServlet {
             if(nomeFile == null) nomeFile ="";
             String[] feeds = nomeFile.split(" ");
             System.err.println("subscribe di Notift  1");
-            String url = "http://www.piemonte.di.unito.it/Flow/";
+           // String url = "http://www.piemonte.di.unito.it/Flow/";
          //   String url = "http://taskmanagerunito.xoom.it/Flow/";
             String feederrati = "";
 
@@ -68,7 +68,8 @@ public class SubscribeServlet extends HttpServlet {
                         System.out.println("Doc: "+nomeDoc);
                         String notiftype = feeds[i].substring(find+1, feeds[i].length());
                         System.out.println("Notification: "+notiftype);
-                        String feed = url+nomeDoc+".xml";
+                        String feed = FeedUtil.SubFeedName(nomeDoc);
+                       //  String feed = url+nomeDoc+".xml";
                         String risp ="";
                         int index = user.indexOf("@");
                         user = user.substring(0, index);
@@ -78,7 +79,8 @@ public class SubscribeServlet extends HttpServlet {
                         Discovery discovery = new Discovery();
                         String hub = discovery.getHub(feed);
                        
-                        risp= new TestSub().testSubscriber(feed, "http://localhost:8080/NotifMgrG/NotifCallbackServlet", "");
+                        risp= new TestSub().testSubscriber(feed, FeedUtil.GetUrl()+"NotifMgrG/NotifCallbackServlet", "");
+                 //       risp= new TestSub().testSubscriber(feed, "http://localhost:8080/NotifMgrG/NotifCallbackServlet", "");
 //risp= new TestSub().testSubscriber(feed, "http://piemonte.di.unito.it/NotifMgrG/NotifCallbackServlet", "");
 
                        // if(hub.equalsIgnoreCase("http://localhost:8080"))

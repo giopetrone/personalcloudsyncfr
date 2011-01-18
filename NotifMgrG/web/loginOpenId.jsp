@@ -29,8 +29,11 @@
                 // the authentication responses from the OpenID provider
                 // YOU SHOULD CHANGE THIS TO GO TO THE
                 //   String returnToUrl = "http://localhost:8081/OpenIdSpike/consumer_returnurl.jsp";
-                //  String returnToUrl = "http://localhost:8080/NotifMgr/index.jsp";
-                String returnToUrl = "http://www.piemonte.di.unito.it/NotifMgrG/index.jsp";
+                //per local
+                   String returnToUrl = "http://localhost:8080/NotifMgr/index.jsp";
+                
+                // PER REMOTE su Piemonte
+               // String returnToUrl = "http://www.piemonte.di.unito.it/NotifMgrG/index.jsp";
 
 
                 // perform discovery on the user-supplied identifier

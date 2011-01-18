@@ -110,7 +110,8 @@ public class NotifThread extends Thread {
                             {
                             String[] destinatarifinali = (String[]) destinators.toArray(new String[0]);
                             String emailSubjectTxt = "A task assigned to you: "+taskdeletedname+" has been deleted";
-                            String link = "http://www.piemonte.di.unito.it/Flow/"+filename+".xml";
+                            String link = FeedUtil.SubFeedName(filename);
+                          //     String link = "http://www.piemonte.di.unito.it/Flow/"+filename+".xml";
                          //     String link = "http://taskmanagerunito.xoom.it/Flow/"+filename+".xml";
                             String text = "The task "+taskdeletedname+" has been deleted.\nYou can see the feed at: "+link;
                             new SendMailCl().sendSSLMessage(destinatarifinali, emailSubjectTxt, text, email,pwd);
@@ -153,7 +154,8 @@ public class NotifThread extends Thread {
                             {
                             String[] destinatarifinali = (String[]) destemaildone.toArray(new String[0]);
                             String emailSubjectTxt = "The Workflow : "+workflow+" has been completed";
-                            String link = "http://www.piemonte.di.unito.it/Flow/"+workflow+".xml";
+                            String link = FeedUtil.SubFeedName(workflow);
+                         //    String link = "http://www.piemonte.di.unito.it/Flow/"+workflow+".xml";
                            //  String link = "http://taskmanagerunito.xoom.it/Flow/"+workflow+".xml";
                             String text = "The Workflow : "+workflow+" has been completed\nYou can see the feed at: "+link;
                             new SendMailCl().sendSSLMessage(destinatarifinali, emailSubjectTxt, text, email,pwd);
