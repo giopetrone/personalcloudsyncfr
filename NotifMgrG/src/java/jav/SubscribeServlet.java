@@ -68,7 +68,8 @@ public class SubscribeServlet extends HttpServlet {
                         System.out.println("Doc: "+nomeDoc);
                         String notiftype = feeds[i].substring(find+1, feeds[i].length());
                         System.out.println("Notification: "+notiftype);
-                        String feed = FeedUtil.SubFeedName(nomeDoc);
+                     //   String feed = FeedUtil.SubFeedName(nomeDoc);
+                          String feed = FeedUtil.FeedUrl(nomeDoc);
                        //  String feed = url+nomeDoc+".xml";
                         String risp ="";
                         int index = user.indexOf("@");
