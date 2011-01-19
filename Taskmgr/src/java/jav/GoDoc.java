@@ -316,17 +316,17 @@ public class GoDoc {
             String hub = null;
             String typeNotif = "";
             if (FeedUtil.isLocalMode()) {
-               // hub = discovery.getHub("/var/www/Flow/" + documentName + ".xml");
-               //  hub = discovery.getHub(FeedUtil.SubFeedName(documentName));
-                   hub = discovery.getHub(FeedUtil.FeedUrl(documentName));
-                 typeNotif = "local";
+                // hub = discovery.getHub("/var/www/Flow/" + documentName + ".xml");
+                //  hub = discovery.getHub(FeedUtil.SubFeedName(documentName));
+                hub = discovery.getHub(FeedUtil.FeedUrl(documentName));
+                typeNotif = "local";
             } else {
                 hub = discovery.getHub(FeedUtil.FeedUrl(documentName));
-               // hub = discovery.getHub(FeedUtil.SubFeedName(documentName));
+                // hub = discovery.getHub(FeedUtil.SubFeedName(documentName));
                 // hub = discovery.getHub("http://www.piemonte.di.unito.it/Flow/" + documentName + ".xml");
-                 typeNotif = "remote";
+                typeNotif = "remote";
             }
-            
+
 //            if (hub.equalsIgnoreCase("http://localhost:8080")) {
 //                typeNotif = "local";
 //            } else if (hub.equals("http://www.piemonte.di.unito.it/Pubsubhub")) {
@@ -966,7 +966,11 @@ public class GoDoc {
                 }
                 s = new GoDoc(service).findFiles(s);
                 File f;
-                f = new File("/var/www/Permissions/prova.txt");
+                if (FeedUtil.isLocalMode()) {
+                    f = new File("/var/www/Permissions/prova.txt");
+                } else {
+                    f = new File("/var/www/html/Permissions/prova.txt");
+                }
                 if (!f.exists()) {
                     f.createNewFile();
                 }
@@ -1036,9 +1040,9 @@ public class GoDoc {
                 System.out.println("GoDOc.savePermissionsOnfile 3");
                 File f;
                 if (FeedUtil.isLocalMode()) {
-                f = new File("/var/www/Permissions/prova.txt");
+                    f = new File("/var/www/Permissions/prova.txt");
                 } else {
-                     f = new File("/var/www/html/Permissions/prova.txt");
+                    f = new File("/var/www/html/Permissions/prova.txt");
                 }
                 if (!f.exists()) {
                     f.createNewFile();

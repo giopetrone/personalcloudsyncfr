@@ -33,7 +33,7 @@ import pubsublib.event.AtomEvent;
  */
 public class FeedUtil {
 
-    static boolean localMode = true;
+    static boolean localMode = false; // da cambiare per versione remota
 
     public static boolean isLocalMode() {
         return localMode;

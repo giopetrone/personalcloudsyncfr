@@ -983,9 +983,10 @@
 
 
 
-            <option value="local">Local</option>
-            <option value="remote">Remote</option>
-
+           
+           <option value="remote">Remote</option>
+ <option value="local">Local</option>
+  
 
 
         </select> | <a href="logout.jsp" class=gb4 >Log out </a> </div>
