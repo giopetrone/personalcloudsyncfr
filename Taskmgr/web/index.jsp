@@ -326,7 +326,7 @@
                         var diagname = document.getElementById('area').value;
                         // var link = "http://localhost:8080/login.jsp?Flow="+diagname;
                         var notification = document.getElementById("notification").value;
-                        if (notification == "remote)")
+                        if (notification == "remote")
                             window.location = "http://www.piemonte.di.unito.it/TaskMgr/login.jsp?Flow="+diagname;
 
                         else  window.location = "http://localhost:8080/login.jsp?Flow="+diagname;
