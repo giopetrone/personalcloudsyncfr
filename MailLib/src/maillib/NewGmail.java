@@ -4,7 +4,8 @@
  */
 package maillib;
 
-
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Properties;
 import javax.mail.Authenticator;
 import javax.mail.Folder;
@@ -27,10 +28,11 @@ public class NewGmail {
     private static final int SMTP_HOST_PORT = 465;
     private static final String SMTP_AUTH_USER = "sgnmrn@gmail.com";
     private static final String SMTP_AUTH_PWD = "micio11";
+    private static boolean debug = true;
 
     public static void main(String[] args) throws Exception {
         NewGmail gMail = new NewGmail();
-      //  gMail.testSendMail();
+        //  gMail.testSendMail();
         gMail.getMailMessages();
     }
 
@@ -41,7 +43,6 @@ public class NewGmail {
         props.put("mail.smtps.host", SMTP_HOST_NAME);
         props.put("mail.smtps.auth", "true");
         // props.put("mail.smtps.quitwait", "false");
-
         Session mailSession = Session.getDefaultInstance(props);
         mailSession.setDebug(true);
         Transport transport = mailSession.getTransport();
@@ -51,7 +52,8 @@ public class NewGmail {
         message.setContent("This is a test", "text/plain");
 
         message.addRecipient(Message.RecipientType.TO,
-                new InternetAddress("gio.petrone@gmail.com"));
+                new InternetAddress("sgnmrn@gmail.com"));
+        //  new InternetAddress("gio.petrone@gmail.com"));
 
         transport.connect(SMTP_HOST_NAME, SMTP_HOST_PORT, SMTP_AUTH_USER, SMTP_AUTH_PWD);
 
@@ -59,41 +61,43 @@ public class NewGmail {
                 message.getRecipients(Message.RecipientType.TO));
         transport.close();
     }
-    public void getMailMessages() {
+
+    public ArrayList<HubMailMsg> getMailMessages() {
+        ArrayList<HubMailMsg> messaRet = new ArrayList();
+        Message[] messages;
+
         try {
-            System.out.println("uno");
+
             InitialContext ic = new InitialContext();
-            System.out.println("due");
             Properties properties = System.getProperties();
-            System.out.println("tre");
             Authenticator auth = new ImapAuthenticator();
             Session session = Session.getDefaultInstance(properties, auth);
-            System.out.println("quattro");
             Store store = session.getStore("imaps");
-            System.out.println("5");
-            //  store.connect("imap.gmail.com", "gio.petrone@gmail.com", "mer20ia05");
-            store.connect("imap.gmail.com", "annamaria.goy@gmail.com", "tex_willer");
 
-            System.out.println("6");
+            //store.connect("imap.gmail.com", "annamaria.goy@gmail.com", "tex_willer");
+            store.connect("imap.gmail.com", "sgnmrn@gmail.com", "micio11");
             Folder folder = store.getFolder("INBOX");
             folder.open(Folder.READ_ONLY);
-            System.out.println("7");
-            Message[] messages = folder.getMessages();
+            messages = folder.getMessages();
             // Display message.
+
             for (int i = 0; i < messages.length; i++) {
+                HubMailMsg hubMsg = new HubMailMsg(messages[i]);
+                messaRet.add(hubMsg);
+                if (debug) {
+                    System.out.println("------------ Message " + (i + 1) + " ------------");
 
-                System.out.println("------------ Message " + (i + 1) + " ------------");
-
-                System.out.println("SentDate : " + messages[i].getSentDate());
-                System.out.println("From : " + messages[i].getFrom()[0]);
-                System.out.println("Subject : " + messages[i].getSubject());
-                System.out.print("Message : ");
-                System.out.print(messages[i].getContent().toString());
-//                InputStream stream = messages[i].getInputStream();
-//                while (stream.available() != 0) {
-//                    System.out.print((char) stream.read());
-//                }
-                System.out.println();
+                    System.out.println("SentDate : " + messages[i].getSentDate());
+                    System.out.println("From : " + messages[i].getFrom()[0]);
+                    System.out.println("Subject : " + messages[i].getSubject());
+                    System.out.print("Message : ");
+                    System.out.print(messages[i].getContent().toString());
+                    InputStream stream = messages[i].getInputStream();
+                    while (stream.available() != 0) {
+                        System.out.print((char) stream.read());
+                    }
+                    System.out.println();
+                }
             }
 
             folder.close(true);
@@ -101,10 +105,10 @@ public class NewGmail {
         } catch (Exception ex) {
             /* The size of the HTTP request body exceeds the limit */
         }
+        return messaRet;
     }
 
-    
-/**
+    /**
      * SimpleAuthenticator is used to do simple authentication
      * when the SMTP server requires it.
      */
