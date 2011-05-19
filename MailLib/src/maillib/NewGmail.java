@@ -82,8 +82,9 @@ public class NewGmail {
             // Display message.
 
             for (int i = 0; i < messages.length; i++) {
-                HubMailMsg hubMsg = new HubMailMsg(messages[i]);
+                HubMailMsg hubMsg = new HubMailMsg(messages[i]);             
                 messaRet.add(hubMsg);
+                System.out.println("Body : " +hubMsg.getContent());
                 if (debug) {
                     System.out.println("------------ Message " + (i + 1) + " ------------");
 
