@@ -22,7 +22,7 @@ public class TestSub {
                 feed = "http://localhost/Atomi/marinofeed.xml";
             }
             if (callback.equals("")) {
-                callback = "http://localhost:8081/PubSubLib/callback";
+                callback = "http://localhost:8080/PubSubLib/callback";
             }
             if (token.equals("")) {
                 token = "pippo";
@@ -42,7 +42,12 @@ public class TestSub {
 
     public static void main(String[] args) {
         try {
-            new TestSub().testSubscriber("http://www.piemonte.di.unito.it/Atomi/marinofeed.xml", "", "");
+            new TestSub().testSubscriber("", "", "");
+            for (int i =0; i < 100;i++) {
+                Thread.sleep(1000);
+                System.err.println("a");
+            }
+           // new TestSub().testSubscriber("http://www.piemonte.di.unito.it/Atomi/marinofeed.xml", "", "");
             //Discovery discovery = new Discovery();
           //    new TestPub().testPublisher("http://pubsubhubbub.appspot.com/","http://taskmanagerunito.xoom.it/Flow/remote.txt.xml");
             //System.out.println("in test subscriber trovo hub: " + discovery.getHub("http://localhost/Atomi/marinofeed.xml"));

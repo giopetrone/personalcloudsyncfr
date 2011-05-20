@@ -4,7 +4,6 @@
  */
 package pubsublib.test;
 
-
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndContentImpl;
 import com.sun.syndication.feed.synd.SyndEntry;
@@ -36,40 +35,48 @@ import pubsublib.event.AtomEvent;
 public class FeedWriter {
 
     private DateFormat DATE_PARSER = new SimpleDateFormat("yyyy-MM-dd");
-    static String fileName = "/var/www/html/Atomi/marinofeed.xml";
-    //static String fileName = "/var/www/Atomi/marinofeed.xml";
-   // SyndFeed feed = new SyndFeedImpl();
-   SyndFeed feed = new SyndFeedImpl();
+    // SyndFeed feed = new SyndFeedImpl();
+    SyndFeed feed = new SyndFeedImpl();
     List entries = new ArrayList();
+    private static boolean piemonte = false;
+
+    public static void setPiemonte(boolean val){
+        piemonte = val;
+    }
+
+    private static String getFileName() {
+        return piemonte ? "/var/www/html/Atomi/marinofeed.xml" : "/var/www/Atomi/marinofeed.xml";
+    }
 
     public static void main(String[] args) {
         final SyndFeedInput input = new SyndFeedInput();
         try {
-            File f = new File(fileName);
+            File f = new File(getFileName());
             final SyndFeed feed =
                     input.build(new XmlReader(f));
-           new FeedWriter().addEntry(feed);
-           System.out.println("pubblico su hub aggiornamento");
+            new FeedWriter().addEntry(feed);
+            System.out.println("pubblico su hub aggiornamento");
 
-      new TestPub().testPublisher("http://localhost:8080","");
+            new TestPub().testPublisher("http://localhost:9090", "");
 
-        } catch (Exception ex) {ex.printStackTrace();
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
-     //  new FeedWriter().doIt();
+        //  new FeedWriter().doIt();
     }
 
     void addEntry(SyndFeed feed) {
-        SyndLinkImpl s = new SyndLinkImpl();
-        s.setHref("http://localhost:8080");
+        /*  SyndLinkImpl s = new SyndLinkImpl();
+        s.setHref("http://localhost:9090");
         s.setRel("hub");
 
         List links = feed.getLinks();
         for (int i=0; i< links.size();i++){
-            System.err.println(links.get(i).toString());
+        System.err.println(links.get(i).toString());
         }
-       links.add(s); feed.setLinks(links);
-      //  List entries = feed.getEntries();
-         SyndEntry entry;
+        links.add(s); feed.setLinks(links); */
+        List entries = feed.getEntries();
+        SyndEntry entry;
         SyndContent description;
         entry = new SyndEntryImpl();
         entry.setTitle("ROME " + "12");
@@ -78,25 +85,24 @@ public class FeedWriter {
         entry.setPublishedDate(Calendar.getInstance().getTime());
         description = new SyndContentImpl();
         description.setType("text/xml");
-        description.setValue( AtomEvent.creaPerProva().toXml());
+        description.setValue(AtomEvent.creaPerProva().toXml());
 
-     /*     description.setType("text/html");
+        /*     description.setType("text/html");
         description.setValue("<p>More Bug fixes, mor API changes, some new features and some Unit testing</p>"
-                + "<p>For details check the <a href=\"http://wiki.java.net/bin/view/Javawsxml/RomeChangesLog#RomeV03\">Changes Log</a></p>");
- */
-      entry.setDescription(description);
+        + "<p>For details check the <a href=\"http://wiki.java.net/bin/view/Javawsxml/RomeChangesLog#RomeV03\">Changes Log</a></p>");
+         */
+        entry.setDescription(description);
         entries.add(entry);
         feed.setEntries(entries);
-try{
-        Writer writer = new FileWriter(fileName);
-        SyndFeedOutput output = new SyndFeedOutput();
-        output.output(feed, writer);
-        writer.close();
-         } catch (Exception e) {
+        try {
+            Writer writer = new FileWriter(getFileName());
+            SyndFeedOutput output = new SyndFeedOutput();
+            output.output(feed, writer);
+            writer.close();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
 
     private void appendAtom(int i) throws Exception {
         SyndEntry entry;
@@ -104,7 +110,7 @@ try{
         entry = new SyndEntryImpl();
         entry.setTitle("ROME " + (i + 3));
         entry.setLink("http://wiki.java.net/bin/view/Javawsxml/Rome03");
-       // possibile che non ci sia??? entry.setId("http://wiki.java.net/bin/view/Javawsxml/Rome03");
+        // possibile che non ci sia??? entry.setId("http://wiki.java.net/bin/view/Javawsxml/Rome03");
         //  entry.setPublishedDate(DATE_PARSER.parse("2009-07-" + i));
         entry.setPublishedDate(Calendar.getInstance().getTime());
         description = new SyndContentImpl();
@@ -115,7 +121,7 @@ try{
         entries.add(entry);
         feed.setEntries(entries);
 
-        Writer writer = new FileWriter(fileName);
+        Writer writer = new FileWriter(getFileName());
         SyndFeedOutput output = new SyndFeedOutput();
         output.output(feed, writer);
         writer.close();
@@ -125,44 +131,43 @@ try{
             "http://localhost:8080";
 
     /*static void sendContent(String file) {
-        try {
-            HttpClient httpclient = new DefaultHttpClient();
-            InputStreamEntity reqEntity = new InputStreamEntity(
-                    new FileInputStream(file), -1);
-            reqEntity.setContentType("binary/octet-stream");
-            reqEntity.setChunked(true);
-            // It may be more appropriate to use FileEntity class in this particular
-            // instance but we are using a more generic InputStreamEntity to demonstrate
-            // the capability to stream out data from any arbitrary source
-            //
-            // FileEntity entity = new FileEntity(file, "binary/octet-stream");
-            HttpPost httppost = new HttpPost(url);
-            httppost.setEntity(reqEntity);
+    try {
+    HttpClient httpclient = new DefaultHttpClient();
+    InputStreamEntity reqEntity = new InputStreamEntity(
+    new FileInputStream(file), -1);
+    reqEntity.setContentType("binary/octet-stream");
+    reqEntity.setChunked(true);
+    // It may be more appropriate to use FileEntity class in this particular
+    // instance but we are using a more generic InputStreamEntity to demonstrate
+    // the capability to stream out data from any arbitrary source
+    //
+    // FileEntity entity = new FileEntity(file, "binary/octet-stream");
+    HttpPost httppost = new HttpPost(url);
+    httppost.setEntity(reqEntity);
 
-            System.out.println("executing request " + httppost.getRequestLine());
-            HttpResponse response = httpclient.execute(httppost);
-            HttpEntity resEntity = response.getEntity();
+    System.out.println("executing request " + httppost.getRequestLine());
+    HttpResponse response = httpclient.execute(httppost);
+    HttpEntity resEntity = response.getEntity();
 
-            System.out.println("----------------------------------------");
-            System.out.println(response.getStatusLine());
-            if (resEntity != null) {
-                System.out.println("Response content length: " + resEntity.getContentLength());
-                System.out.println("Chunked?: " + resEntity.isChunked());
-            }
-            if (resEntity != null) {
-                resEntity.consumeContent();
-            }
+    System.out.println("----------------------------------------");
+    System.out.println(response.getStatusLine());
+    if (resEntity != null) {
+    System.out.println("Response content length: " + resEntity.getContentLength());
+    System.out.println("Chunked?: " + resEntity.isChunked());
+    }
+    if (resEntity != null) {
+    resEntity.consumeContent();
+    }
 
-            // When HttpClient instance is no longer needed,
-            // shut down the connection manager to ensure
-            // immediate deallocation of all system resources
-            httpclient.getConnectionManager().shutdown();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    // When HttpClient instance is no longer needed,
+    // shut down the connection manager to ensure
+    // immediate deallocation of all system resources
+    httpclient.getConnectionManager().shutdown();
+    } catch (Exception e) {
+    e.printStackTrace();
+    }
 
     }*/
-
     void doIt() {
         boolean ok = false;
 
@@ -217,12 +222,12 @@ try{
 
             feed.setEntries(entries);
 
-            Writer writer = new FileWriter(fileName);
+            Writer writer = new FileWriter(getFileName());
             SyndFeedOutput output = new SyndFeedOutput();
             output.output(feed, writer);
             writer.close();
 
-            System.out.println("The feed has been written to the file [" + fileName + "]");
+            System.out.println("The feed has been written to the file [" + getFileName() + "]");
 
             ok = true;
         } catch (Exception ex) {

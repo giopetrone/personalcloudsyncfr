@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
@@ -33,6 +34,10 @@ public class callback extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
+    private boolean debugStream = false;
+    private boolean printHeaders = false;
+    private boolean many = true;
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -76,38 +81,54 @@ public class callback extends HttpServlet {
                         + hubverify + " lease: "
                         + hublease + "\n");
             } else {
-                System.err.println("headers richiesta:");
-                Enumeration e = request.getHeaderNames();
-                while (e.hasMoreElements()) {
-                    String headers = (String) e.nextElement();
-                    if (headers != null) {
-                        System.err.println(headers + " " + request.getHeader(headers));
+                if (printHeaders) {
+                    System.err.println("in callback, headers notifica:");
+                    Enumeration e = request.getHeaderNames();
+                    while (e.hasMoreElements()) {
+                        String headers = (String) e.nextElement();
+                        if (headers != null) {
+                            System.err.println(headers + " " + request.getHeader(headers));
+                        }
                     }
+                    System.err.println("\n");
                 }
-                System.err.println("\n");
-              
                 ServletInputStream inStream = request.getInputStream();
-                /*
-                 String s = "";
-                byte[] b = new byte[1024];
-                 int c;
-                while ((c = inStream.read(b)) != -1) {
-                s += new String(b, 0, c);
-                }
-                System.err.println("new feed content =\n " + s);*/
-                SyndFeedInput input = new SyndFeedInput();
-                try {
-                    SyndFeed feed = input.build(new InputStreamReader(inStream));
-                    List<SyndEntry> entries = feed.getEntries();
-                    SyndEntry entry = entries.get(0); // per ora 1 sola entry nuova ad ogni callback
-                    SyndContent description = entry.getDescription();
-                    String value = description.getValue();
-                    AtomEvent event = AtomEvent.fromXml(value);
-                    if (event != null) {
-                        System.err.println("utente evento: " + event.getUser());
+                if (debugStream) {
+                    String s = "";
+                    byte[] b = new byte[1024];
+                    int c;
+                    while ((c = inStream.read(b)) != -1) {
+                        s += new String(b, 0, c);
                     }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+                    System.err.println("new raw feed content =\n " + s);
+                } else {
+                    SyndFeedInput input = new SyndFeedInput();
+                    try {
+                        SyndFeed feed = input.build(new InputStreamReader(inStream));
+                        List<SyndEntry> entries = feed.getEntries();
+                        if (many) {
+                            Iterator<SyndEntry> it = entries.iterator();
+                            while (it.hasNext()) {
+                                SyndEntry entry = it.next();
+                                SyndContent description = entry.getDescription();
+                                String value = description.getValue();
+                                AtomEvent event = AtomEvent.fromXml(value);
+                                if (event != null) {
+                                    System.err.println(event.toString(true));
+                                }
+                            }
+                        } else {
+                            SyndEntry entry = entries.get(0); // per ora 1 sola entry nuova ad ogni callback
+                            SyndContent description = entry.getDescription();
+                            String value = description.getValue();
+                            AtomEvent event = AtomEvent.fromXml(value);
+                            if (event != null) {
+                                System.err.println("utente evento: " + event.getUser());
+                            }
+                        }
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
                 }
             }
         } finally {

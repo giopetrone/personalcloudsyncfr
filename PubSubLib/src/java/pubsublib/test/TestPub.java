@@ -16,7 +16,7 @@ public class TestPub {
     public  void testPublisher(String hub, String feed) throws Exception {
         Publisher publisher = new Publisher();
         if (hub.equals("")) {
-            hub = "http://localhost:8080";
+            hub = "http://localhost:9090";  // era 8080
         }
         if (feed.equals("")) {
             feed = "http://localhost/Atomi/marinofeed.xml";
@@ -26,6 +26,17 @@ public class TestPub {
     }
 
     public static void main(String[] args) {
+        try {
+            new TestPub().testPublisher("","");
+   //       new TestPub().testPublisher("http://pubsubhubbub.appspot.com","http://localhost/Atomi/marinofeed.xml");
+           Discovery discovery = new Discovery();
+            System.out.println("in test publisher trovo hub: " + discovery.getHub("http://localhost/Atomi/marinofeed.xml"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void mainPiemonte(String[] args) {
         try {
             new TestPub().testPublisher("http://www.piemonte.di.unito.it/Pubsubhub","http://www.piemonte.di.unito.it/Atomi/marinofeed.xml");
    //       new TestPub().testPublisher("http://pubsubhubbub.appspot.com","http://localhost/Atomi/marinofeed.xml");
@@ -39,7 +50,7 @@ public class TestPub {
      public  void testPublisherLocalhost(String hub, String feed) throws Exception {
         Publisher publisher = new Publisher();
         if (hub.equals("")) {
-            hub = "http://localhost:8080";          
+            hub = "http://localhost:9090";
         }
         if (feed.equals("")) {
             feed = "http://localhost/Atomi/marinofeed.xml";
