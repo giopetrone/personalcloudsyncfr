@@ -65,7 +65,7 @@ public class FeedWriter {
         //  new FeedWriter().doIt();
     }
 
-    void addEntry(SyndFeed feed) {
+    public void addEntry(SyndFeed feed) {
         /*  SyndLinkImpl s = new SyndLinkImpl();
         s.setHref("http://localhost:9090");
         s.setRel("hub");
@@ -104,6 +104,45 @@ public class FeedWriter {
         }
     }
 
+    public void addEntry(SyndFeed feed, String content, File f) {
+        /*  SyndLinkImpl s = new SyndLinkImpl();
+        s.setHref("http://localhost:9090");
+        s.setRel("hub");
+
+        List links = feed.getLinks();
+        for (int i=0; i< links.size();i++){
+        System.err.println(links.get(i).toString());
+        }
+        links.add(s); feed.setLinks(links); */
+        List entries = feed.getEntries();
+        SyndEntry entry;
+        SyndContent description;
+        entry = new SyndEntryImpl();
+        entry.setTitle("ROME " + "12");
+        entry.setLink("http://wiki.java.net/bin/view/Javawsxml/Rome03");
+        //  entry.setPublishedDate(DATE_PARSER.parse("2009-07-" + i));
+        entry.setPublishedDate(Calendar.getInstance().getTime());
+        description = new SyndContentImpl();
+        description.setType("text/xml");
+        description.setValue(content);
+
+        /*     description.setType("text/html");
+        description.setValue("<p>More Bug fixes, mor API changes, some new features and some Unit testing</p>"
+        + "<p>For details check the <a href=\"http://wiki.java.net/bin/view/Javawsxml/RomeChangesLog#RomeV03\">Changes Log</a></p>");
+         */
+        entry.setDescription(description);
+        entries.add(entry);
+        feed.setEntries(entries);
+        try {
+            Writer writer = new FileWriter(f);
+            SyndFeedOutput output = new SyndFeedOutput();
+            output.output(feed, writer);
+            writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
     private void appendAtom(int i) throws Exception {
         SyndEntry entry;
         SyndContent description;
