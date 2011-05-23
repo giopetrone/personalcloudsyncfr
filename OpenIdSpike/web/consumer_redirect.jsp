@@ -29,7 +29,7 @@
             // determine a return_to URL where your application will receive
             // the authentication responses from the OpenID provider
             // YOU SHOULD CHANGE THIS TO GO TO THE
-            String returnToUrl = "http://localhost:8081/OpenIdSpike/consumer_returnurl.jsp";
+            String returnToUrl = "http://localhost:8080/OpenIdSpike/consumer_returnurl.jsp";
 
 
             // perform discovery on the user-supplied identifier
@@ -46,14 +46,14 @@
             AuthRequest authReq = manager.authenticate(discovered, returnToUrl);
 
             // Attribute Exchange example: fetching the 'email' attribute
-            //FetchRequest fetch = FetchRequest.createFetchRequest();
-            //fetch.addAttribute("email",
+             FetchRequest fetch = FetchRequest.createFetchRequest();
+             fetch.addAttribute("email",
                     // attribute alias
-             //       "http://schema.openid.net/contact/email",   // type URI
-             //       true);                                      // required
+                     "http://schema.openid.net/contact/email",   // type URI
+                     true);                                      // required
 
             // attach the extension to the authentication request
-            //authReq.addExtension(fetch);
+             authReq.addExtension(fetch);
 
             if (! discovered.isVersion2() )
             {
@@ -93,6 +93,7 @@
                 {
                     key=keyit.next();
                     value=pm.get(key);
+                    session.setAttribute((String)key, value);  //GIO
             %>
         <input type="hidden" name="<%= key%>" value="<%= value%>"/>
         <%
