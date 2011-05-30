@@ -54,7 +54,7 @@ public class PublishMailEventsServlet extends HttpServlet {
                 hm = msg.get(i);
                 // hm.getTextContent(msg[0]); 
                 String s = mhubE.toXML(hm);
-                mhubE.publishMailEvent(s);
+                mhubE.publishMailEvent(s, "raw");
                 out.println("messaggio in XML \n " + s);
                 out.println("------------ Message " + (i + 1) + " ------------\n");
                 out.println("To:    " + hm.getFrom());                
@@ -62,8 +62,8 @@ public class PublishMailEventsServlet extends HttpServlet {
                 out.println("\n Subject : " + hm.getSubject());
                  out.println("\n Body : " + hm.getContent());
                  
-                System.out.print("Message : \n");
-                System.out.print(hm.getContent());
+              //  System.out.print("Message : \n");
+               // System.out.print(hm.getContent());
                  
             }
             }

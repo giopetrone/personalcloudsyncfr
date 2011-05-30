@@ -42,6 +42,11 @@ public class SubscribeToServlet extends HttpServlet {
             out.close();
         }
     }
+    
+public static void mainProva (String[] args){
+     MailHubEvents mhubE = new MailHubEvents();
+            mhubE.subscribeTo();
+}
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /** 

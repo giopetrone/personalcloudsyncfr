@@ -27,7 +27,6 @@ import pubsublib.event.AtomEvent;
  *
  * @author giovanna
  */
- 
 public class Callback extends HttpServlet {
 
     /** 
@@ -48,8 +47,8 @@ public class Callback extends HttpServlet {
 
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        
-        System.out.println("CALLBACK inizio I");
+
+        System.err.println("CALLBACK inizio I");
         String hubmode = "";
         String hubtopic = "";
         String hubchallenge = "";
@@ -117,9 +116,16 @@ public class Callback extends HttpServlet {
                                 SyndEntry entry = it.next();
                                 SyndContent description = entry.getDescription();
                                 String value = description.getValue();
-                                HubMailMsg event = MailHubEvents.fromXml(value);
+                                HubMailMsg event = (HubMailMsg)MailHubEvents.fromXml(value);
                                 if (event != null) {
-                                    System.err.println(event.toString());
+                                    System.err.println("callback: " + event.toString());
+                                    SemInterpreter sem = new SemInterpreter();
+                                    SmartEvent smart = sem.transformEvent(event);
+                                    MailHubEvents mhubE = new MailHubEvents();
+                                    String s = mhubE.toXML(smart);
+                                    System.out.println("callback: smart event = " + s );
+                                   
+                                    mhubE.publishMailEvent(s, "smart");
                                 }
                             }
                         } else {
