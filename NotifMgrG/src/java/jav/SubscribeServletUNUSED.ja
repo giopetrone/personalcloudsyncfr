@@ -23,7 +23,7 @@ import pubsublib.test.TestSub;
  *
  * @author marino
  */
-public class SubscribeServlet extends HttpServlet {
+public class SubscribeServletUNUSED extends HttpServlet {
 
     
 
@@ -80,7 +80,7 @@ public class SubscribeServlet extends HttpServlet {
                         Discovery discovery = new Discovery();
                         String hub = discovery.getHub(feed);
                        
-                        risp= new TestSub().testSubscriber(feed, FeedUtil.GetUrl()+"NotifMgrG/NotifCallbackServlet", "");
+                        risp= new TestSub().testSubscriber(feed, FeedUtil.GetUrl()+"/NotifMgrG/NotifCallbackServlet", "");
                  //       risp= new TestSub().testSubscriber(feed, "http://localhost:8080/NotifMgrG/NotifCallbackServlet", "");
 //risp= new TestSub().testSubscriber(feed, "http://piemonte.di.unito.it/NotifMgrG/NotifCallbackServlet", "");
 

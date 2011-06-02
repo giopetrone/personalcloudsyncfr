@@ -4,13 +4,13 @@
  */
 package jav;
 
-import googlecontacts.ContactCall;
-import googlecontacts.ContactsExampleParameters;
+import documentwatcher.GoDoc;
 import googletalkclient.ChatClient;
 import java.util.ArrayList;
 import java.util.List;
 import maillib.SendMailCl;
-import pubsublib.event.AtomEvent;
+import event.AtomEvent;
+import pubsub.FeedUtil;
 
 /**
  *
@@ -30,161 +30,143 @@ public class NotifThread extends Thread {
 
     public void run() {
         try {
-            
+
             System.err.println("NotifThread.run : NOTIFICATIONS: " + eventi.size());
-           
 
-                for (AtomEvent cont : eventi) {
-                    //   System.err.println("new feed content =\n " + cont.toString(true));
 
-                    String activity = cont.getActivity();
+            for (AtomEvent cont : eventi) {
+                //   System.err.println("new feed content =\n " + cont.toString(true));
 
-                    if (activity.equalsIgnoreCase("Change Status of Task")) {
-                        String taskname = cont.getParameter("Task");
-                        String nomeFile = cont.getParameter("File");
-                        String dest = cont.getParameter("Assigned To");
-                        if (dest == null) {
-                            dest = "";
-                        }
-                        String modifier = cont.getUser();
-                        if (!dest.equals("") && dest != null) {
+                String activity = cont.getActivity();
 
-                            String emailSubjectTxt = "Update of task " + taskname + " status";
+                if (activity.equalsIgnoreCase("Change Status of Task")) {
+                    String taskname = cont.getParameter("Task");
+                    String nomeFile = cont.getParameter("File");
+                    String dest = cont.getParameter("Assigned To");
+                    if (dest == null) {
+                        dest = "";
+                    }
+                    String modifier = cont.getUser();
+                    if (!dest.equals("") && dest != null) {
 
-                            String[] sendTo = dest.split(",");
+                        String emailSubjectTxt = "Update of task " + taskname + " status";
 
-                            for (int i = 0; i < sendTo.length; i++) {
-                                String destim = sendTo[i];
-                                //Controllo se il destinatario si e' iscritto alle notifiche
-                                if (destim.contains("gmail.com") && !destim.equals("") && !destim.equalsIgnoreCase(modifier)) {
+                        String[] sendTo = dest.split(",");
 
-                                    String nomeDoc = extractPermission(destim);
-                                    System.out.println("nomeDoc x change status: " + nomeDoc);
-                                    String sub = GoDoc.checkPermission(nomeDoc, nomeFile, "Changestatusoftask");
-                                    System.out.println("SUB STATUS: " + sub);
-                                    if (sub.equalsIgnoreCase("subscribe"))
-                                    {
-                                        //sendGMsg(emailSubjectTxt, destim);
-                                        chClient.sendGMsg(emailSubjectTxt, destim);
-                                    }
+                        for (int i = 0; i < sendTo.length; i++) {
+                            String destim = sendTo[i];
+                            //Controllo se il destinatario si e' iscritto alle notifiche
+                            if (destim.contains("gmail.com") && !destim.equals("") && !destim.equalsIgnoreCase(modifier)) {
+
+                                String nomeDoc = extractPermission(destim);
+                                System.out.println("nomeDoc x change status: " + nomeDoc);
+                                String sub = GoDoc.checkPermission(nomeDoc, nomeFile, "Changestatusoftask");
+                                System.out.println("SUB STATUS: " + sub);
+                                if (sub.equalsIgnoreCase("subscribe")) {
+                                    //sendGMsg(emailSubjectTxt, destim);
+                                    chClient.sendGMsg(emailSubjectTxt, destim);
                                 }
                             }
                         }
-                    } else if (activity.equalsIgnoreCase("a task has been deleted"))
-                    {
-                        String taskdeletedname = cont.getParameter("Task");
-                        String filename = cont.getParameter("File");
-                        String assigned = cont.getParameter("Assigned To");
-                        if (assigned == null) {
-                            assigned = "";
-                        }
-                        String modifier2 = cont.getUser();
-                        if (!assigned.equals("") && assigned != null)
-                        {
+                    }
+                } else if (activity.equalsIgnoreCase("a task has been deleted")) {
+                    String taskdeletedname = cont.getParameter("Task");
+                    String filename = cont.getParameter("File");
+                    String assigned = cont.getParameter("Assigned To");
+                    if (assigned == null) {
+                        assigned = "";
+                    }
+                    String modifier2 = cont.getUser();
+                    if (!assigned.equals("") && assigned != null) {
 
 
-                            List destinators = new ArrayList();
-                            String[] receivers = assigned.split(",");
+                        List destinators = new ArrayList();
+                        String[] receivers = assigned.split(",");
 
-                            for (int i = 0; i < receivers.length; i++)
-                            {
-                                String destinator = receivers[i];
-                                //Controllo se il destinatario si e' iscritto alle notifiche
-                                if (!destinator.equals("") && !destinator.equalsIgnoreCase(modifier2))
-                                {
+                        for (int i = 0; i < receivers.length; i++) {
+                            String destinator = receivers[i];
+                            //Controllo se il destinatario si e' iscritto alle notifiche
+                            if (!destinator.equals("") && !destinator.equalsIgnoreCase(modifier2)) {
 
-                                    String userDoc = extractPermission(destinator);
-                                    System.out.println("File Name in delete: " + userDoc);
-                                     String emailSubjectTxt = "A task assigned to you: " + taskdeletedname + "has been deleted";
-                                    String sub = GoDoc.checkPermission(userDoc, filename, "Deletetask");
-                                    System.out.println("SUB STATUS IN DELETE: " + sub);
-                                    if (sub.equalsIgnoreCase("subscribe") && sub != null)
-                                    {
-                                        destinators.add(destinator);
-                                         chClient.sendGMsg(emailSubjectTxt, destinator);
-                                    }
+                                String userDoc = extractPermission(destinator);
+                                System.out.println("File Name in delete: " + userDoc);
+                                String emailSubjectTxt = "A task assigned to you: " + taskdeletedname + "has been deleted";
+                                String sub = GoDoc.checkPermission(userDoc, filename, "Deletetask");
+                                System.out.println("SUB STATUS IN DELETE: " + sub);
+                                if (sub.equalsIgnoreCase("subscribe") && sub != null) {
+                                    destinators.add(destinator);
+                                    chClient.sendGMsg(emailSubjectTxt, destinator);
                                 }
                             }
-                           
-                            if(!destinators.isEmpty())
-                            {
+                        }
+
+                        if (!destinators.isEmpty()) {
                             String[] destinatarifinali = (String[]) destinators.toArray(new String[0]);
-                            String emailSubjectTxt = "A task assigned to you: "+taskdeletedname+" has been deleted";
-                            String link = FeedUtil.SubFeedName(filename);
-                          //     String link = "http://www.piemonte.di.unito.it/Flow/"+filename+".xml";
-                         //     String link = "http://taskmanagerunito.xoom.it/Flow/"+filename+".xml";
-                            String text = "The task "+taskdeletedname+" has been deleted.\nYou can see the feed at: "+link;
-                            new SendMailCl().sendSSLMessage(destinatarifinali, emailSubjectTxt, text, email,pwd);
+                            String emailSubjectTxt = "A task assigned to you: " + taskdeletedname + " has been deleted";
+                            String link = FeedUtil.FeedUrl(filename);
+                            // String link = FeedUtil.SubFeedName(filename);
+                            //     String link = "http://www.piemonte.di.unito.it/Flow/"+filename+".xml";
+                            //     String link = "http://taskmanagerunito.xoom.it/Flow/"+filename+".xml";
+                            String text = "The task " + taskdeletedname + " has been deleted.\nYou can see the feed at: " + link;
+                            new SendMailCl().sendSSLMessage(destinatarifinali, emailSubjectTxt, text, email, pwd);
                             System.out.println("%%%% SEND MAIL IN DELETE TASK %%%%%");
-                            }
                         }
+                    }
 
-                    } else if (activity.equalsIgnoreCase("Workflow is Done")) {
-                        String workflow = cont.getParameter("Workflow");
-                        String allusers = cont.getParameter("All users");
-                        System.out.println("USERS prima di substring: " + allusers);
-                        //allusers = allusers.substring(1, allusers.length());
+                } else if (activity.equalsIgnoreCase("Workflow is Done")) {
+                    String workflow = cont.getParameter("Workflow");
+                    String allusers = cont.getParameter("All users");
+                    System.out.println("USERS prima di substring: " + allusers);
+                    //allusers = allusers.substring(1, allusers.length());
 
-                        String[] destemail = allusers.split(",");
-                        List destemaildone = new ArrayList();
-                        for (int j = 0; j < destemail.length; j++)
-                        {
-                            if (destemail[j].contains("@"))
-                            {
-                                String userPermissionDoc = extractPermission(destemail[j]);
-                                if (userPermissionDoc.contains(" ")) {
-                                    userPermissionDoc = userPermissionDoc.replace(" ", "");
-                                }
-                                System.out.println("Nome doc x workflowdone: " + userPermissionDoc);
-                                String sub = GoDoc.checkPermission(userPermissionDoc, workflow, "Workflowisdone");
-                                System.out.println("SUB: " + sub);
-                                String emailSubjectTxt = "The workflow " + workflow + " is completed";
-                                if (sub.equalsIgnoreCase("subscribe") && sub != null)
-                                {
-                                   chClient.sendGMsg(emailSubjectTxt, destemail[j]);
-                                    destemaildone.add(destemail[j]);
-                                }
-                             
+                    String[] destemail = allusers.split(",");
+                    List destemaildone = new ArrayList();
+                    for (int j = 0; j < destemail.length; j++) {
+                        if (destemail[j].contains("@")) {
+                            String userPermissionDoc = extractPermission(destemail[j]);
+                            if (userPermissionDoc.contains(" ")) {
+                                userPermissionDoc = userPermissionDoc.replace(" ", "");
                             }
-                            // String sub = WriterPermission.checkNotifications(sendTo[j],workflow,"Workflowisdone");
-
+                            System.out.println("Nome doc x workflowdone: " + userPermissionDoc);
+                            String sub = GoDoc.checkPermission(userPermissionDoc, workflow, "Workflowisdone");
+                            System.out.println("SUB: " + sub);
+                            String emailSubjectTxt = "The workflow " + workflow + " is completed";
+                            if (sub.equalsIgnoreCase("subscribe") && sub != null) {
+                                chClient.sendGMsg(emailSubjectTxt, destemail[j]);
+                                destemaildone.add(destemail[j]);
+                            }
 
                         }
-                        if(!destemaildone.isEmpty())
-                            {
-                            String[] destinatarifinali = (String[]) destemaildone.toArray(new String[0]);
-                            String emailSubjectTxt = "The Workflow : "+workflow+" has been completed";
-                            String link = FeedUtil.SubFeedName(workflow);
-                         //    String link = "http://www.piemonte.di.unito.it/Flow/"+workflow+".xml";
-                           //  String link = "http://taskmanagerunito.xoom.it/Flow/"+workflow+".xml";
-                            String text = "The Workflow : "+workflow+" has been completed\nYou can see the feed at: "+link;
-                            new SendMailCl().sendSSLMessage(destinatarifinali, emailSubjectTxt, text, email,pwd);
-                            System.out.println("%%%% SEND MAIL IN Workflow done %%%%%");
-                            }
-
+                        // String sub = WriterPermission.checkNotifications(sendTo[j],workflow,"Workflowisdone");
 
 
                     }
+                    if (!destemaildone.isEmpty()) {
+                        String[] destinatarifinali = (String[]) destemaildone.toArray(new String[0]);
+                        String emailSubjectTxt = "The Workflow : " + workflow + " has been completed";
+                        String link = FeedUtil.FeedUrl(workflow);
+                        // String link = FeedUtil.SubFeedName(workflow);
+                        //    String link = "http://www.piemonte.di.unito.it/Flow/"+workflow+".xml";
+                        //  String link = "http://taskmanagerunito.xoom.it/Flow/"+workflow+".xml";
+                        String text = "The Workflow : " + workflow + " has been completed\nYou can see the feed at: " + link;
+                        new SendMailCl().sendSSLMessage(destinatarifinali, emailSubjectTxt, text, email, pwd);
+                        System.out.println("%%%% SEND MAIL IN Workflow done %%%%%");
+                    }
+
+
 
                 }
-                //  String[] to = {"fabrizio.torretta@gmail.com"};
-                //  new SendMailCl().sendSSLMessage(to,"Prova", "text", email,pwd);
 
-            
-
-
-
-
-    }
-    catch
+            }
+            //  String[] to = {"fabrizio.torretta@gmail.com"};
+            //  new SendMailCl().sendSSLMessage(to,"Prova", "text", email,pwd);
 
 
 
-        (
 
 
 
-Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
@@ -239,7 +221,6 @@ Exception ex) {
 //        }
 //        return "Server says: " + s;
 //    }
-
 //    private ContactCall connectContact(String userMail, String psswd) {
 //        ContactCall cCallTmp = null;
 //        try {
@@ -254,16 +235,14 @@ Exception ex) {
 //        }
 //        return cCallTmp;
 //    }
-
-
-    private String extractPermission(String user)
-    {
+    private String extractPermission(String user) {
 
         int index = user.indexOf("@");
-        String nomeDoc = user.substring(0,index);
-        if(nomeDoc.contains(".")) nomeDoc = nomeDoc.replace(".", "_");
+        String nomeDoc = user.substring(0, index);
+        if (nomeDoc.contains(".")) {
+            nomeDoc = nomeDoc.replace(".", "_");
+        }
         nomeDoc += ".txt";
         return nomeDoc;
     }
-
 }

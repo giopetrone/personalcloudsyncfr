@@ -15,7 +15,8 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import pubsublib.event.AtomEvent;
+import event.AtomEvent;
+import pubsub.FeedUtil;
 
 /**
  *
