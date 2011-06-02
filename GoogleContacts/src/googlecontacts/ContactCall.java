@@ -1265,7 +1265,7 @@ public class ContactCall {
         //       String[] myArg = {"--username=annamaria.goy@gmail.com", "--password=tex_willer", "-contactfeed", "--action=update", "--id=http://www.google.com/m8/feeds/contacts/annamaria.goy%40gmail.com/base/38aa1dea099ac975", "--email2=lili@libero.it,rel:http://schemas.google.com/g/2005#other"};
 //  String[] myArg = {"--username=annamaria.goy@gmail.com", "--password=tex_willer", "-groupfeed", "--action=list"};
         //       String[] myArg = {"--username=annamaria.goy@gmail.com", "--password=tex_willer", "--contactfeed", "--action=update", "--id=http://www.google.com/m8/feeds/contacts/annamaria.goy%40gmail.com/base/38aa1dea099ac975", "--groupid2=32af7f8d8a54cb99"};  // OK
-        String[] myArg = {"--username=gio.petrone@gmail.com", "--password=mer20ia05", "-contactfeed", "--action=list"};  // OK
+        String[] myArg = {"--username=sgnmrn@gmail.com", "--password=micio11", "-contactfeed", "--action=list"};  // OK
         ContactsExampleParameters parameters = new ContactsExampleParameters(myArg); // X USAGE
 
         if (parameters.isVerbose()) {
