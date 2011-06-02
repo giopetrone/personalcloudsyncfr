@@ -22,16 +22,15 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import maillib.HubMailMsg;
-import event.AtomEvent;
+import maillib.NewGmail;
 
 /**
  *
  * @author giovanna
  */
-public class Callback extends HttpServlet {
+public class EventCallback extends HttpServlet {
 
-    /** 
+    /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      * @param request servlet request
      * @param response servlet response
@@ -49,7 +48,7 @@ public class Callback extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
 
-        //       System.err.println("Callback 1");
+        System.err.println("EventCallback 1");
         String hubmode = "";
         String hubtopic = "";
         String hubchallenge = "";
@@ -89,7 +88,7 @@ public class Callback extends HttpServlet {
                 }
             } else {  // good content is being notified
                 if (debug) {
-                    System.err.println("in callback, headers notifica:");
+                    System.err.println("in Eventcallback, headers notifica:");
                     Enumeration e = request.getHeaderNames();
                     while (e.hasMoreElements()) {
                         String headers = (String) e.nextElement();
@@ -109,6 +108,7 @@ public class Callback extends HttpServlet {
                     }
                     System.err.println("Callback, new raw feed content =\n " + s);
                 } else {
+                     System.err.println("EventCallback 2");
                     SyndFeedInput input = new SyndFeedInput();
                     try {
                         SyndFeed feed = input.build(new InputStreamReader(inStream));
@@ -116,19 +116,20 @@ public class Callback extends HttpServlet {
                         Iterator<SyndEntry> it = entries.iterator();
                         int i = 0;
                         while (it.hasNext()) {
+                             System.err.println("EventCallback 3");
                             SyndEntry entry = it.next();
                             i++;
                             SyndContent description = entry.getDescription();
                             String value = description.getValue();
-                            HubMailMsg event = (HubMailMsg) MailHubEvents.fromXml(value);
+                            SmartEvent event = (SmartEvent) MailHubEvents.fromXml(value);
+                             System.err.println("EventCallback 4 event, valu = " + event + " "+value);
                             if (event != null) {
-                               if (debug)  System.err.println("callback, event: " + i + " "+ event.toString());
-                                SemInterpreter sem = new SemInterpreter();
-                                SmartEvent smart = sem.transformEvent(event);
                                 MailHubEvents mhubE = new MailHubEvents();
-                                String s = mhubE.toXML(smart);
-                                System.out.println("callback: smart event = " + s);
-                                mhubE.publishMailEvent(s, "smart");
+                                String s = mhubE.toXML(event);
+                                System.out.println("EventCallback: smart event = " + s);
+                                NewGmail gMail = new NewGmail();
+                                // manda mail notifica di un evento
+                                gMail.sendMail("sgnmrn@gmail.com", s);
                             }
                         }
                         if (debug) {
@@ -145,7 +146,7 @@ public class Callback extends HttpServlet {
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /** 
+    /**
      * Handles the HTTP <code>GET</code> method.
      * @param request servlet request
      * @param response servlet response
@@ -158,7 +159,7 @@ public class Callback extends HttpServlet {
         processRequest(request, response);
     }
 
-    /** 
+    /**
      * Handles the HTTP <code>POST</code> method.
      * @param request servlet request
      * @param response servlet response
@@ -171,7 +172,7 @@ public class Callback extends HttpServlet {
         processRequest(request, response);
     }
 
-    /** 
+    /**
      * Returns a short description of the servlet.
      * @return a String containing servlet description
      */

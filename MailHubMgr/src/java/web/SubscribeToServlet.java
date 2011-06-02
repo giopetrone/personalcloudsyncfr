@@ -4,6 +4,7 @@
  */
 package web;
 
+import hubstuff.MailHubEvents;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException; 
@@ -32,11 +33,13 @@ public class SubscribeToServlet extends HttpServlet {
         try {
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet MailE.SubscribeToEentsServlet</title>");
+            out.println("<title>Servlet MailE.SubscribeToEventsServlet</title>");
             out.println("</head>");
             out.println("<body>");
             MailHubEvents mhubE = new MailHubEvents();
-            mhubE.subscribeTo();
+            mhubE.subscribeTo("http://localhost/Atomi/eventiRawMail.xml",  "http://localhost:8080/MailHubMgr/Callback");
+            mhubE = new MailHubEvents();
+            mhubE.subscribeTo("http://localhost/Atomi/eventiInterpretati.xml",  "http://localhost:8080/MailHubMgr/EventCallback");
             // 
         } finally {
             out.close();
@@ -45,7 +48,7 @@ public class SubscribeToServlet extends HttpServlet {
     
 public static void mainProva (String[] args){
      MailHubEvents mhubE = new MailHubEvents();
-            mhubE.subscribeTo();
+            mhubE.subscribeTo("http://localhost/Atomi/eventiRawMail.xml",  "http://localhost:8080/MailHubMgr/Callback");
 }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

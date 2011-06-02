@@ -12,10 +12,10 @@
         <servlet-name>PublishMailEventsServlet</servlet-name>
         <servlet-class>web.PublishMailEventsServlet</servlet-class>
     </servlet>
-    <servlet-mapping>
-        <servlet-name>Callback</servlet-name>
-        <url-pattern>/Callback</url-pattern>
-    </servlet-mapping>
+    <servlet>
+        <servlet-name>EventCallback</servlet-name>
+        <servlet-class>web.EventCallback</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>SubscribeToServlet</servlet-name>
         <url-pattern>/SubscribeToServlet</url-pattern>
@@ -23,6 +23,14 @@
     <servlet-mapping>
         <servlet-name>PublishMailEventsServlet</servlet-name>
         <url-pattern>/PublishMailEventsServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Callback</servlet-name>
+        <url-pattern>/Callback/subscribe/pippo</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>EventCallback</servlet-name>
+        <url-pattern>/EventCallback/subscribe/pippo</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

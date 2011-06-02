@@ -4,6 +4,7 @@
  */
 package web;
 
+import hubstuff.SmartEvent;
 import maillib.HubMailMsg;
 
 /**

@@ -4,8 +4,8 @@
  */
 package web;
 
+import hubstuff.MailHubEvents;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import javax.servlet.ServletException; 
