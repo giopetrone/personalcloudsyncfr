@@ -16,6 +16,8 @@ import com.google.gdata.data.docs.DocumentListEntry;
 import com.google.gdata.data.docs.DocumentListFeed;
 import com.google.gdata.util.ServiceException;
 import com.thoughtworks.xstream.XStream;
+import hubstuff.MailHubEvents;
+import hubstuff.SmartEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -40,8 +42,8 @@ public class DocumentListDemo {
     //anna gio
 //    static String docMakerLogin = "annamaria.goy@gmail.com";  // fino a che  ???  auth funziona
 //    static String docMakerPasswd = "tex_willer";
-    static String docMakerLogin = "annamaria.goy@gmail.com";  // fino a che  ???  auth funziona
-    static String docMakerPasswd = "tex_willer";
+    static String docMakerLogin = "sgnmrn@gmail.com";  // fino a che  ???  auth funziona
+    static String docMakerPasswd = "micio11";
     //fine Anna gio
 
     public DocumentListDemo(SingleUser user) {
@@ -63,7 +65,7 @@ public class DocumentListDemo {
             //   service.setUserCredentials("sgnmrn@gmail.com", "micio11");
             service.setUserCredentials(docMakerLogin, docMakerPasswd);
             documentListFeedUrl = new URL("http://docs.google.com/feeds/documents/private/full");
-        //   doStuffSingle();
+            //   doStuffSingle();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -79,11 +81,23 @@ public class DocumentListDemo {
         this.service = service;
     }
 
+    public static String prendi() {
+        DocsService service = new DocsService("Document List Demo");
+        try {
+            service.setUserCredentials(docMakerLogin, docMakerPasswd);
+            return new DocumentListDemo(service).showAllDocs();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return "errore";
+    }
+
     public static void main(String[] args) {
         DocsService service = new DocsService("Document List Demo");
         try {
             service.setUserCredentials(docMakerLogin, docMakerPasswd);
-            new DocumentListDemo(service).doStuff();
+            //   new DocumentListDemo(service).doStuff();
+            new DocumentListDemo(service).showAllDocs();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -95,7 +109,27 @@ public class DocumentListDemo {
             service.setUserCredentials(user.getMailAddress(), user.getPwd());
             DocumentListFeed feed = service.getFeed(documentListFeedUrl, DocumentListFeed.class);
             return generateChangeEvents(feed);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
 
+    public ArrayList<SmartEvent> doStuffHub(SingleUser user) {
+        try {
+            service.setUserCredentials(user.getMailAddress(), user.getPwd());
+            DocumentListFeed feed = service.getFeed(documentListFeedUrl, DocumentListFeed.class);
+            ArrayList<SmartEvent> eventi = generateHubEvents(feed, null);
+              MailHubEvents mhubE = new MailHubEvents();
+              ArrayList<String> evts = new ArrayList();
+            for (SmartEvent evt : eventi) {              
+                String s = mhubE.toXML(evt);
+                evts.add(s);
+                //    System.out.println("callback: smart event = " + s);
+            }
+             mhubE.publishMailEvents(evts, "smart");
+             System.out.println("document events size = " + eventi.size());
+            return eventi;
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -112,41 +146,44 @@ public class DocumentListDemo {
                 generateChangeEvents(feed);
                 Thread.currentThread().sleep(1000 * 10);
             }
-        //  showAllDocs();
-        //   uploadFile("/home/marino/prova.txt");
+            //  showAllDocs();
+            //   uploadFile("/home/marino/prova.txt");
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
-    public void showAllDocs() throws IOException, ServiceException {
-
+    public String showAllDocs() throws IOException, ServiceException {
+        String ret = "";
         for (int i = 0; i < 10; i++) {
             DocumentListFeed feed = service.getFeed(documentListFeedUrl, DocumentListFeed.class);
 
 
             for (DocumentListEntry entry : feed.getEntries()) {
-                printDocumentEntry(entry);
+                ret += printDocumentEntry(entry) + "\n";
             }
             try {
                 Thread.currentThread().sleep(1000 * 121);
             } catch (Exception e) {
             }
         }
+        return ret;
     }
 
-    public void printDocumentEntry(DocumentListEntry doc) {
+    public String printDocumentEntry(DocumentListEntry doc) {
         String shortId = doc.getId().substring(doc.getId().lastIndexOf('/') + 1);
         DateTime date = doc.getPublished();
         DateTime date1 = doc.getUpdated();
         String versionId = doc.getVersionId();
         //   System.out.println(" -- Document(" + shortId + "/" + doc.getTitle().getPlainText() + ")" + date.toString() +" ver. "+ versionId);
-        System.out.println(" " + doc.getTitle().getPlainText() + "C: " + date.toString() + " U: " + date1.toString());
+        String s = " " + doc.getTitle().getPlainText() + "C: " + date.toString() + " U: " + date1.toString();
+        // System.out.println(s);
+        return s;
     }
 
     void printMap() {
         XStream xstream = new XStream();
-        System.out.println(xstream.toXML(documentVersions));
+      //  System.out.println(xstream.toXML(documentVersions));
     }
 
     public void uploadFile(String filePath) throws IOException,
@@ -176,7 +213,7 @@ public class DocumentListDemo {
                     prevDate = doc.getPublished();
                 }
                 documentVersions.put(tit, prevDate);
-                  ret.add(generateEvent(tit, "DocCreated", prevDate));
+                ret.add(generateEvent(tit, "DocCreated", prevDate));
                 continue;
             }
             DateTime currDate = doc.getUpdated();
@@ -188,16 +225,16 @@ public class DocumentListDemo {
                 //     ret.add(generateEvent(tit, "DocUpdated", currDate));
                 //23-6-09 getContributors restituisce lista vuota, sara' baco di Google ????
                 List<Person> contributors = doc.getContributors();
-                   System.out.println("TUTTI ! di doc = " + doc.getTitle().getPlainText());
-                       System.out.println("size di contributors  = " + contributors.size());
+                System.out.println("TUTTI ! di doc = " + doc.getTitle().getPlainText());
+                System.out.println("size di contributors  = " + contributors.size());
                 if (contributors.size() == 0) {
                     System.out.println("AUTHORS vuoto !!!!! di doc = " + doc.getTitle().getPlainText());
                     ret.add(generateEvent(tit, "DocUpdated", prevDate, "gio.petrone@gmail.com"));  // TEMP per baco contributors
                 } else {
-                for (Person pers : contributors) {
-                    String mail = pers.getEmail();
-                    ret.add(generateEvent(tit, "DocUpdated", prevDate, mail));
-                }
+                    for (Person pers : contributors) {
+                        String mail = pers.getEmail();
+                        ret.add(generateEvent(tit, "DocUpdated", prevDate, mail));
+                    }
                 }
             }
         }
@@ -226,6 +263,119 @@ public class DocumentListDemo {
         return ret;
     }
 
+    private ArrayList<SmartEvent> generateHubEventsOLD(DocumentListFeed feed) {
+        ArrayList<SmartEvent> ret = new ArrayList();
+        HashSet<String> currDocList = new HashSet();
+        for (DocumentListEntry doc : feed.getEntries()) {
+            String tit = doc.getTitle().getPlainText();
+            currDocList.add(tit);
+            DateTime prevDate = documentVersions.get(tit);
+            if (prevDate == null) { // new document
+                prevDate = doc.getUpdated();
+                if (prevDate == null) {
+                    prevDate = doc.getPublished();
+                }
+                documentVersions.put(tit, prevDate);
+                ret.add(generateHubEvent(tit, "DocCreated", prevDate));
+                continue;
+            }
+            DateTime currDate = doc.getUpdated();
+            if (currDate == null) {
+                currDate = doc.getPublished();
+            }
+            if (!currDate.equals(prevDate)) {
+                documentVersions.put(tit, currDate);
+                //     ret.add(generateEvent(tit, "DocUpdated", currDate));
+                //23-6-09 getContributors restituisce lista vuota, sara' baco di Google ????
+                List<Person> contributors = doc.getContributors();
+                System.out.println("TUTTI ! di doc = " + doc.getTitle().getPlainText());
+                System.out.println("size di contributors  = " + contributors.size());
+                if (contributors.size() == 0) {
+                    System.out.println("AUTHORS vuoto !!!!! di doc = " + doc.getTitle().getPlainText());
+                    ret.add(generateHubEvent(tit, "DocUpdated", prevDate, "gio.petrone@gmail.com"));  // TEMP per baco contributors
+                } else {
+                    for (Person pers : contributors) {
+                        String mail = pers.getEmail();
+                        ret.add(generateHubEvent(tit, "DocUpdated", prevDate, mail));
+                    }
+                }
+            }
+        }
+        // now look if any document has benn removed
+        Set<String> prevDocList = documentVersions.keySet();
+        // questo peerche' dice strano errore concurrent access!!!
+        String[] y = prevDocList.toArray(new String[0]);
+        //      prevDocList.removeAll(currDocList); non si puo' fare
+        //  distrugge la mia variabile d'istanza !!!
+        for (int i = 0; i < y.length; i++) {
+            String tit = y[i];
+            if (!currDocList.contains(tit)) {
+                documentVersions.remove(tit);
+                ret.add(generateHubEvent(tit, "DocRemoved", null));
+            }
+        }
+        if (printed) {
+            printed = false;
+        } else {
+            System.out.println("No events");
+        }
+        if (!one) {
+            one = true;
+            printMap();
+        }
+        return ret;
+    }
+     private ArrayList<SmartEvent> generateHubEvents(DocumentListFeed feed, DateTime  startDate) {
+         // si parte dalla creazione, opzionalmente si potrebbe
+         // partire dalla data attuale e scrivere solo quegli eventi
+        ArrayList<SmartEvent> ret = new ArrayList();
+        HashSet<String> currDocList = new HashSet();
+        for (DocumentListEntry doc : feed.getEntries()) {
+            String tit = doc.getTitle().getPlainText();
+            currDocList.add(tit);
+            DateTime prevDate = documentVersions.get(tit);
+            if (prevDate == null) { // new document
+                if (startDate != null ) {
+                    prevDate = startDate; //ignore events before startDate
+                } else {
+                    prevDate = doc.getPublished();
+                    ret.add(generateHubEvent(tit, "DocPublished", prevDate));
+                }
+                documentVersions.put(tit, prevDate);               
+              //  continue;
+            }
+            DateTime currDate = doc.getUpdated();
+            if (currDate != null && !currDate.equals(prevDate) && currDate.compareTo(prevDate) > 0) {
+                System.out.println("Update Vecchia nuova data" + prevDate.toUiString() + " " + currDate.toUiString());
+                documentVersions.put(tit, currDate);
+                ret.add(generateHubEvent(tit, "DocUpdated", currDate));
+            }
+        }
+        // now look if any document has benn removed
+        Set<String> prevDocList = documentVersions.keySet();
+        // questo peerche' dice strano errore concurrent access!!!
+        String[] y = prevDocList.toArray(new String[0]);
+        //      prevDocList.removeAll(currDocList); non si puo' fare
+        //  distrugge la mia variabile d'istanza !!!
+        for (int i = 0; i < y.length; i++) {
+            String tit = y[i];
+            if (!currDocList.contains(tit)) {
+                documentVersions.remove(tit);
+                ret.add(generateHubEvent(tit, "DocRemoved", null));
+            }
+        }
+        if (printed) {
+            printed = false;
+        } else {
+            System.out.println("No events");
+        }
+        if (!one) {
+            one = true;
+            printMap();
+        }
+        return ret;
+    }
+
     /*generate event for document currently:
      *
      * application =  "GoogleDocs"
@@ -234,6 +384,45 @@ public class DocumentListDemo {
      * param2 == <data>
      *
      */
+    private EventDescription generateEvent(String docName, String op, DateTime d, String destinatario) {
+        printed = true;
+        System.out.println("Document \t " + docName + "\t\thas been \t\t" + op);
+        EventDescription des = new EventDescription("*");
+        des.setUser(docMakerLogin);  // utente autenticato nel desktop
+        //    des.setDestinatario(destinatario);
+        des.setApplication("GoogleDocs");
+        des.setEventName(op);
+        des.setParameter("docName", docName);
+        des.setParameter("date", d == null ? "  ?  " : d.toUiString());
+        String link = getEditLink(docName);
+        des.setParameter("docLink", link == null ? "  ?  " : link);
+        //   ArrayList par = new ArrayList();
+        //   par.add(docName);
+        //   par.add(d == null ? "  ?  " : d.toUiString());
+        //  des.setParameters(par);
+        return des;
+    }
+
+    private SmartEvent generateHubEvent(String docName, String op, DateTime d, String destinatario) {
+        printed = true;
+        String title = "Document \t " + docName + "\t\thas been \t\t" + op + " " + destinatario;
+        System.out.println(title);
+        SmartEvent des = new SmartEvent(title);
+        /* des.setUser(docMakerLogin);  utente autenticato nel desktop
+        des.setDestinatario(destinatario);
+        des.setApplication("GoogleDocs");
+        des.setEventName(op);
+        des.setParameter("docName", docName);
+        des.setParameter("date", d == null ? "  ?  " : d.toUiString());
+        String link = getEditLink(docName);
+        des.setParameter("docLink", link == null ? "  ?  " : link);
+        //   ArrayList par = new ArrayList();
+        //   par.add(docName);
+        //   par.add(d == null ? "  ?  " : d.toUiString());
+        //  des.setParameters(par); */
+        return des;
+    }
+
     private EventDescription generateEvent(String docName, String op, DateTime d) {
         printed = true;
         System.out.println("Document \t " + docName + "\t\thas been \t\t" + op);
@@ -252,12 +441,12 @@ public class DocumentListDemo {
         return des;
     }
 
-    private EventDescription generateEvent(String docName, String op, DateTime d, String destinatario) {
+    private SmartEvent generateHubEvent(String docName, String op, DateTime d) {
         printed = true;
-        System.out.println("Document \t " + docName + "\t\thas been \t\t" + op);
-        EventDescription des = new EventDescription("*");
-        des.setUser(docMakerLogin);  // utente autenticato nel desktop
-        des.setDestinatario(destinatario);
+        String title = "Document \t " + docName + "\t\thas been \t\t" + op;
+        System.out.println(title);
+        SmartEvent des = new SmartEvent(title);
+        /*   des.setDestinatario(docMakerLogin);   NON CI SI NOTIFICA ... vedi altra generateEvent
         des.setApplication("GoogleDocs");
         des.setEventName(op);
         des.setParameter("docName", docName);
@@ -268,6 +457,8 @@ public class DocumentListDemo {
         //   par.add(docName);
         //   par.add(d == null ? "  ?  " : d.toUiString());
         //  des.setParameters(par);
+         *
+         */
         return des;
     }
 
