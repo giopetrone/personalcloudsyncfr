@@ -5,6 +5,7 @@
 
 package jav;
 
+import documentwatcher.GoDoc;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
@@ -66,7 +67,7 @@ public class LoadServlet extends HttpServlet {
         try {
             /* TODO output your page here */
           //  out.println(val);
-          //  System.err.println(val);
+         //  System.err.println("LOADSERVLET sorgente: "+val);
             out.print(val);
           
            

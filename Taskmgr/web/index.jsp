@@ -4,7 +4,7 @@
     Author     : Fabrizio
 --%>
 
-<%@page contentType="text/html" pageEncoding="UTF-8" import="jav.GoDoc;"%>
+<%@page contentType="text/html" pageEncoding="UTF-8" import="documentwatcher.GoDoc;"%>
 
 
 

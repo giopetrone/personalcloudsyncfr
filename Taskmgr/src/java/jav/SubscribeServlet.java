@@ -4,13 +4,14 @@ package jav;
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
+import pubsub.FeedUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import pubsublib.test.TestSub;
+import pubsub.Subscriber;
 
 /**
  *
@@ -40,7 +41,7 @@ public class SubscribeServlet extends HttpServlet {
             if (casoSubscribe != null) {
                 if (casoSubscribe.equals("start")) {
                     System.err.println("1 sottoscrivo a:"+FeedUtil.SubFeedName(nomeFile) +", "+"http://localhost:8080/CallbackServlet");
-                    new TestSub().testSubscriber(FeedUtil.SubFeedName(nomeFile), "http://localhost:8080/CallbackServlet", "");
+                    new  Subscriber().subscribe(FeedUtil.SubFeedName(nomeFile), "http://localhost:8080/CallbackServlet", "");
                     out.println("fatta subscribe");
                     out.close();
                 } else {

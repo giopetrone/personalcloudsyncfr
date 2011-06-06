@@ -4,6 +4,7 @@
  */
 package jav;
 
+import pubsub.FeedUtil;
 import java.io.IOException;
 
 import java.io.PrintWriter;
@@ -13,7 +14,7 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import pubsublib.event.AtomEvent;
+import event.AtomEvent;
 
 /**
  *

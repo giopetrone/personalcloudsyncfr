@@ -8,6 +8,7 @@ package jav;
  *
  * @author fabrizio
  */
+import pubsub.FeedUtil;
 import sun.net.ftp.FtpClient;
 import java.util.Vector;
 import java.io.*;

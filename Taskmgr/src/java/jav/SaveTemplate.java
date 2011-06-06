@@ -21,9 +21,9 @@ import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 
-import pubsublib.event.AtomEvent;
+import event.AtomEvent;
+import pubsub.Publisher;
 
-import pubsublib.test.TestPub;
 
 /**
  *
@@ -153,7 +153,7 @@ public class SaveTemplate extends HttpServlet {
             addEntry(feed, event);
             //     new TestPub().testPublisher("http://pubsubhubbub.appspot.com","");
             //    new TestPub().testPublisher("https://code.launchpad.net/subhub","");
-            new TestPub().testPublisher("http://localhost:8080", "");
+            new  Publisher().publish("http://localhost:8080", "");
         } catch (Exception ex) {
             ex.printStackTrace();
         } /*   */ finally {

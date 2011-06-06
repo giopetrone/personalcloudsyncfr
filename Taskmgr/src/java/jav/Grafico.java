@@ -8,7 +8,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import pubsublib.event.AtomEvent;
+import event.AtomEvent;
 
 /**
  *

@@ -4,6 +4,8 @@
  */
 package jav;
 
+import pubsub.FeedUtil;
+import documentwatcher.GoDoc;
 import com.google.gson.Gson;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,9 +15,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import maillib.SendMailCl;
-import pubsublib.pubsubhubbub.Discovery;
-import pubsublib.test.TestPub;
-import pubsublib.test.TestSub;
+import pubsub.Discovery;
+import pubsub.Publisher;
+import pubsub.Subscriber;
 
 /**
  *
@@ -46,7 +48,7 @@ public class SaveServlet extends HttpServlet {
         String assignees = request.getHeader("assignees");
         System.out.println("Assignees: " + assignees);
         notification = request.getHeader("notification");
-        FeedUtil.setLocalMode(notification.equals("local"));
+        FeedUtil.setLocalMode(notification);
 
         //     String loadjson = request.getHeader("loadjson");
         boolean publish = request.getHeader("publish") != null;
@@ -76,7 +78,7 @@ public class SaveServlet extends HttpServlet {
             } else {
                 users = ob.setUsers(owner, writers, users);
             }
-            String val = GoDoc.saveDiagram(owner, nomeFile, publish, gson.toJson(ob), users, writers, pwd, assignees);
+            String val = GoDoc.saveDiagram(owner, nomeFile, publish, gson.toJson(ob), users, writers, pwd, assignees, notification);
             //    out.println("new or old ?  " + val);
             if (val.equals("new")) {
                 ob.createNewEvents(nomeFile, owner);
@@ -96,7 +98,7 @@ public class SaveServlet extends HttpServlet {
                       Discovery discovery = new Discovery();
                        String hub  = discovery.getHub(url);
                        System.err.println("2 sottoscrivo a:hub " +hub +", "+ url +", " + FeedUtil.GetUrl()+"NotifMgrG/NotifCallbackServlet");
-                    new TestSub().testSubscriber(url,FeedUtil.GetUrl()+"NotifMgrG/NotifCallbackServlet", "");
+                    new Subscriber().subscribe(url,FeedUtil.GetUrl()+"NotifMgrG/NotifCallbackServlet", "");
 //                   
 //                    //if(notification.equals("remote"))
 ////                 //   {
@@ -126,7 +128,7 @@ public class SaveServlet extends HttpServlet {
                    
                     System.out.println("PUBBLICO SU HUB: "+hub);
 
-                     new TestPub().testPublisher(hub, FeedUtil.FeedUrl(nomeFile));
+                     new Publisher().publish(hub, FeedUtil.FeedUrl(nomeFile));
                  //   new TestPub().testPublisher(hub, FeedUtil.SubFeedName(nomeFile));
                  //  new TestPub().testPublisher(hub, "http://www.piemonte.di.unito.it/Flow/"+nomeFile+".xml");
                     //  new TestPub().testPublisher(hub, "http://taskmanagerunito.xoom.it/Flow/"+nomeFile+".xml");
@@ -149,12 +151,12 @@ public class SaveServlet extends HttpServlet {
     }
 
 
-    public static String getTypeNotification()
+    private static String getTypeNotification()
     {
         return notification;
     }
 
-    public static void setTypeNotification(String hub)
+    private static void setTypeNotification(String hub)
     {
         notification = hub;
     }

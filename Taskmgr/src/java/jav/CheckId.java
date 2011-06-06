@@ -5,6 +5,7 @@
 
 package jav;
 
+import documentwatcher.GoDoc;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;

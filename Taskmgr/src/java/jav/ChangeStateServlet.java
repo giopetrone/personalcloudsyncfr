@@ -4,14 +4,15 @@
  */
 package jav;
 
+import pubsub.FeedUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import pubsublib.event.AtomEvent;
-import pubsublib.test.TestPub;
+import event.AtomEvent;
+import pubsub.Publisher;
 
 /**
  *
@@ -43,8 +44,8 @@ public class ChangeStateServlet extends HttpServlet {
             // occorre decidere che link abbia piu' senso
 
             //  FeedUtil.addEntry(editLink, nomeFile, event);
-            FeedUtil.addEntry("", nomeFile, event);
-            new TestPub().testPublisher("", FeedUtil.SubFeedName(nomeFile));
+            FeedUtil.addEntry("", nomeFile, event, FeedUtil.isLocalMode()? "local":"remote");
+            new Publisher().publish("", FeedUtil.SubFeedName(nomeFile));
 
             /* TODO output your page here */
             out.println("evento pubblicato");
