@@ -21,7 +21,7 @@ public class GoogleDocsThread extends Thread {
 
     private static boolean publishOnHub = true;
     private ArrayList<SingleUser> uList = new ArrayList();
-    private DocumentListDemo googleDoc = null;
+    private DocumentListDemoOld googleDoc = null;
     GigaListener writer = null;
     static GoogleDocsThread theThread = null;
     //anna gio
@@ -39,7 +39,7 @@ public class GoogleDocsThread extends Thread {
     public GoogleDocsThread(String str) {
         super(str);
         this.writer = new GigaListener(true, false);
-        googleDoc = new DocumentListDemo(loadState());
+        googleDoc = new DocumentListDemoOld(loadState());
     }
 
     public void run() {

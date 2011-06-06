@@ -32,7 +32,7 @@ import javax.activation.MimetypesFileTypeMap;
  *
  * @author marino
  */
-public class DocumentListDemo {
+public class DocumentListDemoOld {
 
     URL documentListFeedUrl = null;
     DocsService service = null;
@@ -46,7 +46,7 @@ public class DocumentListDemo {
     static String docMakerPasswd = "micio11";
     //fine Anna gio
 
-    public DocumentListDemo(SingleUser user) {
+    public DocumentListDemoOld(SingleUser user) {
         service = new DocsService("Document List");
         try {
             service.setUserCredentials(user.getMailAddress(), user.getPwd());
@@ -56,7 +56,7 @@ public class DocumentListDemo {
         }
     }
 
-    public DocumentListDemo(String docList) {
+    public DocumentListDemoOld(String docList) {
         XStream xstream = new XStream();
         // DA FARE IN SEGUITO : se si vuole avere uno snapshot della situazione dei docs di un utente se, docWatcher cade.
         //  documentVersions = (HashMap<String, DateTime>) xstream.fromXML(docList);
@@ -72,7 +72,7 @@ public class DocumentListDemo {
         System.out.println("CIAO");
     }
 
-    public DocumentListDemo(DocsService service) {
+    public DocumentListDemoOld(DocsService service) {
         try {
             documentListFeedUrl = new URL("http://docs.google.com/feeds/documents/private/full");
         } catch (Exception ex) {
@@ -85,7 +85,7 @@ public class DocumentListDemo {
         DocsService service = new DocsService("Document List Demo");
         try {
             service.setUserCredentials(docMakerLogin, docMakerPasswd);
-            return new DocumentListDemo(service).showAllDocs();
+            return new DocumentListDemoOld(service).showAllDocs();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -96,8 +96,8 @@ public class DocumentListDemo {
         DocsService service = new DocsService("Document List Demo");
         try {
             service.setUserCredentials(docMakerLogin, docMakerPasswd);
-            //   new DocumentListDemo(service).doStuff();
-            new DocumentListDemo(service).showAllDocs();
+            //   new DocumentListDemoOld(service).doStuff();
+            new DocumentListDemoOld(service).showAllDocs();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
