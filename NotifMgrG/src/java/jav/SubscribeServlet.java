@@ -10,20 +10,22 @@ package jav;
  */
 
 
+import documentwatcher.GoDoc;
 import java.io.IOException;
 import java.io.PrintWriter; 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import pubsublib.pubsubhubbub.Discovery;
-import pubsublib.test.TestSub;
+import pubsub.Discovery;
+import pubsub.FeedUtil;
+import pubsub.Subscriber;
 
 /**
  *
  * @author marino
  */
-public class SubscribeServletUNUSED extends HttpServlet {
+public class SubscribeServlet extends HttpServlet {
 
     
 
@@ -80,7 +82,8 @@ public class SubscribeServletUNUSED extends HttpServlet {
                         Discovery discovery = new Discovery();
                         String hub = discovery.getHub(feed);
                        
-                        risp= new TestSub().testSubscriber(feed, FeedUtil.GetUrl()+"/NotifMgrG/NotifCallbackServlet", "");
+                       risp = new Subscriber().subscribe(feed, "http://localhost:8080/NotifMgrG/NotifCallbackServlet", "");
+                //  risp= new TestSub().testSubscriber(feed, FeedUtil.GetUrl()+"/NotifMgrG/NotifCallbackServlet", "");
                  //       risp= new TestSub().testSubscriber(feed, "http://localhost:8080/NotifMgrG/NotifCallbackServlet", "");
 //risp= new TestSub().testSubscriber(feed, "http://piemonte.di.unito.it/NotifMgrG/NotifCallbackServlet", "");
 

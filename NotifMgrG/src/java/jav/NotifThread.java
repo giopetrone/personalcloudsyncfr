@@ -29,16 +29,18 @@ public class NotifThread extends Thread {
     }
 
     public void run() {
+        // eventi
+        // "Change Status of Task"
+        // "a task has been deleted"
+        // "Workflow is Done"
+        //
         try {
 
-            System.err.println("NotifThread.run : NOTIFICATIONS: " + eventi.size());
-
-
+            System.err.println("NotifThread.run, NOTIFICATIONS: " + eventi.size());
             for (AtomEvent cont : eventi) {
                 //   System.err.println("new feed content =\n " + cont.toString(true));
-
                 String activity = cont.getActivity();
-
+                System.err.println("NotifThread.run : ACTIVITY = " + activity);
                 if (activity.equalsIgnoreCase("Change Status of Task")) {
                     String taskname = cont.getParameter("Task");
                     String nomeFile = cont.getParameter("File");
@@ -48,20 +50,16 @@ public class NotifThread extends Thread {
                     }
                     String modifier = cont.getUser();
                     if (!dest.equals("") && dest != null) {
-
                         String emailSubjectTxt = "Update of task " + taskname + " status";
-
                         String[] sendTo = dest.split(",");
-
                         for (int i = 0; i < sendTo.length; i++) {
                             String destim = sendTo[i];
                             //Controllo se il destinatario si e' iscritto alle notifiche
                             if (destim.contains("gmail.com") && !destim.equals("") && !destim.equalsIgnoreCase(modifier)) {
-
                                 String nomeDoc = extractPermission(destim);
                                 System.out.println("nomeDoc x change status: " + nomeDoc);
                                 String sub = GoDoc.checkPermission(nomeDoc, nomeFile, "Changestatusoftask");
-                                System.out.println("SUB STATUS: " + sub);
+                                System.out.println("NOTIFTHREAD SUB STATUS: " + sub);
                                 if (sub.equalsIgnoreCase("subscribe")) {
                                     //sendGMsg(emailSubjectTxt, destim);
                                     chClient.sendGMsg(emailSubjectTxt, destim);
@@ -78,16 +76,12 @@ public class NotifThread extends Thread {
                     }
                     String modifier2 = cont.getUser();
                     if (!assigned.equals("") && assigned != null) {
-
-
                         List destinators = new ArrayList();
                         String[] receivers = assigned.split(",");
-
                         for (int i = 0; i < receivers.length; i++) {
                             String destinator = receivers[i];
                             //Controllo se il destinatario si e' iscritto alle notifiche
                             if (!destinator.equals("") && !destinator.equalsIgnoreCase(modifier2)) {
-
                                 String userDoc = extractPermission(destinator);
                                 System.out.println("File Name in delete: " + userDoc);
                                 String emailSubjectTxt = "A task assigned to you: " + taskdeletedname + "has been deleted";
@@ -99,7 +93,6 @@ public class NotifThread extends Thread {
                                 }
                             }
                         }
-
                         if (!destinators.isEmpty()) {
                             String[] destinatarifinali = (String[]) destinators.toArray(new String[0]);
                             String emailSubjectTxt = "A task assigned to you: " + taskdeletedname + " has been deleted";
@@ -112,13 +105,11 @@ public class NotifThread extends Thread {
                             System.out.println("%%%% SEND MAIL IN DELETE TASK %%%%%");
                         }
                     }
-
                 } else if (activity.equalsIgnoreCase("Workflow is Done")) {
                     String workflow = cont.getParameter("Workflow");
                     String allusers = cont.getParameter("All users");
                     System.out.println("USERS prima di substring: " + allusers);
                     //allusers = allusers.substring(1, allusers.length());
-
                     String[] destemail = allusers.split(",");
                     List destemaildone = new ArrayList();
                     for (int j = 0; j < destemail.length; j++) {
@@ -135,11 +126,8 @@ public class NotifThread extends Thread {
                                 chClient.sendGMsg(emailSubjectTxt, destemail[j]);
                                 destemaildone.add(destemail[j]);
                             }
-
                         }
                         // String sub = WriterPermission.checkNotifications(sendTo[j],workflow,"Workflowisdone");
-
-
                     }
                     if (!destemaildone.isEmpty()) {
                         String[] destinatarifinali = (String[]) destemaildone.toArray(new String[0]);
@@ -152,20 +140,10 @@ public class NotifThread extends Thread {
                         new SendMailCl().sendSSLMessage(destinatarifinali, emailSubjectTxt, text, email, pwd);
                         System.out.println("%%%% SEND MAIL IN Workflow done %%%%%");
                     }
-
-
-
                 }
-
             }
             //  String[] to = {"fabrizio.torretta@gmail.com"};
             //  new SendMailCl().sendSSLMessage(to,"Prova", "text", email,pwd);
-
-
-
-
-
-
         } catch (Exception ex) {
             ex.printStackTrace();
         }
