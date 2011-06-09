@@ -934,7 +934,7 @@ public class GoDoc {
 
         } catch (Exception ex) {
             ex.printStackTrace();
-            System.out.println("In Load Doc " + ex.toString());
+           // System.out.println("In Load Doc " + ex.toString());
             List<String> list = new LinkedList();
             list.add("errore");
             list.add("errore");
