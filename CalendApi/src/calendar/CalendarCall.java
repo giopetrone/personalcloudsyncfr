@@ -22,7 +22,7 @@ import java.util.List;
  */
 public class CalendarCall {
 
-    String googleCalFeed = "http://www.google.com/calendar/feeds/";
+    String googleCalFeed = "http://www.google.com/calendar/feeds/"; 
     CalendarService myService = null;
     String googleUserMail;
     String guestEmail;
