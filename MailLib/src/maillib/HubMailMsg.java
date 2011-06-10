@@ -26,6 +26,8 @@ public class HubMailMsg {
     private Date dateSent;
     private String subject;
 
+    private static boolean debug = false;
+
     public HubMailMsg(Message msg) {
         try {
             content = getTextContent(msg);
@@ -67,40 +69,37 @@ public class HubMailMsg {
             Object o = m.getContent();
             String mimeType = m.getContentType();
             if (o instanceof String) {
-                System.out.println("**This is a String Message**");
+                if (debug) {
+                    System.out.println("**This is a String Message**");
                 System.out.println((String) o);
+                }
             } else if (o instanceof Multipart) {
-                System.out.print("**This is a Multipart Message.  ");
+                  if (debug) System.out.print("**This is a Multipart Message.  ");
                 Multipart mp = (Multipart) o;
                 int count3 = mp.getCount();
-                System.out.println("It has " + count3
-                        + " BodyParts in it**");
+                 if (debug)  System.out.println("It has " + count3 + " BodyParts in it**");
                 for (int j = 0; j < count3; j++) {
                     // Part are numbered starting at 0
                     BodyPart b = mp.getBodyPart(j);
                     String mimeType2 = b.getContentType();
-                    System.out.println("BodyPart " + (j + 1)
-                            + " is of MimeType " + mimeType);
+                      if (debug) System.out.println("BodyPart " + (j + 1) + " is of MimeType " + mimeType);
 
                     Object o2 = b.getContent();
                     if (o2 instanceof String) {
-                        System.out.println("**This is a String BodyPart**");
+                          if (debug) System.out.println("**This is a String BodyPart**");
                         s = (String) o2;
-                        System.out.println((String) s);
+                          if (debug) System.out.println((String) s);
                     } else if (o2 instanceof Multipart) {
-                        System.out.print(
-                                "**This BodyPart is a nested Multipart.  ");
+                          if (debug) System.out.print("**This BodyPart is a nested Multipart.  ");
                         Multipart mp2 = (Multipart) o2;
                         int count2 = mp2.getCount();
-                        System.out.println("It has " + count2
-                                + "further BodyParts in it**");
+                         if (debug)  System.out.println("It has " + count2 + "further BodyParts in it**");
                     } else if (o2 instanceof InputStream) {
-                        System.out.println(
-                                "**This is an InputStream BodyPart**");
+                          if (debug) System.out.println("**This is an InputStream BodyPart**");
                     }
                 } //End of for
             } else if (o instanceof InputStream) {
-                System.out.println("**This is an InputStream message**");
+                  if (debug) System.out.println("**This is an InputStream message**");
                 InputStream is = (InputStream) o;
                 // Assumes character content (not binary images)
                 int c;

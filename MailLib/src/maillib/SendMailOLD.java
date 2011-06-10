@@ -44,7 +44,7 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.naming.InitialContext;
 
-public class SendMail {
+public class SendMailOLD {
 
     private static final String SMTP_HOST_NAME = "smtp.gmail.com";
     private static final String SMTP_PORT = "465";
@@ -59,7 +59,7 @@ public class SendMail {
     private static final String[] emailList = {"gio.petrone@gmail.com"};
 
     public static void main(String args[]) throws Exception {
-        SendMail smtpMailSender = new SendMail();
+        SendMailOLD smtpMailSender = new SendMailOLD();
          smtpMailSender.postMail(emailList, emailSubjectTxt, emailMsgTxt, emailFromAddress);
          //   smtpMailSender.getMailMessages();
         System.out.println("Sucessfully Sent mail to All Users");

@@ -30,20 +30,23 @@ public class NewGmail {
     private static final String SMTP_AUTH_USER = "sgnmrn@gmail.com";
     private static final String SMTP_AUTH_PWD = "micio11";
     private static final String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
-    private static boolean debug = true;
+    private static boolean debug = false; // true;
     private static Session mailSession;
 
     public static void main(String[] args) throws Exception {
         NewGmail gMail = new NewGmail();
-        gMail.sendMail("sgnmrn@gmail.com", "esempio mail");
-        gMail = new NewGmail();
-        gMail.sendMail("sgnmrn@gmail.com", "esempio mail");
-        // gMail.getMailMessages();
+        //gMail.sendMail("sgnmrn@gmail.com", "esempio mail");
+        gMail.getMailMessages();
     }
 
-    public void sendMail(String user, String content) throws Exception {
+    public void sendMail(String from, String pwd, String user, String content) throws Exception {
+        if (from.isEmpty() ){
+            // assign default
+            from = SMTP_AUTH_USER;
+            pwd = SMTP_AUTH_PWD;
+        }
         Properties props = new Properties();
-
+        props.put("mail.debug", "false");
         props.put("mail.transport.protocol", "smtps");
         props.put("mail.smtps.host", SMTP_HOST_NAME);
         props.put("mail.smtps.auth", "true");
@@ -51,29 +54,23 @@ public class NewGmail {
         if (mailSession == null) {
             //     mailSession = Session.getDefaultInstance(props);
             mailSession = Session.getInstance(props);
-            mailSession.setDebug(true);
+            mailSession.setDebug(false); // true);
         }
         Transport transport = mailSession.getTransport();
-
         MimeMessage message = new MimeMessage(mailSession);
-        message.setSubject("Testing SMTP-SSL");
+        message.setSubject("Testing semhub");
         message.setContent(content, "text/plain");
-
-        message.addRecipient(Message.RecipientType.TO,
-                new InternetAddress(user));
-        //  new InternetAddress("gio.petrone@gmail.com"));
-
-        transport.connect(SMTP_HOST_NAME, SMTP_HOST_PORT, SMTP_AUTH_USER, SMTP_AUTH_PWD);
-
-        transport.sendMessage(message,
-                message.getRecipients(Message.RecipientType.TO));
+        message.addRecipient(Message.RecipientType.TO, new InternetAddress(user));
+        transport.connect(SMTP_HOST_NAME, SMTP_HOST_PORT,  from, pwd);
+        transport.sendMessage(message, message.getRecipients(Message.RecipientType.TO));
         transport.close();
+        System.out.println("SendMail, from: "+ from + "; to: "+ user);
     }
 
     public void sendSSLMessage(String recipients[], String subject,
             String message, final String from, final String pwd) throws Exception {
         boolean debug = true;
-   sendMail("sgnmrn@gmail.com", "esempio mail da TaskMgr");
+        sendMail("","","sgnmrn@gmail.com", "esempio mail da TaskMgr");
         Properties props = new Properties();
         props.put("mail.smtp.host", SMTP_HOST_NAME);
         props.put("mail.smtp.auth", "true");
@@ -123,7 +120,8 @@ public class NewGmail {
             Store store = session.getStore("imaps");
 
             //store.connect("imap.gmail.com", "annamaria.goy@gmail.com", "tex_willer");
-            store.connect("imap.gmail.com", "sgnmrn@gmail.com", "micio11");
+            //store.connect("imap.gmail.com", "sgnmrn@gmail.com", "micio11");
+            store.connect("imap.gmail.com", "icemgr09@gmail.com", "sync09fr");
             Folder folder = store.getFolder("INBOX");
             folder.open(Folder.READ_ONLY);
             messages = folder.getMessages();
