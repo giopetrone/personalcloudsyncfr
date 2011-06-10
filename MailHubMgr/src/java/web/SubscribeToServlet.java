@@ -46,10 +46,6 @@ public class SubscribeToServlet extends HttpServlet {
         }
     }
     
-public static void mainProva (String[] args){
-     MailHubEvents mhubE = new MailHubEvents();
-            mhubE.subscribeTo("http://localhost/Atomi/eventiRawMail.xml",  "http://localhost:8080/MailHubMgr/Callback");
-}
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /** 

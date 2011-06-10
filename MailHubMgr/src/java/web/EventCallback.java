@@ -48,14 +48,15 @@ public class EventCallback extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
 
-        System.err.println("EventCallback 1");
+        System.err.println("EventCallback");
         String hubmode = "";
         String hubtopic = "";
         String hubchallenge = "";
         String hublease = "";
         String hubverify = "";
         try {
-            response.setContentType("text/html");
+            //response.setContentType("text/html");
+
 
             if (request.getParameter("hub.mode") != null) {
                 hubmode = request.getParameter("hub.mode");
@@ -108,7 +109,7 @@ public class EventCallback extends HttpServlet {
                     }
                     System.err.println("Callback, new raw feed content =\n " + s);
                 } else {
-                     System.err.println("EventCallback 2");
+                    //    System.err.println("EventCallback 2");
                     SyndFeedInput input = new SyndFeedInput();
                     try {
                         SyndFeed feed = input.build(new InputStreamReader(inStream));
@@ -116,20 +117,21 @@ public class EventCallback extends HttpServlet {
                         Iterator<SyndEntry> it = entries.iterator();
                         int i = 0;
                         while (it.hasNext()) {
-                             System.err.println("EventCallback 3");
+                            //   System.err.println("EventCallback 3");
                             SyndEntry entry = it.next();
                             i++;
                             SyndContent description = entry.getDescription();
                             String value = description.getValue();
                             SmartEvent event = (SmartEvent) MailHubEvents.fromXml(value);
-                             System.err.println("EventCallback 4 event, valu = " + event + " "+value);
                             if (event != null) {
                                 MailHubEvents mhubE = new MailHubEvents();
                                 String s = mhubE.toXML(event);
-                                System.out.println("EventCallback: smart event = " + s);
+                                if (debug) {
+                                    System.out.println("EventCallback: smart event = " + s);
+                                }
                                 NewGmail gMail = new NewGmail();
                                 // manda mail notifica di un evento
-                                gMail.sendMail("sgnmrn@gmail.com", s);
+                                gMail.sendMail("", "", "sgnmrn@gmail.com", s);
                             }
                         }
                         if (debug) {

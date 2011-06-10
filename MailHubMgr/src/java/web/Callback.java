@@ -122,7 +122,9 @@ public class Callback extends HttpServlet {
                             String value = description.getValue();
                             HubMailMsg event = (HubMailMsg) MailHubEvents.fromXml(value);
                             if (event != null) {
-                               if (debug)  System.err.println("callback, event: " + i + " "+ event.toString());
+                                if (debug) {
+                                    System.err.println("callback, event: " + i + " " + event.toString());
+                                }
                                 SemInterpreter sem = new SemInterpreter();
                                 SmartEvent smart = sem.transformEvent(event);
                                 MailHubEvents mhubE = new MailHubEvents();
