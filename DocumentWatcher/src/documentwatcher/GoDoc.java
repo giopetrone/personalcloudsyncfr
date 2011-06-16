@@ -54,29 +54,28 @@ public class GoDoc {
     private static final String APPLICATION_NAME = "JavaGDataClientSampleAppV3.0";
     private DocumentList documentList = null;
 
-    private static void uploadFile() {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
     /*
      * To change this template, choose Tools | Templates
      * and open the template in the editor.
      */
-    URL documentListFeedUrl = null;
+    private static URL DocumentListFeedUrl = null;
+    private static String DownloadFeed = "http://docs.google.com/feeds/download/";
     DocsService service = null;
     static HashMap<String, DateTime> documentVersions = new HashMap();
-    private boolean printed = false;
+  //  private boolean printed = false;
     boolean one = false;
     static String docMakerLogin = "icemgr09@gmail.com";  // fino a che  ???  auth funziona
     static String docMakerPasswd = "sync09fr";
 
-    //fine Anna gio
-    public GoDoc(DocsService service) {
+    static {
         try {
-            documentListFeedUrl = new URL("http://docs.google.com/feeds/documents/private/full/");
-
+            DocumentListFeedUrl = new URL("http://docs.google.com/feeds/documents/private/full/");
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+    //fine Anna gio
+    public GoDoc(DocsService service) {
         this.service = service;
     }
 
@@ -86,8 +85,7 @@ public class GoDoc {
 
             DocsService service = new DocsService("Document List Demo");
             service.setUserCredentials(docMakerLogin, docMakerPasswd);
-            URL listFeedUrl = new URL("http://docs.google.com/feeds/documents/private/full/");
-            DocumentListFeed feed = service.getFeed(listFeedUrl, DocumentListFeed.class);
+              DocumentListFeed feed = service.getFeed(DocumentListFeedUrl, DocumentListFeed.class);
             //  System.out.println("FEED :"+feed.toString());
             DocumentListEntry doc = new GoDoc(service).findEntry("fabrizio_torretta.txt");
             if (doc != null) {
@@ -96,7 +94,7 @@ public class GoDoc {
 
                 String docId = resourceId.substring(resourceId.lastIndexOf(':') + 1);
 
-                URL exportUrl = new URL("http://docs.google.com/feeds/download/" + docType
+                URL exportUrl = new URL(DownloadFeed + docType
                         + "s/Export?docID=" + docId + "&exportFormat=" + "html");
 
                 MediaContent mc = new MediaContent();
@@ -148,11 +146,6 @@ public class GoDoc {
         } catch (Exception ex) {
             Logger.getLogger(GoDoc.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-
-
-
-
     }
 
     public static DocumentListEntry createFolder(String title) throws IOException, ServiceException {
@@ -163,11 +156,9 @@ public class GoDoc {
         newEntry.setTitle(new PlainTextConstruct(title));
         URL Url = new URL("http://docs.google.com/feeds/documents/private/full");
         return service.insert(Url, newEntry);
-
     }
 
     public static String prendi(String login, String pwd) {
-
         DocsService service = new DocsService("Document List Demo");
         try {
 
@@ -180,9 +171,36 @@ public class GoDoc {
         }
     }
 
+    private List<String> split(String input) {
+        // spezza i login eliminando i blank, e le virgole
+        ArrayList<String> ret = new ArrayList();
+        if (input != null) {
+            String temp = input.replaceAll(" ", "");
+            for (String s :  temp.split(",")) {
+                if (!s.equals("")) {
+                    ret.add(s);
+                }
+            }
+        }
+        return ret;
+    }
+
+    private AtomEvent generateAccessEvent(String login, String documentName, String permission, String who) {
+        AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
+        event.setParameter("File", documentName);
+        event.setParameter("Permission", permission);
+        event.setParameter("Who", who);
+        return event;
+    }
+
+    private boolean userIdOk(String id) {
+        int count0 = id.indexOf("@");
+        int count1 = id.lastIndexOf("@");
+        return count0 > 0 && count0 == count1;
+    }
+
     public void saveNewDiagram(String login, String documentName, String s, String users, String writers, String pwd, String assignees, String hub) {
         try {
-
             DocumentListEntry documentEntry = findEntry(documentName);
             System.out.println("DOCUMENTO NUOVO");
             List<AtomEvent> listaeventi = new ArrayList();
@@ -194,100 +212,53 @@ public class GoDoc {
             eventSave.setParameter("Link", link);
             listasave.add(eventSave);
             FeedUtil.addEntries("", documentName, listasave, hub);
-            String[] tempwriter;
-            String delimiter = ",";
             List<String> destinatari = new LinkedList();
             //if(writers == null) writers = "";
             if (users == null && writers == null && assignees == null) {
                 System.out.println("NESSEUN UTENTE IN SHARING IN SAVE NEW DIAGRAM");
-
             } else {
-                String[] tempusers;
-                if (writers == null) {
-                    writers = "";
-                }
-                if (users == null) {
-                    users = "";
-                }
-                if (assignees == null) {
-                    assignees = "";
-                }
-                tempusers = users.split(delimiter);
-
-                for (int i = 0; i < tempusers.length; i++) {
-                    if (!tempusers[i].equals("") && !assignees.contains(tempusers[i])) {
-
-                        System.out.println("%%% ASSEGNO Reader a %%%%%%%%% " + tempusers[i]);
-                        addReaders(documentEntry, tempusers[i]);
-                        AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
-                        event.setParameter("File", documentName);
-                        event.setParameter("Permission", "Read");
-                        event.setParameter("Who", tempusers[i]);
+                List<String> tempwriters = split(writers);
+                List<String> tempusers = split(users);
+                List<String> tempassignees = split(assignees);
+                // aggiungi permessi al doc:
+                // users normali hanno READ
+                // writers ed assignees hanno WRITE
+                for (String user : tempusers) {
+                    if (!tempassignees.contains(user)) {
+                        System.out.println("%%% ASSEGNO Reader a %%%%%%%%% " + user);
+                        addRole(documentEntry, user, "reader");
+                        AtomEvent event = generateAccessEvent(login, documentName, "Read", user);
                         listaeventi.add(event);
-                        //  new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
-                        destinatari.add(tempusers[i]);
-
+                        destinatari.add(user);
                     }
-
                 }
-                tempwriter = writers.split(delimiter);
-                for (int j = 0; j < tempwriter.length; j++) {
-                    boolean check = false;
-
-                    for (int i = 0; i < tempusers.length; i++) {
-                        if (tempusers[i].equals(tempwriter[j])) {
-                            check = true;
-                            // System.out.println("true");
-                        }
-
-                    }
-                    if (check == false && !tempwriter[j].equals("")) {
-                        System.out.println("#####ASSEGNO Writer a #### " + tempwriter[j]);
-                        addWriting(documentEntry, tempwriter[j]);
-                        AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
-                        event.setParameter("File", documentName);
-                        event.setParameter("Permission", "Write");
-                        event.setParameter("Who", tempwriter[j]);
+                for (String writer : tempwriters) {
+                    if (!tempusers.contains(writer)) {
+                        //   System.out.println("#####ASSEGNO Writer a #### " + writer);
+                        addRole(documentEntry, writer, "writer");
+                        AtomEvent event = generateAccessEvent(login, documentName, "Write", writer);
                         listaeventi.add(event);
-                        // new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
-                        destinatari.add(tempwriter[j]);
+                        destinatari.add(writer);
                     }
                 }
-
-                String[] tempassignees;
-                tempassignees = assignees.split(delimiter);
-                for (int j = 0; j < tempassignees.length; j++) {
-                    String thisassigner = tempassignees[j];
-                    int count0 = thisassigner.indexOf("@");
-                    int count1 = thisassigner.lastIndexOf("@");
-                    boolean checkchiocciola = false;
-                    if (count0 > 0 && count0 == count1) {
-                        checkchiocciola = true;
-                    }
-                    if (!tempassignees[j].equalsIgnoreCase("") && tempassignees[j] != null && !tempassignees[j].equals(" ") && checkchiocciola == true) {
-
+                for (String assignee : tempassignees) {
+                    if (userIdOk(assignee)) {
                         try {
-                            System.out.println("Assignees " + tempassignees[j]);
-                            addWriting(documentEntry, tempassignees[j]);
-                            AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
-                            event.setParameter("File", documentName);
-                            event.setParameter("Permission", "Write");
-                            event.setParameter("Who", tempassignees[j]);
+                            //     System.out.println("Assignees " + assignee);
+                            addRole(documentEntry, assignee,"writer");
+                            AtomEvent event = generateAccessEvent(login, documentName, "Write", assignee);
                             listaeventi.add(event);
-                            //new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
-                            destinatari.add(tempassignees[j]);
+                            destinatari.add(assignee);
                         } catch (Exception ex) {
                             if (ex.getMessage().equalsIgnoreCase("This user already has access to the document.")) {
-                                System.out.println("DENTRO CATCH X  UTENTE: " + thisassigner);
-
+                                System.out.println("DENTRO CATCH X  UTENTE: " + assignee);
                             } else {
-                                System.out.println("Dentro CATCH X utente " + thisassigner + " " + ex.getMessage());
+                                ex.printStackTrace();
+                                System.out.println("Dentro CATCH X utente " + assignee + " " + ex.getMessage());
                             }
                         }
                     }
-
                 }
-
                 destinatari.add(login);
                 String dest = destinatari.toString();
                 int length = dest.length();
@@ -295,255 +266,112 @@ public class GoDoc {
                 if (destinatari.size() != 1) {
                     sendMail(destfinal, "icemgr09@gmail.com", "sync09fr", documentName);
                 }
-
-                //   FeedUtil.addEntries("",documentName,listaeventi);
-
-
-
-
             }
-
-
         } catch (Exception ex) {
             ex.printStackTrace();
             System.out.println("IN SAVE NEW DIAGRAM " + ex.getMessage());
-
         }
-
-
-
     }
 
-    public String uploadDiagram(String login, String documentName, String users, String writers, String s, String assignees) throws Exception {
+    public String uploadDiagram(String login, String documentName, String users, String writers, String content, String assignees) throws Exception {
         try {
             //  DocsService service = new DocsService("Document List Demo");
-            System.out.println("DocumentEntry NOT null");
-            DocumentListEntry documentEntry = findEntry(documentName);
+            System.out.println("godoc.uploadDiagram, DocumentEntry NOT null");
             AtomEvent eventUpdate = new AtomEvent(login, "TaskManager", "Update Diagram");
             eventUpdate.setParameter("File", documentName);
-            Discovery discovery = new Discovery();
-            //  String hub = discovery.getHub("http://taskmanagerunito.xoom.it/Flow/" + documentName + ".xml");
-            String hub = null;
-            String typeNotif = "";
-            if (FeedUtil.isLocalMode()) {
-                // hub = discovery.getHub("/var/www/Flow/" + documentName + ".xml");
-                //  hub = discovery.getHub(FeedUtil.SubFeedName(documentName));
-                hub = discovery.getHub(FeedUtil.FeedUrl(documentName));
-                typeNotif = "local";
-            } else {
-                hub = discovery.getHub(FeedUtil.FeedUrl(documentName));
-                // hub = discovery.getHub(FeedUtil.SubFeedName(documentName));
-                // hub = discovery.getHub("http://www.piemonte.di.unito.it/Flow/" + documentName + ".xml");
-                typeNotif = "remote";
-            }
-
-//            if (hub.equalsIgnoreCase("http://localhost:8080")) {
-//                typeNotif = "local";
-//            } else if (hub.equals("http://www.piemonte.di.unito.it/Pubsubhub")) {
-//                //  } else if (hub.equals("http://pubsubhubbub.appspot.com")) {
-//                typeNotif = "remote";
-//            }
-            // inutile  SaveServlet.setTypeNotification(typeNotif);
             List<AtomEvent> listaeventi = new ArrayList();
             listaeventi.add(eventUpdate);
-            List<String> readers = new ArrayList();
-            List<String> collaborators = new ArrayList();
-            //    OLD   AclFeed aclFeed = service.getFeed(new URL(documentEntry.getAclFeedLink().getHref()), AclFeed.class);
+            List<String> oldReaders = new ArrayList();
+            List<String> oldWriters = new ArrayList();
+               DocumentListEntry documentEntry = findEntry(documentName);
             AclFeed aclFeed = getDocumentList().getAclFeed(documentEntry.getResourceId());
             for (AclEntry entry : aclFeed.getEntries()) {
                 if (entry.getRole().getValue().equals("reader")) {
-                    readers.add(entry.getScope().getValue());
+                    oldReaders.add(entry.getScope().getValue());
                 } else if (entry.getRole().getValue().equals("writer")) {
-                    collaborators.add(entry.getScope().getValue());
+                    oldWriters.add(entry.getScope().getValue());
                 }
-
-
             }
-
-
-
-
-            String[] tempwriter;
-            String delimiter = ",";
-
+            if (!oldWriters.contains(login)) {
+                // owner e' SEMPRE writer se non c'era aggiungilo
+                writers = writers + "," + login;
+            }
+            List<String> tempwriters = split(writers);
+            List<String> tempassignees = split(assignees);
+            // ogni user avra' permesso di READ: se era WRITE lo si demuove
+            // Se non c'era gli si assegna READ
+            // se invece e' un assignee diventera' WRITE
+            // in termini googledocs
+            // user= READER
+            // writer = WRITER
+            // assignee = WRITER
             if (users != null) {
-                String[] tempusers;
-                if (writers == null) {
-                    writers = "";
-                }
-                if (assignees == null) {
-                    assignees = "";
-                }
-                tempusers = users.split(delimiter);
-                //  System.out.println("READERS SIZE: " + readers.size());
-                //  System.out.println("TEMPUSERS LENGTH: " + tempusers.length);
-                try {
-                    for (int i = 0; i < tempusers.length; i++) {
-                        boolean check = false;
-
-                        //   System.out.println("Il reder e'' assignees? "+assignees.contains(tempusers[i]));
-                        if (!tempusers[i].equals("") && !assignees.contains(tempusers[i])) {
-                            //   System.out.println("TEMPUSER: " + tempusers[i] + " finisce qui");
-                            for (int z = 0; z < readers.size(); z++) {
-                                System.out.println(readers.get(z));
-                                if (tempusers[i].contains(readers.get(z))) {
-                                    check = true;
-                                }
-
-                                //     System.out.println("Check Reader: " + check);
-                            }
-
-                            for (int z = 0; z < collaborators.size(); z++) {
-
-                                //   System.out.println("collaborators: " + collaborators.get(z));
-                                if (tempusers[i].contains(collaborators.get(z))) {
-                                    System.out.println("%%%%% CAMBIO PERMESSI DI %%%% " + collaborators.get(z));
-                                    update(documentEntry, aclFeed, collaborators.get(z));
-                                    AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
-                                    event.setParameter("File", documentName);
-                                    event.setParameter("Change Permission", "From Write To Read");
-                                    event.setParameter("Who", collaborators.get(z));
-                                    listaeventi.add(event);
-                                    //new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
-                                    //     System.out.println("DOPO UPDATE");
-                                    check = true;
-
-                                }
-                            }
-
-                            if (check == false) {
-                                System.out.println("%%%%%%%%% ASSEGNO READER a %%%%% " + tempusers[i]);
-                                addReaders(documentEntry, tempusers[i]);
+                List<String> tempusers = split(users);
+                for (String user : tempusers) {
+                    if (!tempassignees.contains(user)) {
+                        boolean found = false;
+                        for (String oldWriter : oldWriters) {
+                            if (user.equals(oldWriter)) {
+                                //    System.out.println("%%%%% CAMBIO PERMESSI DI %%%% " + oldWriters.get(z));
+                                updateRole(documentEntry, aclFeed, oldWriter);
                                 AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
                                 event.setParameter("File", documentName);
-                                event.setParameter("Permission", "Read");
-                                event.setParameter("Who", tempusers[i]);
+                                event.setParameter("Change Permission", "From Write To Read");
+                                event.setParameter("Who", oldWriter);
                                 listaeventi.add(event);
-                                //  new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
-                            }
-
-                        }
-                    }
-                } catch (Exception ex) {
-                    System.out.println("Dentro for readers: " + ex.getMessage());
-                }
-                if (!writers.contains(login)) // owner e' SEMPRE writer
-                {
-                    writers = writers + "," + login;
-                }
-                tempwriter = writers.split(delimiter);
-                // System.out.println("tempwriter: "+tempwriter.length);
-                // System.out.println("Collaborators SIZE: "+collaborators.size());
-                try {
-                    for (int j = 0; j < tempwriter.length; j++) {
-                        boolean check = false;
-                        //     System.out.println("-------------------------");
-                        //     System.out.println("TEMPWRITER: " + tempwriter[j]);
-
-                        for (int i = 0; i < tempusers.length; i++) {
-                            // System.out.println("TEMPUSER: " + tempusers[i]);
-                            if (tempusers[i].equals(tempwriter[j])) {
-                                check = true;
+                                found = true;
                             }
                         }
-                        for (int z = 0; z < collaborators.size(); z++) {
-                            System.out.println("collaborators: " + collaborators.get(z));
-                            if (collaborators.get(z).contains(tempwriter[j]) || tempwriter[j].contains(collaborators.get(z))) {
-                                //     System.out.println("DENTRO IF");
-                                check = true;
-                            }
-                        }
-                        // System.out.println("Check Writer: " + check);
-                        if (check == false) {
-                            System.out.println("%%%%%% Aggiungo a Writer%%%%% " + tempwriter[j]);
-                            addWriting(documentEntry, tempwriter[j]);
-                            AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
-                            event.setParameter("File", documentName);
-                            event.setParameter("Permission", "Write");
-                            event.setParameter("Who", tempwriter[j]);
+                        if (!found && !oldReaders.contains(user)) {
+                          //  System.out.println("%%%%%%%%% ASSEGNO READER a %%%%% " + user);
+                            addRole(documentEntry, user,"reader");
+                            AtomEvent event = generateAccessEvent(login, documentName, "Read", user);
                             listaeventi.add(event);
-                            // new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
                         }
                     }
-                } catch (Exception ex) {
-                    System.out.println("Dentro for Writers: " + ex.getMessage());
                 }
-
-            } else {
-                tempwriter = writers.split(delimiter);
-                for (int j = 0; j < tempwriter.length; j++) {
-                    boolean check = false;
-                    for (int z = 0; z < collaborators.size(); z++) {
-                        //   System.out.println("collaborators: " + collaborators.get(z));
-                        if (collaborators.get(z).equals(tempwriter[j])) {
-                            check = true;
-                        }
-                    }
-                    // System.out.println("Check Writer: " + check);
-                    if (check == false) {
-                        //  System.out.println("%%%%%%% Aggiungo a Writer%%%%%% " + tempwriter[j]);
-                        addWriting(documentEntry, tempwriter[j]);
-                        AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
-                        event.setParameter("File", documentName);
-                        event.setParameter("Permission", "Write");
-                        event.setParameter("Who", tempwriter[j]);
+                // dovrebbe essere inutile!!
+                for (String writer : tempwriters) {
+                    if (!tempusers.contains(writer) && !oldWriters.contains(writer)) {
+                        System.out.println("%%%%%% Aggiungo a Writer%%%%% " + writer);
+                        addRole(documentEntry, writer,"writer");
+                        AtomEvent event = generateAccessEvent(login, documentName, "Write", writer);
                         listaeventi.add(event);
-                        //  new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
+                    }
+                }
+            } else {
+                for (String writer : tempwriters) {
+                    if (!oldWriters.contains(writer)) {
+                        //  System.out.println("%%%%%%% Aggiungo a Writer%%%%%% " + tempwriter[j]);
+                        addRole(documentEntry, writer,"writer");
+                        AtomEvent event = generateAccessEvent(login, documentName, "Write", writer);
+                        listaeventi.add(event);
                     }
                 }
             }
-            if (assignees != null) {
-                String[] tempassignes;
-                String thisassigner;
-                tempassignes = assignees.split(",");
-                for (int z = 0; z < tempassignes.length; z++) {
-                    thisassigner = tempassignes[z];
-                    int count0 = thisassigner.indexOf("@");
-                    int count1 = thisassigner.lastIndexOf("@");
-                    boolean checkchiocciola = false;
-                    if (count0 > 0 && count0 == count1) {
-                        checkchiocciola = true;
-                    }
-                    if (!tempassignes[z].equals("") && checkchiocciola == true) {
-
-                        try {
-
-                            addWriting(documentEntry, tempassignes[z]);
-                            //     System.out.println("%%%% Diventa writer Assign%%%%%%% "+tempassignes[z]);
-                            AtomEvent event = new AtomEvent(login, "TaskManager", "DocumentAccess");
-                            event.setParameter("File", documentName);
-                            event.setParameter("Permission", "Write");
-                            event.setParameter("Who", tempassignes[z]);
-                            listaeventi.add(event);
-                            //   new TestPub().testPublisher("", FeedUtil.SubFeedName(documentName));
-
-                        } catch (Exception ex) {
-                            System.out.println("DENTRO FOR ASSIGNEES in Update DIagram X UTENTE " + tempassignes[z] + " " + ex.getMessage());
-                        }
-                    }
+            // gli assignees hanno permesso di write!
+            for (String assignee : split(assignees)) {
+                if (userIdOk(assignee)) {
+                    addRole(documentEntry, assignee,"writer");
+                    AtomEvent event = generateAccessEvent(login, documentName, "Write", assignee);
+                    listaeventi.add(event);
                 }
-
-
             }
+
             FeedUtil.addEntries(documentEntry.getDocumentLink().getHref(), documentName, listaeventi, FeedUtil.isLocalMode() ? "local" : "remote");
-
             documentEntry.getService().getRequestFactory().setHeader("If-Match", "*");
-            // documentEntry.setMediaSource(new MediaByteArraySource(s.getBytes(), "text/plain"));
-            documentEntry.setMediaSource(new MediaByteArraySource(s.getBytes(), "text/plain"));
-
-            //   documentEntry.setContent(new PlainTextConstruct(s));
+            documentEntry.setMediaSource(new MediaByteArraySource(content.getBytes(), "text/plain"));
             documentEntry.updateMedia(false);
             return "notnew";
-//  return documentEntry.getDocumentLink().getHref();
+//  non BUTTARE: return documentEntry.getDocumentLink().getHref();
 
         } catch (Exception ex) {
-            ex.printStackTrace();
+           // ex.printStackTrace();
             if (ex.getMessage().equalsIgnoreCase("This user already has access to the document.")) {
-
-                //  System.out.println("DENTRO If update diagram "+ex.getMessage());
+   //  System.out.println("DENTRO If updateRole diagram "+ex.getMessage());
                 return "notnew";
             } else {
-                System.err.println("DEntro Update diagram" + ex.getMessage());
+                ex.printStackTrace();
                 return ex.getMessage();
             }
         }
@@ -555,30 +383,16 @@ public class GoDoc {
             //System.out.println ("saveDiagram \n" + s );
             //         System.out.println("-----");
             DocumentListEntry documentEntry = findEntry(documentName);
-
             if (documentEntry == null) {
-
                 saveNewDiagram(login, documentName, s, users, writers, pwd, assignees, hub);
-
                 return "new";
-
             } else {
-                //   System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%");
                 String ret = uploadDiagram(login, documentName, users, writers, s, assignees);
-                /*  System.out.println("RET: " + ret);
-                documentEntry.getService().getRequestFactory().setHeader("If-Match", "*");
-                // documentEntry.setMediaSource(new MediaByteArraySource(s.getBytes(), "text/plain"));
-                documentEntry.setMediaSource(new MediaByteArraySource("updated content".getBytes(), "text/plain"));
-
-                documentEntry.updateMedia(false);*/
                 return ret;
-
             }
-
         } catch (Exception ex) {
             System.out.println("Dentro SAVEDOC " + ex.getMessage());
             ex.printStackTrace();
-            ;
             if (ex.getMessage().equalsIgnoreCase("Could not convert document.")) {
                 return "notnew";
             } else {
@@ -604,21 +418,6 @@ public class GoDoc {
         return ret;
     }
 
-    public DocumentListEntry uploadFileOLD(String content, String title)
-            throws IOException, ServiceException {
-        File file = new File("/tmp/" + title);
-        FileOutputStream of = new FileOutputStream(file);
-        of.write(content.getBytes(), 0, content.length());
-        of.close();
-        DocumentListEntry newDocument = new DocumentListEntry();
-        String mimeType = DocumentListEntry.MediaType.fromFileName(file.getName()).getMimeType();
-        newDocument.setFile(file, mimeType);
-        newDocument.setTitle(new PlainTextConstruct(title));
-        DocumentListEntry ret = service.insert(new URL("http://docs.google.com/feeds/documents/private/full/"), newDocument);
-        file.delete();
-        return ret;
-    }
-
     public void uploadPermissions(String documentName, String flowName, String notification) throws Exception {
         System.out.println("Doc: " + documentName);
         System.out.println("FlowName: " + flowName);
@@ -631,14 +430,13 @@ public class GoDoc {
             String resourceId = documentEntry.getResourceId();
             String docType = resourceId.substring(0, resourceId.lastIndexOf(':'));
             String docId = resourceId.substring(resourceId.lastIndexOf(':') + 1);
-            URL exportUrl = new URL("http://docs.google.com/feeds/download/" + docType
+            URL exportUrl = new URL(DownloadFeed + docType
                     + "s/Export?docID=" + docId + "&exportFormat=" + "html");
             MediaContent mc = new MediaContent();
             mc.setUri(exportUrl.toString());
             MediaSource ms = service.getMedia(mc);
             String s = "";
             byte[] b = new byte[1024];
-
             InputStream inStream = ms.getInputStream();
             int c;
             String oldsetting = "";
@@ -657,178 +455,22 @@ public class GoDoc {
 
             }
             documentEntry = uploadFile(newtext, documentName);
-
-            //   s = findBody(s);
-
         }
     }
 
-    private AclEntry addWriting(DocumentListEntry documentEntry, String who) throws Exception {
-        AclRole role = new AclRole("writer");
-
+    private AclEntry addRole(DocumentListEntry documentEntry, String who, String type) throws Exception {
+        AclRole role = new AclRole(type); // read o write
         AclScope scope = new AclScope(AclScope.Type.USER, who);
-        //      AclEntry entry = new AclEntry();
-//        entry.setRole(role);
-//        entry.setScope(scope);
-//        URL url = new URL("http://docs.google.com/feeds/acl/private/full/" + documentEntry.getResourceId());
-//        return service.insert(url, entry);
-
         return getDocumentList().addAclRole(role, scope, documentEntry.getResourceId());
     }
 
-    private void update(DocumentListEntry documentEntry, AclFeed aclFeed, String who) throws IOException, MalformedURLException, ServiceException {
-
-
+    private void updateRole(DocumentListEntry documentEntry, AclFeed aclFeed, String who) throws IOException, MalformedURLException, ServiceException {
         for (AclEntry entry : aclFeed.getEntries()) {
-
             //  System.err.println(entry.getRole().getValue());
             if (entry.getScope().getValue().equals(who)) {
                 entry.setRole(new AclRole("reader"));
                 entry.update();
             }
-
-
-
-        }
-
-    }
-
-    private AclEntry addReaders(DocumentListEntry documentEntry, String who) throws IOException, MalformedURLException, ServiceException {
-
-        AclRole role = new AclRole("reader");
-
-        AclScope scope = new AclScope(AclScope.Type.USER, who);
-        AclEntry entry = new AclEntry();
-        entry.setRole(role);
-        entry.setScope(scope);
-        URL url = new URL("http://docs.google.com/feeds/acl/private/full/" + documentEntry.getResourceId());
-        return service.insert(url, entry);
-    }
-
-    public List<String> loadDocOld(String valorefile, boolean refresh, String owner) {
-        try {
-
-            DocumentListEntry documentEntry = findEntry(valorefile);
-            //   System.out.println(documentEntry.toString());
-            List<String> list = new LinkedList();
-            if (documentEntry == null) {
-                return list; //document not found
-            }
-            //   System.out.println("1. documento trovato");
-            DateTime last = documentEntry.getUpdated();
-            DateTime curr = documentVersions.get(valorefile);
-            if (refresh) {
-                if (curr == null || curr.getValue() == last.getValue()) {
-                    return list;  // no version or no new version
-                }
-            }
-            documentVersions.put(valorefile, last); // update current version
-            String resourceId = documentEntry.getResourceId();
-            //    System.out.println("2. resourceId" + resourceId);
-            String docType = resourceId.substring(0, resourceId.lastIndexOf(':'));
-            String docId = resourceId.substring(resourceId.lastIndexOf(':') + 1);
-
-            URL exportUrl = new URL("http://docs.google.com/feeds/download/" + docType
-                    + "s/Export?docID=" + docId + "&exportFormat=" + "html");
-//            MediaContent mc = new MediaContent();
-//            mc.setUri(exportUrl.toString());
-            //  MediaSource ms = service.getMedia(mc);
-
-            DocumentListFeed feed = getDocumentList().getDocsListFeed("all");
-            MediaContent mc = (MediaContent) documentList.getDocsListEntry(resourceId).getContent();
-
-
-            mc.setUri(exportUrl.toString());
-            MediaSource ms = service.getMedia(mc);
-
-            InputStream inStream = ms.getInputStream();
-            String s = "";
-            byte[] b = new byte[1024];
-
-            int c;
-            while ((c = inStream.read(b)) != -1) {
-                s += new String(b, 0, c);
-            }
-            //     System.out.println("3. stringa" + s);
-            s = findBody(s);
-//System.out.println("1. stringa" + s);
-            String error = "Non hai i permessi";
-            List<String> people = new ArrayList();
-            List<String> collaborators = new ArrayList();
-            List<String> readers = new ArrayList();
-            System.out.println("Prima ciclo reader");
-            String docowner = "";
-
-            AclFeed aclFeed = service.getFeed(new URL(documentEntry.getAclFeedLink().getHref()), AclFeed.class);
-            int size = aclFeed.getEntries().size();
-            System.out.println("SIZE " + aclFeed.getEntries().size());
-            for (AclEntry entry : aclFeed.getEntries()) {
-
-                System.out.println("RUOLO " + entry.getRole().getValue());
-                if (entry.getRole().getValue().equals("reader")) {
-                    System.out.println("Trovato reader");
-                    readers.add(entry.getScope().getValue());
-                } else if (entry.getRole().getValue().equals("writer")) {
-                    System.out.println("Trovato Writer");
-                    collaborators.add(entry.getScope().getValue());
-                } else if (entry.getRole().getValue().equals("owner")) {
-                    docowner = entry.getScope().getValue();
-                }
-                people.add(entry.getScope().getValue());
-
-
-            }
-
-            String users = readers.toString();
-
-
-            String nousers = "";
-            if (users.equals("[]")) {
-                users = "";
-            } else {
-                users = users.substring(1, users.length() - 1);
-            }
-            System.out.println("USERS: " + users);
-            String writers = collaborators.toString();
-
-            if (writers.equals("[]")) {
-                writers = "";
-            } else {
-                writers = writers.substring(1, writers.length() - 1);
-            }
-            System.out.println("Writers " + writers);
-            System.out.println("People: " + people.toString());
-            System.out.println("Owner: " + owner);
-
-            if (size == 1 && !owner.equals(docowner)) {
-                System.out.println("SIZE 1 e docowner");
-                readers.add(owner);
-                people.add(owner);
-                list.add(s);
-                list.add(users);
-                list.add(writers);
-             System.out.println("NOSAVE 809");     list.add("nosave");
-                return list;
-            } else if (people.toString().contains(owner) == true) {
-                list.add(s);
-                list.add(users);
-                list.add(writers);
-                return list;
-            } else {
-                list.add(error);
-                list.add(nousers);
-                list.add(nousers);
-                return list;
-            }
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.out.println("In Load Doc " + ex.toString());
-            List<String> list = new LinkedList();
-            list.add("errore");
-            list.add("errore");
-            list.add("errore");
-            return list;
         }
     }
 
@@ -849,7 +491,7 @@ public class GoDoc {
                     return list;  // no version or no new version
                 }
             }
-            documentVersions.put(valorefile, last); // update current version
+            documentVersions.put(valorefile, last); // updateRole current version
             String resourceId = documentEntry.getResourceId();
             // System.out.println("resourceId= "+ resourceId + " "+ getDocumentList().getDocsListEntry(resourceId));
             MediaContent mc = (MediaContent) getDocumentList().getDocsListEntry(resourceId).getContent();
@@ -918,7 +560,7 @@ public class GoDoc {
                 list.add(s);
                 list.add(users);
                 list.add(writers);
-     // SBALLATO RIFARE!!!!!   System.out.println("NOSAVE 920");        list.add("nosave");
+                // SBALLATO RIFARE!!!!!   System.out.println("NOSAVE 920");        list.add("nosave");
                 return list;
             } else if (people.toString().contains(owner) == true) {
                 list.add(s);
@@ -934,7 +576,7 @@ public class GoDoc {
 
         } catch (Exception ex) {
             ex.printStackTrace();
-           // System.out.println("In Load Doc " + ex.toString());
+            // System.out.println("In Load Doc " + ex.toString());
             List<String> list = new LinkedList();
             list.add("errore");
             list.add("errore");
@@ -961,20 +603,6 @@ public class GoDoc {
         return r;
     }
 
-    private String findBodyOLD(String r) {
-        System.out.println("findBody, doc: \n" + r);
-        System.out.println("---------------");
-        int ind1 = r.indexOf("connections");
-        int ind2 = r.indexOf("</p></body>");
-        // int ind2 = r.indexOf("<br></body>");
-        //     int ind2 = r.indexOf("</body>");
-        //  r = r.substring(ind1 - 2, ind2);
-        r = r.substring(ind1, ind2);
-        r = r.replaceAll("&gt;", ">");
-        r = r.replaceAll("&lt;", "<");
-        return r;
-    }
-
     private String findFiles(String s) {
 
         int ind1 = s.lastIndexOf(" ");
@@ -995,23 +623,7 @@ public class GoDoc {
         DocumentListFeed feed = getDocumentList().getDocsListFeed("all");
         String ret = "";
         // for (int i = 0; i < 10; i++) {
-        // DocumentListFeed feed = service.getFeed(documentListFeedUrl, DocumentListFeed.class);
-        for (DocumentListEntry entry : feed.getEntries()) {
-            ret += printDocumentEntry(entry) + ",";
-        }
-        try {
-            //  Thread.currentThread().sleep(1000 * 121);
-        } catch (Exception e) {
-            System.out.println("Dentro show all: " + e.getMessage());
-            // }
-        }
-        return ret;
-    }
-
-    public String showAllDocsOld() throws Exception {
-        String ret = "";
-        // for (int i = 0; i < 10; i++) {
-        DocumentListFeed feed = service.getFeed(documentListFeedUrl, DocumentListFeed.class);
+        // DocumentListFeed feed = service.getFeed(DocumentListFeedUrl, DocumentListFeed.class);
         for (DocumentListEntry entry : feed.getEntries()) {
             ret += printDocumentEntry(entry) + ",";
         }
@@ -1031,25 +643,10 @@ public class GoDoc {
         String versionId = doc.getVersionId();
         String resourceId = doc.getResourceId();
         String modified = doc.getLastModifiedBy().getName();
-        /*String resourceFolderId = "";
-        URL feedUri = new URL("http://docs.google.com/feeds/documents/private/full/-/folder?showfolders=true");
-        DocumentListFeed feed = service.getFeed(feedUri, DocumentListFeed.class);
-        for (DocumentListEntry entry : feed.getEntries())
-        {        String name =entry.getTitle().getPlainText();
-        if(name.equalsIgnoreCase("Flow")){
-
-        resourceFolderId = entry.getResourceId();
-
-        }
-        }*/
+      
         String title = "";
         if (doc.getTitle().getPlainText().contains("Flow_")) {
             title = doc.getTitle().getPlainText();
-            /* URL url = new URL("http://docs.google.com/feeds/folders/private/full/"+resourceFolderId);
-            DocumentEntry newEntry = new DocumentEntry();
-            newEntry.setId(doc.getId());
-            service.insert(url, newEntry);*/
-
         }
         String docType = resourceId.substring(0, resourceId.lastIndexOf(':'));
 
@@ -1112,18 +709,13 @@ public class GoDoc {
 
     public String checkPermissionOnFile(String nomeFile, String flowName, String notification) {
         try {
-
-//            DocsService service = new DocsService("Document List Demo");
-//            service.setUserCredentials(docMakerLogin, docMakerPasswd);
-//            URL listFeedUrl = new URL("http://docs.google.com/feeds/documents/private/full/");
-//            DocumentListFeed feed = service.getFeed(listFeedUrl, DocumentListFeed.class);
-            DocumentListEntry doc = new GoDoc(service).findEntry(nomeFile);
+            DocumentListEntry doc = findEntry(nomeFile);
             if (doc != null) {
 
                 String resourceId = doc.getResourceId();
                 String docType = resourceId.substring(0, resourceId.lastIndexOf(':'));
                 String docId = resourceId.substring(resourceId.lastIndexOf(':') + 1);
-                URL exportUrl = new URL("http://docs.google.com/feeds/download/" + docType
+                URL exportUrl = new URL(DownloadFeed + docType
                         + "s/Export?docID=" + docId + "&exportFormat=" + "html");
                 MediaContent mc = new MediaContent();
                 mc.setUri(exportUrl.toString());
@@ -1181,17 +773,13 @@ public class GoDoc {
     public void savePermissionsOnFile(String nomeFile, String flowName, String notification) {
         try {
             System.out.println("GoDOc.savePermissionsOnfile 1");
-//            DocsService service = new DocsService("Document List Demo");
-//            service.setUserCredentials(docMakerLogin, docMakerPasswd);
-//            URL listFeedUrl = new URL("http://docs.google.com/feeds/documents/private/full/");
-         //   DocumentListFeed feed = service.getFeed(listFeedUrl, DocumentListFeed.class);
-             DocumentListEntry documentEntry = findEntry(nomeFile);
-         //   DocumentListEntry doc = new GoDoc(service).findEntry(nomeFile);
+            DocumentListEntry documentEntry = findEntry(nomeFile);
+            //   DocumentListEntry doc = new GoDoc(service).findEntry(nomeFile);
             if (documentEntry != null) {
                 String resourceId = documentEntry.getResourceId();
                 String docType = resourceId.substring(0, resourceId.lastIndexOf(':'));
                 String docId = resourceId.substring(resourceId.lastIndexOf(':') + 1);
-                URL exportUrl = new URL("http://docs.google.com/feeds/download/" + docType
+                URL exportUrl = new URL(DownloadFeed + docType
                         + "s/Export?docID=" + docId + "&exportFormat=" + "html");
                 MediaContent mc = new MediaContent();
                 System.out.println("GoDOc.savePermissionsOnfile 2");
@@ -1239,13 +827,13 @@ public class GoDoc {
                 } else {
                     s += "\r\n" + add;
                 }
-             //   service.getRequestFactory().setHeader("If-Match", "*");
-              //  doc.setMediaSource(new MediaByteArraySource(s.getBytes(), "text/plain"));
-              //  doc.updateMedia(false);
+                //   service.getRequestFactory().setHeader("If-Match", "*");
+                //  doc.setMediaSource(new MediaByteArraySource(s.getBytes(), "text/plain"));
+                //  doc.updateMedia(false);
 
-                  documentEntry.getService().getRequestFactory().setHeader("If-Match", "*");
-            documentEntry.setMediaSource(new MediaByteArraySource(s.getBytes(), "text/plain"));
-            documentEntry.updateMedia(false);
+                documentEntry.getService().getRequestFactory().setHeader("If-Match", "*");
+                documentEntry.setMediaSource(new MediaByteArraySource(s.getBytes(), "text/plain"));
+                documentEntry.updateMedia(false);
             } else {
                 String s = flowName + "/" + notification + "\r\n";
                 documentEntry = new GoDoc(service).uploadFile(s, nomeFile);
@@ -1331,7 +919,7 @@ public class GoDoc {
 
     public DocumentListEntry findEntryOld(String title) throws Exception {
         DocumentListEntry ret = null;
-        DocumentListFeed feed = service.getFeed(documentListFeedUrl, DocumentListFeed.class);
+        DocumentListFeed feed = service.getFeed(DocumentListFeedUrl, DocumentListFeed.class);
         for (DocumentListEntry entry : feed.getEntries()) {
             if (entry.getTitle().getPlainText().equals(title)) {
                 return entry;
@@ -1340,7 +928,7 @@ public class GoDoc {
         return ret;
     }
 
-    public static String checkid(String user, String pwd) {
+    public static String checkUserId(String user, String pwd) {
         try {
             DocsService service = new DocsService("Document List Demo");
             service.setUserCredentials(user, pwd);
@@ -1364,23 +952,11 @@ public class GoDoc {
         newDocument.setTitle(new PlainTextConstruct(title));
         DocumentListEntry ret = service.insert(uri, newDocument);
         return ret;
-
-
-
-
-
-
-
-
-
-
     }
 
-    public void sendMail(String dest, String login, String pwd, String name) {
+    public void sendMail(String dest, String emailFromAddress, String pwd, String name) {
         try {
-            System.out.println(" sendMail LOGIN: " + login);
-            String SMTP_HOST_NAME = "smtp.gmail.com";
-            String SMTP_PORT = "465";
+            //   System.out.println(" godoc.sendMail() mittente: " + emailFromAddress);
             String url = FeedUtil.GetUrl() + "TaskMgr/index.jsp?Flow=" + name;
             //15-12-2010      String url = "http://localhost:8081/index.jsp?Flow="+name;
             String url2 = FeedUtil.GetUrl() + "NotifMgrG/settings.jsp?Flow=" + name;
@@ -1389,8 +965,6 @@ public class GoDoc {
             String emailMsgTxt = text + text2;
 
             String emailSubjectTxt = "New Collaborative Workflow: " + name;
-            String emailFromAddress = login;
-            String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
             String[] sendTo = dest.split(",");
             new NewGmail().sendSSLMessage(sendTo, emailSubjectTxt, emailMsgTxt, emailFromAddress, pwd);
         } catch (Exception ex) {
@@ -1405,15 +979,11 @@ public class GoDoc {
             DocsService service = new DocsService("Document List Demo");
             service.setUserCredentials(user, pwd);
             return new GoDoc(service).findNewVersion(nomeFile);
-
-
         } catch (Exception ex) {
             System.out.println("ERRORE IN CHECKNEW: " + ex.getMessage());
             ex.printStackTrace();
             return "error";
         }
-
-
     }
 
     public String findNewVersion(String nomeFile) {
@@ -1424,10 +994,9 @@ public class GoDoc {
             // System.out.println("LAST: "+last.getValue());
             // System.out.println("CURR: "+curr.getValue());
             if (curr == null || curr.getValue() == last.getValue()) {
-
                 return "old";
             } else {
-                documentVersions.put(nomeFile, last); // update current version
+                documentVersions.put(nomeFile, last); // updateRole current version
                 return "new";
             }
         } catch (Exception ex) {
@@ -1442,7 +1011,6 @@ public class GoDoc {
         try {
             if (documentList == null) {
                 documentList = new DocumentList(APPLICATION_NAME, DocumentList.DEFAULT_HOST);
-
                 documentList.login(docMakerLogin, docMakerPasswd);
             }
         } catch (Exception ex) {
