@@ -35,10 +35,10 @@ public class IdentityChecker extends HttpServlet {
              String pwd = request.getHeader("pwd");
              String email = request.getHeader("email");
              System.out.println(email+pwd);
-         //    String check = GoDoc.checkid(email, pwd);
+         //    String check = GoDoc.checkUserId(email, pwd);
 
-             System.out.println( GoDoc.checkid(email, pwd));
-             out.print( GoDoc.checkid(email, pwd));
+             System.out.println( GoDoc.checkUserId(email, pwd));
+             out.print( GoDoc.checkUserId(email, pwd));
 
 
         }
