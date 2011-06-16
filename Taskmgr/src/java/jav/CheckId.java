@@ -36,7 +36,7 @@ public class CheckId extends HttpServlet {
             //HttpSession session = request.getSession(true);
             String pwd = request.getHeader("pwd");
              String email = request.getHeader("email");
-             String check = GoDoc.checkid(email, pwd);
+             String check = GoDoc.checkUserId(email, pwd);
              out.print(check);
         }
         catch(Exception ex)
