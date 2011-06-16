@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import event.AtomEvent;
+import java.util.ArrayList;
+import java.util.List;
 import pubsub.Publisher;
 
 /**
@@ -40,11 +42,12 @@ public class ChangeStateServlet extends HttpServlet {
             AtomEvent event = new AtomEvent(user, "TaskManager", activity);
             event.setParameter("File", nomeFile);
             event.setParameter("ChangeState", state);
-
+            List <AtomEvent> events = new ArrayList();
+            events.add(event);
             // occorre decidere che link abbia piu' senso
 
             //  FeedUtil.addEntry(editLink, nomeFile, event);
-            FeedUtil.addEntry("", nomeFile, event, FeedUtil.isLocalMode()? "local":"remote");
+            FeedUtil.addEntries("", nomeFile, events, FeedUtil.isLocalMode()? "local":"remote");
             new Publisher().publish("", FeedUtil.SubFeedName(nomeFile));
 
             /* TODO output your page here */
