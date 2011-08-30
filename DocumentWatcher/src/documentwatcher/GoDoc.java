@@ -79,7 +79,13 @@ public class GoDoc {
         this.service = service;
     }
 
-    public static void main(String[] args) throws MalformedURLException, IOException, ServiceException {
+      public static void main(String[] args) throws MalformedURLException, IOException, ServiceException {
+
+        try {System.out.println(prendi(docMakerLogin , docMakerPasswd ));
+          } catch (Exception e){}
+    }
+
+    public static void mainOLD(String[] args) throws MalformedURLException, IOException, ServiceException {
 
         try {
 
