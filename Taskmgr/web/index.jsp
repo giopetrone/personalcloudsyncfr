@@ -985,7 +985,7 @@
 
            
            <option value="local">Local</option>
- <option value="remote">Remote</option>
+ <option value="remote">Remote</option>     
   
 
 
