@@ -3,8 +3,8 @@
     <head>
         <meta name='gwt:module' content='org.vt.Main=org.vt.Main'>
         <title>Main</title>
-        <link rel="STYLESHEET" type="text/css" href="VirtualBoard.css">
-        <script type="text/javascript">
+         <link rel="STYLESHEET" type="text/css" href="VirtualBoard.css">
+          <script type="text/javascript">
             function OnDropBody (event) {
                 alert ("Please drop the item into the red field.");
                 return false;
@@ -16,6 +16,7 @@
                         var infoTable = document.getElementById ("info");
                         var infoTableBody = infoTable.tBodies[0];
                         infoTableBody.innerHTML = "";
+        //  alert(window.event.srcElement.id);  // MAR NUOVO
                         for (var i = 0; i < event.dataTransfer.types.length; i++) {
                             var row = infoTableBody.insertRow (-1);
                             var cell = row.insertCell (0);
@@ -24,17 +25,14 @@
                             cell = row.insertCell (1);
                             cell.textContent = event.dataTransfer.getData (type);
                         }
-                        var fireOnThis = document.getElementById('obiettivo');
-                      //  var evObj = document.createEvent('KeyEvents');
-                      //  evObj.initEvent( 'keypress', true, true );
-                       
-                        var clickEvent = document.createEvent ("MouseEvent");
-                    clickEvent.initMouseEvent ("click", true, true, window, 0,
-                                                event.screenX, event.screenY, event.clientX, event.clientY,
-                                                event.ctrlKey, event.altKey, event.shiftKey, event.metaKey,
-                                                0, null);
+                         var fireOnThis = document.getElementById('obiettivo');
 
-                    fireOnThis.dispatchEvent(clickEvent); }
+        //   var evObj = document.createEvent('Event');
+    //   evObj.initEvent( 'miospeciale', true, true );
+          var evObj = document.createEvent('KeyEvents');
+    evObj.initEvent( 'keypress', true, true );
+        fireOnThis.dispatchEvent(evObj);
+                    }
                     else {
                         alert ("Your browser does not support the types property.");
                     }
@@ -52,11 +50,16 @@
             }
         </script>
     </head>
-
-    <body  ondragenter="return false;" ondragover="return false;" ondrop="return OnDropTarget (event);"  >
-        <script type="text/javascript"  src="org.vt.Main/org.vt.Main.nocache.js"></script>
-        <div id="demo"></div>
-        <table id="info" border="2px" type="hidden">
+     <body ondragenter="return false;" ondragover="return false;" ondrop="return OnDropBody (event);">
+        Please drag some text or a <a href="#">link</a> or a file (from outside this browser window) and drop it into the red field.
+        If you drop more than one file, the table below the red field will only contain information about the first dropped file.
+        <br /><br />
+        <div id="obiettivoOrg" ondragenter="return false;" ondragover="return false;" ondrop="return OnDropTarget (event);"
+             style="width:300px; height:100px; background-color:#f08080;">
+        </div>
+        <br /><br />
+        The following table contains the available data formats and their corresponding values for the first dropped item.
+        <table id="info" border="2px">
             <thead>
                 <tr>
                     <th>Data type</th>
@@ -66,6 +69,10 @@
             <tbody>
             </tbody>
         </table>
-       
+    </body>
+    <body>
+        <script type="text/javascript"  src="org.vt.Main/org.vt.Main.nocache.js"></script>
+        <div id="demo"></div>
     </body>
 </html>
+

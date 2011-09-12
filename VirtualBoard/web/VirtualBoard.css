@@ -1,37 +1,64 @@
 
 root { 
-    display: block;
+    display: block;   
+}
+.MainLabel {
+    text-align: center;
+    font-weight: bold;
+    font-size:large;
+    width:8em;
+
+}
+.mainPanelStyle{
+    padding: 4px;
+    font-weight: bold;
+    cursor: default;
+    background-color: #ECF4B5;
+    border:3px;    
+    border-bottom: 2px solid #87ffff;
+    margin-right: 2px;
 }
 
-.gwt-TabPanel {
-  margin-top: 4px;
-  color: #33333; 
+.style1{
+         background-color: #ED9A5A;
+
 }
 
-.gwt-TabPanelBottom {
-  background-color: #E8E8E8;
+.style2{
+         background-color: #F498DB;
+
 }
 
-.gwt-TabBar {
-  padding-top: 2px;
-  border-bottom: 4px solid #878787;
-  background-color: #fff;
+.gwt-TabPanelOLD {
+    margin-top: 4px;
+    color: #333333;
 }
 
-.gwt-TabBarItem {
-  padding: 4px;
-  cursor: pointer;
-  background-color: #e8e8e8;
-  border-bottom: 2px solid white;
-  margin-right: 2px;
+.gwt-TabPanelBottomOLD {
+    background-color: #333333;
 }
 
-.gwt-TabBarItem-selected {
-  padding: 4px;
-  font-weight: bold;
-  cursor: default;
+.gwt-TabBarOLD {
+    padding-top: 2px;
+    border-bottom: 4px solid #878787;
+    background-color: #333333;
+}
 
-  background-color: #878787;
-  border-bottom: 2px solid #87ffff;
-  margin-right: 2px;
+
+.gwt-TabBarItemOLD {
+    padding: 4px;
+    cursor: pointer;
+    background-color: #333333;
+    border-bottom: 2px solid white;
+    margin-right: 2px;
+}
+
+.gwt-TabBarItem-selectedOLD {
+    padding: 4px;
+    font-weight: bold;
+    cursor: default;
+
+    background-color: #878787;
+    border-bottom: 2px solid #87ffff;
+    margin-right: 2px;
 }
