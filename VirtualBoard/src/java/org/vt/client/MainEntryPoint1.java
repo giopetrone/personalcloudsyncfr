@@ -112,7 +112,7 @@ public class MainEntryPoint1 implements EntryPoint {
           nut = new PushButton(new Image("GogDoc.jpg"));
         pa = new VerticalPanel();
         lab = new Label("titolo documento");
-        header = new HTML("Title/Header (Drag Handle) with <a href='http://google.com/' target='_blank'>link</a>");
+        header = new HTML("Drag Handle");
         pa.add(header);
         pa.add(nut);
         pa.add(lab);
