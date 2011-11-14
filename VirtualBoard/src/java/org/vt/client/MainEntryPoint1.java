@@ -97,6 +97,8 @@ public class MainEntryPoint1 implements EntryPoint {
         AbsolutePanel absolutePanel = addTabPanel( "style1","STEPS");
         VerticalPanel pa = creaPannello("TaskMgr.jpg","STEP 1","Drag Handle"," http://www.piemonte.di.unito.it/TaskMgr/index.jsp?Flow=Flow_aug30-1.txt",absolutePanel);
         absolutePanel.add((pa));
+        VerticalPanel pag = creaPannello("GogDoc.jpg","STEP 1","Drag Handle"," https://docs.google.com/Doc?docid=0AbFwBaRMUH4EZGY2bng5ZjNfMTQxYzNtNWhtZHE&hl=en_US",absolutePanel);
+        absolutePanel.add((pag));
         absolutePanel = addTabPanel( "style2","Virtual Collaboration");
         pa = creaPannello("GogDoc.jpg","titolo documento","Drag Handle","https://docs.google.com/document/d/11zOX13sBVGExwkFgmlUdGFgz3L0Uvp7l73rL2VR0sxk/edit?hl=en_US",absolutePanel);
         absolutePanel.add((pa));
