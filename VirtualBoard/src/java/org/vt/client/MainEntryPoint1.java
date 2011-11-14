@@ -18,13 +18,17 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.ResizeEvent;
+import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Event.NativePreviewEvent;
 import com.google.gwt.user.client.Event.NativePreviewHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AbsolutePanel;
+import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -33,6 +37,7 @@ import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import java.util.ArrayList;
 
 /**
  * Main entry point.
@@ -44,6 +49,8 @@ public class MainEntryPoint1 implements EntryPoint {
     private static TextArea messaggio = new TextArea();
     AbsolutePanel currTab = null;
     PickupDragController dragController = null;
+    TabPanel tabPanel = new TabPanel();
+    ArrayList<Attiva> pannelli = new ArrayList();
 
     /**
      * Creates a new instance of MainEntryPoint
@@ -62,72 +69,40 @@ public class MainEntryPoint1 implements EntryPoint {
     public void onModuleLoad() {
         messaggio.setPixelSize(400, 150);
         RootPanel.get().add(messaggio);
-         VerticalPanel mainPanel = new VerticalPanel();
-         mainPanel.addStyleName("mainPanelStyle");
-         mainPanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
-         RootPanel.get("demo").add(mainPanel);
+        final VerticalPanel mainPanel = new VerticalPanel();
+        mainPanel.addStyleName("mainPanelStyle");
+        mainPanel.setHeight(Window.getClientHeight() + "px");
+        mainPanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+        RootPanel.get("demo").add(mainPanel);
+        Window.addResizeHandler(new ResizeHandler() {
+
+            public void onResize(ResizeEvent event) {
+                int height = event.getHeight();
+                mainPanel.setHeight(height + "px");
+            }
+        });
         Label mainTitle = new Label("My Tables");
         mainTitle.addStyleName("MainLabel");
         mainTitle.setPixelSize(600, 40);
         mainPanel.add(mainTitle);
-        final TabPanel tabPanel = new TabPanel();
-        mainPanel.add(tabPanel);
-        tabPanel.addSelectionHandler(new SelectionHandler<Integer>() {
-
-            public void onSelection(SelectionEvent<Integer> event) {
-                currTab = (AbsolutePanel) tabPanel.getWidget(event.getSelectedItem().intValue());
-            }
-        });
-        AbsolutePanel absolutePanel = new AbsolutePanel();
-        currTab = absolutePanel;
-        absolutePanel.addStyleName("style1");
-        absolutePanel.setPixelSize(900, 400);
-        dragController = new PickupDragController(absolutePanel, true);
-        dragController.setBehaviorDragStartSensitivity(5);
-        dragController.setBehaviorDragProxy(true);
-        DropController dropController = new AbsolutePositionDropController(RootPanel.get());
-        // Don't forget to register each DropController with a DragController
-        dragController.registerDropController(dropController);
-        PushButton nut = new PushButton(new Image("TaskMgr.jpg"));
-        VerticalPanel pa = new VerticalPanel();
-        Label lab = new Label("STEP 1");
-        HTML header = new HTML("Drag Handle");
-        pa.add(header);
-        pa.add(nut);
-        pa.add(lab);
-        absolutePanel.add((pa));
-        dragController.makeDraggable(pa, header);
-        nut.addClickHandler(new ClickHandler() {
-
-            @Override
-            public void onClick(ClickEvent event) {
-                com.google.gwt.user.client.Window.open(" http://www.piemonte.di.unito.it/TaskMgr/index.jsp?Flow=Flow_aug30-1.txt", "_blank", "");
-            }
-        });
-        tabPanel.add(absolutePanel, "STEPS");
-        absolutePanel = new AbsolutePanel();
-          absolutePanel.addStyleName("style2");
-        absolutePanel.setPixelSize(900, 400);
-        tabPanel.add(absolutePanel, "Virtual Collaboration");
-          nut = new PushButton(new Image("GogDoc.jpg"));
-        pa = new VerticalPanel();
-        lab = new Label("titolo documento");
-        header = new HTML("Drag Handle");
-        pa.add(header);
-        pa.add(nut);
-        pa.add(lab);
-        absolutePanel.add((pa));
-        dragController.makeDraggable(pa, header);
-        nut.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                com.google.gwt.user.client.Window.open("https://docs.google.com/document/d/11zOX13sBVGExwkFgmlUdGFgz3L0Uvp7l73rL2VR0sxk/edit?hl=en_US", "_blank", "");
-            }
-        });
-        tabPanel.selectTab(0);
         tabPanel.setSize("900px", "400px");
         tabPanel.addStyleName("table-center");
-       // RootPanel.get("demo").add(tabPanel);
+        mainPanel.add(tabPanel);
+        tabPanel.addSelectionHandler(new SelectionHandler<Integer>() {
+            public void onSelection(SelectionEvent<Integer> event) {
+                currTab = (AbsolutePanel) tabPanel.getWidget(event.getSelectedItem().intValue());
+                dragController = pannelli.get(event.getSelectedItem().intValue()).getDrag();
+            }
+        });
+        AbsolutePanel absolutePanel = addTabPanel( "style1","STEPS");
+        VerticalPanel pa = creaPannello("TaskMgr.jpg","STEP 1","Drag Handle"," http://www.piemonte.di.unito.it/TaskMgr/index.jsp?Flow=Flow_aug30-1.txt",absolutePanel);
+        absolutePanel.add((pa));
+        absolutePanel = addTabPanel( "style2","Virtual Collaboration");
+        pa = creaPannello("GogDoc.jpg","titolo documento","Drag Handle","https://docs.google.com/document/d/11zOX13sBVGExwkFgmlUdGFgz3L0Uvp7l73rL2VR0sxk/edit?hl=en_US",absolutePanel);
+        absolutePanel.add((pa));
+        tabPanel.selectTab(0);
+      
+        // RootPanel.get("demo").add(tabPanel);
         //   String content = " <div id=\"obiettivo\" ondragenter=\"return false;\" ondragover=\"return false;\" ondrop=\"return OnDropTarget (event);\" style=\"width:300px; height:100px; background-color:#f08080;\"> </div>";
         String content = " <div id=\"obiettivo\" style=\"width:30px; height:30px; background-color:#f09080;\"> </div>";
         HTML widget = new HTML(content);
@@ -149,6 +124,12 @@ public class MainEntryPoint1 implements EntryPoint {
                 //  preview.consume();
             }
         });
+
+        FlexTable f = new FlexTable();
+          FlexTable.FlexCellFormatter form = f.getFlexCellFormatter();
+         f.setText(0, 0, "week"); form.addStyleName(0,0,"style1");
+
+        RootPanel.get("demo").add(f);
         RootPanel.get("demo").add(widget);
     }
 
@@ -223,10 +204,80 @@ public class MainEntryPoint1 implements EntryPoint {
         pa.setBorderWidth(2);
         //  HTML header = new HTML("(Drag Handle)with <a href='http://google.com/' target='_blank'>link</a>");
         String titolo = abbrevia(opeart);
-        debug("link == "+titolo + " <a href='" + opeart + "' target='_blank'>link</a>");
+        debug("link == " + titolo + " <a href='" + opeart + "' target='_blank'>link</a>");
         HTML header = new HTML(titolo + " <a href='" + opeart + "' target='_blank'>link</a>");
+        Image la = new Image("TaskMgr.jpg");
+        pa.add(la);
         pa.add(header);
+        int dropX = currTab.getAbsoluteLeft();
+        int dropY = currTab.getAbsoluteTop();
+        currTab.add(pa, posX > dropX ? posX : dropX, posY - 20 > dropY ? posY - 20 : dropY);
         dragController.makeDraggable(pa, header);
-        currTab.add(pa, posX, posY - 20);
     }
+    
+    private  AbsolutePanel addTabPanel( String a, String b){
+        AbsolutePanel ret = new AbsolutePanel();       
+        ret.addStyleName(a);
+        ret.setPixelSize(900, 400);
+        Attiva curAtt = new Attiva(ret);  
+        pannelli.add(curAtt);     
+        tabPanel.add(ret, b);
+        return ret;      
+    }
+
+    private VerticalPanel creaPannello(String a, String b, String c, final String d, AbsolutePanel pan){
+        VerticalPanel ret = new VerticalPanel();
+        PushButton nut = new PushButton(new Image(a));
+        Label lab = new Label(b);
+        HTML header = new HTML(c);
+        ret.add(header);
+        ret.add(nut);
+        ret.add(lab);
+        getDrag(pan).makeDraggable(ret, header);
+        nut.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                com.google.gwt.user.client.Window.open(d, "_blank", "");
+            }
+        });
+        return ret;
+    }
+
+     private PickupDragController getDrag(AbsolutePanel pa){
+
+                for (Attiva at: pannelli){
+                    if (at.absolutePanel == pa)
+                        return at.dragController;
+                }
+                return null;
+
+        }
+
+    class Attiva {
+
+        AbsolutePanel absolutePanel;
+        PickupDragController dragController;
+        DropController dropController;
+
+        public Attiva(AbsolutePanel absolutePanel) {
+            this.absolutePanel = absolutePanel;
+            dragController = new PickupDragController(absolutePanel, true);
+            dragController.setBehaviorDragStartSensitivity(5);
+            dragController.setBehaviorDragProxy(true);
+            dragController.setBehaviorConstrainedToBoundaryPanel(true);
+            dropController = new AbsolutePositionDropController(RootPanel.get());
+            // Don't forget to register each DropController with a DragController
+
+            // prox riga sembra inutile?????
+           // dragController.registerDropController(dropController);
+        }
+
+        public PickupDragController getDrag(){
+          
+                return dragController;
+
+        }
+    }
+
+
 }
