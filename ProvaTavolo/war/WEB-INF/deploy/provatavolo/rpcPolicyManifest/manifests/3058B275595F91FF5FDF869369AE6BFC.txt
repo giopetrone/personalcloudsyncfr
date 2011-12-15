@@ -1,0 +1,2 @@
+serviceClass: provatavolo.client.GreetingService
+path: 2E7E21766DA242BD5CB2542CDEE897E0.gwt.rpc
