@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+              http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	version="2.5" xmlns="http://java.sun.com/xml/ns/javaee">
+
+
+
+	<!-- Default page to serve -->
+	<welcome-file-list>
+		<welcome-file>SecondApp.html</welcome-file>
+	</welcome-file-list>
+
+	<servlet>
+		<servlet-name>feedServlet</servlet-name>
+		<servlet-class>com.mui.myproject.server.services.FeedServiceImpl</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>feedServlet</servlet-name>
+		<url-pattern>/secondapp/feed-service</url-pattern>
+	</servlet-mapping>
+
+
+	<servlet>
+		<servlet-name>myServiceImpl</servlet-name>
+		<servlet-class>
+		  com.mui.myproject.server.services.MyServiceImpl
+		</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>myServiceImpl</servlet-name>
+		<url-pattern>/secondapp/myService</url-pattern>
+	</servlet-mapping>
+
+</web-app>
