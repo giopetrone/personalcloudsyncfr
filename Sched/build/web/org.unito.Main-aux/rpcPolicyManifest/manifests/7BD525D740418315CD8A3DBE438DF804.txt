@@ -1,0 +1,2 @@
+serviceClass: org.unito.client.TaskAllocation
+path: A99B6549FFC4303D5D54D3A4DFF9E09A.gwt.rpc

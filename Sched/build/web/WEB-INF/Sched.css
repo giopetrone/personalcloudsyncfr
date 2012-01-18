@@ -1,0 +1,77 @@
+/* 
+    Document   : Sched
+    Created on : Nov 10, 2011, 1:36:47 PM
+    Author     : marino
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+/* 
+   TODO customize this sample style
+   Syntax recommendation http://www.w3.org/TR/REC-CSS2/
+*/
+
+root {
+    display: block;
+}
+.MainLabel {
+    text-align: center;
+    font-weight: bold;
+    font-size:large;
+    width:8em;
+
+}
+.mainPanelStyle{
+    padding: 4px;
+    font-weight: bold;
+    cursor: default;
+    background-color: #ECF4B5;
+    border:3px;
+    border-bottom: 2px solid #87ffff;
+    margin-right: 2px;
+}
+
+.style1{
+         background-color: #ED9A5A;
+
+}
+
+.style2{
+         background-color: #F498DB;
+
+}
+
+.gwt-TabPanelOLD {
+    margin-top: 4px;
+    color: #333333;
+}
+
+.gwt-TabPanelBottomOLD {
+    background-color: #333333;
+}
+
+.gwt-TabBarOLD {
+    padding-top: 2px;
+    border-bottom: 4px solid #878787;
+    background-color: #333333;
+}
+
+
+.gwt-TabBarItemOLD {
+    padding: 4px;
+    cursor: pointer;
+    background-color: #333333;
+    border-bottom: 2px solid white;
+    margin-right: 2px;
+}
+
+.gwt-TabBarItem-selectedOLD {
+    padding: 4px;
+    font-weight: bold;
+    cursor: default;
+
+    background-color: #878787;
+    border-bottom: 2px solid #87ffff;
+    margin-right: 2px;
+}
+
