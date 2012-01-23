@@ -1,0 +1,2 @@
+serviceClass: mui.client.services.LoginService
+path: 2BD86D1CFDEEB0263DBBCCD860AEF62B.gwt.rpc

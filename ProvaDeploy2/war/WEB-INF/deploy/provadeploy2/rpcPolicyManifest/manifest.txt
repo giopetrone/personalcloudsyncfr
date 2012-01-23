@@ -1,0 +1,4 @@
+# Module provadeploy2
+# RPC service class, partial path of RPC policy file
+mui.client.services.LoginService, 2BD86D1CFDEEB0263DBBCCD860AEF62B.gwt.rpc
+mui.client.services.TokenService, 1FC554CCBB0DE4D253CB8B9790EE5863.gwt.rpc
