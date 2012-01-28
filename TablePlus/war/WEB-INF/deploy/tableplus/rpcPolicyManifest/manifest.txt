@@ -1,0 +1,4 @@
+# Module tableplus
+# RPC service class, partial path of RPC policy file
+com.unito.tableplus.client.services.TokenService, 7EEE3AA4559D74A94EA982C776A4F605.gwt.rpc
+com.unito.tableplus.client.services.LoginService, 99B3E1F3E10B7A4867A25245E46E2458.gwt.rpc

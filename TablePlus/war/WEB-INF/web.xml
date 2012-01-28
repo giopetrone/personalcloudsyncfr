@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+              http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	version="2.5" xmlns="http://java.sun.com/xml/ns/javaee">
+
+	<!-- Servlets -->
+
+	<!-- LOGIN SERVLET -->
+	
+	<servlet>
+		<servlet-name>loginServlet</servlet-name>
+		<servlet-class>com.unito.tableplus.server.services.LoginServiceImpl</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>loginServlet</servlet-name>
+		<url-pattern>/tableplus/login-service</url-pattern>
+	</servlet-mapping>
+	
+	<!-- GROUP SERVLET -->
+	
+	<servlet>
+		<servlet-name>groupServlet</servlet-name>
+		<servlet-class>com.unito.tableplus.server.services.GroupServiceImpl</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>groupServlet</servlet-name>
+		<url-pattern>/tableplus/group-service</url-pattern>
+	</servlet-mapping>
+	
+	<!-- OBJECT SERVLET -->
+	
+	<servlet>
+		<servlet-name>objectServlet</servlet-name>
+		<servlet-class>com.unito.tableplus.server.services.ObjectServiceImpl</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>objectServlet</servlet-name>
+		<url-pattern>/tableplus/object-service</url-pattern>
+	</servlet-mapping>
+	
+	<!-- TABLE SERVLET -->
+	
+	<servlet>
+		<servlet-name>tableServlet</servlet-name>
+		<servlet-class>com.unito.tableplus.server.services.TableServiceImpl</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>tableServlet</servlet-name>
+		<url-pattern>/tableplus/table-service</url-pattern>
+	</servlet-mapping>
+	
+	<!-- TOKEN SERVLET -->
+	
+	<servlet>
+		<servlet-name>tokenServlet</servlet-name>
+		<servlet-class>com.unito.tableplus.server.services.TokenServiceImpl</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>tokenServlet</servlet-name>
+		<url-pattern>/tableplus/token-service</url-pattern>
+	</servlet-mapping>
+	
+	
+	
+	
+	<!-- Default page to serve -->
+	<welcome-file-list>
+		<welcome-file>TablePlus.html</welcome-file>
+	</welcome-file-list>
+
+</web-app>
