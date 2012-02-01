@@ -18,11 +18,9 @@ import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.DockPanel;
 import com.google.gwt.user.client.ui.FlexTable;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLTable;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -141,7 +139,7 @@ public class MainEntryPoint implements EntryPoint {
                 Task tat = new Task(te1.getText(), te3.getText(), te4.getText(), te2.getText(), te5.getText(), te6.getText(), te7.getText(), ch7.getValue());
                 TaskGroup.change(tat);
                 //      Window.alert("add task "+ Task.get(te1.getText()).toString());
-           // INUTILE???     TaskGroup.current().setSchedule(tat);
+                // INUTILE???     TaskGroup.current().setSchedule(tat);
                 riempi(taskTable, false);
                 updateText(te1.getText());
                 updateTasks();
@@ -152,7 +150,7 @@ public class MainEntryPoint implements EntryPoint {
         removeButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-                //   getService().removeTask(te1.getText(), prova);
+                getService().removeTask(te1.getText(), prova);
                 TaskGroup.remove(te1.getText());
                 riempi(taskTable, false);
                 updateText("");
@@ -173,7 +171,7 @@ public class MainEntryPoint implements EntryPoint {
             }
         });
         final Button insertButton = new Button("Insert(startIntervals)");
-         h.add(insertButton);
+        h.add(insertButton);
         insertButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
@@ -213,14 +211,26 @@ public class MainEntryPoint implements EntryPoint {
                 }
             }
         });
+        final Button lunchButton = new Button("Lunch");
+        h.add(lunchButton);
+        lunchButton.addClickHandler(new ClickHandler() {
+
+            public void onClick(ClickEvent event) {
+
+                TaskGroup.lunch();
+                riempi(taskTable, false);
+                updateTasks();
+            }
+        });
         final Button liliButton = new Button("Esempio Liliana ");
         h.add(liliButton);
         liliButton.addClickHandler(new ClickHandler() {
+
             public void onClick(ClickEvent event) {
                 TaskGroup.reset();
                 TaskGroup.addTaskGroup();
                 TaskGroup.esempioLili();
-                 riempi(taskTable, false);
+                riempi(taskTable, false);
                 updateTasks();
             }
         });
@@ -233,7 +243,7 @@ public class MainEntryPoint implements EntryPoint {
         schedule1Button.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-               // Window.alert("bottonr cliccato size " + TaskGroup.current().getTasks().size());
+                // Window.alert("bottonr cliccato size " + TaskGroup.current().getTasks().size());
 
                 getService().schedule(new ViaVai(TaskGroup.current()), "start", "new", callbackTask);
                 // getService().schedule(new TaskGroup(), "start", callbackTask);
@@ -276,7 +286,7 @@ public class MainEntryPoint implements EntryPoint {
 
     private void iniziaTable(final FlexTable t) {
         FlexTable.FlexCellFormatter form = t.getFlexCellFormatter();
-        t.setText(0, 0, "week");
+        t.setText(0, 0, "Time");
         form.addStyleName(0, 0, "style1");
         //   t.addStyleName("MainLabel");
         t.setText(0, 1, "Monday");
@@ -355,7 +365,7 @@ public class MainEntryPoint implements EntryPoint {
         taskDefTable.setText(row, 4, ta == null ? "" : ta.beforeString());
         taskDefTable.setText(row, 5, ta == null ? "" : ta.afterString());
         taskDefTable.setText(row, 6, ta == null ? "" : "" + ta.getOverlap());
-        taskDefTable.setText(row, 7, ta == null ? "" : "" + ta.getOfficialSchedule());
+        taskDefTable.setText(row, 7, ta == null ? "" : "" + ta.getOfficialScheduleAsString());
     }
 
     private void updateTasks() {
@@ -377,7 +387,7 @@ public class MainEntryPoint implements EntryPoint {
             te4.setText("" + ta.getMaxEndHour());
             te5.setText(ta.beforeString());
             te6.setText(ta.afterString());
-            te7.setText("" + ta.getOfficialSchedule());
+            te7.setText("" + ta.getOfficialScheduleAsString());
             ch7.setValue(ta.getOverlap());
         } else {
             te1.setText("");
@@ -431,6 +441,7 @@ public class MainEntryPoint implements EntryPoint {
             Window.alert("Communication failed");
         }
     };
+
     final AsyncCallback<ViaVai> callbackTaskSuggest = new AsyncCallback<ViaVai>() {
 
         public void onSuccess(ViaVai result) {
@@ -455,9 +466,9 @@ public class MainEntryPoint implements EntryPoint {
         public void onSuccess(String s) {
             lblServerReply.setText("successo");
             if (s == null) {
-                Window.alert("task not removed");
+                Window.alert("task not removed in scheduler");
             } else {
-                Window.alert("task removed");
+                Window.alert("task removed in scheduler");
             }
         }
 
@@ -481,7 +492,7 @@ public class MainEntryPoint implements EntryPoint {
     class MyDialog extends DialogBox implements ClickListener {
 
         public MyDialog(FlexTable f) {
-            setText("All tasks");
+            setText("Specification of all tasks");
 
             Button closeButton = new Button("Close", this);
             // HTML msg = new HTML("<center>A standard dialog box component.</center>",true);

@@ -28,19 +28,20 @@ public class TaskCall {
 
     public TaskGroup doRequest(TaskGroup iTask, String taskName, String taskNet, String mode) {
 
+        // 2 modes:
+        // "startintervals" to request places where a task can be placed
+        // "tasknet"   if the user wants to move a task, the constraint solver
+        // generates additional constraints aindicating that maybe other tasks
+        // have to be moved to make room for it in the specified interval;
+        // the resulting net is then passes to jacop for generating a schedule
+
         String pr = new Request(iTask, taskName, taskNet, mode).toServerString();
         System.err.println("in dorequest request=\n" + pr);
-        if (false) {  // per prova, per ora va in crash
-            ArrayList<org.unito.client.Interval> arra = MyDOMParserBean.getIntervals(null);
-            TaskGroup ret = new TaskGroup();
-            ret.setTaskSchedule(arra);
-            return ret;
-        }
         try {
             DefaultHttpClient httpClient = new DefaultHttpClient();
             HttpPost postRequest = new HttpPost(
-                       "http://localhost:3000/modstn/"+ taskNet);
-                 //   "http://localhost:3000/modstn/startintervals");
+                    "http://localhost:3000/modstn/" + taskNet);
+            //   "http://localhost:3000/modstn/startintervals");   oppure "tasknet"
             StringEntity input = new StringEntity(pr);
             input.setContentType("text/xml");
             postRequest.setEntity(input);
@@ -52,11 +53,19 @@ public class TaskCall {
             //  System.out.println("risposta=\n");
             //  response.getEntity().writeTo(System.out);
             InputStream is = response.getEntity().getContent();
-            ArrayList<org.unito.client.Interval> arra = MyDOMParserBean.getIntervals(is);
+          /* OLD:  ArrayList<org.unito.client.Interval> arra = MyDOMParserBean.getIntervals(is);
             TaskGroup ret = new TaskGroup();
             ret.setTaskSchedule(arra);
+           * */
+            TaskGroup ret =  MyDOMParserBean.fillReply(is);
             httpClient.getConnectionManager().shutdown();
-            return ret;
+            if (taskNet.equals("tasknet")) {
+                // call Scheduler with result from constraint solver
+                TaskGroup ret1 = new TaskCall().doIt(ret, "start", "new");
+                return ret1;
+            } else {  // taskNet.equals("tasknet")
+                return ret;
+            }
         } catch (ClientProtocolException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -69,7 +78,7 @@ public class TaskCall {
     public TaskGroup doIt(TaskGroup taskGroup, String mode, String old) {
         // create store of tasks
         if (!old.equals("old")) {   //riparti da 0
-             ts = new TaskStore();
+            ts = new TaskStore();
         }
         ArrayList<String> taskNames = new ArrayList<String>();
         System.err.println("in doit taskssize=" + taskGroup.getTasks().size());
@@ -130,12 +139,18 @@ public class TaskCall {
                 TaskGroup ret = new TaskGroup(taskGroup);
                 for (int k = 0; k < tasks.size(); k++) {
                     MyTask st = tasks.get(k);
-                    String[] arra = ("" + st.getStart()).split(" ", -1);
-                    int start = Integer.parseInt(arra[2]);
+                    //    System.out.println("miotaskstartinput=" + st.getName() + ";"+ st.getStart() +";min="+
+                    //          st.getStart().dom().min()  );
+                /*    String[] arra = ("" + st.getStart()).split(" ", -1);
+                    int start = Integer.parseInt(arra[arra.length -1]);
                     arra = ("" + st.getEnd()).split(" ", -1);
-                    int end = Integer.parseInt(arra[2]);
+                    int end = Integer.parseInt(arra[arra.length -1]);
                     arra = ("" + st.getDuration()).split(" ", -1);
-                    int dura = Integer.parseInt(arra[2]);
+                    int dura = Integer.parseInt(arra[arra.length -1]);
+                    ret.addSchedule(new org.unito.client.Interval(st.getName(), start, end)); */
+                    int start = st.getStart().dom().min();
+                    int end = st.getEnd().dom().min();
+                    int dura = st.getDuration().dom().min();
                     ret.addSchedule(new org.unito.client.Interval(st.getName(), start, end));
                     //  curr.setDuration(dura);
                     System.out.println("Miotask=" + st.getName() + " " + start + " " + end + " " + dura);
@@ -158,12 +173,15 @@ public class TaskCall {
                 TaskGroup ret = new TaskGroup(taskGroup);
                 for (int k = 0; k < tasks.size(); k++) {
                     MyTask st = tasks.get(k);
-                    String[] arra = ("" + st.getStart()).split(" ", -1);
+                    /*   String[] arra = ("" + st.getStart()).split(" ", -1);
                     int start = Integer.parseInt(arra[2]);
                     arra = ("" + st.getEnd()).split(" ", -1);
                     int end = Integer.parseInt(arra[2]);
                     arra = ("" + st.getDuration()).split(" ", -1);
-                    int dura = Integer.parseInt(arra[2]);
+                    int dura = Integer.parseInt(arra[2]); */
+                    int start = st.getStart().dom().min();
+                    int end = st.getEnd().dom().min();
+                    int dura = st.getDuration().dom().min();
                     ret.addSchedule(new org.unito.client.Interval(st.getName(), start, end));
                     System.out.println("Miotask=" + st.getName() + " " + start + " " + end + " " + dura);
                 }
@@ -175,16 +193,20 @@ public class TaskCall {
         return null;
     }
 
-     public String removeTask(String task) {
+    public String removeTask(String task) {
         // Do something interesting with 's' here on the server.
-        boolean taskRemoved = ts == null ? false : ts.removeTask(task);
+        boolean taskRemoved = false;
+        if (ts != null && ts.getTasks().size() > 0) {
+            taskRemoved = ts.removeTask(task, true);
+        } else {
+            System.out.println("no tasks to remove!!");
+        }
         if (taskRemoved) {
-            System.out.println("task T2 removed");
+            System.out.println("task " + task + " removed");
             return "true";
         } else {
             System.out.println("I could not remove the task");
             return null;
         }
     }
-
 }

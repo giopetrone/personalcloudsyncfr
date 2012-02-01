@@ -13,14 +13,14 @@ import java.util.ArrayList;
  * @author marino
  */
 public class Task implements IsSerializable {
+
     private String name;
     private int firstStartHour = 0;
     private int lastEndHour = 1;
     private int duration = 1;
-     private int schedule = -1; // used to set a specific starting hour;
-     // the class Taskgroup contains a list of schedules for all the tasks
-     // and also a list of possible alternative intervals for a specific task
-
+    private int schedule = -1; // used to set a specific starting hour;
+    // the class Taskgroup contains a list of schedules for all the tasks
+    // and also a list of possible alternative intervals for a specific task
     private boolean overlap = false;
     private ArrayList<String> before = new ArrayList();
     private ArrayList<String> after = new ArrayList();
@@ -62,17 +62,22 @@ public class Task implements IsSerializable {
         return after;
     }
 
-    public int getOfficialSchedule(){
+    public int getOfficialSchedule() {
         return TaskGroup.current().getOfficialSchedule(getName());
     }
-    
-     public int getSchedule(){
+
+    public String getOfficialScheduleAsString() {
+        int val = getOfficialSchedule();
+        return "" + (val == -1 ? " ?" : val);
+    }
+
+    public int getSchedule() {
         return schedule;
     }
 
     public Task() {
-     //   this.name = "NULL";
-      //  this.duration = 0;
+        //   this.name = "NULL";
+        //  this.duration = 0;
     }
 
     public Task(String name, int firstStartHour, int lastEndHour, int duration) {
@@ -100,10 +105,14 @@ public class Task implements IsSerializable {
         if (Integer.parseInt(lastEndHour) >= 0) {
             this.lastEndHour = Integer.parseInt(lastEndHour);
         }
-        int sche = schedule.equals("")? -1: Integer.parseInt(schedule);
-        this.schedule = sche;     //occorre capire che fare !!!!!!!!
-     //   this.startHour = this.firstStartHour;
-     //   this.endHour = this.firstStartHour + this.duration;
+        try {
+            this.schedule = Integer.parseInt(schedule);
+        } catch (NumberFormatException ex) {
+            this.schedule = -1;
+        }
+        //occorre capire che fare !!!!!!!!
+        //   this.startHour = this.firstStartHour;
+        //   this.endHour = this.firstStartHour + this.duration;
         String[] tmp = before.split(" ", -1);
         for (int i = 0; i < tmp.length; i++) {
             if (TaskGroup.exists(tmp[i])) {
@@ -118,17 +127,18 @@ public class Task implements IsSerializable {
                 this.after.add(tmp[i]);
             }
         }
-     //   Window.alert(this.toString());
+        //   Window.alert(this.toString());
     }
-/*
+    /*
     public int getStartHour() {
-        return startHour;
+    return startHour;
     }
 
     public int getEndHour() {
-        return startHour + duration;
+    return startHour + duration;
     }
-*/
+     */
+
     public int getDuration() {
         return duration;
     }
@@ -141,30 +151,29 @@ public class Task implements IsSerializable {
         return getLastEndHour();
     }
 
- /*   public void setStartHour(int startHour) {
-        this.startHour = startHour;
+    /*   public void setStartHour(int startHour) {
+    this.startHour = startHour;
     }
 
     public int getstartHourDay() {
-        return startHour % giornata;
+    return startHour % giornata;
     }
 
     public int getEndHourDay() {
-        return (startHour + duration) % giornata;
+    return (startHour + duration) % giornata;
     }
 
     public int getStartDay() {
-        return startHour / giornata;
+    return startHour / giornata;
     }
 
     public int getEndDay() {
-        return (startHour + duration) / giornata;
+    return (startHour + duration) / giornata;
     }
-*/
+     */
     public String getName() {
         return name;
     }
-
 
     public void setDuration(int duration) {
         this.duration = duration;
@@ -267,6 +276,14 @@ public class Task implements IsSerializable {
      */
     public void setAfter(ArrayList<String> after) {
         this.after = after;
+    }
+
+    public void addBefore(String after) {
+        this.before.add(after);
+    }
+
+    public void addAfter(String after) {
+        this.after.add(after);
     }
 
     /**

@@ -36,8 +36,8 @@ public class TaskGroup {
 
     public void setChoiceForTask(String tName) {
         Task t = get(tName);
-        choice = new StartInterval(tName, t.getOfficialSchedule(), t.getOfficialSchedule());
-        System.err.println("in taskgroup.setChoiceForTas task= choice=" + tName + " " + choice);
+        choice = new StartInterval(tName, t.getOfficialSchedule(), t.getOfficialSchedule() + 1);
+        Window.alert("in taskgroup.setChoiceForTas task: " + tName + " " + choice.getMin() + ", " + choice.getMax());
     }
 
     public TaskGroup(ViaVai via) { // copia task del parametro
@@ -77,11 +77,11 @@ public class TaskGroup {
 
     public void setSchedule(Task t) {
         int sta = t.getSchedule();
-      //  Window.alert("setschedule task= "+t.getName() +" sta="+sta);
+        //  Window.alert("setschedule task= "+t.getName() +" sta="+sta);
         if (sta < 0) {
             sta = possibileInizio(t.getName());
-       //     Window.alert("possinileinizio= "+sta);
-        } 
+            //     Window.alert("possinileinizio= "+sta);
+        }
         Interval inte = findIntervalForTask(t.getName());
         if (inte == null) {
             globalSchedule.add(new StartInterval(t.getName(), sta, sta));
@@ -134,6 +134,10 @@ public class TaskGroup {
 
     public static void add(Task t) {
         current().tasks.add(t);
+    }
+
+    public  void addI(Task t) {
+        tasks.add(t);
     }
 
     public ArrayList<Interval> getCurrSchedule() {
@@ -205,10 +209,10 @@ public class TaskGroup {
         int fine = questo.getLastEndHour();
         int dura = questo.getDuration();
         for (int k = inizio; k < fine - dura; k++) {
-            if (libero[k] ) {  // un' ora libera
+            if (libero[k]) {  // un' ora libera
                 boolean ok = true;
-                for (int kk = k+ 1; kk < k + dura  && ok; kk++) {
-                   ok = libero[kk];
+                for (int kk = k + 1; kk < k + dura && ok; kk++) {
+                    ok = libero[kk];
                 }
                 if (ok) {
                     return k;
@@ -232,7 +236,7 @@ public class TaskGroup {
                     if (ret[sta + i].equals("")) {
                         ret[sta + i] = t.getName();
                     } else {
-                         ret[sta + i] += "; "+ t.getName();
+                        ret[sta + i] += "; " + t.getName();
                     }
                 }
             }
@@ -261,6 +265,17 @@ public class TaskGroup {
             }
         }
         return false;
+    }
+
+    public Task getI(String name) {
+
+        for (Task t : tasks) {
+             System.out.println("task="+name);
+            if (t.getName().equals(name)) {
+                return t;
+            }
+        }
+        return null;
     }
 
     public static Task get(String name) {
@@ -339,6 +354,21 @@ public class TaskGroup {
         tg.addScheduledTask(task, 24, 26);
         task = new Task("T3", 20, 50, 4);
         tg.addScheduledTask(task, 36, 40);
+        //   Window.alert("corrente in esempio"+ current().tasks);
+    }
+
+    public static void lunch() {
+        TaskGroup tg = current();
+        Task task = new Task("Lunch1", 4, 5, 1);
+        tg.addScheduledTask(task, 4, 5);
+        task = new Task("Lunch2", 16, 17, 1);
+        tg.addScheduledTask(task, 16, 17);
+        task = new Task("Lunch3", 28, 29, 1);
+        tg.addScheduledTask(task, 28, 29);
+        task = new Task("Lunch4", 40, 41, 1);
+        tg.addScheduledTask(task, 40, 41);
+        task = new Task("Lunch5", 52, 53, 1);
+        tg.addScheduledTask(task, 52, 53);
         //   Window.alert("corrente in esempio"+ current().tasks);
     }
 
