@@ -6,7 +6,6 @@ import javax.servlet.http.HttpSession;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.unito.tableplus.client.services.LoginService;
 import com.unito.tableplus.shared.*;

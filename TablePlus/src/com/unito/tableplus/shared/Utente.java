@@ -1,6 +1,7 @@
 package com.unito.tableplus.shared;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class Utente implements Serializable{
 
@@ -13,7 +14,8 @@ public class Utente implements Serializable{
 	private String email;
 	private String loginUrl;
 	private String logoutUrl;
-	private Wallet wallet;
+	private Wallet wallet=new Wallet();
+	private List<Document> documents;
 
 	public String getLogoutUrl() {
 		return logoutUrl;
@@ -53,6 +55,14 @@ public class Utente implements Serializable{
 
 	public void setWallet(Wallet wallet) {
 		this.wallet = wallet;
+	}
+
+	public List<Document> getDocuments() {
+		return documents;
+	}
+
+	public void setDocuments(List<Document> documents) {
+		this.documents = documents;
 	}
 	
 	
