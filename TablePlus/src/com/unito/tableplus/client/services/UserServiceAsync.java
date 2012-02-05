@@ -5,7 +5,7 @@ import com.unito.tableplus.shared.model.User;
 
 public interface UserServiceAsync {
 
-	void queryUserByName(String username, AsyncCallback<User> callback);
+	void queryUserByUsername(String username, AsyncCallback<User> callback);
 
 	void queryUserByEmail(String email, AsyncCallback<User> callback);
 

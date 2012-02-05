@@ -6,6 +6,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.unito.tableplus.client.services.UserService;
+import com.unito.tableplus.shared.model.GoogleUser;
 import com.unito.tableplus.shared.model.User;
 
 public class UserServiceImpl extends RemoteServiceServlet implements
@@ -14,9 +15,9 @@ public class UserServiceImpl extends RemoteServiceServlet implements
 	private static final long serialVersionUID = 2345237647330858842L;
 
 	@Override
-	public User queryUserByName(String username) {
+	public User queryUserByUsername(String username) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Query query = pm.newQuery(User.class);
+		Query query = pm.newQuery(GoogleUser.class);
 		query.setFilter("username == usernameParam");
 		query.declareParameters("String usernameParam");
 		User user = null;
@@ -28,6 +29,7 @@ public class UserServiceImpl extends RemoteServiceServlet implements
 			user = pm.detachCopy(results.get(0));
 		} catch (Exception e) {
 			System.err.println("There has been an error querying user: " + e);
+			e.printStackTrace();
 		} finally {
 			query.closeAll();
 			pm.close();
@@ -61,9 +63,10 @@ public class UserServiceImpl extends RemoteServiceServlet implements
 	public void storeUser(User user) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
-			pm.makePersistent(this);
+			pm.makePersistent(user);
 		} catch (Exception e) {
 			System.err.println("Something gone wrong storing the user: " + e);
+			e.printStackTrace();
 		} finally {
 			pm.close();
 		}

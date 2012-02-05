@@ -1,7 +1,9 @@
 package com.unito.tableplus.shared.model;
 
+import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 
+@PersistenceCapable
 public class GoogleUser extends User {
 
 	private static final long serialVersionUID = -147740847060485538L;

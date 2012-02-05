@@ -7,7 +7,7 @@
 	<!-- Servlets -->
 
 	<!-- LOGIN SERVLET -->
-	
+
 	<servlet>
 		<servlet-name>loginServlet</servlet-name>
 		<servlet-class>com.unito.tableplus.server.services.LoginServiceImpl</servlet-class>
@@ -17,9 +17,9 @@
 		<servlet-name>loginServlet</servlet-name>
 		<url-pattern>/tableplus/login-service</url-pattern>
 	</servlet-mapping>
-	
+
 	<!-- GROUP SERVLET -->
-	
+
 	<servlet>
 		<servlet-name>groupServlet</servlet-name>
 		<servlet-class>com.unito.tableplus.server.services.GroupServiceImpl</servlet-class>
@@ -29,9 +29,9 @@
 		<servlet-name>groupServlet</servlet-name>
 		<url-pattern>/tableplus/group-service</url-pattern>
 	</servlet-mapping>
-	
+
 	<!-- OBJECT SERVLET -->
-	
+
 	<servlet>
 		<servlet-name>objectServlet</servlet-name>
 		<servlet-class>com.unito.tableplus.server.services.ObjectServiceImpl</servlet-class>
@@ -41,9 +41,9 @@
 		<servlet-name>objectServlet</servlet-name>
 		<url-pattern>/tableplus/object-service</url-pattern>
 	</servlet-mapping>
-	
+
 	<!-- TABLE SERVLET -->
-	
+
 	<servlet>
 		<servlet-name>tableServlet</servlet-name>
 		<servlet-class>com.unito.tableplus.server.services.TableServiceImpl</servlet-class>
@@ -53,9 +53,9 @@
 		<servlet-name>tableServlet</servlet-name>
 		<url-pattern>/tableplus/table-service</url-pattern>
 	</servlet-mapping>
-	
+
 	<!-- TOKEN SERVLET -->
-	
+
 	<servlet>
 		<servlet-name>tokenServlet</servlet-name>
 		<servlet-class>com.unito.tableplus.server.services.TokenServiceImpl</servlet-class>
@@ -65,11 +65,22 @@
 		<servlet-name>tokenServlet</servlet-name>
 		<url-pattern>/tableplus/token-service</url-pattern>
 	</servlet-mapping>
-	
-	
-	
-	
+
+	<!-- USER SERVLET -->
+
+	<servlet>
+		<servlet-name>userServlet</servlet-name>
+		<servlet-class>com.unito.tableplus.server.services.UserServiceImpl</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>userServlet</servlet-name>
+		<url-pattern>/tableplus/user-service</url-pattern>
+	</servlet-mapping>
+
+
 	<!-- Default page to serve -->
+
 	<welcome-file-list>
 		<welcome-file>TablePlus.html</welcome-file>
 	</welcome-file-list>

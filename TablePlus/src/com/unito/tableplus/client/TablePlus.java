@@ -5,6 +5,8 @@ import java.util.List;
 import com.unito.tableplus.client.gui.*;
 import com.unito.tableplus.client.services.*;
 import com.unito.tableplus.shared.*;
+import com.unito.tableplus.shared.model.GoogleUser;
+import com.unito.tableplus.shared.model.User;
 
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
@@ -31,6 +33,9 @@ public class TablePlus implements EntryPoint {
 	private final TokenServiceAsync tokenService = GWT
 			.create(TokenService.class);
 
+	// crea il servizio per l'utente
+	private final UserServiceAsync userService = GWT.create(UserService.class);
+
 	// crea l'utente corrente
 	private Utente utente = null;
 
@@ -49,8 +54,38 @@ public class TablePlus implements EntryPoint {
 
 	public void onModuleLoad() {
 
+		provaDB();
+
 		// inizializza l'utenteCorrente
 		initiateUser();
+	}
+
+	public void provaDB() {
+
+		AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void onSuccess(Void result) {
+//				// TODO Auto-generated method stub
+//				if (result != null)
+//					System.out.println("NOME: " + result.getUsername());
+//				else
+//					System.out.println("RESULT = NULL");
+			}
+
+		};
+
+		User gu = new GoogleUser();
+		gu.setUsername("pippo2");
+		//userService.queryUserByUsername("pippo", callback);
+		userService.storeUser(gu, callback);
+
 	}
 
 	// ******************************************************************************
@@ -120,11 +155,6 @@ public class TablePlus implements EntryPoint {
 		Table table2 = new DataMaker().getTable2(desktop, utente);
 		desktop.addTable(table2);
 
-		// gestisce la presenza di un token nell'URL
-//		if (com.google.gwt.user.client.Window.Location.getHref().contains(
-//				"token="))
-//			manageNewToken();
-
 	}
 
 	// ******************************************************************************
@@ -172,11 +202,12 @@ public class TablePlus implements EntryPoint {
 				}
 				// se l'utente non ha un token
 				else {
-					if (com.google.gwt.user.client.Window.Location.getHref().contains(
-							"token="))
+					if (com.google.gwt.user.client.Window.Location.getHref()
+							.contains("token="))
 						manageNewToken();
-					//se nell'url c'è un token
-					else onModuleLoad1_5();
+					// se nell'url c'è un token
+					else
+						onModuleLoad1_5();
 				}
 			}
 		};
@@ -220,29 +251,10 @@ public class TablePlus implements EntryPoint {
 					public void onSuccess(List<Document> result) {
 						utente.setDocuments(result);
 
-//						// -(2.c)- aggiorniamo i documenti dell'utente
-//						PersonalPanel rightPanel = (PersonalPanel) desktop
-//								.getPersonalTable().getRightPanel();
-//
-//						((ContentPanel) rightPanel.getItem(0)).getItem(1)
-//								.setEnabled(false);
-//						((ContentPanel) rightPanel.getItem(0)).getItem(3)
-//								.setEnabled(false);
-//						((ContentPanel) rightPanel.getItem(0)).getItem(4)
-//								.setEnabled(false);
-//						((ContentPanel) rightPanel.getItem(0)).add(new Text(
-//								utente.getWallet().getGoogleDocSessionToken()));
-//						((ContentPanel) rightPanel.getItem(0)).layout();
-//
-//						// -(3)- aggiorniamo "my docs"
-//						rightPanel.updateMyDocuments(utente.getDocuments(),
-//								rightPanel.myResources);
 						onModuleLoad1_5();
 					}
 				};
 				tokenService.getDocumentList(result, callback);
-
-				// desktop.getTables().get(0).getRightPanel().updateMyDocuments(result,desktop.getTables().get(0).getRightPanel().getMyResourcesPanel());
 
 			}
 		};
