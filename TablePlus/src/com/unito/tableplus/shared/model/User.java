@@ -40,7 +40,6 @@ public abstract class User implements Serializable {
 	
 	private boolean online;
 
-
 	public Long getKey() {
 		return key;
 	}
