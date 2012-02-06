@@ -1,7 +1,6 @@
 package com.unito.tableplus.shared.model;
 
 import java.io.Serializable;
-import java.util.Iterator;
 import java.util.List;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.Inheritance;
@@ -35,8 +34,7 @@ public abstract class User implements Serializable {
 	@Persistent
 	private List<Long> tables;
 	
-	@Persistent
-	private List<Long> documents;
+	private List<Document> documents;
 	
 	private boolean online;
 
@@ -95,14 +93,10 @@ public abstract class User implements Serializable {
 	}
 
 
-	public List<Long> getDocuments() {
-		return documents;
-	}
 
 
-	public void setDocuments(List<Long> documents) {
-		this.documents = documents;
-	}
+
+
 
 
 	public boolean isOnline() {
@@ -113,22 +107,17 @@ public abstract class User implements Serializable {
 	public void setOnline(boolean online) {
 		this.online = online;
 	}
-	
-	public void addDocument(Long document){
-		this.documents.add(document);
+
+
+	public List<Document> getDocuments() {
+		return documents;
+	}
+
+
+	public void setDocuments(List<Document> documents) {
+		this.documents = documents;
 	}
 	
-	public boolean removeDocument(Long document) {
-		Iterator<Long> d = this.documents.iterator();
-		Boolean found = false;
-		while (d.hasNext() && !found) {
-			if (d.equals(document)) {
-				tables.remove(d);
-				found = true;
-			}
-			d.next();
-		}
-		return found;
-	}
+
 
 }

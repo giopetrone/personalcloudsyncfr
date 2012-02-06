@@ -39,6 +39,9 @@ public class TablePlus implements EntryPoint {
 	// crea l'utente corrente
 	private Utente utente = null;
 
+	// crea l'utente corrente
+	private User user = null;
+
 	// PersonalTable
 	private PersonalTable personalTable;
 
@@ -54,7 +57,7 @@ public class TablePlus implements EntryPoint {
 
 	public void onModuleLoad() {
 
-		provaDB();
+		// provaDB();
 
 		// inizializza l'utenteCorrente
 		initiateUser();
@@ -72,18 +75,18 @@ public class TablePlus implements EntryPoint {
 
 			@Override
 			public void onSuccess(Void result) {
-//				// TODO Auto-generated method stub
-//				if (result != null)
-//					System.out.println("NOME: " + result.getUsername());
-//				else
-//					System.out.println("RESULT = NULL");
+				// // TODO Auto-generated method stub
+				// if (result != null)
+				// System.out.println("NOME: " + result.getUsername());
+				// else
+				// System.out.println("RESULT = NULL");
 			}
 
 		};
 
 		User gu = new GoogleUser();
 		gu.setUsername("pippo2");
-		//userService.queryUserByUsername("pippo", callback);
+		// userService.queryUserByUsername("pippo", callback);
 		userService.storeUser(gu, callback);
 
 	}
