@@ -4,9 +4,7 @@ import java.util.List;
 
 import com.unito.tableplus.client.gui.*;
 import com.unito.tableplus.client.services.*;
-import com.unito.tableplus.shared.*;
-import com.unito.tableplus.shared.model.GoogleUser;
-import com.unito.tableplus.shared.model.User;
+import com.unito.tableplus.shared.model.*;
 
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
@@ -25,10 +23,6 @@ public class TablePlus implements EntryPoint {
 	private Window loginWindow = new Window();
 	Button loginButton = new Button("Login Google");
 
-	// crea il servizio per il login
-	private final LoginServiceAsync loginService = GWT
-			.create(LoginService.class);
-
 	// crea il servizio per il token
 	private final TokenServiceAsync tokenService = GWT
 			.create(TokenService.class);
@@ -37,13 +31,17 @@ public class TablePlus implements EntryPoint {
 	private final UserServiceAsync userService = GWT.create(UserService.class);
 
 	// crea l'utente corrente
-	private Utente utente = null;
+	// private Utente utente = null;
 
 	// crea l'utente corrente
-	private User user = null;
+	private User user = new User();
 
 	// PersonalTable
 	private PersonalTable personalTable;
+
+	private String loginUrl;
+
+	private String logoutUrl;
 
 	// ******************************************************************************
 	// ******************************************************************************
@@ -57,37 +55,10 @@ public class TablePlus implements EntryPoint {
 
 	public void onModuleLoad() {
 
-		// provaDB();
-
-		// inizializza l'utenteCorrente
-		initiateUser();
-	}
-
-	public void provaDB() {
-
-		AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void onSuccess(Void result) {
-				// // TODO Auto-generated method stub
-				// if (result != null)
-				// System.out.println("NOME: " + result.getUsername());
-				// else
-				// System.out.println("RESULT = NULL");
-			}
-
-		};
-
-		User gu = new GoogleUser();
-		gu.setUsername("pippo2");
-		// userService.queryUserByUsername("pippo", callback);
-		userService.storeUser(gu, callback);
+		// verifico se è loggato con google
+		// se è loggato carico il desktop vuoto
+		// se non è loggato carico la finestra di login
+		verifyLoginStatus();
 
 	}
 
@@ -95,83 +66,13 @@ public class TablePlus implements EntryPoint {
 	// ******************************************************************************
 	// ******************************************************************************
 	// ******
-	// ****** onModuleLoad1_5()
+	// ****** verifyLoginStatus()
 	// ******
 	// ******************************************************************************
 	// ******************************************************************************
 	// ******************************************************************************
 
-	public void onModuleLoad1_5() {
-		// se sono loggato carica normalmente
-		if (utente.isLoggedIn())
-			onModuleLoad2();
-
-		// se non sono loggato carica la finestra di login
-		else if (!utente.isLoggedIn()) {
-			desktop = new DesktopPlus();
-			desktop.getTaskBar().disable();
-
-			loginButton
-					.addSelectionListener(new SelectionListener<ButtonEvent>() {
-						public void componentSelected(ButtonEvent ce) {
-							// Azioni da eseguire alla pressione del button
-							redirect(utente.getLoginUrl());
-						}
-					});
-
-			loginWindow.setHeading("Google Login Window");
-			loginWindow.setLayout(new FlowLayout());
-			loginWindow.add(loginButton);
-			loginWindow.setClosable(false);
-			desktop.addWindow(loginWindow);
-			loginWindow.show();
-		}
-
-	}
-
-	// ******************************************************************************
-	// ******************************************************************************
-	// ******************************************************************************
-	// ******
-	// ****** onModuleLoad2()
-	// ******
-	// ******************************************************************************
-	// ******************************************************************************
-	// ******************************************************************************
-
-	public void onModuleLoad2() {
-
-		// crea il desktop standard
-		desktop = new DesktopPlus();
-
-		// crea il personalTable
-		personalTable = new PersonalTable(desktop, utente);
-
-		// carica il personal table
-		desktop.loadPersonalTable(personalTable);
-
-		// crea il tavolo del gruppo 1 e lo aggiunge al desktop
-		Table table1 = new DataMaker().getTable1(desktop, utente);
-		desktop.addTable(table1);
-
-		// crea il tavolo del gruppo 2 e lo aggiunge al desktop
-		Table table2 = new DataMaker().getTable2(desktop, utente);
-		desktop.addTable(table2);
-
-	}
-
-	// ******************************************************************************
-	// ******************************************************************************
-	// ******************************************************************************
-	// ******
-	// ****** initiateUser()
-	// ******
-	// ******************************************************************************
-	// ******************************************************************************
-	// ******************************************************************************
-
-	public void initiateUser() {
-
+	public void verifyLoginStatus() {
 		// URL della home
 		final String homepageURL;
 		if (GWT.getHostPageBaseURL().contains("127.0.0.1"))
@@ -179,16 +80,47 @@ public class TablePlus implements EntryPoint {
 		else
 			homepageURL = GWT.getHostPageBaseURL();
 
-		// -(1)- inizializziamo l'utente
-		AsyncCallback<Utente> callback = new AsyncCallback<Utente>() {
+		AsyncCallback<String> callback = new AsyncCallback<String>() {
+			@Override
 			public void onFailure(Throwable caught) {
 			}
 
-			public void onSuccess(Utente result) {
-				utente = result;
+			@Override
+			public void onSuccess(String result) {
+				if (result.startsWith("y")) {
+					logoutUrl = result.substring(1);
+					initUser();
+				} else if (result.startsWith("n")) {
+					loginUrl = result.substring(1);
+					loadLoginWindow();
+				}
+			}
+		};
+		userService.isLoggedIn(homepageURL, callback);
+	}
 
-				// se l'utente ha un token
-				if (utente.getWallet().getGoogleDocSessionToken() != null) {
+	// ******************************************************************************
+	// ******************************************************************************
+	// ******************************************************************************
+	// ******
+	// ****** initUser()
+	// ******
+	// ******************************************************************************
+	// ******************************************************************************
+	// ******************************************************************************F
+
+	public void initUser() {
+		AsyncCallback<User> callback = new AsyncCallback<User>() {
+			@Override
+			public void onFailure(Throwable caught) {
+			}
+
+			@Override
+			public void onSuccess(User result) {
+				// Auto-generated method stub
+				user = result;
+
+				if (user.getToken() != null) {
 					AsyncCallback<List<Document>> callback = new AsyncCallback<List<Document>>() {
 						public void onFailure(Throwable caught) {
 
@@ -196,25 +128,23 @@ public class TablePlus implements EntryPoint {
 
 						@Override
 						public void onSuccess(List<Document> result) {
-							utente.setDocuments(result);
-							onModuleLoad1_5();
+							user.setDocuments(result);
+							loadActiveDesktop();
 						}
 					};
-					tokenService.getDocumentList(utente.getWallet()
-							.getGoogleDocSessionToken(), callback);
-				}
-				// se l'utente non ha un token
-				else {
+					tokenService.getDocumentList(user.getToken(), callback);
+
+				} else {
 					if (com.google.gwt.user.client.Window.Location.getHref()
 							.contains("token="))
 						manageNewToken();
 					// se nell'url c'è un token
 					else
-						onModuleLoad1_5();
+						loadActiveDesktop();
 				}
 			}
 		};
-		loginService.isLogged(homepageURL, callback);
+		userService.getCurrentUser(callback);
 	}
 
 	// ******************************************************************************
@@ -232,8 +162,7 @@ public class TablePlus implements EntryPoint {
 		String token = com.google.gwt.user.client.Window.Location
 				.getParameter("token");
 
-		// -(2)- pruomovi il token a "sessionToken" e lo aggiungi
-		// alla session dell'utente e al suo wallet
+		// -(2)- pruomovi il token a "sessionToken" e lo aggiungi all'utente
 		AsyncCallback<String> callback = new AsyncCallback<String>() {
 			public void onFailure(Throwable caught) {
 			}
@@ -241,24 +170,30 @@ public class TablePlus implements EntryPoint {
 			@Override
 			public void onSuccess(String result) {
 				// -(2.b)- poi aggiungiamo sessionToken al wallet
-				if (utente.getWallet() == null)
-					utente.setWallet(new Wallet());
-				utente.getWallet().setGoogleDocSessionToken(result);
+				user.setToken(result);
 
-				AsyncCallback<List<Document>> callback = new AsyncCallback<List<Document>>() {
+				AsyncCallback<List<Document>> callback2 = new AsyncCallback<List<Document>>() {
 					public void onFailure(Throwable caught) {
-
 					}
 
 					@Override
 					public void onSuccess(List<Document> result) {
-						utente.setDocuments(result);
+						AsyncCallback<Void> callback3 = new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+							}
 
-						onModuleLoad1_5();
+							@Override
+							public void onSuccess(Void result) {
+							}
+						};
+						userService.storeUser(user, callback3);
+						user.setDocuments(result);
+
+						loadActiveDesktop();
 					}
 				};
-				tokenService.getDocumentList(result, callback);
-
+				tokenService.getDocumentList(result, callback2);
 			}
 		};
 		// -(2.a)- il servizio aggiunge il sessionToken alla session
@@ -269,11 +204,64 @@ public class TablePlus implements EntryPoint {
 	// ******************************************************************************
 	// ******************************************************************************
 	// ******
-	// ****** redirect(String url)
+	// ****** loadActiveDesktop()
 	// ******
 	// ******************************************************************************
 	// ******************************************************************************
 	// ******************************************************************************
+
+	public void loadActiveDesktop() {
+
+		// crea il desktop standard
+		desktop = new DesktopPlus();
+
+		// crea il personalTable
+		personalTable = new PersonalTable(desktop, user, logoutUrl);
+
+		// carica il personal table
+		desktop.loadPersonalTable(personalTable);
+
+		// crea il tavolo del gruppo 1 e lo aggiunge al desktop
+		Table table1 = new DataMaker().getTable1(desktop, user);
+		desktop.addTable(table1);
+
+		// crea il tavolo del gruppo 2 e lo aggiunge al desktop
+		Table table2 = new DataMaker().getTable2(desktop, user);
+		desktop.addTable(table2);
+		
+		//dovrei avere una funzione che restituisce una lista dei tavoli dell'utente
+
+	}
+
+	// ******************************************************************************
+	// ******************************************************************************
+	// ******************************************************************************
+	// ******
+	// ****** loadLoginWindow()
+	// ******
+	// ******************************************************************************
+	// ******************************************************************************
+	// ******************************************************************************
+
+	public void loadLoginWindow() {
+		desktop = new DesktopPlus();
+		desktop.getTaskBar().disable();
+
+		loginButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			public void componentSelected(ButtonEvent ce) {
+				// Azioni da eseguire alla pressione del button
+				redirect(loginUrl);
+			}
+		});
+
+		loginWindow.setHeading("Google Login Window");
+		loginWindow.setLayout(new FlowLayout());
+		loginWindow.add(loginButton);
+		loginWindow.setClosable(false);
+		desktop.addWindow(loginWindow);
+		loginWindow.show();
+
+	}
 
 	public static native void redirect(String url)
 	/*-{

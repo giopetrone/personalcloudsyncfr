@@ -9,30 +9,33 @@ import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.unito.tableplus.shared.Utente;
+import com.unito.tableplus.client.services.UserService;
+import com.unito.tableplus.client.services.UserServiceAsync;
+import com.unito.tableplus.shared.model.User;
 
 public class PersonalPanel extends RightPanel {
 	
-	
+	// crea il servizio per l'utente
+		private final UserServiceAsync userService = GWT.create(UserService.class);
 
 	public ContentPanel wallet = new ContentPanel();
 	public ContentPanel myResources = new ContentPanel();
 	public ContentPanel groups = new ContentPanel();
 	TextField<String> manualSessionToken = null;
 
-	public PersonalPanel(DesktopPlus desktop, Utente utente) {
+	public PersonalPanel(DesktopPlus desktop, User user) {
 
-		super(desktop, utente);
+		super(desktop, user);
 
 		addWalletPanel();
 
 		addMyResourcesPanel();
-		
+
 		addGroupsPanel();
 
 	}
-	
-	public void addGroupsPanel(){
+
+	public void addGroupsPanel() {
 		groups = new ContentPanel();
 		groups.setHeading("Groups");
 		groups.add(new Text("Third Panel Text"));
@@ -40,7 +43,7 @@ public class PersonalPanel extends RightPanel {
 		groups.setTitleCollapse(true);
 		groups.setBodyStyle("backgroundColor: white;");
 		groups.setScrollMode(Scroll.AUTO);
-		
+
 		add(groups);
 	}
 
@@ -52,10 +55,9 @@ public class PersonalPanel extends RightPanel {
 		myResources.setBodyStyle("backgroundColor: white;");
 		myResources.setScrollMode(Scroll.AUTO);
 
-		if (utente.getWallet() != null)
-			if (utente.getDocuments() != null) {
-				updateMyDocuments(utente.getDocuments(),myResources);
-			}
+		if (user.getToken() != null)
+			updateMyDocuments(user.getToken(), myResources);
+
 		add(myResources);
 	}
 
@@ -100,25 +102,28 @@ public class PersonalPanel extends RightPanel {
 		Button go = new Button("GO");
 		go.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			public void componentSelected(ButtonEvent ce) {
+				
+				user.setToken(manualSessionToken.getValue());
+				
 				AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 					public void onFailure(Throwable caught) {
 					}
 
 					@Override
 					public void onSuccess(Void result) {
-						// TODO Auto-generated method stub
+						// Auto-generated method stub
 						wallet.getItem(1).setEnabled(false);
 						wallet.getItem(3).setEnabled(false);
 						wallet.getItem(4).setEnabled(false);
 						wallet.add(new Text(manualSessionToken.getValue()));
 						wallet.layout();
-						updateMyDocuments(manualSessionToken.getValue(),myResources);
+						updateMyDocuments(manualSessionToken.getValue(),
+								myResources);
 					}
 				};
-				utente.getWallet().setGoogleDocSessionToken(
-						manualSessionToken.getValue());
-				tokenService.manualToken(manualSessionToken.getValue(),
-						callback);
+				
+
+				userService.storeUser(user, callback);
 			}
 		});
 		// item (3)
@@ -127,14 +132,12 @@ public class PersonalPanel extends RightPanel {
 		wallet.add(go);
 
 		// se abbiamo già il token, il button sarà inattivo
-		if (utente.getWallet() != null)
-			if (utente.getWallet().getGoogleDocSessionToken() != null) {
-				toGdocTokenRequestButton.setEnabled(false);
-				manualSessionToken.setEnabled(false);
-				go.setEnabled(false);
-				wallet.add(new Text(utente.getWallet()
-						.getGoogleDocSessionToken()));
-			}
+		if (user.getToken() != null) {
+			toGdocTokenRequestButton.setEnabled(false);
+			manualSessionToken.setEnabled(false);
+			go.setEnabled(false);
+			wallet.add(new Text(user.getToken()));
+		}
 
 		System.out.println("da RPP: " + homepageURL);
 
@@ -142,7 +145,7 @@ public class PersonalPanel extends RightPanel {
 		wallet.setTitleCollapse(true);
 		wallet.setBodyStyle("backgroundColor: white;");
 		wallet.setScrollMode(Scroll.AUTO);
-		
+
 		add(wallet);
 	}
 

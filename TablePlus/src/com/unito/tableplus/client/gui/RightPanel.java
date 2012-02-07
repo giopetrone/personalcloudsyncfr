@@ -22,34 +22,32 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.unito.tableplus.client.services.TokenService;
 import com.unito.tableplus.client.services.TokenServiceAsync;
-import com.unito.tableplus.shared.Document;
-import com.unito.tableplus.shared.Utente;
+import com.unito.tableplus.shared.model.Document;
+import com.unito.tableplus.shared.model.User;
 
 public class RightPanel extends ContentPanel {
 
 	private Desktop desktop;
 	private ToolBar toolBar = null;
-	public Utente utente = null;
+	public User user = null;
 	public List<Document> myDocuments = null;
 
-	
-
-	public RightPanel(Desktop desktop, Utente utente) {
+	public RightPanel(Desktop desktop, User user) {
 		this.setDesktop(desktop);
-		this.utente = utente;
-		
+		this.user = user;
+
 		setLayout(new FillLayout(Orientation.VERTICAL));
-		setHeading("One Glance View");
+		setHeading("Quick View");
 		setCollapsible(true);
 		setTitleCollapse(true);
 		setBodyStyle("backgroundColor: lightgray;");
 		setFrame(true);
-		
+
 		addToolBar();
 	}
 
-	public Utente getUtente() {
-		return utente;
+	public User getUser() {
+		return user;
 	}
 
 	public ToolBar getToolBar() {
@@ -73,10 +71,11 @@ public class RightPanel extends ContentPanel {
 	// crea il servizio per il token
 	public final TokenServiceAsync tokenService = GWT
 			.create(TokenService.class);
-	
+
 	ContentPanel tmpDocContainer;
-	
-	public void updateMyDocuments(List<Document> documentsList,ContentPanel docContainer){
+
+	public void updateMyDocuments(List<Document> documentsList,
+			ContentPanel docContainer) {
 		TreeStore<ModelData> store = new TreeStore<ModelData>();
 		TreePanel<ModelData> tree = new TreePanel<ModelData>(store);
 
@@ -86,7 +85,7 @@ public class RightPanel extends ContentPanel {
 		m.set("name", "MyGoogleDocs");
 		store.add(m, false);
 		ModelData m_son;
-		
+
 		for (Document document : documentsList) {
 			m_son = new BaseModelData();
 			m_son.set("name", document.getTitle());
@@ -96,10 +95,11 @@ public class RightPanel extends ContentPanel {
 		docContainer.add(tree);
 		docContainer.layout();
 	}
-	
-	public void updateMyDocuments(String gdocSessionToken,ContentPanel docContainer) {
-		
-		tmpDocContainer=docContainer;
+
+	public void updateMyDocuments(String gdocSessionToken,
+			ContentPanel docContainer) {
+
+		tmpDocContainer = docContainer;
 		AsyncCallback<List<Document>> callback = new AsyncCallback<List<Document>>() {
 			public void onFailure(Throwable caught) {
 
@@ -107,8 +107,8 @@ public class RightPanel extends ContentPanel {
 
 			@Override
 			public void onSuccess(List<Document> result) {
-				myDocuments=result;
-				System.out.println("Sono qui "+myDocuments.get(0).getTitle());
+				myDocuments = result;
+				System.out.println("Sono qui " + myDocuments.get(0).getTitle());
 				loadMyDocuments();
 			}
 		};
@@ -127,7 +127,7 @@ public class RightPanel extends ContentPanel {
 		m.set("name", "MyGoogleDocs");
 		store.add(m, false);
 		ModelData m_son;
-		
+
 		for (Document document : myDocuments) {
 			m_son = new BaseModelData();
 			m_son.set("name", document.getTitle());
@@ -137,7 +137,7 @@ public class RightPanel extends ContentPanel {
 		tmpDocContainer.add(tree);
 		tmpDocContainer.layout();
 	}
-	
+
 	public void addToolBar() {
 		ToolBar toolBar = new ToolBar();
 		Button styleButton = new Button("Style");
@@ -155,8 +155,7 @@ public class RightPanel extends ContentPanel {
 				new SelectionListener<MenuEvent>() {
 					@Override
 					public void componentSelected(MenuEvent ce) {
-						setLayout(new FillLayout(
-								Orientation.VERTICAL));
+						setLayout(new FillLayout(Orientation.VERTICAL));
 						layout();
 					}
 				});
@@ -172,7 +171,6 @@ public class RightPanel extends ContentPanel {
 		toolBar.add(button2);
 		setTopComponent(toolBar);
 
-		
 	}
 
 	public Desktop getDesktop() {
@@ -182,7 +180,7 @@ public class RightPanel extends ContentPanel {
 	public void setDesktop(Desktop desktop) {
 		this.desktop = desktop;
 	}
-	
+
 	public ContentPanel getMyResourcesPanel() {
 		ContentPanel myResources = new ContentPanel();
 		myResources.setHeading("My Resources");
@@ -191,11 +189,9 @@ public class RightPanel extends ContentPanel {
 		myResources.setBodyStyle("backgroundColor: white;");
 		myResources.setScrollMode(Scroll.AUTO);
 
-		if (utente.getWallet() != null)
-			if (utente.getWallet().getGoogleDocSessionToken() != null) {
-				updateMyDocuments(utente.getWallet()
-						.getGoogleDocSessionToken(),myResources);
-			}
+		if (user.getToken() != null)
+			updateMyDocuments(user.getToken(), myResources);
+
 		return myResources;
 	}
 

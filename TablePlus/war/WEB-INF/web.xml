@@ -6,18 +6,6 @@
 
 	<!-- Servlets -->
 
-	<!-- LOGIN SERVLET -->
-
-	<servlet>
-		<servlet-name>loginServlet</servlet-name>
-		<servlet-class>com.unito.tableplus.server.services.LoginServiceImpl</servlet-class>
-	</servlet>
-
-	<servlet-mapping>
-		<servlet-name>loginServlet</servlet-name>
-		<url-pattern>/tableplus/login-service</url-pattern>
-	</servlet-mapping>
-
 	<!-- GROUP SERVLET -->
 
 	<servlet>

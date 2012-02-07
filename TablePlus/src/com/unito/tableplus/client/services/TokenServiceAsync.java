@@ -3,7 +3,7 @@ package com.unito.tableplus.client.services;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.unito.tableplus.shared.Document;
+import com.unito.tableplus.shared.model.Document;
 
 public interface TokenServiceAsync {
 
@@ -13,6 +13,5 @@ public interface TokenServiceAsync {
 
 	void getGdocSessionToken(String gdocToken, AsyncCallback<String> callback);
 
-	void manualToken(String SessionToken, AsyncCallback<Void> callback);
-
+	
 }

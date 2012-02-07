@@ -7,6 +7,8 @@ import com.unito.tableplus.shared.model.User;
 @RemoteServiceRelativePath("user-service")
 public interface UserService extends RemoteService {
 
+	User getCurrentUser();
+	
 	void storeUser(User user);
 
 	User queryUser(String fieldName, String fieldValue);
@@ -15,4 +17,5 @@ public interface UserService extends RemoteService {
 
 	void deleteUser(Long key);
 
+	public String isLoggedIn(String requestUri);
 }

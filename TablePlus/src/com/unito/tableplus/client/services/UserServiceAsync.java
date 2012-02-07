@@ -14,4 +14,8 @@ public interface UserServiceAsync {
 
 	void deleteUser(Long key, AsyncCallback<Void> callback);
 
+	void getCurrentUser(AsyncCallback<User> callback);
+	
+	void isLoggedIn(String requestUri, AsyncCallback<String> callback);
+
 }

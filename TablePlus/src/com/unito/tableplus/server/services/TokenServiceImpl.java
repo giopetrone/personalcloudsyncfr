@@ -7,9 +7,6 @@ import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
 import com.google.gdata.client.docs.DocsService;
 import com.google.gdata.client.http.AuthSubUtil;
 import com.google.gdata.data.docs.DocumentListEntry;
@@ -18,7 +15,7 @@ import com.google.gdata.util.AuthenticationException;
 import com.google.gdata.util.ServiceException;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.unito.tableplus.client.services.TokenService;
-import com.unito.tableplus.shared.Document;
+import com.unito.tableplus.shared.model.Document;
 
 public class TokenServiceImpl extends RemoteServiceServlet implements
 		TokenService {
@@ -97,24 +94,7 @@ public class TokenServiceImpl extends RemoteServiceServlet implements
 			e1.printStackTrace();
 		}
 
-		// lo memorizzo nella session
-		HttpServletRequest request = getThreadLocalRequest();
-		HttpSession session = request.getSession();
-		session.setAttribute("gdocSessionToken", gdocSessionToken);
-
-		System.out.println(session.getAttribute("gdocSessionToken"));
-
 		return gdocSessionToken;
-	}
-
-	@Override
-	public void manualToken(String SessionToken) {
-		// TODO Auto-generated method stub
-		// lo memorizzo nella session
-		HttpServletRequest request = getThreadLocalRequest();
-		HttpSession session = request.getSession();
-		session.setAttribute("gdocSessionToken", SessionToken);
-
 	}
 
 }

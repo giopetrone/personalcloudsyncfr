@@ -8,7 +8,8 @@ import com.extjs.gxt.desktop.client.StartMenu;
 import com.extjs.gxt.desktop.client.TaskBar;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
-import com.unito.tableplus.shared.Utente;
+import com.unito.tableplus.shared.model.User;
+
 
 public class Table {
 	
@@ -21,13 +22,13 @@ public class Table {
 
 	private TaskBar taskBar;
 	
-	public Utente utente;
+	public User user;
 	private DesktopPlus desktop;
 	protected RightPanel rightPanel;
 	
-	public Table(DesktopPlus desktop, Utente utente,RightPanel rightPanel){
+	public Table(DesktopPlus desktop, User user,RightPanel rightPanel){
 		this.desktop=desktop;
-		this.utente=utente;
+		this.user=user;
 		this.rightPanel=rightPanel;
 		
 		windows=new ArrayList<Window>();
@@ -83,12 +84,12 @@ public class Table {
 		this.menuItems = menuItems;
 	}
 
-	public Utente getUtente() {
-		return utente;
+	public User getUser() {
+		return user;
 	}
 
-	public void setUtente(Utente utente) {
-		this.utente = utente;
+	public void setUtente(User user) {
+		this.user = user;
 	}
 
 	public DesktopPlus getDesktop() {

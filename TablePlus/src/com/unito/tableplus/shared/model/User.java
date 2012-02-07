@@ -3,15 +3,13 @@ package com.unito.tableplus.shared.model;
 import java.io.Serializable;
 import java.util.List;
 import javax.jdo.annotations.IdGeneratorStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.InheritanceStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 @PersistenceCapable
-@Inheritance(strategy = InheritanceStrategy.SUBCLASS_TABLE)
-public abstract class User implements Serializable {
+
+public class User implements Serializable {
 	
 	private static final long serialVersionUID = -7305579743183016832L;
 	
@@ -34,6 +32,13 @@ public abstract class User implements Serializable {
 	@Persistent
 	private List<Long> tables;
 	
+	@Persistent
+	private String token;
+	
+	@Persistent
+	private String loginProvider;
+	
+
 	private List<Document> documents;
 	
 	private boolean online;
@@ -116,6 +121,27 @@ public abstract class User implements Serializable {
 
 	public void setDocuments(List<Document> documents) {
 		this.documents = documents;
+	}
+
+
+	public String getToken() {
+		return token;
+	}
+
+
+	public void setToken(String token) {
+		this.token = token;
+	}
+
+
+
+	public String getLoginProvider() {
+		return loginProvider;
+	}
+
+
+	public void setLoginProvider(String loginProvider) {
+		this.loginProvider = loginProvider;
 	}
 	
 

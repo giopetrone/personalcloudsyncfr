@@ -7,7 +7,7 @@ import com.extjs.gxt.ui.client.store.TreeStore;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Text;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanel;
-import com.unito.tableplus.shared.Utente;
+import com.unito.tableplus.shared.model.User;
 
 public class GroupPanel extends RightPanel{
 	
@@ -15,19 +15,12 @@ public class GroupPanel extends RightPanel{
 	public ContentPanel myResources = new ContentPanel();
 	public ContentPanel groupResources = new ContentPanel();
 	
-	public GroupPanel(DesktopPlus desktop, Utente utente){
+	public GroupPanel(DesktopPlus desktop, User user){
 		
-		super(desktop,utente);
+		super(desktop,user);
 		
 		addMembersPanel();
 		
-//		myResources.setHeading("My Resources");
-//		myResources.add(new Text("Panel 2 Text"));
-//		myResources.setCollapsible(true);
-//		myResources.setTitleCollapse(true);
-//		myResources.setBodyStyle("backgroundColor: white;");
-//		myResources.setScrollMode(Scroll.AUTO);
-//		add(myResources);
 		myResources=getMyResourcesPanel();
 	    add(myResources);
 		

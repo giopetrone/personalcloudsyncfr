@@ -6,12 +6,12 @@ import com.unito.tableplus.client.gui.DesktopPlus;
 import com.unito.tableplus.client.gui.ExampleAccordionWindow;
 import com.unito.tableplus.client.gui.GroupPanel;
 import com.unito.tableplus.client.gui.Table;
-import com.unito.tableplus.shared.Utente;
+import com.unito.tableplus.shared.model.User;
 
 public class DataMaker {
-	public Table getTable1(DesktopPlus desktop,Utente utente) {
+	public Table getTable1(DesktopPlus desktop,User user) {
 
-		Table table1 = new Table(desktop,utente,new GroupPanel(desktop,utente));
+		Table table1 = new Table(desktop,user,new GroupPanel(desktop,user));
 		
 		Window accordionWindow = new ExampleAccordionWindow();
 		table1.addWindow(accordionWindow);
@@ -36,9 +36,9 @@ public class DataMaker {
 	}
 	
 	
-	public Table getTable2(DesktopPlus desktop,Utente utente) {
+	public Table getTable2(DesktopPlus desktop,User user) {
 
-		Table table2 = new Table(desktop,utente,new GroupPanel(desktop,utente));
+		Table table2 = new Table(desktop,user,new GroupPanel(desktop,user));
 		
 		Window accordionWindow = new ExampleAccordionWindow();
 		table2.addWindow(accordionWindow);

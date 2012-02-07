@@ -12,14 +12,18 @@ import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
-import com.unito.tableplus.shared.Utente;
+import com.unito.tableplus.shared.model.User;
 
 public class PersonalTable extends Table {
 	
-	public PersonalTable(DesktopPlus desktop, Utente utente_) {
-		
-		super(desktop,utente_,new PersonalPanel(desktop,utente_));
+	String logoutUrl;
 	
+	public PersonalTable(DesktopPlus desktop, User user, String logoutUrl_) {
+		
+		super(desktop,user,new PersonalPanel(desktop,user));
+	
+		this.logoutUrl=logoutUrl_;
+		
 		// -(1)- crea delle finestre; credo che di default, una volta
 		// aggiunte al desktop, siano inizialmente invisibili
 
@@ -42,7 +46,7 @@ public class PersonalTable extends Table {
 		startMenu = taskBar.getStartMenu();
 
 		// -(5)- popola lo StartMenu(D)
-		startMenu.setHeading(utente.getEmail());
+		startMenu.setHeading(user.getEmail());
 		startMenu.setIconStyle("user");
 
 		
@@ -104,7 +108,7 @@ public class PersonalTable extends Table {
 			@Override
 			public void componentSelected(MenuEvent ce) {
 				// Info.display("Event", "The 'Logout' tool was clicked");
-				redirect(utente.getLogoutUrl());
+				redirect(logoutUrl);
 			}
 		});
 		startMenu.addTool(tool);
