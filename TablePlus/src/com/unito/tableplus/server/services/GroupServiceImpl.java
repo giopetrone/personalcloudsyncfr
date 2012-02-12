@@ -16,16 +16,19 @@ public class GroupServiceImpl extends RemoteServiceServlet implements
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	public void storeGroup(Group group) {
+	public Long storeGroup(Group group) {
+		Long key=null;
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
 			pm.makePersistent(group);
+			key=group.getKey();
 		} catch (Exception e) {
 			System.err.println("There has been an error storing the group: "
 					+ e);
 		} finally {
 			pm.close();
 		}
+		return key;
 	}
 
 	@Override

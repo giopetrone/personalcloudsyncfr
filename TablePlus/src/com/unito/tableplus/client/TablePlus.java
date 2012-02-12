@@ -31,9 +31,6 @@ public class TablePlus implements EntryPoint {
 	private final UserServiceAsync userService = GWT.create(UserService.class);
 
 	// crea l'utente corrente
-	// private Utente utente = null;
-
-	// crea l'utente corrente
 	private User user = new User();
 
 	// PersonalTable
@@ -172,28 +169,29 @@ public class TablePlus implements EntryPoint {
 				// -(2.b)- poi aggiungiamo sessionToken al wallet
 				user.setToken(result);
 
-				AsyncCallback<List<Document>> callback2 = new AsyncCallback<List<Document>>() {
-					public void onFailure(Throwable caught) {
-					}
-
-					@Override
-					public void onSuccess(List<Document> result) {
-						AsyncCallback<Void> callback3 = new AsyncCallback<Void>() {
-							@Override
+				tokenService.getDocumentList(result,
+						new AsyncCallback<List<Document>>() {
 							public void onFailure(Throwable caught) {
 							}
 
 							@Override
-							public void onSuccess(Void result) {
-							}
-						};
-						userService.storeUser(user, callback3);
-						user.setDocuments(result);
+							public void onSuccess(List<Document> result) {
+								userService.storeUser(user,
+										new AsyncCallback<Void>() {
+											@Override
+											public void onFailure(
+													Throwable caught) {
+											}
 
-						loadActiveDesktop();
-					}
-				};
-				tokenService.getDocumentList(result, callback2);
+											@Override
+											public void onSuccess(Void result) {
+											}
+										});
+
+								user.setDocuments(result);
+								loadActiveDesktop();
+							}
+						});
 			}
 		};
 		// -(2.a)- il servizio aggiunge il sessionToken alla session
@@ -228,8 +226,9 @@ public class TablePlus implements EntryPoint {
 		// crea il tavolo del gruppo 2 e lo aggiunge al desktop
 		Table table2 = new DataMaker().getTable2(desktop, user);
 		desktop.addTable(table2);
-		
-		//dovrei avere una funzione che restituisce una lista dei tavoli dell'utente
+
+		// dovrei avere una funzione che restituisce una lista dei tavoli
+		// dell'utente
 
 	}
 

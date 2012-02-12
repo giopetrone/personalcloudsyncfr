@@ -1,5 +1,6 @@
 package com.unito.tableplus.shared.model;
 
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -9,8 +10,13 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 @PersistenceCapable(detachable = "true")
-public class Group {
+public class Group implements Serializable{
 	
+		/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 		@PrimaryKey
 		@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
 		private Long key;
@@ -30,16 +36,21 @@ public class Group {
 		@Persistent(mappedBy = "group")
 		private List<Message> blackboard;
 		
-		private List<Long> documents;
+		@Persistent
+		private List<String> docIDs;
 		
 		public Group(Long creator){
 			this.creator =  creator;
 			this.owner = creator;
 			this.blackboard = new LinkedList<Message>();
-			this.documents = new LinkedList<Long>();
+			this.docIDs = new LinkedList<String>();
 			this.members = new LinkedList<Long>();
 			this.members.add(creator);			
-		}		
+		}
+		
+		public Group(){
+			
+		}
 
 		public List<Message> getBlackBoard() {
 			return this.blackboard;
@@ -109,12 +120,12 @@ public class Group {
 			this.members = members;
 		}
 
-		public List<Long> getDocuments() {
-			return documents;
+		public List<String> getDocIDs() {
+			return docIDs;
 		}
 
-		public void setDocuments(List<Long> documents) {
-			this.documents = documents;
+		public void setDocIDs(List<String> docIDs) {
+			this.docIDs = docIDs;
 		}
 	}
 

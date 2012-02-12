@@ -10,7 +10,7 @@ import com.unito.tableplus.shared.model.Message;
 @RemoteServiceRelativePath("group-service")
 public interface GroupService extends RemoteService {
 
-	void storeGroup(Group group);
+	Long storeGroup(Group group);
 	
 	Group queryGroup(Long key);
 	

@@ -20,10 +20,10 @@ public class Table {
 	
 
 
-	private TaskBar taskBar;
+	protected TaskBar taskBar;
 	
 	public User user;
-	private DesktopPlus desktop;
+	protected DesktopPlus desktop;
 	protected RightPanel rightPanel;
 	
 	public Table(DesktopPlus desktop, User user,RightPanel rightPanel){

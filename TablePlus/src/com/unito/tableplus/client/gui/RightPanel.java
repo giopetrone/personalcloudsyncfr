@@ -2,7 +2,6 @@ package com.unito.tableplus.client.gui;
 
 import java.util.List;
 
-import com.extjs.gxt.desktop.client.Desktop;
 import com.extjs.gxt.ui.client.Style.Orientation;
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.data.BaseModelData;
@@ -27,12 +26,12 @@ import com.unito.tableplus.shared.model.User;
 
 public class RightPanel extends ContentPanel {
 
-	private Desktop desktop;
+	protected DesktopPlus desktop;
 	private ToolBar toolBar = null;
 	public User user = null;
 	public List<Document> myDocuments = null;
 
-	public RightPanel(Desktop desktop, User user) {
+	public RightPanel(DesktopPlus desktop, User user) {
 		this.setDesktop(desktop);
 		this.user = user;
 
@@ -173,13 +172,7 @@ public class RightPanel extends ContentPanel {
 
 	}
 
-	public Desktop getDesktop() {
-		return desktop;
-	}
 
-	public void setDesktop(Desktop desktop) {
-		this.desktop = desktop;
-	}
 
 	public ContentPanel getMyResourcesPanel() {
 		ContentPanel myResources = new ContentPanel();
@@ -193,6 +186,14 @@ public class RightPanel extends ContentPanel {
 			updateMyDocuments(user.getToken(), myResources);
 
 		return myResources;
+	}
+
+	public DesktopPlus getDesktop() {
+		return desktop;
+	}
+
+	public void setDesktop(DesktopPlus desktop) {
+		this.desktop = desktop;
 	}
 
 }

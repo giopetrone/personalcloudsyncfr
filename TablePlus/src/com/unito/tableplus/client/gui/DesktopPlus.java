@@ -18,7 +18,7 @@ import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 
 public class DesktopPlus extends Desktop {
 
-	private List<Table> tables=new ArrayList<Table>();
+	private List<Table> tables = new ArrayList<Table>();
 	private Table currentTable;
 	private PersonalTable personalTable;
 	private RightPanel currentRightPanel;
@@ -37,6 +37,8 @@ public class DesktopPlus extends Desktop {
 
 				if (s.contains("Group") || s.contains("Personal Table")) {
 					switchToTable(s);
+				} else if (s.equals("Add Table")) {
+					createTable();
 				} else {
 					itemSelected(me);
 				}
@@ -49,7 +51,13 @@ public class DesktopPlus extends Desktop {
 				itemSelected(ce);
 			}
 		});
+		
+		
 
+	}
+	
+	public void createTable(){
+		
 	}
 
 	public void loadPersonalTable(PersonalTable personalTable_) {
@@ -59,30 +67,27 @@ public class DesktopPlus extends Desktop {
 		currentRightPanel = currentTable.getRightPanel();
 		createRightPanel();
 
-		
-		
 		for (Shortcut s : currentTable.getShortcuts()) {
 			this.addShortcut(s);
 			s.addSelectionListener(shortcutListener);
 		}
-		
+
 		switchToTable("Personal Table");
 
 	}
 
 	public void switchToTable(String s) {
 		unloadCurrentTable();
-		if(s.equals("Group 1"))
+		if (s.equals("Group 1"))
 			loadTable(tables.get(0));
-		if(s.equals("Group 2"))
+		if (s.equals("Group 2"))
 			loadTable(tables.get(1));
-		else if(s.equals("Personal Table"))
+		else if (s.equals("Personal Table"))
 			loadTable(personalTable);
 	}
 
 	public void unloadCurrentTable() {
 
-		
 		for (Shortcut s : currentTable.getShortcuts()) {
 			s.setVisible(false);
 			System.out.println("Reso invisibile uno shortcut");
@@ -100,9 +105,9 @@ public class DesktopPlus extends Desktop {
 			System.out.println("caricato uno shortcut");
 			s.setVisible(true);
 		}
-		
-		//carica il pannello di destra
-		currentRightPanel=table.getRightPanel();
+
+		// carica il pannello di destra
+		currentRightPanel = table.getRightPanel();
 		desktop.add(currentRightPanel, new RowData(350, 1, new Margins(8)));
 		desktop.layout();
 	}
@@ -181,8 +186,8 @@ public class DesktopPlus extends Desktop {
 	public void setTables(List<Table> tables) {
 		this.tables = tables;
 	}
-	
-	public void addTable(Table t){
+
+	public void addTable(Table t) {
 		this.tables.add(t);
 		for (Shortcut s : t.getShortcuts()) {
 			System.out.println("caricato uno shortcut");

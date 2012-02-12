@@ -21,30 +21,35 @@ public class UserServiceImpl extends RemoteServiceServlet implements
 		com.google.appengine.api.users.User appEngineUser = appEngineUserService
 				.getCurrentUser();
 
-		return (appEngineUser != null) ? "y"+appEngineUserService.createLogoutURL(requestUri)
-				: "n"+appEngineUserService.createLoginURL(requestUri);
+		return (appEngineUser != null) ? "y"
+				+ appEngineUserService.createLogoutURL(requestUri) : "n"
+				+ appEngineUserService.createLoginURL(requestUri);
 	}
-	
+
 	@Override
 	public User getCurrentUser() {
 		com.google.appengine.api.users.UserService appEngineUserService = UserServiceFactory
 				.getUserService();
 		com.google.appengine.api.users.User appEngineUser = appEngineUserService
 				.getCurrentUser();
-		
-		String email= appEngineUser.getEmail();
-		
-		System.out.println("EMAIL: "+email);
 
-		User user=queryUser("email",email);
-		
-		if(user==null){
+		String email = appEngineUser.getEmail();
+
+		System.out.println("EMAIL: " + email);
+
+		User user = queryUser("email", email);
+
+		if (user == null) {
 			System.out.println("NULL");
-			user=new User();
+			user = new User();
 			user.setEmail(email);
+			user.setOnline(true);
+			storeUser(user);
+		} else{
+			user.setOnline(true);
 			storeUser(user);
 		}
-		
+
 		return user;
 	}
 

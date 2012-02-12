@@ -6,7 +6,7 @@ import com.unito.tableplus.shared.model.Message;
 
 public interface GroupServiceAsync {
 
-	void storeGroup(Group group, AsyncCallback<Void> callback);
+	void storeGroup(Group group, AsyncCallback<Long> callback);
 	
 	void queryGroup(Long key, AsyncCallback<Group> callback);
 

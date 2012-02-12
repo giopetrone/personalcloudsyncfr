@@ -12,24 +12,31 @@ import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.unito.tableplus.client.services.UserService;
+import com.unito.tableplus.client.services.UserServiceAsync;
 import com.unito.tableplus.shared.model.User;
 
 public class PersonalTable extends Table {
-	
+
 	String logoutUrl;
-	
-	public PersonalTable(DesktopPlus desktop, User user, String logoutUrl_) {
-		
-		super(desktop,user,new PersonalPanel(desktop,user));
-	
-		this.logoutUrl=logoutUrl_;
-		
+
+	// crea il servizio per l'utente
+	private final UserServiceAsync userService = GWT.create(UserService.class);
+
+	public PersonalTable(DesktopPlus desktop_, User user_, String logoutUrl_) {
+
+		super(desktop_, user_, new PersonalPanel(desktop_, user_));
+
+		this.logoutUrl = logoutUrl_;
+
 		// -(1)- crea delle finestre; credo che di default, una volta
 		// aggiunte al desktop, siano inizialmente invisibili
 
 		Window gridWindow = new ExampleGridWindow();// createGridWindow();
 		this.addWindow(gridWindow);
-		
+
 		// -(2)- crea degli shortcuts da associare alle windows appena
 		// create
 		Shortcut s1 = new Shortcut();
@@ -39,8 +46,8 @@ public class PersonalTable extends Table {
 		this.addShortcut(s1);
 
 		// -(3)- estrae dal desktop la TaskBar(D)
-		TaskBar taskBar = desktop.getTaskBar();
-		this.setTaskBar(taskBar);
+		TaskBar taskBar_ = desktop.getTaskBar();
+		this.taskBar=taskBar_;
 
 		// -(4)- estrae dalla TaskBar lo StartMenu(D)
 		startMenu = taskBar.getStartMenu();
@@ -49,21 +56,13 @@ public class PersonalTable extends Table {
 		startMenu.setHeading(user.getEmail());
 		startMenu.setIconStyle("user");
 
-		
-		
-		MenuItem menuItem = new MenuItem("Personal Table");
+		MenuItem menuItem = new MenuItem("Add Table");
 		menuItem.addSelectionListener(desktop.getMenuListener());// menuListener);
 		this.addMenuItem(menuItem);
 		startMenu.add(menuItem);
-		
-		menuItem = new MenuItem("Group 1");
-		menuItem.addSelectionListener(desktop.getMenuListener());// menuListener);
-		this.addMenuItem(menuItem);
-		startMenu.add(menuItem);
-		
-		menuItem = new MenuItem("Group 2");
-		menuItem.addSelectionListener(desktop.getMenuListener());// menuListener);
-		this.addMenuItem(menuItem);
+
+		menuItem = new MenuItem("Switch Table");
+		menuItem.setSubMenu(getSubMenu());
 		startMenu.add(menuItem);
 
 		menuItem = new MenuItem("Tab Window");
@@ -108,14 +107,54 @@ public class PersonalTable extends Table {
 			@Override
 			public void componentSelected(MenuEvent ce) {
 				// Info.display("Event", "The 'Logout' tool was clicked");
+				user.setOnline(false);
+				userService.storeUser(user, new AsyncCallback<Void>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						// Auto-generated method stub
+
+					}
+
+					@Override
+					public void onSuccess(Void result) {
+						// Auto-generated method stub
+						System.out.println("SUCCESSO");
+					}
+
+				});
 				redirect(logoutUrl);
 			}
 		});
 		startMenu.addTool(tool);
-		
-		
-		
+	}
+	
+	public Menu groupsSubMenu; 
 
+	public Menu getSubMenu() {
+		groupsSubMenu = new Menu();
+
+		MenuItem item_ = new MenuItem("Personal Table");
+		item_.addSelectionListener(desktop.getMenuListener());
+		this.addMenuItem(item_);
+		groupsSubMenu.add(item_);
+
+		item_ = new MenuItem("Group 1");
+		item_.addSelectionListener(desktop.getMenuListener());
+		this.addMenuItem(item_);
+		groupsSubMenu.add(item_);
+
+		item_ = new MenuItem("Group 2");
+		item_.addSelectionListener(desktop.getMenuListener());
+		this.addMenuItem(item_);
+		groupsSubMenu.add(item_);
+		
+		return groupsSubMenu;
+	}
+
+	public void updateGroupsList() {
+		groupsSubMenu.add(new MenuItem("Prova"));
+		taskBar.layout();
 	}
 
 	public static native void redirect(String url)
@@ -154,6 +193,5 @@ public class PersonalTable extends Table {
 		w.setSize(400, 300);
 		return w;
 	}
-
 
 }
