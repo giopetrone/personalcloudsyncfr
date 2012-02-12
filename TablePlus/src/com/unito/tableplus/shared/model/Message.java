@@ -1,5 +1,6 @@
 package com.unito.tableplus.shared.model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Date;
 
@@ -8,13 +9,18 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
-@PersistenceCapable(detachable="true")
-public class Message {
-	
-	@PrimaryKey
+@PersistenceCapable(detachable = "true")
+public class Message implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	//@PrimaryKey
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
 	private Long key;
-	
+
 	@Persistent
 	private String author = null;
 	@Persistent
@@ -22,18 +28,23 @@ public class Message {
 	@Persistent
 	private String content = null;
 	@Persistent
-	private final Timestamp date;
+	private Timestamp date;
 	@Persistent
-	private final int hashcode;
+	private int hashcode;
 	@Persistent
 	private Group group;
 
-	protected Message(String author, MessageType type, String content) {
+	public Message(String author, MessageType type, String content) {
 		date = new Timestamp(new Date().getTime());
 		this.author = author;
 		this.type = type;
 		this.content = content;
 		this.hashcode = this.hashCode();
+	}
+	
+	public Message(){
+		date = new Timestamp(new Date().getTime());
+		this.hashcode = 1;
 	}
 
 	protected String getAuthor() {
@@ -63,24 +74,24 @@ public class Message {
 	protected Timestamp getDate() {
 		return date;
 	}
-	
+
 	protected int getHashcode() {
 		return hashcode;
 	}
-	
+
 	protected boolean equals(Message message) {
 		return (this.hashcode == message.getHashcode());
 	}
-	
+
 	public int hashCode() {
-	    StringBuilder builder = new StringBuilder();
-	    builder.append(this.date);
-	    builder.append(this.author);
-	    builder.append(this.type);
-	    builder.append(this.content);
-	    return builder.hashCode();
+		StringBuilder builder = new StringBuilder();
+		builder.append(this.date);
+		builder.append(this.author);
+		builder.append(this.type);
+		builder.append(this.content);
+		return builder.hashCode();
 	}
-	
+
 	public String toString() {
 		return this.getDate() + "--" + this.getAuthor() + "--"
 				+ this.getContent() + "--" + this.getType();
