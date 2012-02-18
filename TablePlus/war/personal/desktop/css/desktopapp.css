@@ -64,6 +64,26 @@
   background-image: url(../../../shared/icons/fam/user_suit.gif) !important;
 }
 
+.user-green {
+  background-image: url(../images/user_green.png) !important;
+}
+
+.user-silhouette {
+  background-image: url(../images/user_silhouette.png) !important;
+}
+
+.document_font {
+  background-image: url(../images/document_font.png) !important;
+}
+
+.lightbulb {
+  background-image: url(../images/lightbulb.png) !important;
+}
+
+.lightbulb_off {
+  background-image: url(../images/lightbulb_off.png) !important;
+}
+
 /* shortcuts */
 #grid-win-shortcut img {
   width: 48px; height: 48px; background: url(../images/grid48x48.png);
@@ -71,4 +91,28 @@
 
 #acc-win-shortcut img {
   width: 48px; height: 48px; background-image: url(../images/im48x48.png);
+}
+
+#wallet-win-shortcut img {
+  width: 64px; height: 64px; background-image: url(../images/Briefcase.png);
+}
+
+#calendar-win-shortcut img {
+  width: 64px; height: 64px; background-image: url(../images/Address_Book.png);
+}
+
+#groupsmanager-win-shortcut img {
+  width: 64px; height: 64px; background-image: url(../images/User.png);
+}
+
+#pesmanager-win-shortcut img {
+  width: 64px; height: 64px; background-image: url(../images/E-Mail.png);
+}
+
+#myresources-win-shortcut img {
+  width: 64px; height: 64px; background-image: url(../images/Folder_Web.png);
+}
+
+#groupresources-win-shortcut img {
+  width: 64px; height: 64px; background-image: url(../images/Folder_FTP.png);
 }
