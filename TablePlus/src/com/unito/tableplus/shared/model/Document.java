@@ -12,6 +12,7 @@ public class Document implements Serializable{
 	private String title;
 	private String type;
 	private String DocId;
+	private String link;
 	
 	public String getTitle() {
 		return title;
@@ -30,6 +31,12 @@ public class Document implements Serializable{
 	}
 	public void setDocId(String docId) {
 		DocId = docId;
+	}
+	public String getLink() {
+		return link;
+	}
+	public void setLink(String link) {
+		this.link = link;
 	}
 
 }

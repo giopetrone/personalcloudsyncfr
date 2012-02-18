@@ -1,6 +1,7 @@
 package com.unito.tableplus.server.services;
 
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.jdo.PersistenceManager;
@@ -16,12 +17,30 @@ public class GroupServiceImpl extends RemoteServiceServlet implements
 	private static final long serialVersionUID = 1L;
 
 	@Override
+	public List<Group> queryGroups(List<Long> keys) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		List<Group> groups = new LinkedList<Group>();
+		Object object = null;
+		try {
+			for (Long key : keys) {
+				object = pm.getObjectById(Group.class, key);
+				groups.add((Group) pm.detachCopy(object));
+			}
+		} catch (Exception e) {
+			System.err.println("There has been an error querying groups: " + e);
+		} finally {
+			pm.close();
+		}
+		return groups;
+	}
+
+	@Override
 	public Long storeGroup(Group group) {
-		Long key=null;
+		Long key = null;
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
 			pm.makePersistent(group);
-			key=group.getKey();
+			key = group.getKey();
 		} catch (Exception e) {
 			System.err.println("There has been an error storing the group: "
 					+ e);
@@ -82,8 +101,7 @@ public class GroupServiceImpl extends RemoteServiceServlet implements
 		}
 		return true;
 	}
-	
-	
+
 	public boolean removeMessage(Long groupKey, Long message) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Transaction tx = pm.currentTransaction();
@@ -124,7 +142,8 @@ public class GroupServiceImpl extends RemoteServiceServlet implements
 			blackboard = group.getBlackBoard();
 			blackboard.clear();
 		} catch (Exception e) {
-			System.err.println("There has been an error clearing messages: " + e);
+			System.err.println("There has been an error clearing messages: "
+					+ e);
 		} finally {
 			pm.close();
 		}

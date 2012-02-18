@@ -8,6 +8,7 @@ import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Extension;
 
 @PersistenceCapable(detachable = "true")
 public class Message implements Serializable {
@@ -17,9 +18,10 @@ public class Message implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	//@PrimaryKey
+	@PrimaryKey
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
-	private Long key;
+	@Extension(vendorName="datanucleus", key="gae.encoded-pk", value="true")
+	private String key;
 
 	@Persistent
 	private String author = null;
@@ -97,7 +99,7 @@ public class Message implements Serializable {
 				+ this.getContent() + "--" + this.getType();
 	}
 
-	protected Long getKey() {
+	protected String getKey() {
 		return key;
 	}
 

@@ -55,6 +55,8 @@ public class TokenServiceImpl extends RemoteServiceServlet implements
 				d = new Document();
 				d.setTitle(entry.getTitle().getPlainText());
 				d.setDocId(entry.getDocId());
+				d.setLink(entry.getDocumentLink().getHref());
+				//System.out.println("L = "+entry.getDocumentLink().getHref());
 				myDocumentList.add(d);
 				// System.out.println(entry.getTitle().getPlainText());
 			}

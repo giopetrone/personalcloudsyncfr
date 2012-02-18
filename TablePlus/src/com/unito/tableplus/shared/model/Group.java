@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import javax.jdo.annotations.IdGeneratorStrategy;
+import javax.jdo.annotations.NotPersistent;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
@@ -38,6 +39,9 @@ public class Group implements Serializable{
 		
 		@Persistent
 		private List<String> docIDs;
+		
+		@NotPersistent
+		private List<User> hiddenMembers;
 		
 		public Group(Long creator){
 			this.creator =  creator;
@@ -127,5 +131,15 @@ public class Group implements Serializable{
 		public void setDocIDs(List<String> docIDs) {
 			this.docIDs = docIDs;
 		}
+
+		public List<User> getHiddenMembers() {
+			return hiddenMembers;
+		}
+
+		public void setHiddenMembers(List<User> hiddenMembers) {
+			this.hiddenMembers = hiddenMembers;
+		}
+
+		
 	}
 

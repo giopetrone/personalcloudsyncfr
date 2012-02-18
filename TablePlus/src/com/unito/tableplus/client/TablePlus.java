@@ -30,6 +30,10 @@ public class TablePlus implements EntryPoint {
 	// crea il servizio per l'utente
 	private final UserServiceAsync userService = GWT.create(UserService.class);
 
+	// crea il servizio per il group
+	private final GroupServiceAsync groupService = GWT
+			.create(GroupService.class);
+
 	// crea l'utente corrente
 	private User user = new User();
 
@@ -132,10 +136,11 @@ public class TablePlus implements EntryPoint {
 					tokenService.getDocumentList(user.getToken(), callback);
 
 				} else {
+					// se nell'url c'è un token
 					if (com.google.gwt.user.client.Window.Location.getHref()
 							.contains("token="))
 						manageNewToken();
-					// se nell'url c'è un token
+
 					else
 						loadActiveDesktop();
 				}
@@ -211,25 +216,33 @@ public class TablePlus implements EntryPoint {
 	public void loadActiveDesktop() {
 
 		// crea il desktop standard
-		desktop = new DesktopPlus();
+		desktop = new DesktopPlus(user, logoutUrl);
+		desktop.addFixedShortcuts();
 
 		// crea il personalTable
-		personalTable = new PersonalTable(desktop, user, logoutUrl);
+		personalTable = new PersonalTable(desktop, user);
 
 		// carica il personal table
 		desktop.loadPersonalTable(personalTable);
 
-		// crea il tavolo del gruppo 1 e lo aggiunge al desktop
-		Table table1 = new DataMaker().getTable1(desktop, user);
-		desktop.addTable(table1);
+		// carica la lista di gruppi dell'utente corrente
+		groupService.queryGroups(user.getGroups(),
+				new AsyncCallback<List<Group>>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						//  Auto-generated method stub
+					}
+					@Override
+					public void onSuccess(List<Group> result) {
+						//  Auto-generated method stub
+						for (Group g : result) {
+							System.out.println("BLA " + g.getName());
+							GroupTable gt = new GroupTable(desktop, user, g);
 
-		// crea il tavolo del gruppo 2 e lo aggiunge al desktop
-		Table table2 = new DataMaker().getTable2(desktop, user);
-		desktop.addTable(table2);
-
-		// dovrei avere una funzione che restituisce una lista dei tavoli
-		// dell'utente
-
+							desktop.addTable(gt);
+						}
+					}
+				});
 	}
 
 	// ******************************************************************************
@@ -243,7 +256,7 @@ public class TablePlus implements EntryPoint {
 	// ******************************************************************************
 
 	public void loadLoginWindow() {
-		desktop = new DesktopPlus();
+		desktop = new DesktopPlus(user, logoutUrl);
 		desktop.getTaskBar().disable();
 
 		loginButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
