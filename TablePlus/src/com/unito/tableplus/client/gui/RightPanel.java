@@ -6,9 +6,14 @@ import com.extjs.gxt.ui.client.Style.Orientation;
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.data.BaseModelData;
 import com.extjs.gxt.ui.client.data.ModelData;
+import com.extjs.gxt.ui.client.data.ModelIconProvider;
+import com.extjs.gxt.ui.client.event.Events;
+import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MenuEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
+import com.extjs.gxt.ui.client.event.TreePanelEvent;
 import com.extjs.gxt.ui.client.store.TreeStore;
+import com.extjs.gxt.ui.client.util.IconHelper;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.AccordionLayout;
@@ -19,6 +24,7 @@ import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanel;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.unito.tableplus.client.services.TokenService;
 import com.unito.tableplus.client.services.TokenServiceAsync;
 import com.unito.tableplus.shared.model.Document;
@@ -73,27 +79,6 @@ public class RightPanel extends ContentPanel {
 
 	ContentPanel tmpDocContainer;
 
-	public void updateMyDocuments(List<Document> documentsList,
-			ContentPanel docContainer) {
-		TreeStore<ModelData> store = new TreeStore<ModelData>();
-		TreePanel<ModelData> tree = new TreePanel<ModelData>(store);
-
-		tree.setDisplayProperty("name");
-
-		ModelData m = new BaseModelData();
-		m.set("name", "MyGoogleDocs");
-		store.add(m, false);
-		ModelData m_son;
-
-		for (Document document : documentsList) {
-			m_son = new BaseModelData();
-			m_son.set("name", document.getTitle());
-			store.add(m, m_son, false);
-		}
-		// aggiunge l'albero al secondo contentPanel
-		docContainer.add(tree);
-		docContainer.layout();
-	}
 
 	public void updateMyDocuments(String gdocSessionToken,
 			ContentPanel docContainer) {
@@ -113,27 +98,53 @@ public class RightPanel extends ContentPanel {
 		};
 		tokenService.getDocumentList(gdocSessionToken, callback);
 	}
+	TreeStore<ModelData> storeMyDocuments = new TreeStore<ModelData>();
+	TreePanel<ModelData> treePanelMyDocuments = new TreePanel<ModelData>(storeMyDocuments);
 
 	public void loadMyDocuments() {
-		System.out.println(myDocuments.get(0).getTitle());
-		// crea un tree per il secondo contentpanel
-		TreeStore<ModelData> store = new TreeStore<ModelData>();
-		TreePanel<ModelData> tree = new TreePanel<ModelData>(store);
+		//System.out.println(myDocuments.get(0).getTitle());
 
-		tree.setDisplayProperty("name");
+		// crea un tree per il secondo contentpanel
+//		TreeStore<ModelData> store = new TreeStore<ModelData>();
+//		TreePanel<ModelData> treePanel = new TreePanel<ModelData>(store);
+		treePanelMyDocuments.setIconProvider(new ModelIconProvider<ModelData>() {
+			public AbstractImagePrototype getIcon(ModelData model) {
+				if (model.get("icon") != null) {
+					return IconHelper.createStyle((String) model.get("icon"));
+				} else {
+					return null;
+				}
+			}
+
+		});
+		treePanelMyDocuments.setDisplayProperty("name");
+		treePanelMyDocuments.addListener(Events.OnDoubleClick,
+				new Listener<TreePanelEvent<ModelData>>() {
+					public void handleEvent(TreePanelEvent<ModelData> be) {
+						//System.out.println("CIAO " + be.getItem().get("name"));
+						if (be.getItem().get("link") != null)
+							com.google.gwt.user.client.Window.open((String) be
+									.getItem().get("link"), "_blank", "");
+					};
+				});
+		
 
 		ModelData m = new BaseModelData();
 		m.set("name", "MyGoogleDocs");
-		store.add(m, false);
+		storeMyDocuments.add(m, false);
 		ModelData m_son;
 
 		for (Document document : myDocuments) {
 			m_son = new BaseModelData();
 			m_son.set("name", document.getTitle());
-			store.add(m, m_son, false);
+			m_son.set("icon", "document_font");
+			m_son.set("link", document.getLink());
+			//System.out.println("LINK = "+document.getLink());
+			storeMyDocuments.add(m, m_son, false);
 		}
 		// aggiunge l'albero al secondo contentPanel
-		tmpDocContainer.add(tree);
+		treePanelMyDocuments.setExpanded(m, true);
+		//tmpDocContainer.add(treePanel);
 		tmpDocContainer.layout();
 	}
 
@@ -172,10 +183,9 @@ public class RightPanel extends ContentPanel {
 
 	}
 
-
-
 	public ContentPanel getMyResourcesPanel() {
 		ContentPanel myResources = new ContentPanel();
+		myResources.add(this.treePanelMyDocuments);
 		myResources.setHeading("My Resources");
 		myResources.setCollapsible(true);
 		myResources.setTitleCollapse(true);

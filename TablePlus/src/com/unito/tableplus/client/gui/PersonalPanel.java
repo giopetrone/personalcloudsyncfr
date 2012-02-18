@@ -1,12 +1,10 @@
 package com.unito.tableplus.client.gui;
 
-import com.extjs.gxt.desktop.client.Shortcut;
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Text;
-import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.google.gwt.core.client.GWT;
@@ -76,17 +74,20 @@ public class PersonalPanel extends RightPanel {
 		add(groups);
 	}
 
+	private Group newGroup=null;
+	
 	public void createNewGroup() {
 		if (newGroupName.getValue() == null) {
 			System.out.println("A: insert valid groupname");
 		} else {
 			System.out.println("B");
+			
 			// (10)crea un nuovo gruppo
-			Group g = new Group(user.getKey());
-			g.setName(newGroupName.getValue());
+			newGroup = new Group(user.getKey());
+			newGroup.setName(newGroupName.getValue());
 
 			// (20)aggiunge il nuovo gruppo al db
-			groupService.storeGroup(g, new AsyncCallback<Long>() {
+			groupService.storeGroup(newGroup, new AsyncCallback<Long>() {
 				@Override
 				public void onFailure(Throwable caught) {
 				}
@@ -108,8 +109,9 @@ public class PersonalPanel extends RightPanel {
 						public void onSuccess(Void result) {
 						}
 					});
-					
+
 					// (28)chiama createNewTable()
+					createNewTable();
 				}
 			});
 
@@ -118,27 +120,11 @@ public class PersonalPanel extends RightPanel {
 
 	public void createNewTable() {
 
-		/*
-		 * // (30)crea il tavolo corrispondente Table table1 = new
-		 * Table(desktop, user, new GroupPanel(desktop, user));
-		 * 
-		 * Window accordionWindow = new ExampleAccordionWindow();
-		 * table1.addWindow(accordionWindow);
-		 * 
-		 * Shortcut s2 = new Shortcut(); s2.setText(newGroupName.getValue() +
-		 * " shortcut"); s2.setId("acc-win-shortcut"); s2.setData("window",
-		 * accordionWindow); //
-		 * s1.addSelectionListener(desktop.getShortcutListener());
-		 * table1.addShortcut(s2);
-		 * 
-		 * // (40)aggiunge il nuovo tavolo al desktop desktop.addTable(table1);
-		 * 
-		 * // (50)aggiunge il nome del gruppo nello "switch"
-		 * desktop.getPersonalTable().updateGroupsList();
-		 * 
-		 * // (60)fa il layout di startmenu
-		 */
+		// (30)crea il tavolo corrispondente Table table1 = new
+		GroupTable table1=new GroupTable(desktop, user,newGroup);
 
+		// (40)aggiunge il nuovo tavolo al desktop 
+		desktop.addTable(table1);
 	}
 
 	public void addMyResourcesPanel() {

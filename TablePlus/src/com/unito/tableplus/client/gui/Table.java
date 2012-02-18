@@ -6,72 +6,78 @@ import java.util.List;
 import com.extjs.gxt.desktop.client.Shortcut;
 import com.extjs.gxt.desktop.client.StartMenu;
 import com.extjs.gxt.desktop.client.TaskBar;
-import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
+import com.unito.tableplus.client.gui.windows.WindowPlus;
 import com.unito.tableplus.shared.model.User;
 
-
 public class Table {
-	
-	private List<Window> windows;
+
+	private List<WindowPlus> windows;
 	private List<Shortcut> shortcuts;
 	protected StartMenu startMenu;
 	private List<MenuItem> menuItems;
-	
-
 
 	protected TaskBar taskBar;
-	
+
 	public User user;
 	protected DesktopPlus desktop;
 	protected RightPanel rightPanel;
-	
-	public Table(DesktopPlus desktop, User user,RightPanel rightPanel){
-		this.desktop=desktop;
-		this.user=user;
-		this.rightPanel=rightPanel;
-		
-		windows=new ArrayList<Window>();
-		shortcuts=new ArrayList<Shortcut>();
-		startMenu=new StartMenu();
+
+	public Table(DesktopPlus desktop, User user, RightPanel rightPanel) {
+		this.desktop = desktop;
+		this.user = user;
+		this.rightPanel = rightPanel;
+
+		windows = new ArrayList<WindowPlus>();
+		shortcuts = new ArrayList<Shortcut>();
+		startMenu = new StartMenu();
 		menuItems = new ArrayList<MenuItem>();
-		taskBar=new TaskBar();
+		taskBar = new TaskBar();
+
+		
+
 	}
-	
-	public void addWindow(Window w){
+
+	public void addWindow(WindowPlus w) {
 		windows.add(w);
 	}
-	
-	public void addShortcut(Shortcut s){
+
+	public void addShortcut(Shortcut s) {
 		shortcuts.add(s);
 	}
-	
-	public void addMenuItem(MenuItem mi){
+
+	public void addMenuItem(MenuItem mi) {
 		menuItems.add(mi);
 	}
-	
-	public List<Window> getWindows() {
+
+	public List<WindowPlus> getWindows() {
 		return windows;
 	}
-	public void setWindows(List<Window> windows) {
+
+	public void setWindows(List<WindowPlus> windows) {
 		this.windows = windows;
 	}
+
 	public List<Shortcut> getShortcuts() {
 		return shortcuts;
 	}
+
 	public void setShortcuts(List<Shortcut> shortcuts) {
 		this.shortcuts = shortcuts;
 	}
+
 	public StartMenu getStartMenu() {
 		return startMenu;
 	}
+
 	public void setStartMenu(StartMenu startMenu) {
 		this.startMenu = startMenu;
 	}
-	
+
 	public TaskBar getTaskBar() {
 		return taskBar;
 	}
+
 	public void setTaskBar(TaskBar taskBar) {
 		this.taskBar = taskBar;
 	}
@@ -107,8 +113,5 @@ public class Table {
 	public void setRightPanel(RightPanel rightPanel) {
 		this.rightPanel = rightPanel;
 	}
-	
-
-	
 
 }
