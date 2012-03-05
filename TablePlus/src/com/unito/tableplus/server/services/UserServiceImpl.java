@@ -1,5 +1,6 @@
 package com.unito.tableplus.server.services;
 
+import java.util.LinkedList;
 import java.util.List;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -35,17 +36,15 @@ public class UserServiceImpl extends RemoteServiceServlet implements
 
 		String email = appEngineUser.getEmail();
 
-		System.out.println("EMAIL: " + email);
 
 		User user = queryUser("email", email);
 
 		if (user == null) {
-			System.out.println("NULL");
 			user = new User();
 			user.setEmail(email);
 			user.setOnline(true);
 			storeUser(user);
-		} else{
+		} else {
 			user.setOnline(true);
 			storeUser(user);
 		}
@@ -113,6 +112,27 @@ public class UserServiceImpl extends RemoteServiceServlet implements
 		} finally {
 			pm.close();
 		}
+	}
+
+	@Override
+	public List<User> queryUsers(List<Long> keys) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		List<User> users = new LinkedList<User>();
+		Object object = null;
+
+		try {
+			for (Long key : keys) {
+				object = pm.getObjectById(User.class, key);
+				users.add((User) pm.detachCopy(object));
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			pm.close();
+		}
+
+		return users;
 	}
 
 }

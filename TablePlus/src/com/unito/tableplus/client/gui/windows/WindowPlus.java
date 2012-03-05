@@ -17,7 +17,6 @@ public class WindowPlus extends Window {
 
 		this.addListener(Events.Hide, new Listener<WindowEvent>(){
 			public void handleEvent(WindowEvent be) {
-				System.out.println("CHE NE SO 2");
 				if(!closedBySwitch){
 					setPreviousPosition(getPosition(false));
 					wasOpen = false;

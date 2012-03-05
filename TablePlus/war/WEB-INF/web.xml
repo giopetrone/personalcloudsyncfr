@@ -54,7 +54,18 @@
 		<url-pattern>/tableplus/user-service</url-pattern>
 	</servlet-mapping>
 
+	<!-- NOTIFICATION SERVLET -->
 
+	<servlet>
+		<servlet-name>notificationServlet</servlet-name>
+		<servlet-class>com.unito.tableplus.server.services.NotificationServiceImpl</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>notificationServlet</servlet-name>
+		<url-pattern>/tableplus/notification-service</url-pattern>
+	</servlet-mapping>
+	
 	<!-- Default page to serve -->
 
 	<welcome-file-list>

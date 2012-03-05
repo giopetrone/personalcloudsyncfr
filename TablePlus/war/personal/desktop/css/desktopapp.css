@@ -1,118 +1,168 @@
 #x-desktop {
-  width: 50%;
+	width: 50%;
 }
 
-
 .icon-grid {
-  background: url( ../images/grid.png ) !important;
+	background: url( ../images/grid.png ) !important;
 }
 
 .bogus {
-  background-image: url( ../images/bogus.png ) !important;
+	background-image: url( ../images/bogus.png ) !important;
 }
 
 .add {
-  background-image: url(../../../shared/icons/fam/add.gif) !important;
+	background-image: url(../../../shared/icons/fam/add.gif) !important;
 }
 
 .option {
-  background-image: url(../../../shared/icons/fam/plugin.gif) !important;
+	background-image: url(../../../shared/icons/fam/plugin.gif) !important;
 }
 
 .remove {
-  background-image: url(../../../shared/icons/fam/delete.gif) !important;
+	background-image: url(../../../shared/icons/fam/delete.gif) !important;
 }
 
 .save {
-  background-image: url(../../../shared/icons/save.gif) !important;
+	background-image: url(../../../shared/icons/save.gif) !important;
 }
 
 .accordion {
-  background: url(../images/accordian.gif) no-repeat 0 50% !important;
+	background: url(../images/accordian.gif) no-repeat 0 50% !important;
 }
 
 .tabs {
-  background-image: url(../images/tabs.gif) !important;
+	background-image: url(../images/tabs.gif) !important;
 }
 
 /* IM window icons */
 .user {
-  background-image: url(../../../shared/icons/fam/user.gif ) !important;
+	background-image: url(../../../shared/icons/fam/user.gif ) !important;
 }
 
 .user-add {
-  background-image: url(../../../shared/icons/fam/user_add.gif) !important;
+	background-image: url(../../../shared/icons/fam/user_add.gif) !important;
 }
 
 .user-delete {
-  background-image: url(../../../shared/icons/fam/user_delete.gif) !important;
+	background-image: url(../../../shared/icons/fam/user_delete.gif)
+		!important;
 }
 
 .connect {
-  background-image: url(../../../shared/icons/fam/connect.gif) !important;
+	background-image: url(../../../shared/icons/fam/connect.gif) !important;
 }
 
 .user-girl {
-  background-image: url(../../../shared/icons/fam/user_female.gif) !important;
+	background-image: url(../../../shared/icons/fam/user_female.gif)
+		!important;
 }
 
 .user-kid {
-  background-image: url(../../../shared/icons/fam/user_green.gif) !important;
+	background-image: url(../../../shared/icons/fam/user_green.gif)
+		!important;
 }
 
 .user-suit {
-  background-image: url(../../../shared/icons/fam/user_suit.gif) !important;
+	background-image: url(../../../shared/icons/fam/user_suit.gif)
+		!important;
 }
 
 .user-green {
-  background-image: url(../images/user_green.png) !important;
+	background-image: url(../images/status_online.png) !important;
 }
 
 .user-silhouette {
-  background-image: url(../images/user_silhouette.png) !important;
+	background-image: url(../images/status_offline.png) !important;
 }
 
 .document_font {
-  background-image: url(../images/document_font.png) !important;
+	background-image: url(../images/document_font.png) !important;
 }
 
 .lightbulb {
-  background-image: url(../images/lightbulb.png) !important;
+	background-image: url(../images/lightbulb.png) !important;
 }
 
 .lightbulb_off {
-  background-image: url(../images/lightbulb_off.png) !important;
+	background-image: url(../images/lightbulb_off.png) !important;
+}
+
+.invite-user {
+	background-image: url(../images/user_add.png) !important;
+}
+
+.set-hidden {
+	background-image: url(../images/user_silhouette.png) !important;
+}
+.sort_ascending{
+	background-image: url(../images/sort_ascending.png) !important;
+}
+
+.arrow_refresh{
+	background-image: url(../images/arrow_refresh.png) !important;
+}
+
+.folder_16{
+	background-image: url(../images/folder.png) !important;
+}
+
+.monitor{
+	background-image: url(../images/monitor.png) !important;
+}
+
+.monitor_add{
+	background-image: url(../images/monitor_add.png) !important;
+}
+
+.monitor_go{
+	background-image: url(../images/monitor_go.png) !important;
 }
 
 /* shortcuts */
 #grid-win-shortcut img {
-  width: 48px; height: 48px; background: url(../images/grid48x48.png);
+	width: 48px;
+	height: 48px;
+	background: url(../images/grid48x48.png);
 }
 
 #acc-win-shortcut img {
-  width: 48px; height: 48px; background-image: url(../images/im48x48.png);
+	width: 48px;
+	height: 48px;
+	background-image: url(../images/im48x48.png);
 }
 
 #wallet-win-shortcut img {
-  width: 64px; height: 64px; background-image: url(../images/Briefcase.png);
+	width: 64px;
+	height: 64px;
+	background-image: url(../images/Briefcase.png);
 }
 
 #calendar-win-shortcut img {
-  width: 64px; height: 64px; background-image: url(../images/Address_Book.png);
+	width: 64px;
+	height: 64px;
+	background-image: url(../images/Address_Book.png);
 }
 
 #groupsmanager-win-shortcut img {
-  width: 64px; height: 64px; background-image: url(../images/User.png);
+	width: 64px;
+	height: 64px;
+	background-image: url(../images/User.png);
 }
 
 #pesmanager-win-shortcut img {
-  width: 64px; height: 64px; background-image: url(../images/E-Mail.png);
+	width: 64px;
+	height: 64px;
+	background-image: url(../images/E-Mail.png);
 }
 
 #myresources-win-shortcut img {
-  width: 64px; height: 64px; background-image: url(../images/Folder_Web.png);
+	width: 64px;
+	height: 64px;
+	background-image: url(../images/Folder_Web.png);
 }
 
 #groupresources-win-shortcut img {
-  width: 64px; height: 64px; background-image: url(../images/Folder_FTP.png);
+	width: 64px;
+	height: 64px;
+	background-image: url(../images/Folder_FTP.png);
 }

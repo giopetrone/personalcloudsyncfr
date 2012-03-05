@@ -35,6 +35,9 @@ public class TokenServiceImpl extends RemoteServiceServlet implements
 	@Override
 	public List<Document> getDocumentList(String gdocSessionToken) {
 
+		if(gdocSessionToken==null)
+			return null;
+		
 		List<Document> myDocumentList = new ArrayList<Document>();
 
 		DocsService client = new DocsService("yourCo-yourAppName-v1");
@@ -62,13 +65,10 @@ public class TokenServiceImpl extends RemoteServiceServlet implements
 			}
 
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ServiceException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -87,13 +87,10 @@ public class TokenServiceImpl extends RemoteServiceServlet implements
 			gdocSessionToken = AuthSubUtil.exchangeForSessionToken(gdocToken,
 					null);
 		} catch (AuthenticationException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (GeneralSecurityException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 

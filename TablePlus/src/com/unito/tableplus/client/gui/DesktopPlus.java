@@ -22,17 +22,21 @@ import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.unito.tableplus.client.TablePlus;
 import com.unito.tableplus.client.gui.windows.*;
+import com.unito.tableplus.client.services.NotificationService;
+import com.unito.tableplus.client.services.NotificationServiceAsync;
 import com.unito.tableplus.client.services.UserService;
 import com.unito.tableplus.client.services.UserServiceAsync;
+import com.unito.tableplus.shared.model.Notification;
 import com.unito.tableplus.shared.model.User;
 
 public class DesktopPlus extends Desktop {
 
-	private List<GroupTable> tables = new ArrayList<GroupTable>();
+	private List<Table> groupTables = new ArrayList<Table>();
 	private Table currentTable;
-	private PersonalTable personalTable;
 	private RightPanel currentRightPanel;
 	// listener dedicato al menu
 	private SelectionListener<MenuEvent> menuListener;
@@ -45,6 +49,10 @@ public class DesktopPlus extends Desktop {
 	String logoutUrl;
 	// crea il servizio per l'utente
 	private final UserServiceAsync userService = GWT.create(UserService.class);
+
+	// crea il servizio per il notification
+	protected final NotificationServiceAsync notificationService = GWT
+			.create(NotificationService.class);
 
 	protected User user;
 
@@ -203,8 +211,45 @@ public class DesktopPlus extends Desktop {
 			@Override
 			public void componentSelected(MenuEvent ce) {
 				// Info.display("Event", "The 'Logout' tool was clicked");
-				user.setOnline(false);
-				userService.storeUser(user, new AsyncCallback<Void>() {
+				userService.queryUser(user.getKey(), new AsyncCallback<User>() {
+					@Override
+					public void onFailure(Throwable caught) {
+					}
+
+					@Override
+					public void onSuccess(User result) {
+						user = result;
+						user.setOnline(false);
+
+						// notifica di un utente offline
+						Notification n = new Notification();
+						n.setSenderEmail(user.getEmail());
+						n.setSenderKey(user.getKey());
+						n.setEventKind("MEMBEROFFLINE");
+						n.setOwningGroups(user.getGroups());
+						n.setMemberEmail(user.getEmail());
+						throwNotification(n);
+
+						userService.storeUser(user, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+							}
+
+							@Override
+							public void onSuccess(Void result) {
+							}
+						});
+						redirect(logoutUrl);
+					}
+				});
+			}
+		});
+		startMenu.addTool(tool);
+	}
+
+	public void throwNotification(Notification notification) {
+		notificationService.sendNotification(notification,
+				new AsyncCallback<Boolean>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -213,16 +258,12 @@ public class DesktopPlus extends Desktop {
 					}
 
 					@Override
-					public void onSuccess(Void result) {
+					public void onSuccess(Boolean result) {
 						// Auto-generated method stub
-						System.out.println("SUCCESSO");
+
 					}
 
 				});
-				redirect(logoutUrl);
-			}
-		});
-		startMenu.addTool(tool);
 	}
 
 	public void setGroupSubMenu() {
@@ -236,10 +277,9 @@ public class DesktopPlus extends Desktop {
 
 	}
 
-	public void loadPersonalTable(PersonalTable personalTable_) {
+	public void loadPersonalTable(Table personalTable_) {
 
-		personalTable = personalTable_;
-		currentTable = personalTable;
+		currentTable = TablePlus.personalTable;
 		currentRightPanel = currentTable.getRightPanel();
 		createRightPanel();
 
@@ -256,47 +296,88 @@ public class DesktopPlus extends Desktop {
 		unloadCurrentTable();
 
 		if (s.equals("Personal Table"))
-			loadTable(personalTable);
+			loadTable(TablePlus.personalTable);
 		else
-			for (GroupTable t : tables) {
-				if (t.getGroup().getName().equals(s))
+			for (Table t : groupTables) {
+				if (t.groupName.equals(s))
 					loadTable(t);
 			}
 
 	}
 
+	public Table tableToLeave;
+
 	public void unloadCurrentTable() {
 
+		// parte il timer della presence selettiva (a meno che non sia il
+		// personal table)
+
+		if (currentTable.groupKey != null) {
+			tableToLeave = currentTable;
+			tableToLeave.timer = new Timer() {
+				@Override
+				public void run() {
+					tableToLeave.selectivePresenceOff();
+				}
+			};
+			tableToLeave.timer.schedule(5000);
+		}
+
+		// operazioni per l'unload del tavolo
 		for (Shortcut s : currentTable.getShortcuts()) {
 			s.setVisible(false);
-			System.out.println("Reso invisibile uno shortcut");
 		}
 
 		for (WindowPlus w : currentTable.getWindows()) {
 			if (w.isVisible()) {
 				w.setClosedBySwitch(true);
 				w.setWasOpen(true);
-				
+
 				w.hide();
 			}
 		}
 
 		currentRightPanel.removeFromParent();
-		System.out.println("UNLOAD TABLE");
 	}
+
+	public Table tableToJoin;
 
 	public void loadTable(Table table) {
 		this.currentTable = table;
 
+		// ferma il timer della presence selettiva (a meno che non sia il
+		// personal table)
+
+		if (currentTable.groupName != null) {
+			tableToJoin = currentTable;
+			// System.out.println("AAA");
+			// se il timer è attivo (ma non ho un modo per controllare)
+			// significa che risulto presenceSelective=true, ma il timer è
+			// già partito
+			if (tableToJoin.timer != null) {
+				// System.out.println("BBB");
+
+				tableToJoin.timer.cancel();
+			}// altrimenti, se il timer non è attivo significa (a meno di
+				// situazioni particolari che al momento possiamo non
+				// considerare) che siamo presenceSelective=false
+			if (tableToJoin.selectivePresence == false) {
+				// System.out.println("CCC");
+
+				tableToJoin.selectivePresenceOn();
+			}
+		}
+
+		// operazioni per l'unload del tavolo...
+
 		// carica gli shortcuts e i rispettivi listener
 		for (Shortcut s : currentTable.getShortcuts()) {
-			System.out.println("caricato uno shortcut");
 			s.setVisible(true);
 		}
 
 		for (WindowPlus w : currentTable.getWindows()) {
 			if (w.getWasOpen()) {
-				//w.setPagePosition(w.getPreviousPosition());
+				// w.setPagePosition(w.getPreviousPosition());
 				w.show();
 				w.setWasOpen(false);
 			}
@@ -304,8 +385,10 @@ public class DesktopPlus extends Desktop {
 
 		// carica il pannello di destra
 		currentRightPanel = table.getRightPanel();
+		// System.out.println("CRP is "+((currentRightPanel==null)?"null":"not null"));
 		desktop.add(currentRightPanel, new RowData(350, 1, new Margins(8)));
 		desktop.layout();
+		
 	}
 
 	public void createRightPanel() {
@@ -329,21 +412,16 @@ public class DesktopPlus extends Desktop {
 		if (ce instanceof MenuEvent) {
 			MenuEvent me = (MenuEvent) ce;
 			w = me.getItem().getData("window");
-			System.out.println("AAAAA");
 		} else {
 			w = ce.getComponent().getData("window");
-			System.out.println("BBBBB");
 		}
 		if (!getWindows().contains(w)) {
 			addWindow(w);
-			System.out.println("CCCCC");
 		}
 		if (w != null && !w.isVisible()) {
 			w.show();
-			System.out.println("DDDDD");
 		} else {
 			w.toFront();
-			System.out.println("EEEEE");
 		}
 	}
 
@@ -372,26 +450,17 @@ public class DesktopPlus extends Desktop {
 		this.currentRightPanel = rightPanel;
 	}
 
-	public PersonalTable getPersonalTable() {
-		return personalTable;
+	public List<Table> getGroupTables() {
+		return groupTables;
 	}
 
-	public void setPersonalTable(PersonalTable personalTable) {
-		this.personalTable = personalTable;
+	public void setGroupTables(List<Table> groupTables) {
+		this.groupTables = groupTables;
 	}
 
-	public List<GroupTable> getTables() {
-		return tables;
-	}
-
-	public void setTables(List<GroupTable> tables) {
-		this.tables = tables;
-	}
-
-	public void addTable(GroupTable t) {
-		this.tables.add(t);
+	public void addGroupTable(Table t) {
+		this.groupTables.add(t);
 		for (Shortcut s : t.getShortcuts()) {
-			System.out.println("caricato uno shortcut");
 			this.addShortcut(s);
 			s.addSelectionListener(shortcutListener);
 			s.setVisible(false);
@@ -399,8 +468,8 @@ public class DesktopPlus extends Desktop {
 		updateGroupsList(t);
 	}
 
-	public void updateGroupsList(GroupTable t) {
-		MenuItem item_ = new MenuItem(t.getGroup().getName());
+	public void updateGroupsList(Table t) {
+		MenuItem item_ = new MenuItem(t.groupName);
 		item_.addSelectionListener(groupMenuListener);
 		menuItems.add(item_);
 		groupsSubMenu.add(item_);

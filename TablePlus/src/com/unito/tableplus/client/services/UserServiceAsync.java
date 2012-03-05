@@ -1,5 +1,7 @@
 package com.unito.tableplus.client.services;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.unito.tableplus.shared.model.User;
 
@@ -17,5 +19,7 @@ public interface UserServiceAsync {
 	void getCurrentUser(AsyncCallback<User> callback);
 	
 	void isLoggedIn(String requestUri, AsyncCallback<String> callback);
+
+	void queryUsers(List<Long> keys, AsyncCallback<List<User>> callback);
 
 }

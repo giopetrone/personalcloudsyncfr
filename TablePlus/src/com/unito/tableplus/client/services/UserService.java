@@ -1,5 +1,7 @@
 package com.unito.tableplus.client.services;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.unito.tableplus.shared.model.User;
@@ -7,6 +9,8 @@ import com.unito.tableplus.shared.model.User;
 @RemoteServiceRelativePath("user-service")
 public interface UserService extends RemoteService {
 
+	List<User> queryUsers(List<Long> keys);
+	
 	User getCurrentUser();
 	
 	void storeUser(User user);
