@@ -19,7 +19,7 @@ public class NewClass {
     public static void main(String[] args) {
 
         rpcService = (GWTService) SyncProxy.newProxyInstance(GWTService.class,
-                "http://localhost:8080/ppp/org.yournamehere.Main/", "gwtservice");
+                "http://localhost:8080/ppp/org.yournamehere.Main/", "gwtservice");  
 
         String result = rpcService.myMethod("SyncProxy");
 
