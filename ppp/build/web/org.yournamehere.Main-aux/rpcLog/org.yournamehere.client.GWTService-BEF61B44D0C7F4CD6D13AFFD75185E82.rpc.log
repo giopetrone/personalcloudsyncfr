@@ -1,0 +1,144 @@
+====================================
+Types potentially sent from browser:
+====================================
+
+Reachable types computed on: Wed Mar 21 11:01:46 CET 2012
+E
+   Serialization status
+      Not serializable
+   Path
+      'E' is reachable from field 'exposeElement' of type 'java.util.ArrayList<E>'
+      'java.util.ArrayList<java.lang.String>' is reachable as a subtype of type 'class java.util.ArrayList<java.lang.String>'
+      Started from 'java.util.ArrayList<java.lang.String>'
+
+com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException
+   Serialization status
+      Instantiable
+   Path
+      Started from 'com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException'
+
+com.google.gwt.user.client.rpc.XsrfToken
+   Serialization status
+      Instantiable
+   Path
+      Started from 'com.google.gwt.user.client.rpc.XsrfToken'
+
+int
+   Serialization status
+      Not serializable
+   Path
+      'int' is reachable from field 'size' of type 'java.util.ArrayList<E>'
+      'java.util.ArrayList<java.lang.String>' is reachable as a subtype of type 'class java.util.ArrayList<java.lang.String>'
+      Started from 'java.util.ArrayList<java.lang.String>'
+
+java.lang.Exception
+   Serialization status
+      Field serializable
+   Path
+      'java.lang.Exception' is reachable as a supertype of type 'class java.lang.RuntimeException'
+      'java.lang.RuntimeException' is reachable as a supertype of type 'class com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException'
+      'com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException' is reachable as a subtype of type 'class com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException'
+      Started from 'com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException'
+
+java.lang.RuntimeException
+   Serialization status
+      Field serializable
+   Path
+      'java.lang.RuntimeException' is reachable as a supertype of type 'class com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException'
+      'com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException' is reachable as a subtype of type 'class com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException'
+      Started from 'com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException'
+
+java.lang.String
+   Serialization status
+      Instantiable
+   Path
+      Started from 'java.lang.String'
+
+java.lang.Throwable
+   Serialization status
+      Field serializable
+   Path
+      'java.lang.Throwable' is reachable as a supertype of type 'class java.lang.Exception'
+      'java.lang.Exception' is reachable as a supertype of type 'class java.lang.RuntimeException'
+      'java.lang.RuntimeException' is reachable as a supertype of type 'class com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException'
+      'com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException' is reachable as a subtype of type 'class com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException'
+      Started from 'com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException'
+
+java.util.ArrayList<java.lang.String>
+   Serialization status
+      Instantiable
+   Path
+      Started from 'java.util.ArrayList<java.lang.String>'
+
+===================================
+Types potentially sent from server:
+===================================
+
+Reachable types computed on: Wed Mar 21 11:01:46 CET 2012
+E
+   Serialization status
+      Not serializable
+   Path
+      'E' is reachable from field 'exposeElement' of type 'java.util.ArrayList<E>'
+      'java.util.ArrayList<java.lang.String>' is reachable as a subtype of type 'class java.util.ArrayList<java.lang.String>'
+      Started from 'java.util.ArrayList<java.lang.String>'
+
+com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException
+   Serialization status
+      Instantiable
+   Path
+      Started from 'com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException'
+
+com.google.gwt.user.client.rpc.RpcTokenException
+   Serialization status
+      Instantiable
+   Path
+      Started from 'com.google.gwt.user.client.rpc.RpcTokenException'
+
+int
+   Serialization status
+      Not serializable
+   Path
+      'int' is reachable from field 'size' of type 'java.util.ArrayList<E>'
+      'java.util.ArrayList<java.lang.String>' is reachable as a subtype of type 'class java.util.ArrayList<java.lang.String>'
+      Started from 'java.util.ArrayList<java.lang.String>'
+
+java.lang.Exception
+   Serialization status
+      Field serializable
+   Path
+      'java.lang.Exception' is reachable as a supertype of type 'class java.lang.RuntimeException'
+      'java.lang.RuntimeException' is reachable as a supertype of type 'class com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException'
+      'com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException' is reachable as a subtype of type 'class com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException'
+      Started from 'com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException'
+
+java.lang.RuntimeException
+   Serialization status
+      Field serializable
+   Path
+      'java.lang.RuntimeException' is reachable as a supertype of type 'class com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException'
+      'com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException' is reachable as a subtype of type 'class com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException'
+      Started from 'com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException'
+
+java.lang.String
+   Serialization status
+      Instantiable
+   Path
+      Started from 'java.lang.String'
+
+java.lang.Throwable
+   Serialization status
+      Field serializable
+   Path
+      'java.lang.Throwable' is reachable as a supertype of type 'class java.lang.Exception'
+      'java.lang.Exception' is reachable as a supertype of type 'class java.lang.RuntimeException'
+      'java.lang.RuntimeException' is reachable as a supertype of type 'class com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException'
+      'com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException' is reachable as a subtype of type 'class com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException'
+      Started from 'com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException'
+
+java.util.ArrayList<java.lang.String>
+   Serialization status
+      Instantiable
+   Path
+      Started from 'java.util.ArrayList<java.lang.String>'
+
