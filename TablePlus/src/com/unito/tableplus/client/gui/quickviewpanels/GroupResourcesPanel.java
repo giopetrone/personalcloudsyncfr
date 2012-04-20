@@ -44,7 +44,7 @@ public class GroupResourcesPanel extends ContentPanel {
 	public GroupResourcesPanel(RightPanel rightPanel_) {
 		this.rightPanel = rightPanel_;
 
-		setHeading("Group Resources");
+		setHeading("Table Objects");
 		setCollapsible(true);
 		setTitleCollapse(true);
 		setBodyStyle("backgroundColor: white;");
@@ -104,7 +104,7 @@ public class GroupResourcesPanel extends ContentPanel {
 		treePanel = new TreePanel<ModelData>(treeStore) {
 			@Override
 			protected boolean hasChildren(ModelData m) {
-				if ("GroupGoogleDocs".equals(m.get("name"))) {
+				if ("TableGoogleDocs".equals(m.get("name"))) {
 					return true;
 				}
 				return super.hasChildren(m);
@@ -136,7 +136,7 @@ public class GroupResourcesPanel extends ContentPanel {
 					};
 				});
 
-		googleDocsRoot.set("name", "GroupGoogleDocs");
+		googleDocsRoot.set("name", "TableGoogleDocs");
 		treeStore.add(googleDocsRoot, false);
 
 		// ModelData m_son;

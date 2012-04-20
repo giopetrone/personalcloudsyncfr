@@ -44,7 +44,7 @@ public class MyResourcesPanel extends ContentPanel {
 	public MyResourcesPanel(RightPanel rightPanel_) {
 		this.rightPanel = rightPanel_;
 		
-		setHeading("My Resources");
+		setHeading("My Objects");
 		setCollapsible(true);
 		setTitleCollapse(true);
 		setBodyStyle("backgroundColor: white;");
@@ -127,7 +127,7 @@ public class MyResourcesPanel extends ContentPanel {
 		treeStore.add(googleDocsRoot, false);
 
 		ModelData m_son;
-
+		
 		if (TablePlus.user.getDocuments() != null)
 			for (Document document : TablePlus.user.getDocuments()) {
 				m_son = new BaseModelData();
@@ -138,7 +138,7 @@ public class MyResourcesPanel extends ContentPanel {
 				// System.out.println("LINK = "+document.getLink());
 				treeStore.add(googleDocsRoot, m_son, false);
 			}
-
+		
 		treePanel.setExpanded(googleDocsRoot, true);
 
 		rightLayoutContainer.add(treePanel);

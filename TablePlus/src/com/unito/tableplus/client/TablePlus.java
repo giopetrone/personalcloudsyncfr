@@ -8,11 +8,15 @@ import com.unito.tableplus.shared.model.*;
 
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
+import com.extjs.gxt.ui.client.widget.Info;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.logical.shared.CloseEvent;
+import com.google.gwt.event.logical.shared.CloseHandler;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class TablePlus implements EntryPoint {
@@ -48,6 +52,8 @@ public class TablePlus implements EntryPoint {
 
 	private long clientSeqNumber = -1;
 
+	static boolean legalPageChange = false;
+
 	// ******************************************************************************
 	// ******************************************************************************
 	// ******************************************************************************
@@ -59,6 +65,42 @@ public class TablePlus implements EntryPoint {
 	// ******************************************************************************
 
 	public void onModuleLoad() {
+
+		com.google.gwt.user.client.Window
+				.addCloseHandler(new CloseHandler<com.google.gwt.user.client.Window>() {
+
+					@Override
+					public void onClose(
+							CloseEvent<com.google.gwt.user.client.Window> event) {
+						// Auto-generated method stub
+						if (!legalPageChange) {
+							System.out.println("ABBIAMO CHIUSO I BATTENTI");
+							// redirect(logoutUrl);
+							// desktop.logoutUser();
+							// notifica di un utente offline
+							Notification n = new Notification();
+							n.setSenderEmail(user.getEmail());
+							n.setSenderKey(user.getKey());
+							n.setEventKind("MEMBEROFFLINE");
+							n.setOwningGroups(user.getGroups());
+							n.setMemberEmail(user.getEmail());
+							throwNotification(n);
+
+							user.setOnline(false);
+							userService.storeUser(user,
+									new AsyncCallback<Void>() {
+										@Override
+										public void onFailure(Throwable caught) {
+										}
+
+										@Override
+										public void onSuccess(Void result) {
+										}
+									});
+						}
+					}
+
+				});
 
 		// verifico se è loggato con google
 		// se è loggato carico il desktop vuoto
@@ -240,6 +282,15 @@ public class TablePlus implements EntryPoint {
 	// ******************************************************************************
 
 	public void loadActiveDesktop() {
+		timer = new Timer() {
+			@Override
+			public void run() {
+				Notification n = new Notification();
+				n.setEventKind("ANSWERNOW");
+				n.setSenderEmail(user.getEmail());
+				throwNotification(n);
+			}
+		};
 
 		// crea il desktop standard
 		desktop = new DesktopPlus(user, logoutUrl);
@@ -285,46 +336,66 @@ public class TablePlus implements EntryPoint {
 	// ******************************************************************************
 	// ******************************************************************************
 
+	Timer timer = null;
+
 	public void startNotificationListener() {
+
+		if (timer != null) {
+			timer.cancel();
+			timer.schedule(50000);
+		}
+
 		// fa partire il listener delle notifiche
 		// System.out.println(user.getEmail() + " attende news...");
-		notificationService.waitForNotification(user.getGroups(), new Long(
-				clientSeqNumber), user.getEmail(),
-				new AsyncCallback<List<Notification>>() {
+		try {
+			notificationService.waitForNotification(user.getGroups(), new Long(
+					clientSeqNumber), user.getEmail(),
+					new AsyncCallback<List<Notification>>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						// Auto-generated method stub
+						@Override
+						public void onFailure(Throwable caught) {
+							// Auto-generated method stub
 
-					}
+						}
 
-					@Override
-					public void onSuccess(List<Notification> result) {
-						clientSeqNumber = result.get(0).getSequenceNumber();
-						// if (user.getGroups() != null
-						// && user.getGroups().size() > 0)
-						// System.out.println("PROVA "
-						// + user.getGroups().get(0));
+						@Override
+						public void onSuccess(List<Notification> result) {
+							if (result != null) {
+								clientSeqNumber = result.get(0)
+										.getSequenceNumber();
+								// if (user.getGroups() != null
+								// && user.getGroups().size() > 0)
+								// System.out.println("PROVA "
+								// + user.getGroups().get(0));
 
-						// il blocco sottostante
-						// (1) fa ripartire immediatamente il
-						// listener delle modifiche
-						// (2) gestisce la nuova notifica ricevuta.
-						//
-						// L'if serve a invertire le sequenze (1) e (2) perchè,
-						// nel caso in cui la notifica riguardi il MIO essere
-						// stato aggiunto a un gruppo, prima di far ripartire il
-						// listener devo aggiornare le mie sottoscrizioni,
-						// aggiungendo questo nuovo gruppo
-						if (!(result.get(0).getEventKind()
-								.equals("MEMBERGROUPADD") && result.get(0)
-								.getMemberEmail().equals(user.getEmail())))
-							startNotificationListener();
+								// il blocco sottostante
+								// (1) fa ripartire immediatamente il
+								// listener delle modifiche
+								// (2) gestisce la nuova notifica ricevuta.
+								//
+								// L'if serve a invertire le sequenze (1) e (2)
+								// perchè,
+								// nel caso in cui la notifica riguardi il MIO
+								// essere
+								// stato aggiunto a un gruppo, prima di far
+								// ripartire il
+								// listener devo aggiornare le mie
+								// sottoscrizioni,
+								// aggiungendo questo nuovo gruppo
+								if (!(result.get(0).getEventKind()
+										.equals("MEMBERGROUPADD") && result
+										.get(0).getMemberEmail()
+										.equals(user.getEmail())))
+									startNotificationListener();
 
-						manageNotification(result);
-					}
+								manageNotification(result);
+							}
+						}
 
-				});
+					});
+		} catch (Exception e) {
+			System.out.println("CATCH 1");
+		}
 	}
 
 	// ******************************************************************************
@@ -340,12 +411,16 @@ public class TablePlus implements EntryPoint {
 	public void manageNotification(List<Notification> nList) {
 		Notification n = nList.get(0);
 
-		if (n.getEventKind().equals("MEMBERONLINE")
-				|| n.getEventKind().equals("MEMBEROFFLINE"))
+		Info.display("Notification Received",
+				n.getEventKind() + " from " + n.getSenderEmail());
+
+		if (//n.getEventKind().equals("MEMBERONLINE")||
+				n.getEventKind().equals("MEMBEROFFLINE")) {
 			for (Table t : desktop.getGroupTables())
 				for (Long memberGroup : n.getOwningGroups())
 					if (t.groupKey.compareTo(memberGroup) == 0)
 						t.getRightPanel().membersPanel.refreshMembersTree(n);
+		}
 
 		if (n.getEventKind().equals("MEMBERGROUPADD")) {
 
@@ -361,20 +436,20 @@ public class TablePlus implements EntryPoint {
 				|| n.getEventKind().equals("MEMBERVISIBLE")) {
 			for (Table t : desktop.getGroupTables())
 				if (t.groupKey.compareTo(n.getGroupKey()) == 0)
-						t.getRightPanel().membersPanel.refreshMembersTree(n);
+					t.getRightPanel().membersPanel.refreshMembersTree(n);
 		}
-		
+
 		if (n.getEventKind().equals("SELECTIVEPRESENCEOFF")
 				|| n.getEventKind().equals("SELECTIVEPRESENCEON")) {
 			for (Table t : desktop.getGroupTables())
 				if (t.groupKey.compareTo(n.getGroupKey()) == 0)
-						t.getRightPanel().membersPanel.refreshMembersTree(n);
+					t.getRightPanel().membersPanel.refreshMembersTree(n);
 		}
 
-//		System.out.println("\n" + user.getEmail()
-//				+ " riceve una notifica:\n------ " + n.getSequenceNumber()
-//				+ "\n------ " + n.getEventKind() + "\n------ "
-//				+ n.getMemberEmail() + "\n");
+		// System.out.println("\n" + user.getEmail()
+		// + " riceve una notifica:\n------ " + n.getSequenceNumber()
+		// + "\n------ " + n.getEventKind() + "\n------ "
+		// + n.getMemberEmail() + "\n");
 	}
 
 	public void invitedToNewGroup(Notification n) {
@@ -444,8 +519,14 @@ public class TablePlus implements EntryPoint {
 
 	}
 
-	public static native void redirect(String url)
+	public static void redirect(String url) {
+		legalPageChange = true;
+		redirect_(url);
+	}
+
+	public static native void redirect_(String url)
 	/*-{
 		$wnd.location = url;
 	}-*/;
+
 }

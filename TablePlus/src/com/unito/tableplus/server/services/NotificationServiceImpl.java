@@ -3,6 +3,7 @@ package com.unito.tableplus.server.services;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import com.google.appengine.api.mail.MailService;
 import com.google.appengine.api.mail.MailServiceFactory;
@@ -21,6 +22,9 @@ public class NotificationServiceImpl extends RemoteServiceServlet implements
 
 	public static long seqNumber = 0;
 	public static List<Notification> notificationsList = new ArrayList<Notification>();
+
+	private static final Logger log = Logger
+			.getLogger(NotificationServiceImpl.class.getName());
 
 	@Override
 	public boolean sendEmail(List<String> recipientList, String emailSubject,
@@ -49,24 +53,38 @@ public class NotificationServiceImpl extends RemoteServiceServlet implements
 	public List<Notification> waitForNotification(
 			List<Long> groupKeySubscription, Long clientSeqNumber,
 			String clientEmail) {
-		
-		String sub="";
-		for (Long myGroup : groupKeySubscription)
-			sub=sub+", "+myGroup;
-//		System.out.println(clientEmail + " ("
-//				+ Thread.currentThread().getName()
-//				+ ") parte con waitForNotification(), queste le sottoscrizioni: "+sub);
+
+		log.warning("DENTROOOO: clientSeqNumber=" + clientSeqNumber
+				+ ", seqNumber=" + seqNumber);
+		System.out.println("DENTRO");
+
+		// Timer timer=new Timer();
+		// timer.schedule(new TimerTask(){
+		// public void run(){
+		// System.out.println("boh");
+		// }
+		// }, 5000);
+
+		// String sub = "";
+		// for (Long myGroup : groupKeySubscription)
+		// sub = sub + ", " + myGroup;
+		// System.out.println(clientEmail + " ("
+		// + Thread.currentThread().getName()
+		// +
+		// ") parte con waitForNotification(), queste le sottoscrizioni: "+sub);
 
 		List<Notification> myNotifications = new ArrayList<Notification>();
 		Notification n = null;
 		boolean needed = false;
 
-		// quest'if fa sì che al primo accesso di un client A, lo stesso ignori
+		// quest'if fa sì che al primo accesso di un client A, lo stesso
+		// ignori
 		// la propria notifica appena inviata di --IO SONO ONLINE--, perchè
 		// è vero che questa notifica viene inviata e viene aumentato il
 		// seqNumber,
 		// ma è anche vero che qui la prima cosa che faccio è aggiornare il
-		// clientSeqNumber a quello corrente (come a dire: sono aggiornato del
+		// clientSeqNumber a quello corrente (come a dire: sono aggiornato
+		// del
 		// fatto che sono online!)
 		if (clientSeqNumber < 0)
 			clientSeqNumber = seqNumber;
@@ -88,41 +106,49 @@ public class NotificationServiceImpl extends RemoteServiceServlet implements
 				// c'è qualche nuova notifica. Dovrei controllare se le
 				// nuove notifiche sono più di una, ma al momento
 				// do per scontato che sia una sola
+
 				n = notificationsList.get(notificationsList.size() - 1);
 
 			}
 			// l'ultima notifica aggiunta è interessante?
 
+			if (n.getEventKind().equals("ANSWERNOW")
+					&& n.getSenderEmail().equals(clientEmail)) {
+				log.warning("Forzo la risposta");
+				needed = true;
+			}
+
 			// quando un membro passa online/offline è interessante se
 			// appartiene ad almeno un mio stesso gruppo
 			if (n.getEventKind().equals("MEMBERONLINE")
-					|| n.getEventKind().equals("MEMBEROFFLINE")){
+					|| n.getEventKind().equals("MEMBEROFFLINE")) {
 				for (Long memberGroup : n.getOwningGroups())
 					for (Long myGroup : groupKeySubscription)
 						if (myGroup.compareTo(memberGroup) == 0)
 							needed = true;
 			}
-			
+
 			if (n.getEventKind().equals("MEMBERVISIBLE")
-					||n.getEventKind().equals("MEMBERHIDDEN"))
+					|| n.getEventKind().equals("MEMBERHIDDEN"))
 				for (Long myGroup : groupKeySubscription)
 					if (myGroup.compareTo(n.getGroupKey()) == 0)
 						needed = true;
 
 			if (n.getEventKind().equals("SELECTIVEPRESENCEON")
-					||n.getEventKind().equals("SELECTIVEPRESENCEOFF"))
+					|| n.getEventKind().equals("SELECTIVEPRESENCEOFF"))
 				for (Long myGroup : groupKeySubscription)
 					if (myGroup.compareTo(n.getGroupKey()) == 0)
 						needed = true;
-			
-			// quando viene aggiunto un membro ad un gruppo è interessante se
+
+			// quando viene aggiunto un membro ad un gruppo è interessante
+			// se
 			// 1) io appartengo a quel gruppo
 			// 2) io non appartengo a quel gruppo, ma sono l'invitato
 			if (n.getEventKind().equals("MEMBERGROUPADD")) {
 				for (Long myGroup : groupKeySubscription)
 					if (myGroup.compareTo(n.getGroupKey()) == 0)
 						needed = true;
-				
+
 				if (n.getMemberEmail().equals(clientEmail))
 					needed = true;
 			}
@@ -135,17 +161,18 @@ public class NotificationServiceImpl extends RemoteServiceServlet implements
 					needed = true;
 
 			clientSeqNumber++;
-//			System.out.println(clientEmail + " ("
-//					+ Thread.currentThread().getName()
-//					+ ") ha appena aumentato il proprio clientSeqNumber a "
-//					+ clientSeqNumber + ", e needed è " + needed);
+			// System.out.println(clientEmail + " ("
+			// + Thread.currentThread().getName()
+			// + ") ha appena aumentato il proprio clientSeqNumber a "
+			// + clientSeqNumber + ", e needed è " + needed);
 		}
 
 		myNotifications.add(n);
-//		System.out.println(clientEmail + " ("
-//				+ Thread.currentThread().getName()
-//				+ ") abbandona waitForNotification()");
+		// System.out.println(clientEmail + " ("
+		// + Thread.currentThread().getName()
+		// + ") abbandona waitForNotification()");
 		return myNotifications;
+
 	}
 
 	@Override
@@ -153,12 +180,12 @@ public class NotificationServiceImpl extends RemoteServiceServlet implements
 		synchronized (this) {
 			seqNumber++;
 
-//			System.out.println("\n" + notification.getSenderEmail() + " ("
-//					+ Thread.currentThread().getName()
-//					+ ") sta per lanciare una notifica:\n------ seqNumber = "
-//					+ seqNumber + "\n------ eventKind = "
-//					+ notification.getEventKind() + "\n------ memberEmail = "
-//					+ notification.getMemberEmail() + "\n");
+			// System.out.println("\n" + notification.getSenderEmail() + " ("
+			// + Thread.currentThread().getName()
+			// + ") sta per lanciare una notifica:\n------ seqNumber = "
+			// + seqNumber + "\n------ eventKind = "
+			// + notification.getEventKind() + "\n------ memberEmail = "
+			// + notification.getMemberEmail() + "\n");
 
 			notification.setSequenceNumber(seqNumber);
 			notificationsList.add(notification);

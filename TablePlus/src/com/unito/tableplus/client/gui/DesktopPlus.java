@@ -211,37 +211,7 @@ public class DesktopPlus extends Desktop {
 			@Override
 			public void componentSelected(MenuEvent ce) {
 				// Info.display("Event", "The 'Logout' tool was clicked");
-				userService.queryUser(user.getKey(), new AsyncCallback<User>() {
-					@Override
-					public void onFailure(Throwable caught) {
-					}
-
-					@Override
-					public void onSuccess(User result) {
-						user = result;
-						user.setOnline(false);
-
-						// notifica di un utente offline
-						Notification n = new Notification();
-						n.setSenderEmail(user.getEmail());
-						n.setSenderKey(user.getKey());
-						n.setEventKind("MEMBEROFFLINE");
-						n.setOwningGroups(user.getGroups());
-						n.setMemberEmail(user.getEmail());
-						throwNotification(n);
-
-						userService.storeUser(user, new AsyncCallback<Void>() {
-							@Override
-							public void onFailure(Throwable caught) {
-							}
-
-							@Override
-							public void onSuccess(Void result) {
-							}
-						});
-						redirect(logoutUrl);
-					}
-				});
+				logoutUser();
 			}
 		});
 		startMenu.addTool(tool);
@@ -260,10 +230,44 @@ public class DesktopPlus extends Desktop {
 					@Override
 					public void onSuccess(Boolean result) {
 						// Auto-generated method stub
-
+						//logoutUser();
 					}
 
 				});
+	}
+
+	public void logoutUser() {
+		userService.queryUser(user.getKey(), new AsyncCallback<User>() {
+			@Override
+			public void onFailure(Throwable caught) {
+			}
+
+			@Override
+			public void onSuccess(User result) {
+				user = result;
+				user.setOnline(false);
+
+				// notifica di un utente offline
+				Notification n = new Notification();
+				n.setSenderEmail(user.getEmail());
+				n.setSenderKey(user.getKey());
+				n.setEventKind("MEMBEROFFLINE");
+				n.setOwningGroups(user.getGroups());
+				n.setMemberEmail(user.getEmail());
+				throwNotification(n);
+
+				userService.storeUser(user, new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+					}
+
+					@Override
+					public void onSuccess(Void result) {
+					}
+				});
+				redirect(logoutUrl);
+			}
+		});
 	}
 
 	public void setGroupSubMenu() {
@@ -388,7 +392,7 @@ public class DesktopPlus extends Desktop {
 		// System.out.println("CRP is "+((currentRightPanel==null)?"null":"not null"));
 		desktop.add(currentRightPanel, new RowData(350, 1, new Margins(8)));
 		desktop.layout();
-		
+
 	}
 
 	public void createRightPanel() {

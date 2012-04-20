@@ -88,6 +88,7 @@ public class UserServiceImpl extends RemoteServiceServlet implements
 
 	@Override
 	public User queryUser(Long key) {
+		System.out.println("sonoqui");
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		User user = null;
 		try {

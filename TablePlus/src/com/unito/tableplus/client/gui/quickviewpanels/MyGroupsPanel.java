@@ -174,7 +174,7 @@ public class MyGroupsPanel extends ContentPanel {
 			@Override
 			public void onSuccess(Long result) {
 
-				createNewGroup_2(result);
+				createNewGroup_20(result);
 			}
 		});
 
@@ -189,7 +189,7 @@ public class MyGroupsPanel extends ContentPanel {
 
 	private Long newGroupKey;
 
-	public void createNewGroup_2(Long newGroupKey_) {
+	public void createNewGroup_20(Long newGroupKey_) {
 		this.newGroupKey = newGroupKey_;
 		// (24)aggiorna l'utente corrente
 		userService.queryUser(TablePlus.user.getKey(),
@@ -200,7 +200,7 @@ public class MyGroupsPanel extends ContentPanel {
 
 					@Override
 					public void onSuccess(User result_) {
-						TablePlus.user = result_;
+						//TablePlus.user = result_;
 
 						// (25)aggiunge all'utente il gruppo appena creato
 						TablePlus.user.addGroup(newGroupKey);
