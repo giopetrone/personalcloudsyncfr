@@ -66,6 +66,38 @@
 		<url-pattern>/tableplus/notification-service</url-pattern>
 	</servlet-mapping>
 	
+	<!-- CHAT SERVLETS -->
+	
+	<servlet>
+		<servlet-name>chat_service</servlet-name>
+		<servlet-class>com.unito.tableplus.server.services.ChatServiceImpl</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>chat_service</servlet-name>
+		<url-pattern>/chat/chatservice</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>handle_connect</servlet-name>
+		<servlet-class>com.unito.tableplus.server.services.ConnectionServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>handle_connect</servlet-name>
+		<url-pattern>/_ah/channel/connected/</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>handle_disconnect</servlet-name>
+		<servlet-class>com.unito.tableplus.server.services.DisconnectionServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>handle_disconnect</servlet-name>
+		<url-pattern>/_ah/channel/disconnected/</url-pattern>
+	</servlet-mapping>
+	
 	<!-- Default page to serve -->
 
 	<welcome-file-list>
