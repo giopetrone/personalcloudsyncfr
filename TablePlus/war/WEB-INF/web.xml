@@ -75,7 +75,7 @@
 
 	<servlet-mapping>
 		<servlet-name>chat_service</servlet-name>
-		<url-pattern>/chat/chatservice</url-pattern>
+		<url-pattern>/tableplus/chatservice</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
@@ -97,6 +97,18 @@
 		<servlet-name>handle_disconnect</servlet-name>
 		<url-pattern>/_ah/channel/disconnected/</url-pattern>
 	</servlet-mapping>
+	
+	<!-- PROXY SERVLET -->
+	
+	<servlet>
+		<servlet-name>proxy</servlet-name>
+		<servlet-class>com.unito.tableplus.server.services.Proxy</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>proxy</servlet-name>
+		<url-pattern>/tableplus/proxy</url-pattern>
+	</servlet-mapping>	
 	
 	<!-- Default page to serve -->
 
