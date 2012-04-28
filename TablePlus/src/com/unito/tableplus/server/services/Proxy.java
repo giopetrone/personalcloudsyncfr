@@ -38,19 +38,12 @@ public class Proxy extends HttpServlet {
 			String request = jo.getString("request");
 			PrintWriter pw = resp.getWriter();
 
-			switch (request) {
-			case "queryUser":
+			if(request.equals("queryUser"))
 				queryUser(jo, pw);
-				break;
-			case "queryTable":
+			else if(request.equals("queryTable"))
 				queryTable(jo, pw);
-				break;
-			case "queryTables":
+			else if(request.equals("queryTables"))
 				queryTables(jo, pw);
-				break;
-			default:
-				break;
-			}
 
 		} catch (JSONException e) {
 			System.err.println("Error while processing post request.");
@@ -64,17 +57,22 @@ public class Proxy extends HttpServlet {
 			String email = jo.getString("userEmail");
 			User user = userProxy.queryUser("email", email);
 			JSONObject rj = new JSONObject();
+			JSONObject uj = new JSONObject();
 
 			if (user == null) {
 				rj.put("status", "ERROR");
 				rj.put("error", "User not found");
 			} else {
-				rj.put("key", user.getKey());
-				rj.put("username", user.getUsername());
-				rj.put("firstname", user.getFirstName());
-				rj.put("lastname", user.getLastName());
-				rj.put("email", user.getEmail());
-				rj.put("tables", user.getGroups());
+				rj.put("status", "OK");
+				
+				uj.put("key", user.getKey());
+				uj.put("username", user.getUsername());
+				uj.put("firstname", user.getFirstName());
+				uj.put("lastname", user.getLastName());
+				uj.put("email", user.getEmail());
+				uj.put("tables", user.getGroups());
+				
+				rj.put("results", uj);
 			}
 
 			pw.print(rj.toString());
@@ -116,6 +114,7 @@ public class Proxy extends HttpServlet {
 
 				rj.put("results", table);
 			}
+			
 			pw.print(rj.toString());
 			pw.flush();
 			pw.close();
