@@ -1,0 +1,1 @@
+svn import https://personalcloudsyncfr.googlecode.com/svn/Sched/src/java/org/unito/client/UiUser.java -m 'ciaso' --username sgnmrn@gmail.com
