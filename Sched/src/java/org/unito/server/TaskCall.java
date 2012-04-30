@@ -12,11 +12,13 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.unito.client.StartInterval;
+
 import org.unito.client.Task;
 import org.unito.client.TaskGroup;
+import org.unito.client.UiUser;
 import testjacop.MyTask;
 import testjacop.TaskStore;
+import testjacop.User;
 
 /**
  *
@@ -26,7 +28,7 @@ public class TaskCall {
 
     static TaskStore ts = new TaskStore();
 
-    public TaskGroup doRequest(TaskGroup iTask, String taskName, String taskNet, String mode) {
+    public TaskGroup doRequest(TaskGroup iTask, String taskName, String taskNet, String mu, String mode, String user) {
 
         // 2 modes:
         // "startintervals" to request places where a task can be placed
@@ -35,12 +37,12 @@ public class TaskCall {
         // have to be moved to make room for it in the specified interval;
         // the resulting net is then passes to jacop for generating a schedule
 
-        String pr = new Request(iTask, taskName, taskNet, mode).toServerString();
+        String pr = new Request(iTask, taskName, taskNet, mu, mode, user).toServerString();
         System.err.println("in dorequest request=\n" + pr);
         try {
             DefaultHttpClient httpClient = new DefaultHttpClient();
             HttpPost postRequest = new HttpPost(
-                    "http://localhost:3000/modstn/" + taskNet);
+                    "http://localhost:3000/modstn/"+mu  + taskNet);
             //   "http://localhost:3000/modstn/startintervals");   oppure "tasknet"
             StringEntity input = new StringEntity(pr);
             input.setContentType("text/xml");
@@ -75,15 +77,29 @@ public class TaskCall {
         return null;
     }
 
+    private void  createUsers(TaskGroup taskGroup){
+       // create users , duplicates are ignored
+        for (Task t : taskGroup.getTasks()) {
+            for (UiUser uu: t.getUsers()){
+                new User(uu.getId(),uu.getWeight());
+            }
+        }
+    }
+
     public TaskGroup doIt(TaskGroup taskGroup, String mode, String old) {
         // create store of tasks
         if (!old.equals("old")) {   //riparti da 0
             ts = new TaskStore();
+            User.clear();
         }
         ArrayList<String> taskNames = new ArrayList<String>();
         System.err.println("in doit taskssize=" + taskGroup.getTasks().size());
         for (Task t : taskGroup.getTasks()) {
             ts.addTask(t.getName(), t.getMinStartHour(), t.getMaxEndHour(), t.getMinStartHour(), t.getMaxEndHour(), t.getDuration());
+            createUsers(taskGroup);
+            for (UiUser u : t.getUsers()) {
+                ts.addActorToTask(t.getName(), User.find(u.getId()));
+            }
             if (!t.getOverlap()) {
                 taskNames.add(t.getName());
             }
@@ -209,4 +225,5 @@ public class TaskCall {
             return null;
         }
     }
+
 }

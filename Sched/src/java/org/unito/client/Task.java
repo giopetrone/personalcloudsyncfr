@@ -25,6 +25,7 @@ public class Task implements IsSerializable {
     private ArrayList<String> before = new ArrayList();
     private ArrayList<String> after = new ArrayList();
     private ArrayList<Interval> intervals = new ArrayList();
+    private ArrayList<UiUser> users = new ArrayList();
 
     public String toRequest(boolean tasco) {
         String ret = "";
@@ -37,6 +38,14 @@ public class Task implements IsSerializable {
             ret += new Interval(getName(), getFirstStartHour(), getLastEndHour()).toRequest();
             ret += "\" start=\"";
             ret += new Interval(getName(), getFirstStartHour(), getLastEndHour()).toRequest();
+            ret += "\"\nusers=\"";
+            for (int i = 0; i < users.size(); i++) {
+                UiUser uu = users.get(i);
+                ret += uu.getId();
+                if (i < users.size() - 1) {
+                    ret += ",";
+                }
+            }
             ret += "\"/>";
         } else {
             if (!before.isEmpty()) {
@@ -60,6 +69,10 @@ public class Task implements IsSerializable {
 
     public ArrayList<String> getAfter() {
         return after;
+    }
+
+    public ArrayList<UiUser> getUsers() {
+        return users;
     }
 
     public int getOfficialSchedule() {
@@ -95,7 +108,7 @@ public class Task implements IsSerializable {
         return "name: " + getName() + " start: " + getFirstStartHour() + " end: " + getLastEndHour() + "duration: " + getDuration() + "schedule: " + getSchedule();
     }
 
-    public Task(String name, String firstStartHour, String lastEndHour, String duration, String before, String after, String schedule, boolean overlap) {
+    public Task(String name, String firstStartHour, String lastEndHour, String duration, String before, String after, String schedule, String users, boolean overlap) {
         this.name = name;
         this.overlap = overlap;
         this.duration = Integer.parseInt(duration);
@@ -125,6 +138,14 @@ public class Task implements IsSerializable {
             if (TaskGroup.exists(tmp[i])) {
                 //   Window.alert("aggiungo after a:" + name + " "+ tmp[i] );
                 this.after.add(tmp[i]);
+            }
+        }
+        tmp = users.split(" ", -1);
+        for (int i = 0; i < tmp.length; i++) {
+            UiUser uu = UiUser.find(tmp[i]);
+            if (uu != null) {
+                //   Window.alert("aggiungo user a:" + name + " "+ tmp[i] );
+                this.users.add(uu);
             }
         }
         //   Window.alert(this.toString());
@@ -188,7 +209,18 @@ public class Task implements IsSerializable {
         }
         String ret = "";
         for (String s : getBefore()) {
-            ret += s;
+            ret += s + " ";
+        }
+        return ret;
+    }
+
+    public String userString() {
+        if (getUsers().isEmpty()) {
+            return "          ";
+        }
+        String ret = "";
+        for (UiUser s : getUsers()) {
+            ret += s.getId() + " ";
         }
         return ret;
     }
@@ -199,7 +231,7 @@ public class Task implements IsSerializable {
         }
         String ret = "";
         for (String s : getAfter()) {
-            ret += s;
+            ret += s + " ";
         }
         return ret;
     }
@@ -268,22 +300,26 @@ public class Task implements IsSerializable {
      * @param before the before to set
      */
     public void setBefore(ArrayList<String> before) {
-        this.before = before;
+        this.setBefore(before);
     }
 
     /**
      * @param after the after to set
      */
     public void setAfter(ArrayList<String> after) {
-        this.after = after;
+        this.setAfter(after);
     }
 
     public void addBefore(String after) {
-        this.before.add(after);
+        this.getBefore().add(after);
     }
 
     public void addAfter(String after) {
-        this.after.add(after);
+        this.getAfter().add(after);
+    }
+
+    public void addUser(UiUser user) {
+        this.getUsers().add(user);
     }
 
     /**
@@ -297,6 +333,22 @@ public class Task implements IsSerializable {
      * @param intervals the intervals to set
      */
     public void setIntervals(ArrayList<Interval> intervals) {
-        this.intervals = intervals;
+        this.setIntervals(intervals);
+    }
+
+    /**
+     * @param users the users to set
+     */
+    public void setUsers(ArrayList<UiUser> users) {
+        this.users = users;
+    }
+
+    public boolean containsUser(String name) {
+        for (UiUser u : users) {
+            if (u.getId().equals(name)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

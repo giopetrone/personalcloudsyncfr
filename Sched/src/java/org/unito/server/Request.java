@@ -17,8 +17,10 @@ public class Request {
     private TaskGroup tasks;
     String action = ""; //move";
     String taskNet = ""; //move";
+    String mu = null; //move";
+    String user = "";
     String task = "";
-   // StartInterval choice = new StartInterval("",0,0);
+    // StartInterval choice = new StartInterval("",0,0);
     StartInterval choice = null;
     String requestString1 = "<request>\n";
     String actionString1 = "<action task=\"";
@@ -58,28 +60,38 @@ public class Request {
     </request>
      */
 
-    public Request(TaskGroup itasks, String tName, String taskNet, String action) {
+    public Request(TaskGroup itasks, String tName, String taskNet, String mu, String action, String user) {
         task = tName;
         tasks = itasks;
         this.action = action;
+        this.mu = mu;
+        this.user = user;
         this.taskNet = taskNet;
         this.choice = itasks.getChoice();
     }
 
     public String toServerString() {
         String ret = requestString1;
-        ret += actionString1;
-        ret += task;
-        ret += actionString2;
-        ret += action;
-        ret += actionString3;
-        if (choice != null){
-        ret += choiceString1;
-        ret += choice.toRequest();
-        ret += choiceString2;
+        if (!mu.equals("")) {
+            ret += "<user name =\"";
+            ret += user;
+            ret += "\"/>\n<action type=\"insert\">\n";
+            Task tata = TaskGroup.get(task);
+            ret += tata.toRequest(true) + "\n";
+            ret += "</action>\n";
+        } else {
+            ret += actionString1;
+            ret += task;
+            ret += actionString2;
+            ret += action;
+            ret += actionString3;
+            if (choice != null) {
+                ret += choiceString1;
+                ret += choice.toRequest();
+                ret += choiceString2;
+            }
         }
         ret += tasknetString1;
-
         if (tasks != null) {
             for (Task t : tasks.getTasks()) {
                 ret += t.toRequest(true) + "\n";
@@ -94,14 +106,15 @@ public class Request {
         ret += tasknetString3;
         ret += scheduleString1;
         //  <stask name="A1" start="15" />
-         if (tasks != null) {
+        if (tasks != null) {
             for (Task t : tasks.getTasks()) {
                 int sta = tasks.getOfficialSchedule(t.getName());
-                ret += "<stask name=\""+t.getName()+"\" start=\""+ sta + "\" />\n";
+                ret += "<stask name=\"" + t.getName() + "\" start=\"" + sta + "\" />\n";
             }
         }
         ret += scheduleString2;
         ret += requestString2;
         return ret;
     }
+
 }

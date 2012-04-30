@@ -45,12 +45,17 @@
 }
 
 .styleUnused{
-         background-color: #ED9A5A;
+         background-color: #F0F0F0;
 
 }
 
 .styleBusy{
          background-color: #F498DB;
+
+}
+
+.styleOwner{
+         background-color: #D0B000;
 
 }
 

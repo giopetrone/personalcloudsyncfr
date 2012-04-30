@@ -16,5 +16,5 @@ public interface TaskAllocationAsync {
     public void myMethod(String s, AsyncCallback<String> callback);
     public void removeTask(String s, AsyncCallback<String> callback);
     public void  schedule(ViaVai daFare, String mode, String old,  AsyncCallback<ViaVai> callback);
-    public void  scheduleRequest(ViaVai daFare, String taskName, String taskNet, String mode,  AsyncCallback<ViaVai> callback);
+    public void  scheduleRequest(ViaVai daFare, String taskName, String taskNet, String mu, String mode, String user,  AsyncCallback<ViaVai> callback);
 }

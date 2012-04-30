@@ -20,6 +20,7 @@ public class TaskGroup {
     private ArrayList<Interval> taskSchedule = new ArrayList();  // possible starting intervals for a task
     private ArrayList<Task> tasks = new ArrayList();
     private StartInterval choice = null;
+    static boolean lunch = false;
 
     public static TaskGroup addTaskGroup() {
         TaskGroup ret = new TaskGroup();
@@ -75,7 +76,9 @@ public class TaskGroup {
         globalSchedule.add(new StartInterval(t.getName(), start, end));
     }
 
-    public void setSchedule(Task t) {
+    public int setSchedule(Task t) {
+        // find time to schedule as early as possible the task
+        // set to -1 if no time has been found
         int sta = t.getSchedule();
         //  Window.alert("setschedule task= "+t.getName() +" sta="+sta);
         if (sta < 0) {
@@ -92,12 +95,21 @@ public class TaskGroup {
             // inte.setMin(t.getDefaultSchedule());
             //  inte.setMax(t.getDefaultSchedule());
         }
+        return sta;
     }
 
-    public static String checkAndAddTask(String name, String firstStartHour, String lastEndHour, String duration, String before, String after, String schedule, boolean overlap) {
-        if (TaskGroup.current().get(name) != null) {
-            return "task already existent: " + name;
+    public static String addScheduleTask(String name, String firstStartHour, String lastEndHour, String duration, String before, String after, String schedule, String users, boolean overlap) {
+        String msg = "";
+        Task tat = new Task(name, firstStartHour, lastEndHour, duration, before, after, schedule, users, overlap);
+        TaskGroup.add(tat);
+        int sched = TaskGroup.current().setSchedule(tat);
+        if (sched == -1) {
+            msg += "task has not been scheduled";
         }
+        return msg;
+    }
+
+    public static String checkTask(String name, String firstStartHour, String lastEndHour, String duration, String before, String after, String schedule, String users, boolean overlap) {
         int fis = Integer.parseInt(firstStartHour);
         int las = Integer.parseInt(lastEndHour);
         String msg = "";
@@ -124,10 +136,13 @@ public class TaskGroup {
                 }
             }
         }
-        if (msg.equals("")) {
-            Task tat = new Task(name, firstStartHour, lastEndHour, duration, before, after, schedule, overlap);
-            TaskGroup.add(tat);
-            TaskGroup.current().setSchedule(tat);
+        tmp = users.split(" ", -1);
+        for (int i = 0; i < tmp.length; i++) {
+            if (!tmp[i].equals("") && !tmp[i].equals(" ")) {
+                if (UiUser.find(tmp[i]) == null) {
+                    msg += "User not found: " + tmp[i] + "\n";
+                }
+            }
         }
         return msg;
     }
@@ -136,7 +151,7 @@ public class TaskGroup {
         current().tasks.add(t);
     }
 
-    public  void addI(Task t) {
+    public void addI(Task t) {
         tasks.add(t);
     }
 
@@ -184,6 +199,16 @@ public class TaskGroup {
         return null;
     }
 
+    public ArrayList<Task> getUnscheduledTasks() {
+        ArrayList<Task> ret = new ArrayList();
+        for (Task t : tasks) {
+            if (getOfficialSchedule(t.getName()) == -1) {
+                ret.add(t);
+            }
+        }
+        return ret;
+    }
+
     public int getOfficialSchedule(String name) {
         Interval inte = findIntervalForTask(name);
         return inte == null ? -1 : inte.getMin();
@@ -222,14 +247,14 @@ public class TaskGroup {
         return -1;
     }
 
-    public static String[] retr(boolean showAlt) {
+    public static String[] retr(boolean showAlt, TaskGroup fonte) {
         String[] ret = new String[oreLavoro];
         for (int i = 0; i < oreLavoro; i++) {
             ret[i] = "";
         }
         // Window.alert("in retr task sz =" + current().tasks.size());
-        for (Task t : current().tasks) {
-            int sta = current().getOfficialSchedule(t.getName());
+        for (Task t : fonte.tasks) {
+            int sta = fonte.getOfficialSchedule(t.getName());
             //   Window.alert("in retr task=" + t.getName() + " " +sta);
             if (sta >= 0) {
                 for (int i = 0; i < t.getDuration(); i++) {
@@ -242,8 +267,8 @@ public class TaskGroup {
             }
         }
         if (showAlt) {
-            for (Interval inte : current().taskSchedule) {
-                Task ta = current().get(inte.getName());
+            for (Interval inte : fonte.taskSchedule) {
+                Task ta = fonte.get(inte.getName());
                 //  Window.alert("task, min max dur"+ta.getName()+ " "+inte.getMin()+ " "+inte.getMax()+" "+ + ta.getDuration());
                 for (int j = inte.getMin(); j <= inte.getMax(); j++) { // MINORE O MINORE UGUALE?????
                     for (int i = 0; i < ta.getDuration(); i++) {
@@ -270,7 +295,7 @@ public class TaskGroup {
     public Task getI(String name) {
 
         for (Task t : tasks) {
-             System.out.println("task="+name);
+            System.out.println("task=" + name);
             if (t.getName().equals(name)) {
                 return t;
             }
@@ -298,18 +323,24 @@ public class TaskGroup {
         current().removeSchedule(name);
     }
 
-    public static void change(Task t) {
+    public static String change(Task t) {
+        String ret = "";
         for (Task c : current().tasks) {
             if (t.getName().equals(c.getName())) {
                 current().tasks.remove(c);
                 current().tasks.add(t);
-                current().setSchedule(t);
+                int start = current().setSchedule(t);
+                if (start == -1) {
+                    ret = "task has not been scheduled";
+                }
             }
         }
+        return ret;
     }
 
     public static void esempioLili() {
 
+        UiUser.createUsers();
         TaskGroup tg = current();
         Task task = new Task("WTec1", 1, 3, 2);
         tg.addScheduledTask(task, 1, 3);
@@ -346,29 +377,49 @@ public class TaskGroup {
     }
 
     public static void esempio() {
-
+        UiUser.createUsers();
         TaskGroup tg = current();
         Task task = new Task("T1", 0, 10, 4);
+        task.addUser(UiUser.find("liliana"));
+        task.addUser(UiUser.find("marino"));
         tg.addScheduledTask(task, 6, 10);
+
         task = new Task("T2", 24, 40, 2);
+        task.addUser(UiUser.find("balbo"));
         tg.addScheduledTask(task, 24, 26);
+
         task = new Task("T3", 20, 50, 4);
+        task.addUser(UiUser.find("gianluca"));
         tg.addScheduledTask(task, 36, 40);
         //   Window.alert("corrente in esempio"+ current().tasks);
     }
 
+    public static boolean ContainsUser(String user, String task) {
+        Task t = current().get(task);
+        return t == null ? false : t.containsUser(user);
+    }
+
     public static void lunch() {
+        lunch = !lunch;
         TaskGroup tg = current();
-        Task task = new Task("Lunch1", 4, 5, 1);
-        tg.addScheduledTask(task, 4, 5);
-        task = new Task("Lunch2", 16, 17, 1);
-        tg.addScheduledTask(task, 16, 17);
-        task = new Task("Lunch3", 28, 29, 1);
-        tg.addScheduledTask(task, 28, 29);
-        task = new Task("Lunch4", 40, 41, 1);
-        tg.addScheduledTask(task, 40, 41);
-        task = new Task("Lunch5", 52, 53, 1);
-        tg.addScheduledTask(task, 52, 53);
+        if (lunch) {
+            Task task = new Task("Lunch1", 4, 5, 1);
+            tg.addScheduledTask(task, 4, 5);
+            task = new Task("Lunch2", 16, 17, 1);
+            tg.addScheduledTask(task, 16, 17);
+            task = new Task("Lunch3", 28, 29, 1);
+            tg.addScheduledTask(task, 28, 29);
+            task = new Task("Lunch4", 40, 41, 1);
+            tg.addScheduledTask(task, 40, 41);
+            task = new Task("Lunch5", 52, 53, 1);
+            tg.addScheduledTask(task, 52, 53);
+        } else {
+            tg.remove("Lunch1");
+            tg.remove("Lunch2");
+            tg.remove("Lunch3");
+            tg.remove("Lunch4");
+            tg.remove("Lunch5");
+        }
         //   Window.alert("corrente in esempio"+ current().tasks);
     }
 

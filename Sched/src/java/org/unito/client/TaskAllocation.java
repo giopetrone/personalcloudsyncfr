@@ -18,7 +18,7 @@ public interface TaskAllocation extends RemoteService {
 
     public ViaVai schedule(ViaVai daFare, String mode, String old);
 
-    public ViaVai scheduleRequest(ViaVai daFare, String taskName, String taskNet, String mode);
+    public ViaVai scheduleRequest(ViaVai daFare, String taskName, String taskNet, String mu, String mode, String user);
 
     public String removeTask(String s);
 }

@@ -65,7 +65,7 @@ public class MyDOMParserBean
 
     public static void main(String[] args) {
         TaskGroup ret = fillReply(null);
-        Request r = new Request(ret, "", "", "");
+        Request r = new Request(ret, "", "", "", "", "");
         System.out.println(r.toServerString());
     }
 
@@ -86,12 +86,16 @@ public class MyDOMParserBean
         printUnNodo(ele, "");
         TaskGroup ret = new TaskGroup();
         ret.setTaskSchedule(inter);
-        Request r = new Request(ret, "", "", "");
+        Request r = new Request(ret, "", "", "", "", "");
         System.out.println(r.toServerString());
     }
     static String taskName = "";
 
+
     public static void parseIntervals(Node n, ArrayList<Interval> inter, String indent) {
+        // recupera sia gli intervalli che eventualmente
+        // in quali casi  ci siano utenti con schedule da modificare
+        
         String s = "" + n.getClass();
 
         boolean stampa = !s.equals("class com.sun.org.apache.xerces.internal.dom.DeferredTextImpl");
@@ -113,7 +117,9 @@ public class MyDOMParserBean
                     taskName = n8.getNodeValue();
                     System.out.print("carico " + n8.getNodeName() + " ='" + n8.getNodeValue() + "'");
                 }
-                if (n8.getNodeName().equals("start") && (n.getNodeName().equals("interval") || n.getNodeName().equals("intervals"))) {
+                if (n.getNodeName().equals("interval") || n.getNodeName().equals("intervals")) {
+                    n8 = l5.getNamedItem("start");
+
                     String s1 = n8.getNodeValue();
                     s1 = s1.replaceAll("[(),]", " ");
                     String[] pars = s1.split(" ");
@@ -122,6 +128,14 @@ public class MyDOMParserBean
                     Interval inte = new StartInterval(taskName, min, max);
                     inter.add(inte);
                     System.out.print("intervallo " + s1);
+                    n8 = l5.getNamedItem("users");
+                    if (n8 != null) {  // recupera utenti
+                        s1 = n8.getNodeValue();                    
+                        pars = s1.split(",");
+                        for (int i = 0; i < pars.length; i++) {
+                            inte.addUser(pars[i]);
+                        }
+                    }
                 }
             }
         }
@@ -288,4 +302,50 @@ public class MyDOMParserBean
             parseNet(n67, iTasks, "", indent + "    ");
         }
     }
+
+    public static void parseIntervalsOLD(Node n, ArrayList<Interval> inter, String indent) {
+        String s = "" + n.getClass();
+
+        boolean stampa = !s.equals("class com.sun.org.apache.xerces.internal.dom.DeferredTextImpl");
+
+        //   if (stampa) System.out.println(indent+ "Nodo: " + n.getClass() + " name:" + n.getNodeName());// + " value:'" + n.getNodeValue()+"'");
+        if (stampa) {
+            System.out.print(indent + "elem: " + n.getNodeName());// + " value:'" + n.getNodeValue()+"'");
+        }
+        NamedNodeMap l5 = n.getAttributes();
+        if (l5 == null) {
+            //   if (stampa) System.out.println(indent+"0 attributes ");
+        } else {
+
+            //  if (stampa)  System.out.println(indent + l5.getLength() + " attributes ");
+            for (int k = 0; k < l5.getLength(); k++) {
+                Node n8 = l5.item(k);
+                // System.out.print(" " + n8.getNodeName() + " ='" + n8.getNodeValue() + "'");
+                if (n8.getNodeName().equals("task") && n.getNodeName().equals("action")) {
+                    taskName = n8.getNodeValue();
+                    System.out.print("carico " + n8.getNodeName() + " ='" + n8.getNodeValue() + "'");
+                }
+                if (n.getNodeName().equals("interval") || n.getNodeName().equals("intervals")) {
+                    if (n8.getNodeName().equals("start")) {
+                        String s1 = n8.getNodeValue();
+                        s1 = s1.replaceAll("[(),]", " ");
+                        String[] pars = s1.split(" ");
+                        int min = Integer.parseInt(pars[1]);
+                        int max = Integer.parseInt(pars[2]);
+                        Interval inte = new StartInterval(taskName, min, max);
+                        inter.add(inte);
+                        System.out.print("intervallo " + s1);
+                    }
+                }
+            }
+        }
+        System.out.println();
+        NodeList l33 = n.getChildNodes();
+        //   if (stampa)    System.out.println(indent+ l33.getLength() + " children ");
+        for (int w = 0; w < l33.getLength(); w++) {
+            Node n67 = l33.item(w);
+            parseIntervalsOLD(n67, inter, indent + "    ");
+        }
+    }
+
 }

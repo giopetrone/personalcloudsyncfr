@@ -647,6 +647,7 @@ exists or setup the property manually. For example like this:
         <copyfiles files="${file.reference.validation-api-1.0.0.GA-sources.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${libs.HTTPCLIENT.classpath}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${reference.TestJacop.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${file.reference.SyncProxy.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${file.reference.Sched.css}" todir="${build.web.dir}//"/>
         <mkdir dir="${build.web.dir}/META-INF"/>
         <manifest file="${build.web.dir}/META-INF/MANIFEST.MF" mode="update"/>
@@ -658,6 +659,7 @@ exists or setup the property manually. For example like this:
         <copyfiles files="${file.reference.validation-api-1.0.0.GA-sources.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${libs.HTTPCLIENT.classpath}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${reference.TestJacop.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copyfiles files="${file.reference.SyncProxy.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${file.reference.Sched.css}" todir="${build.web.dir}//"/>
     </target>
     <target depends="init" if="dist.ear.dir" name="-clean-webinf-lib">
