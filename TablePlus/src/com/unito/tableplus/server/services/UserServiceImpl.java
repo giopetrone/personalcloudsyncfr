@@ -126,7 +126,6 @@ public class UserServiceImpl extends RemoteServiceServlet implements
 				users.add((User) pm.detachCopy(object));
 			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
 			pm.close();

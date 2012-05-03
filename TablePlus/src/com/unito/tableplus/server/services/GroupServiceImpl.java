@@ -35,11 +35,13 @@ public class GroupServiceImpl extends RemoteServiceServlet implements
 	public List<Group> queryGroups(List<Long> keys) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		List<Group> groups = new LinkedList<Group>();
-		Object object = null;
 		try {
 			for (Long key : keys) {
-				object = pm.getObjectById(Group.class, key);
-				groups.add((Group) pm.detachCopy(object));
+				Group g = pm.getObjectById(Group.class, key);
+				//because of lazy behaviour the BlackBoard must be "touched"
+				//for being detached
+				g.getBlackBoard();
+				groups.add(pm.detachCopy(g));
 			}
 		} catch (Exception e) {
 			System.err.println("There has been an error querying groups: " + e);
@@ -90,6 +92,9 @@ public class GroupServiceImpl extends RemoteServiceServlet implements
 			Group group = pm.getObjectById(Group.class, key);
 			if (group == null)
 				return group;
+			//because of lazy behaviour the BlackBoard must be "touched"
+			//for being detached
+			group.getBlackBoard();			
 			detached = pm.detachCopy(group);
 		} catch (Exception e) {
 			System.err.println("There has been an error querying groups: " + e);

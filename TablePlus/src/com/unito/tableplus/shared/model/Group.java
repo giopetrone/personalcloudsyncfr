@@ -12,11 +12,8 @@ import javax.jdo.annotations.PrimaryKey;
 
 @PersistenceCapable(detachable = "true")
 public class Group implements Serializable {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+	
+	private static final long serialVersionUID = -4489608881786573961L;
 
 	@PrimaryKey
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)

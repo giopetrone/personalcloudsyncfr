@@ -18,6 +18,7 @@ import org.json.JSONTokener;
 
 import com.unito.tableplus.shared.model.Group;
 import com.unito.tableplus.shared.model.Message;
+import com.unito.tableplus.shared.model.MessageType;
 import com.unito.tableplus.shared.model.User;
 
 public class Proxy extends HttpServlet {
@@ -26,6 +27,7 @@ public class Proxy extends HttpServlet {
 
 	GroupServiceImpl groupProxy = new GroupServiceImpl();
 	UserServiceImpl userProxy = new UserServiceImpl();
+	TokenServiceImpl tokenProxy  = new TokenServiceImpl();
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -38,12 +40,14 @@ public class Proxy extends HttpServlet {
 			String request = jo.getString("request");
 			PrintWriter pw = resp.getWriter();
 
-			if(request.equals("queryUser"))
+			if (request.equals("queryUser"))
 				queryUser(jo, pw);
-			else if(request.equals("queryTable"))
+			else if (request.equals("queryTable"))
 				queryTable(jo, pw);
-			else if(request.equals("queryTables"))
+			else if (request.equals("queryTables"))
 				queryTables(jo, pw);
+			else if (request.equals("writeMessage"))
+				writeMessage(jo,pw);
 
 		} catch (JSONException e) {
 			System.err.println("Error while processing post request.");
@@ -64,14 +68,14 @@ public class Proxy extends HttpServlet {
 				rj.put("error", "User not found");
 			} else {
 				rj.put("status", "OK");
-				
+
 				uj.put("key", user.getKey());
 				uj.put("username", user.getUsername());
 				uj.put("firstname", user.getFirstName());
 				uj.put("lastname", user.getLastName());
 				uj.put("email", user.getEmail());
 				uj.put("tables", user.getGroups());
-				
+
 				rj.put("results", uj);
 			}
 
@@ -106,15 +110,34 @@ public class Proxy extends HttpServlet {
 				table.put("owner", group.getOwner());
 
 				List<Message> messages = group.getBlackBoard();
+				
+				//if there are no messages this key won't be put into the json
+				int n = 1;
 				int size = messages.size();
+				JSONArray ja = new JSONArray();
+				JSONObject jm;
+				Message m;
+				
+				while(size-n >= 0 && n < 10){
+					jm = new JSONObject();
+					m = messages.get(size-n);
+					
+					jm.put("key", m.getKey());
+					jm.put("timestamp", m.getDate());
+					jm.put("author", m.getAuthor());
+					jm.put("type", m.getType().toString());
+					jm.put("content", m.getContent());
+					
+					ja.put(jm);
+					
+					n++;
+				}
+				table.put("messages", ja);
 
-				table.put("messages",
-						group.getBlackBoard().subList(size - 11, size - 1));
 				table.put("documents", group.getDocuments());
 
 				rj.put("results", table);
 			}
-			
 			pw.print(rj.toString());
 			pw.flush();
 			pw.close();
@@ -130,23 +153,25 @@ public class Proxy extends HttpServlet {
 		try {
 			JSONArray tableKeysArray = jo.getJSONArray("tablesKeyList");
 			List<Long> queryList = new ArrayList<Long>();
-			JSONObject table = new JSONObject();
-			JSONObject rj = new JSONObject();
-			JSONArray ja = new JSONArray();
-
+			JSONObject table, rj;
+			JSONArray ja;
+			
 			for (int i = 0; i < tableKeysArray.length(); i++) {
 				queryList.add((Long) tableKeysArray.getLong(i));
 			}
 
 			List<Group> groups = groupProxy.queryGroups(queryList);
 
+			rj = new JSONObject();
+			
 			if (groups == null) {
 				rj.put("status", "ERROR");
 				rj.put("error", "No tables found for requested key");
 			} else {
 				rj.put("status", "OK");
-
+				ja = new JSONArray();
 				for (Group group : groups) {
+					table = new JSONObject();
 					table.put("key", group.getKey());
 					table.put("name", group.getName());
 					table.put("members", group.getMembers().size());
@@ -171,4 +196,30 @@ public class Proxy extends HttpServlet {
 
 	}
 
+	private void writeMessage(JSONObject jo, PrintWriter pw){
+		try {
+			JSONObject rj = new JSONObject();
+			Long table =  jo.getLong("tableKey");
+			Long author = jo.getLong("authorKey");
+			String type = jo.getString("messageType");
+			String content = jo.getString("messageContent");
+			
+			MessageType mType = Enum.valueOf(MessageType.class, type);
+			
+			Message message = new Message(author, mType, content);
+			
+			Group group = groupProxy.queryGroup(table);
+			group.getBlackBoard().add(message);
+			groupProxy.storeGroup(group);
+			
+			rj.put("status", "OK");
+			pw.print(rj.toString());
+			pw.flush();
+			pw.close();
+		} catch (JSONException e) {
+			System.err.println("Error while writing message.");
+			System.err.println(e);
+		}
+	}
 }
+

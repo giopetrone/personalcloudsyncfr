@@ -13,10 +13,7 @@ import javax.jdo.annotations.Extension;
 @PersistenceCapable(detachable = "true")
 public class Message implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 4594842116272050252L;
 
 	@PrimaryKey
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
@@ -24,20 +21,20 @@ public class Message implements Serializable {
 	private String key;
 
 	@Persistent
-	private String author = null;
+	private Long author = null;
 	@Persistent
 	private MessageType type = null;
 	@Persistent
 	private String content = null;
 	@Persistent
-	private Timestamp date;
+	private String date;
 	@Persistent
 	private int hashcode;
 	@Persistent
 	private Group group;
 
-	public Message(String author, MessageType type, String content) {
-		date = new Timestamp(new Date().getTime());
+	public Message(Long author, MessageType type, String content) {
+		date = new Timestamp(new Date().getTime()).toString();
 		this.author = author;
 		this.type = type;
 		this.content = content;
@@ -45,43 +42,43 @@ public class Message implements Serializable {
 	}
 	
 	public Message(){
-		date = new Timestamp(new Date().getTime());
-		this.hashcode = 1;
+		date = new Timestamp(new Date().getTime()).toString();
+		this.hashcode = this.hashCode();
 	}
 
-	protected String getAuthor() {
+	public Long getAuthor() {
 		return author;
 	}
 
-	protected void setAuthor(String author) {
+	public void setAuthor(Long author) {
 		this.author = author;
 	}
 
-	protected MessageType getType() {
+	public MessageType getType() {
 		return type;
 	}
 
-	protected void setType(MessageType type) {
+	public void setType(MessageType type) {
 		this.type = type;
 	}
 
-	protected String getContent() {
+	public String getContent() {
 		return content;
 	}
 
-	protected void setContent(String content) {
+	public void setContent(String content) {
 		this.content = content;
 	}
 
-	protected Timestamp getDate() {
+	public String getDate() {
 		return date;
 	}
 
-	protected int getHashcode() {
+	public int getHashcode() {
 		return hashcode;
 	}
 
-	protected boolean equals(Message message) {
+	public boolean equals(Message message) {
 		return (this.hashcode == message.getHashcode());
 	}
 
@@ -99,7 +96,7 @@ public class Message implements Serializable {
 				+ this.getContent() + "--" + this.getType();
 	}
 
-	protected String getKey() {
+	public String getKey() {
 		return key;
 	}
 
