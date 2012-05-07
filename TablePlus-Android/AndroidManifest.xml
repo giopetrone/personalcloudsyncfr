@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="it.unito.gui"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk android:minSdkVersion="8" />
+	<uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:name="it.unito.utility.TablePlusAndroid"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name" >
+        
+        <activity
+            android:name=".MainGuiActivity"
+            android:label="@string/app_name" >
+        </activity>
+         <activity
+            android:name=".TableList"
+            android:label="ListaTavoliGUI" >
+        </activity>
+      
+         <activity
+            android:name=".LoginActivity"
+            android:label="Login" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+         <activity
+            android:name=".InsertMessage"
+            android:label="NewTable" >
+        </activity>
+         <activity
+            android:name="HelloTabWidgetActivity"
+            android:label="HelloTabWidgetActivity" >
+        </activity>
+         <activity
+            android:name="InfoActivity"
+            android:label="InfoActivity" >
+        </activity>
+         <activity
+            android:name=".BlackBoard"
+            android:label="Message" >
+        </activity>
+        <activity
+            android:name=".ExistantTable"
+            android:label="ExistantTable" >
+        </activity>
+        <activity
+            android:name=".Members"
+            android:label="Members" >
+        </activity>
+         <activity
+            android:name=".AddMessageActivity"
+            android:label="AddActivity" >
+        </activity>
+    </application>
+
+</manifest>

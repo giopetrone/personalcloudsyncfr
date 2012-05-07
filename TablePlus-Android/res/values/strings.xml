@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="inputData">InputData</string>
+    <string name="outData">OutData</string>
+    <string name="hello">Hello World, Main!</string>
+    <string name="app_name">TablePlus-Android</string>
+	<string name="Bottone1">Salva</string>
+    
+    <string name="reset">Reset</string>
+    <string name="invia">Invia</string>
+    <string name="resta_connesso">Resta connesso</string>
+    <string name="password">Password</string>
+    <string name="mail">Mail</string>
+    <string name="login">Login</string>
+    <string name="create_table">Create</string>
+    <string name="tab"></string>
+    <string name="tab2"></string>
+    <string name="add_obj">Add</string>
+    <string name="info_tab">Info</string>
+    
+    <string name="addelem">Inserisci un oggetto da mettere sul tavolo</string>  
+    <string name="addel">Indirizzo</string>
+    <string name="aggiungi">Add</string>
+    
+</resources>
