@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -38,8 +37,8 @@ public class GroupServiceImpl extends RemoteServiceServlet implements
 		try {
 			for (Long key : keys) {
 				Group g = pm.getObjectById(Group.class, key);
-				//because of lazy behaviour the BlackBoard must be "touched"
-				//for being detached
+				// because of lazy behaviour the BlackBoard must be "touched"
+				// for being detached
 				g.getBlackBoard();
 				groups.add(pm.detachCopy(g));
 			}
@@ -92,9 +91,9 @@ public class GroupServiceImpl extends RemoteServiceServlet implements
 			Group group = pm.getObjectById(Group.class, key);
 			if (group == null)
 				return group;
-			//because of lazy behaviour the BlackBoard must be "touched"
-			//for being detached
-			group.getBlackBoard();			
+			// because of lazy behaviour the BlackBoard must be "touched"
+			// for being detached
+			group.getBlackBoard();
 			detached = pm.detachCopy(group);
 		} catch (Exception e) {
 			System.err.println("There has been an error querying groups: " + e);
@@ -107,7 +106,6 @@ public class GroupServiceImpl extends RemoteServiceServlet implements
 	@Override
 	public void deleteGroup(Long key) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-
 		try {
 			Group group = pm.getObjectById(Group.class, key);
 			pm.deletePersistentAll(group);
@@ -138,34 +136,19 @@ public class GroupServiceImpl extends RemoteServiceServlet implements
 		}
 		return true;
 	}
-
-	public boolean removeMessage(Long groupKey, Long message) {
+	
+	@Override
+	public void removeMessage(String messageKey) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Transaction tx = pm.currentTransaction();
-		Boolean found = false;
 		try {
-			Group group = pm.getObjectById(Group.class, groupKey);
-			if (group == null)
-				return false;
-			List<Message> blackboard = group.getBlackBoard();
-			Iterator<Message> i = blackboard.iterator();
-			while (i.hasNext() && !found) {
-				if (i.next().equals(message)) {
-					tx.begin();
-					i.remove();
-					found = true;
-					tx.commit();
-				}
-			}
+			Message message = pm.getObjectById(Message.class, messageKey);
+			pm.deletePersistentAll(message);
 		} catch (Exception e) {
 			System.err
 					.println("There has been an error removing message: " + e);
 		} finally {
-			if (tx.isActive())
-				tx.rollback();
 			pm.close();
 		}
-		return found;
 	}
 
 	@Override
@@ -428,12 +411,12 @@ public class GroupServiceImpl extends RemoteServiceServlet implements
 		// recupera l'oggetto gruppo
 		Group g = this.queryGroup(groupKey);
 
-//		System.out
-//				.println("removeSelectivePresenceMemberFromGroup:\n------ userKey = "
-//						+ userKey
-//						+ "\n------ groupKey = "
-//						+ groupKey
-//						+ "\n------ group = " + (g!=null?g.getName():"null"));
+		// System.out
+		// .println("removeSelectivePresenceMemberFromGroup:\n------ userKey = "
+		// + userKey
+		// + "\n------ groupKey = "
+		// + groupKey
+		// + "\n------ group = " + (g!=null?g.getName():"null"));
 
 		// rimuove l'utente dal gruppo e lo salva
 		g.removeSelectivePresenceMember(userKey);

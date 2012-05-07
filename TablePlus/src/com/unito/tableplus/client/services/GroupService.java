@@ -41,4 +41,6 @@ public interface GroupService extends RemoteService {
 	boolean addSelectivePresenceMemberToGroup(Long userKey, Long groupKey);
 
 	boolean removeSelectivePresenceMemberFromGroup(Long userKey, Long groupKey);
+
+	void removeMessage(String messageKey);
 }

@@ -9,21 +9,21 @@ import com.unito.tableplus.shared.model.Message;
 import com.unito.tableplus.shared.model.User;
 
 public interface GroupServiceAsync {
-	
-	void queryGroups(List<Long> keys,AsyncCallback<List<Group>> callback);
+
+	void queryGroups(List<Long> keys, AsyncCallback<List<Group>> callback);
 
 	void storeGroup(Group group, AsyncCallback<Long> callback);
-	
+
 	void queryGroup(Long key, AsyncCallback<Group> callback);
 
 	void deleteGroup(Long key, AsyncCallback<Void> callback);
-	
+
 	void addMessage(Long key, Message message, AsyncCallback<Boolean> callback);
 
 	void clearMessages(Long key, AsyncCallback<Boolean> callback);
 
-	void addDocumentToGroup(String DocId, User user,
-			Long groupKey,AsyncCallback<Boolean> callback);
+	void addDocumentToGroup(String DocId, User user, Long groupKey,
+			AsyncCallback<Boolean> callback);
 
 	void storeGroupProva(Group group, AsyncCallback<Long> callback);
 
@@ -45,6 +45,8 @@ public interface GroupServiceAsync {
 			AsyncCallback<Boolean> callback);
 
 	void removeSelectivePresenceMemberFromGroup(Long userKey, Long groupKey,
-			AsyncCallback<Boolean> callback);	
+			AsyncCallback<Boolean> callback);
+
+	void removeMessage(String messageKey, AsyncCallback<Void> callback);
 
 }

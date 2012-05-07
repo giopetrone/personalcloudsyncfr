@@ -27,7 +27,7 @@ public class Proxy extends HttpServlet {
 
 	GroupServiceImpl groupProxy = new GroupServiceImpl();
 	UserServiceImpl userProxy = new UserServiceImpl();
-	TokenServiceImpl tokenProxy  = new TokenServiceImpl();
+	TokenServiceImpl tokenProxy = new TokenServiceImpl();
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -37,6 +37,7 @@ public class Proxy extends HttpServlet {
 		try {
 			JSONTokener jt = new JSONTokener(is);
 			JSONObject jo = new JSONObject(jt);
+
 			String request = jo.getString("request");
 			PrintWriter pw = resp.getWriter();
 
@@ -46,13 +47,24 @@ public class Proxy extends HttpServlet {
 				queryTable(jo, pw);
 			else if (request.equals("queryTables"))
 				queryTables(jo, pw);
+			else if (request.equals("queryMessages"))
+				queryMessages(jo, pw);
 			else if (request.equals("writeMessage"))
-				writeMessage(jo,pw);
+				writeMessage(jo, pw);
+			else if (request.equals("deleteMessage"))
+				deleteMessage(jo, pw);
+			else {
+				JSONObject rj = new JSONObject();
+				rj.put("status", "ERROR");
+				rj.put("error", "Request unkown.");
+				pw.print(rj.toString());
+				pw.flush();
+				pw.close();
+			}
 
 		} catch (JSONException e) {
 			System.err.println("Error while processing post request.");
 			System.err.println(e);
-			e.printStackTrace();
 		}
 	}
 
@@ -81,12 +93,12 @@ public class Proxy extends HttpServlet {
 
 			pw.print(rj.toString());
 			pw.flush();
-			pw.close();
 
 		} catch (JSONException e) {
 			System.err.println("Error while querying user");
 			System.err.println(e);
-			e.printStackTrace();
+		} finally {
+			pw.close();
 		}
 	}
 
@@ -110,42 +122,41 @@ public class Proxy extends HttpServlet {
 				table.put("owner", group.getOwner());
 
 				List<Message> messages = group.getBlackBoard();
-				
-				//if there are no messages this key won't be put into the json
+
+				// if there are no messages this key won't be put into the json
 				int n = 1;
 				int size = messages.size();
 				JSONArray ja = new JSONArray();
 				JSONObject jm;
 				Message m;
-				
-				while(size-n >= 0 && n < 10){
+
+				while (size - n >= 0 && n < 10) {
 					jm = new JSONObject();
-					m = messages.get(size-n);
-					
+					m = messages.get(size - n);
+
 					jm.put("key", m.getKey());
 					jm.put("timestamp", m.getDate());
 					jm.put("author", m.getAuthor());
 					jm.put("type", m.getType().toString());
 					jm.put("content", m.getContent());
-					
+
 					ja.put(jm);
-					
+
 					n++;
 				}
-				table.put("messages", ja);
 
+				table.put("messages", ja);
 				table.put("documents", group.getDocuments());
 
 				rj.put("results", table);
 			}
 			pw.print(rj.toString());
 			pw.flush();
-			pw.close();
-
 		} catch (JSONException e) {
 			System.err.println("Error while querying table");
 			System.err.println(e);
-			e.printStackTrace();
+		} finally {
+			pw.close();
 		}
 	}
 
@@ -155,7 +166,7 @@ public class Proxy extends HttpServlet {
 			List<Long> queryList = new ArrayList<Long>();
 			JSONObject table, rj;
 			JSONArray ja;
-			
+
 			for (int i = 0; i < tableKeysArray.length(); i++) {
 				queryList.add((Long) tableKeysArray.getLong(i));
 			}
@@ -163,7 +174,7 @@ public class Proxy extends HttpServlet {
 			List<Group> groups = groupProxy.queryGroups(queryList);
 
 			rj = new JSONObject();
-			
+
 			if (groups == null) {
 				rj.put("status", "ERROR");
 				rj.put("error", "No tables found for requested key");
@@ -186,40 +197,107 @@ public class Proxy extends HttpServlet {
 
 			pw.print(rj.toString());
 			pw.flush();
-			pw.close();
 
 		} catch (JSONException e) {
 			System.err.println("Error while querying tables");
 			System.err.println(e);
-			e.printStackTrace();
+		} finally {
+			pw.close();
 		}
 
 	}
 
-	private void writeMessage(JSONObject jo, PrintWriter pw){
+	private void queryMessages(JSONObject jo, PrintWriter pw) {
+		Long tableKey;
+		JSONObject rj = new JSONObject();
+		try {
+			tableKey = jo.getLong("tableKey");
+			Group group = groupProxy.queryGroup(tableKey);
+			if (group == null) {
+				rj.put("status", "ERROR");
+				rj.put("error", "No table found for requested key");
+			} else {
+				rj.put("status", "OK");
+				List<Message> messages = group.getBlackBoard();
+
+				int n = 1;
+				int size = messages.size();
+				JSONArray ja = new JSONArray();
+				JSONObject jm;
+				Message m;
+
+				while (size - n >= 0 && n < 10) {
+					jm = new JSONObject();
+					m = messages.get(size - n);
+
+					jm.put("key", m.getKey());
+					jm.put("timestamp", m.getDate());
+					jm.put("author", m.getAuthor());
+					jm.put("type", m.getType().toString());
+					jm.put("content", m.getContent());
+
+					ja.put(jm);
+
+					n++;
+				}
+
+				rj.put("results", ja);
+
+				pw.print(rj.toString());
+				pw.flush();
+			}
+		} catch (JSONException e) {
+			System.err.println("Error while querying messages");
+			System.err.println(e);
+		} finally {
+			pw.close();
+		}
+	}
+
+	private void writeMessage(JSONObject jo, PrintWriter pw) {
 		try {
 			JSONObject rj = new JSONObject();
-			Long table =  jo.getLong("tableKey");
+			Long table = jo.getLong("tableKey");
 			Long author = jo.getLong("authorKey");
 			String type = jo.getString("messageType");
 			String content = jo.getString("messageContent");
-			
+
 			MessageType mType = Enum.valueOf(MessageType.class, type);
-			
+
 			Message message = new Message(author, mType, content);
-			
+
 			Group group = groupProxy.queryGroup(table);
 			group.getBlackBoard().add(message);
 			groupProxy.storeGroup(group);
-			
+
 			rj.put("status", "OK");
 			pw.print(rj.toString());
 			pw.flush();
-			pw.close();
+
 		} catch (JSONException e) {
 			System.err.println("Error while writing message.");
 			System.err.println(e);
+		} finally {
+			pw.close();
+		}
+	}
+
+	private void deleteMessage(JSONObject jo, PrintWriter pw) {
+		JSONObject rj = new JSONObject();
+		String key;
+		try {
+			key = jo.getString("messageKey");
+			groupProxy.removeMessage(key);
+
+			rj.put("status", "OK");
+			pw.print(rj.toString());
+			pw.flush();
+
+		} catch (JSONException e) {
+			System.err.println("Error while deleting message.");
+			System.err.println(e);
+		} finally {
+			pw.close();
 		}
 	}
 }
-

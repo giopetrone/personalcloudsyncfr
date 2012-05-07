@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" output="test-classes" path="test"/>
 	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
 	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/GXT_2_2_5"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/GDATA"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/GWTChannelAPI.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/gxt-2.2.5-gwt22.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/gwt-gdata.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/guava-gwt-11.0.2.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/guava-11.0.2.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/gdata-base-1.0.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/gdata-client-1.0.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/gdata-core-1.0.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/gdata-docs-3.0.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/gdata-media-1.0.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/json.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>
