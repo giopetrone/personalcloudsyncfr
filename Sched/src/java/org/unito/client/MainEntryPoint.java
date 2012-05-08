@@ -13,18 +13,26 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.MouseOutEvent;
+import com.google.gwt.event.dom.client.MouseOutHandler;
+import com.google.gwt.event.dom.client.MouseOverEvent;
+import com.google.gwt.event.dom.client.MouseOverHandler;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.DockPanel;
 import com.google.gwt.user.client.ui.FlexTable;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLTable;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 import java.util.ArrayList;
 
 /**
@@ -34,9 +42,15 @@ import java.util.ArrayList;
  */
 public class MainEntryPoint implements EntryPoint {
 
-    final FlexTable taskTable = new FlexTable();
-    final FlexTable taskDefTable = new FlexTable();
+    final FlexTable taskTable = new FlexTable();//(13,8);
+    final FlexTable taskDefTable = new FlexTable();//(13,8);
     private Label lblServerReply = new Label();
+    DatePicker dayStart = new DatePicker("giorni", 0);
+    DatePicker timeStart = new DatePicker("ore", 0);
+    DatePicker dayEnd = new DatePicker("giorni", 4);
+    DatePicker timeEnd = new DatePicker("ore", 11);
+    DatePicker daySchedule = new DatePicker("giorni", 0);
+    DatePicker timeSchedule = new DatePicker("ore", 0);
     int partenza = 8;
     int fine = 20;
     int orario = fine - partenza;
@@ -45,21 +59,21 @@ public class MainEntryPoint implements EntryPoint {
     Label label2 = new Label("Duration:");
     TextBox te2 = new TextBox();
     Label label3 = new Label("Start:");
-    TextBox te3 = new TextBox();
+    //   TextBox te3 = new TextBox();
     Label label4 = new Label("End:");
-    TextBox te4 = new TextBox();
+    //   TextBox te4 = new TextBox();
     Label label5 = new Label("Before:");
     TextBox te5 = new TextBox();
     Label label6 = new Label("After:");
     TextBox te6 = new TextBox();
     Label label7 = new Label("Schedule:");
-    TextBox te7 = new TextBox();
+    //  TextBox te7 = new TextBox();
     Label label8 = new Label("Users:");
     TextBox te8 = new TextBox();
     Label label9 = new Label("Select User:");
     // Label label7 = new Label("Overlap:");
     CheckBox ch7 = new CheckBox("Can overlap other tasks ");
-    String currentUser = "*";
+    ArrayList<String> currentUsers = new ArrayList();
 
     /**
      * Creates a new instance of MainEntryPoint
@@ -97,12 +111,14 @@ public class MainEntryPoint implements EntryPoint {
         h = new HorizontalPanel();
         label3.setWidth("100px");
         h.add(label3);
-        h.add(te3);
+        h.add(dayStart);
+        h.add(timeStart); // h.add(te3);
         vert.add(h);
         h = new HorizontalPanel();
         label4.setWidth("100px");
         h.add(label4);
-        h.add(te4);
+        h.add(dayEnd);
+        h.add(timeEnd); //h.add(te4);
         vert.add(h);
         h = new HorizontalPanel();
         label5.setWidth("100px");
@@ -117,7 +133,8 @@ public class MainEntryPoint implements EntryPoint {
         h = new HorizontalPanel();
         label7.setWidth("100px");
         h.add(label7);
-        h.add(te7);
+        h.add(daySchedule);
+        h.add(timeSchedule); // h.add(te7);
         vert.add(h);
         h = new HorizontalPanel();
         label8.setWidth("100px");
@@ -138,14 +155,21 @@ public class MainEntryPoint implements EntryPoint {
                     Window.alert("task already existent: " + te1.getText());
                     return;
                 }
-                String msg = TaskGroup.checkTask(te1.getText(), te3.getText(), te4.getText(), te2.getText(), te5.getText(), te6.getText(), te7.getText(), te8.getText(), ch7.getValue());
+                //  Window.alert("giornoSelezionato: " + dayStart.getSelectedIndex());
+                String vv = stringVal(dayStart, timeStart);
+                String vvv = stringVal(dayEnd, timeEnd);
+                String vvvv = stringVal(daySchedule, timeSchedule);
+                String msg = TaskGroup.checkTask(te1.getText(), vv, vvv, te2.getText(), te5.getText(), te6.getText(), vvvv, te8.getText(), ch7.getValue());
                 if (!msg.equals("")) {
                     Window.alert(msg);
                     return;
                 }
-                msg = TaskGroup.addScheduleTask(te1.getText(), te3.getText(), te4.getText(), te2.getText(), te5.getText(), te6.getText(), te7.getText(), te8.getText(), ch7.getValue());
-                if (!msg.equals("")) {
-                    Window.alert(msg);
+                int sch = TaskGroup.addScheduleTask(te1.getText(), vv, vvv, te2.getText(), te5.getText(), te6.getText(), vvvv, te8.getText(), ch7.getValue());
+                if (sch == -1) {
+                    boolean callScheduler = Window.confirm("task has not been scheduled, do you want to change something?");
+                    if (callScheduler) {
+                        Window.alert("still to be done");
+                    }
                     return;
                 }
                 riempi(taskTable, false, TaskGroup.current());
@@ -158,11 +182,14 @@ public class MainEntryPoint implements EntryPoint {
         changeButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-                String msg = TaskGroup.checkTask(te1.getText(), te3.getText(), te4.getText(), te2.getText(), te5.getText(), te6.getText(), te7.getText(), te8.getText(), ch7.getValue());
+                String vv = stringVal(dayStart, timeStart);
+                String vvv = stringVal(dayEnd, timeEnd);
+                String vvvv = stringVal(daySchedule, timeSchedule);
+                String msg = TaskGroup.checkTask(te1.getText(), vv, vvv, te2.getText(), te5.getText(), te6.getText(), vvv, te8.getText(), ch7.getValue());
                 if (!msg.equals("")) {
                     Window.alert(msg);
                 }
-                Task tat = new Task(te1.getText(), te3.getText(), te4.getText(), te2.getText(), te5.getText(), te6.getText(), te7.getText(), te8.getText(), ch7.getValue());
+                Task tat = new Task(te1.getText(), vv, vvv, te2.getText(), te5.getText(), te6.getText(), vvv, te8.getText(), ch7.getValue());
                 msg = TaskGroup.change(tat);
                 if (!msg.equals("")) {
                     Window.alert(msg);
@@ -295,13 +322,14 @@ public class MainEntryPoint implements EntryPoint {
 
             public void onClick(ClickEvent event) {
 
-              
+
                 DialogBox dlg = new MyDialog("Specification of all tasks", null, false);
                 dlg.center();
             }
         });
         h11.add(schedVertPanel);
-        ListBox li9 = iniziaUtenti();
+        FlexTable li9 = new FlexTable();
+        iniziaUtenti(li9);
         h11.add(label9);
         h11.add(li9);
         RootPanel.get().add(h11);
@@ -318,7 +346,7 @@ public class MainEntryPoint implements EntryPoint {
     }
 
     private void iniziaTable(final FlexTable t, TaskGroup tg) {
-        FlexTable.FlexCellFormatter form = t.getFlexCellFormatter();
+        FlexTable.CellFormatter form = t.getCellFormatter();
         t.setText(0, 0, "Time");
         form.addStyleName(0, 0, "style1");
         //   t.addStyleName("MainLabel");
@@ -355,7 +383,7 @@ public class MainEntryPoint implements EntryPoint {
     }
 
     private void initDefTable(final FlexTable t) {
-        FlexTable.FlexCellFormatter form = t.getFlexCellFormatter();
+        FlexTable.CellFormatter form = t.getCellFormatter();
         t.setBorderWidth(1);
         t.setText(0, 0, "Task name");
         form.addStyleName(0, 0, "style1");
@@ -388,11 +416,11 @@ public class MainEntryPoint implements EntryPoint {
                 updateText(s);
             }
         });
-        
+
     }
 
     void addRow(FlexTable f, Task ta) {
-        FlexTable.FlexCellFormatter form = f.getFlexCellFormatter();
+        FlexTable.CellFormatter form = f.getCellFormatter();
         int row = f.getRowCount();
         f.setText(row, 0, ta == null ? "" : ta.getName());
         f.setText(row, 1, ta == null ? "" : "" + ta.getDuration());
@@ -409,17 +437,17 @@ public class MainEntryPoint implements EntryPoint {
     }
 
     private void updateTasks(FlexTable f) {
-       
+
         while (taskDefTable.getRowCount() > 1) {
             taskDefTable.removeRow(taskDefTable.getRowCount() - 1);
         }
-      
+
         for (Task ta : TaskGroup.current().getTasks()) {
             addRow(f, ta);
         }
-      
+
         addRow(f, null);
-       
+
     }
 
     private void updateText(String s) {
@@ -427,21 +455,33 @@ public class MainEntryPoint implements EntryPoint {
             Task ta = TaskGroup.get(s);
             te1.setText(ta.getName());
             te2.setText("" + ta.getDuration());
-            te3.setText("" + ta.getMinStartHour());
-            te4.setText("" + ta.getMaxEndHour());
+            dayStart.setSelectedIndex(Task.dayOf(ta.getMinStartHour()));
+            timeStart.setSelectedIndex(Task.timeOf(ta.getMinStartHour()));
+            // te4.setText("" + ta.getMaxEndHour());
+            dayEnd.setSelectedIndex(Task.dayOf(ta.getMaxEndHour()));
+            timeEnd.setSelectedIndex(Task.timeOf(ta.getMaxEndHour()));
             te5.setText(ta.beforeString());
             te6.setText(ta.afterString());
-            te7.setText("" + ta.getOfficialScheduleAsString());
+
+            daySchedule.setSelectedIndex(Task.dayOf(ta.getOfficialSchedule()));
+            timeSchedule.setSelectedIndex(Task.timeOf(ta.getOfficialSchedule()));
+
+            //  te7.setText("" + ta.getOfficialScheduleAsString());
             te8.setText(ta.userString());
             ch7.setValue(ta.getOverlap());
         } else {
             te1.setText("");
             te2.setText("");
-            te3.setText("");
-            te4.setText("");
+            dayStart.setSelectedIndex(0);
+            timeStart.setSelectedIndex(0);
+            // te4.setText("");
+            dayEnd.setSelectedIndex(0);
+            timeEnd.setSelectedIndex(0);
             te5.setText("");
             te6.setText("");
-            te7.setText("");
+            daySchedule.setSelectedIndex(0);
+            timeSchedule.setSelectedIndex(0);
+            //  te7.setText("");
             te8.setText("");
             ch7.setValue(false);
         }
@@ -467,28 +507,79 @@ public class MainEntryPoint implements EntryPoint {
     }
 
     private void riempi(FlexTable t, boolean showAlt, TaskGroup tg) {
-        FlexTable.FlexCellFormatter form = t.getFlexCellFormatter();
-        String[] vals = TaskGroup.retr(showAlt, tg);
+        FlexTable.CellFormatter form = t.getCellFormatter();
+
+        ArrayList<String>[] vals = TaskGroup.retr(showAlt, tg);
+
         int k = 0;
         for (int j = 0; j < 7 + 1; j++) {  // migliorare i colori
-            for (int i = 0; i < orario; i++) {
-                if (vals[k].equals("***")) {
-                    t.setText(i + 1, j + 1, "");
-                    form.setStyleName(i + 1, j + 1, "styleAvailable");
-                } else if (vals[k].equals("")) {
+            for (int i = 0; i < orario && k < vals.length; i++) {
+                ArrayList<String> curr = vals[k];
+                if (curr.isEmpty()) {
                     t.setText(i + 1, j + 1, "");
                     form.setStyleName(i + 1, j + 1, "styleUnused");
+                } else if (curr.get(0).equals("***")) {
+                    t.setText(i + 1, j + 1, "");
+                    form.setStyleName(i + 1, j + 1, "styleAvailable");
                 } else {
-                    t.setText(i + 1, j + 1, vals[k]);
-                    if (TaskGroup.ContainsUser(currentUser, vals[k])) {
-                        form.setStyleName(i + 1, j + 1, "styleOwner");
+                    t.setWidget(i + 1, j + 1, bottoni(curr));
+                    /* VECCHIO
+                    t.setText(i + 1, j + 1, curr.get(0));
+                    UiUser uu = TaskGroup.ContainsUser(currentUsers, curr.get(0));
+                    if (uu != null) {
+                    form.setStyleName(i + 1, j + 1, uu.getStyle());
                     } else {
-                        form.setStyleName(i + 1, j + 1, "styleBusy");
-                    }
+                    form.setStyleName(i + 1, j + 1, "styleBusy");
+                    }                   
+                     */
                 }
                 k++;
             }
         }
+        for (int j = 5; j < 7 + 1; j++) {
+            for (int i = 0; i < orario; i++) {
+                form.setStyleName(i + 1, j + 1, "styleHoliday");
+            }
+        }
+    }
+
+    private Widget bottoni(ArrayList<String> tas) {
+        ArrayList<UiUser> thisBox = new ArrayList();
+        HorizontalPanel oriz = new HorizontalPanel();
+        for (String ta : tas) {
+            final Button bu = new Button(ta);
+            Task t = TaskGroup.get(ta);
+
+            // bu.addMouseListener(
+            //          new TooltipListener(
+            //          t.userString(), 5000 /* timeout in milliseconds*/, "yourcssclass"));
+            TooltipListener tip = new TooltipListener(
+                    t.userString(), 5000, "yourcssclass");
+            bu.addMouseOverHandler(tip);
+            bu.addMouseOutHandler(tip);
+            bu.addClickHandler(new ClickHandler() {
+
+                public void onClick(ClickEvent event) {
+                    String vv = bu.getText();
+                    updateText(vv);
+                }
+            });
+            ArrayList<UiUser> uu = TaskGroup.ContainsUser(currentUsers, ta);
+            for (UiUser us : uu) {
+                if (!thisBox.contains(us)) {
+                    thisBox.add(us);
+                }
+            }
+            oriz.add(bu);
+        }
+        // add colors for all users busy in this interval
+        for (UiUser ui : thisBox) {
+            Label l = new Label("");
+            l.setSize("10px", "22px");
+            l.setStyleName(ui.getStyle());
+            oriz.add(l);
+        }
+        return oriz;
     }
     // Create an asynchronous callback to handle the result.
     final AsyncCallback<ViaVai> callbackTask = new AsyncCallback<ViaVai>() {
@@ -573,29 +664,34 @@ public class MainEntryPoint implements EntryPoint {
         return ta;
     }
 
+    private String stringVal(ListBox day, ListBox time) {
+
+        return "" + (day.getSelectedIndex() * 12 + time.getSelectedIndex());
+    }
+
     class MyDialog extends DialogBox implements ClickHandler {
 
         private boolean proposal = false;
         private TaskGroup tg;
 
         public MyDialog(String title, TaskGroup tg, boolean proposal) {
-            
+
             this.proposal = proposal;
             this.tg = tg;
 
             setText(title);
             FlexTable f = null;
             if (tg != null) {
-              
+
                 // it's a new task schedule proposal, show it
                 f = new FlexTable();
                 iniziaTable(f, tg);
             } else {
-               
+
                 // just show the task list of the current proposal
                 f = taskDefTable;
                 initDefTable(f);
-                 
+
             }
             Button okButton = new Button("OK", this);
             Button cancelButton = new Button("Cancel", this);
@@ -610,8 +706,8 @@ public class MainEntryPoint implements EntryPoint {
             if (proposal) {
                 oriz.add(cancelButton);
             }
-          
-;            /*
+
+            ;            /*
             dock.add(okButton, DockPanel.SOUTH);
             if (proposal) {
             dock.add(cancelButton, DockPanel.SOUTH);
@@ -644,21 +740,216 @@ public class MainEntryPoint implements EntryPoint {
         }
     }
 
-    private ListBox iniziaUtenti() {
-        final ListBox ret = new ListBox();
+
+    /* */
+    private void iniziaUtenti(final FlexTable t) {
+
+        FlexTable.CellFormatter form = t.getCellFormatter();
+        t.setBorderWidth(1);
+        t.setText(0, 0, "User name");
+        t.setText(0, 1, "Show");
+
+        ArrayList<UiUser> ids = UiUser.getUsers();
+        int index = 1;
+        for (UiUser u : ids) {
+            t.setText(index, 0, u.getId());
+            t.setWidget(index, 1, new CheckBox());
+            form.addStyleName(index, 0, u.getStyle());
+            index++;
+        }
+
+
+        // Let's put a button in the middle...
+        //  t.setWidget(1, 0, new Button("Wide Button"));
+
+        // ...and set it's column span so that it takes up the whole row.
+        //  t.getFlexCellFormatter().setColSpan(1, 0, 3);
+
+        t.addClickHandler(new ClickHandler() {
+
+            @Override
+            public void onClick(ClickEvent event) {
+                HTMLTable.Cell clickedCell = t.getCellForEvent(event);
+                int rowIndex = clickedCell.getRowIndex();
+                int colIndex = clickedCell.getCellIndex();
+                if (colIndex == 1 && rowIndex > 0) { // click su un checkbox
+                    currentUsers.clear();
+                    for (int i = 1; i < t.getRowCount(); i++) {
+                        CheckBox ch = (CheckBox) t.getWidget(i, 1);
+                        if (ch.isChecked()) {
+                            currentUsers.add(t.getText(i, 0));
+                        }
+                    }
+                    riempi(taskTable, false, TaskGroup.current());
+                }
+            }
+        });
+
+    }
+
+    private ListBox iniziaUtentiOld() {
+        final ListBox ret = new ListBox(true);
         ArrayList<String> ids = UiUser.getUserIds();
         for (String s : ids) {
             ret.addItem(s);
         }
         ret.addItem("*");
-        ret.setVisibleItemCount(1);
+        ret.setVisibleItemCount(ids.size());
         ret.addChangeHandler(new ChangeHandler() {
 
             public void onChange(ChangeEvent event) {
-                currentUser = ret.getValue(ret.getSelectedIndex());
+                currentUsers.clear();
+                for (int i = 0; i < ret.getItemCount(); i++) {
+                    if (ret.isItemSelected(i)) {
+                        currentUsers.add(ret.getItemText(i));
+                    }
+                }
                 riempi(taskTable, false, TaskGroup.current());
             }
         });
         return ret;
+    }
+
+    class DatePicker extends ListBox {
+
+        int selectedValue = -1;
+
+        public DatePicker(String what, int index) {
+            if (what.equals("giorni")) {
+                addItem("Monday");
+                addItem("Tuesday");
+                addItem("Wednesday");
+                addItem("Thursday");
+                addItem("Friday");
+                setSelectedIndex(index);
+            } else if (what.equals("ore")) {
+                for (int i = 8; i < 20; i++) {
+                    addItem("" + i);
+                }
+                setSelectedIndex(index);
+            } else {
+                Window.alert("DatePicker, unknown option: " + what);
+                setVisibleItemCount(1);
+                addChangeHandler(new ChangeHandler() {
+
+                    public void onChange(ChangeEvent event) {
+                        selectedValue =
+                                getSelectedIndex();
+                    }
+                });
+            }
+        }
+    }
+
+    //   class TooltipListener extends MouseListenerAdapter {
+    class TooltipListener implements MouseOverHandler, MouseOutHandler {
+
+        private static final String DEFAULT_TOOLTIP_STYLE = "TooltipPopup";
+        private static final int DEFAULT_OFFSET_X = 10;
+        private static final int DEFAULT_OFFSET_Y = 35;
+
+        private class Tooltip extends PopupPanel {
+
+            private int delay;
+
+            public Tooltip(Widget sender, int offsetX, int offsetY,
+                    final String text, final int delay, final String styleName) {
+                super(true);
+
+                this.delay = delay;
+
+                HTML contents = new HTML(text);
+                add(contents);
+
+                int left = sender.getAbsoluteLeft() + offsetX;
+                int top = sender.getAbsoluteTop() + offsetY;
+
+                setPopupPosition(left, top);
+                setStyleName(styleName);
+            }
+
+            public void show() {
+                super.show();
+
+                Timer t = new Timer() {
+
+                    public void run() {
+                        Tooltip.this.hide();
+                    }
+                };
+                t.schedule(delay);
+            }
+        }
+        private Tooltip tooltip;
+        private String text;
+        private String styleName;
+        private int delay;
+        private int offsetX = DEFAULT_OFFSET_X;
+        private int offsetY = DEFAULT_OFFSET_Y;
+
+        public TooltipListener(String text, int delay) {
+            this(text, delay, DEFAULT_TOOLTIP_STYLE);
+        }
+
+        public TooltipListener(String text, int delay, String styleName) {
+            this.text = text;
+            this.delay = delay;
+            this.styleName = styleName;
+        }
+
+        public void onMouseOver(MouseOverEvent e) {
+
+            if (tooltip != null) {
+                tooltip.hide();
+            }
+            Widget sender = (Widget) e.getSource();
+            tooltip = new Tooltip(sender, offsetX, offsetY, text, delay, styleName);
+            tooltip.show();
+        }
+
+        public void onMouseOut(MouseOutEvent e) {
+
+            if (tooltip != null) {
+                tooltip.hide();
+            }
+
+        }
+        /*   public void onMouseEnter(Widget sender) {
+        if (tooltip != null) {
+        tooltip.hide();
+        }
+        tooltip = new Tooltip(sender, offsetX, offsetY, text, delay, styleName);
+        tooltip.show();
+        }
+
+        public void onMouseLeave(Widget sender) {
+        if (tooltip != null) {
+        tooltip.hide();
+        }
+        }*/
+
+        public String getStyleName() {
+            return styleName;
+        }
+
+        public void setStyleName(String styleName) {
+            this.styleName = styleName;
+        }
+
+        public int getOffsetX() {
+            return offsetX;
+        }
+
+        public void setOffsetX(int offsetX) {
+            this.offsetX = offsetX;
+        }
+
+        public int getOffsetY() {
+            return offsetY;
+        }
+
+        public void setOffsetY(int offsetY) {
+            this.offsetY = offsetY;
+        }
     }
 }

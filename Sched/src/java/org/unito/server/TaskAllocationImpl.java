@@ -30,12 +30,16 @@ public class TaskAllocationImpl extends RemoteServiceServlet implements TaskAllo
     public ViaVai schedule(ViaVai daFare, String mode, String old) {
         System.err.println("in taskimpl.schedule");
         TaskGroup ret = new TaskCall().doIt(new TaskGroup(daFare), mode, old);
-        return ret != null? new ViaVai(ret): null;
+        return ret != null ? new ViaVai(ret) : null;
     }
 
     public ViaVai scheduleRequest(ViaVai daFare, String taskName, String taskNet, String mu, String mode, String user) {
+        // "startintervals", "", "move", "pippo"
+        //  "startintervals", "", "insert", "pippo",
+        //  "tasknet", "", "move", "pippo",
+        // "tasknet", "", "insert", "pippo",
         System.err.println("in taskimpl.scheduleRequest");
         TaskGroup ret = new TaskCall().doRequest(new TaskGroup(daFare), taskName, taskNet, mu, mode, user);
-        return ret != null? new ViaVai(ret): null;
+        return ret != null ? new ViaVai(ret) : null;
     }
 }

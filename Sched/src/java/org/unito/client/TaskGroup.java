@@ -78,13 +78,13 @@ public class TaskGroup {
 
     public int setSchedule(Task t) {
         // find time to schedule as early as possible the task
-        // set to -1 if no time has been found
-        int sta = t.getSchedule();
-        //  Window.alert("setschedule task= "+t.getName() +" sta="+sta);
-        if (sta < 0) {
-            sta = possibileInizio(t.getName());
-            //     Window.alert("possinileinizio= "+sta);
+        // set to -1 if no time has been found;
+        // first try user schedulke (if any, then try any poossible iunterval
+        int sta = possibileInizio(t.getName(), t.getSchedule());
+        if (sta == -1) {
+            return -1;
         }
+        //   Window.alert("setschedule task= "+t.getName() +" sta="+sta);
         Interval inte = findIntervalForTask(t.getName());
         if (inte == null) {
             globalSchedule.add(new StartInterval(t.getName(), sta, sta));
@@ -98,15 +98,11 @@ public class TaskGroup {
         return sta;
     }
 
-    public static String addScheduleTask(String name, String firstStartHour, String lastEndHour, String duration, String before, String after, String schedule, String users, boolean overlap) {
-        String msg = "";
+    public static int addScheduleTask(String name, String firstStartHour, String lastEndHour, String duration, String before, String after, String schedule, String users, boolean overlap) {
         Task tat = new Task(name, firstStartHour, lastEndHour, duration, before, after, schedule, users, overlap);
         TaskGroup.add(tat);
         int sched = TaskGroup.current().setSchedule(tat);
-        if (sched == -1) {
-            msg += "task has not been scheduled";
-        }
-        return msg;
+        return sched;
     }
 
     public static String checkTask(String name, String firstStartHour, String lastEndHour, String duration, String before, String after, String schedule, String users, boolean overlap) {
@@ -116,9 +112,14 @@ public class TaskGroup {
         if (fis < 0 || las < 0 || fis >= oreLavoro || las > oreLavoro) {
             msg += "invalid start or end hour: must be 0 <= VALUE <= " + oreLavoro + "\n";
         }
+        if (duration.equals("")) {
+            duration = "0";
+        }
+
         int dur = Integer.parseInt(duration);
+
         if (dur < 1 || dur > oreLavoro) {
-            msg += "invalid duration: must be 0 <= VALUE <= " + oreLavoro + "\n";
+            msg += "invalid duration: must be 1 <= VALUE <= " + oreLavoro + "\n";
         }
         String[] tmp = before.split(" ", -1);
         for (int i = 0; i < tmp.length; i++) {
@@ -214,14 +215,22 @@ public class TaskGroup {
         return inte == null ? -1 : inte.getMin();
     }
 
-    private int possibileInizio(String name) {
+    private int possibileInizio(String name, int wantedStart) {
         boolean[] libero = new boolean[oreLavoro];
         for (int i = 0; i < oreLavoro; i++) {
             libero[i] = true;
         }
         Task questo = get(name);
+        for (int i = 0; i < questo.getFirstStartHour(); i++) {
+            libero[i] = false;
+        }
+        for (int i = questo.getLastEndHour(); i < oreLavoro; i++) {
+            libero[i] = false;
+        }
         for (Task t : current().tasks) {
-            if (t != questo) {
+            if (t != questo && !t.concurrent(questo)) {
+                // tasks cannot run in parallel
+                //  Window.alert("blocco "+t.getName());
                 int sta = current().getOfficialSchedule(t.getName());
                 if (sta >= 0) {
                     for (int i = 0; i < t.getDuration(); i++) {
@@ -230,10 +239,19 @@ public class TaskGroup {
                 }
             }
         }
-        int inizio = questo.getFirstStartHour();
-        int fine = questo.getLastEndHour();
-        int dura = questo.getDuration();
-        for (int k = inizio; k < fine - dura; k++) {
+        if (wantedStart >= 0) {
+            int fai = canStart(libero, wantedStart, wantedStart + questo.getDuration(), questo.getDuration());
+            if (fai == wantedStart) {
+                return fai;
+            }
+        }
+        // return any good time
+        return canStart(libero, questo.getFirstStartHour(), questo.getLastEndHour(), questo.getDuration());
+    }
+
+    private int canStart(boolean[] libero, int inizio, int fine, int dura) {
+        //  Window.alert("canstart"+ inizio+" "+fine + " "+dura + " "+ libero[6]);
+        for (int k = inizio; k < fine - dura + 1; k++) {
             if (libero[k]) {  // un' ora libera
                 boolean ok = true;
                 for (int kk = k + 1; kk < k + dura && ok; kk++) {
@@ -247,10 +265,10 @@ public class TaskGroup {
         return -1;
     }
 
-    public static String[] retr(boolean showAlt, TaskGroup fonte) {
-        String[] ret = new String[oreLavoro];
+    public static ArrayList<String>[] retr(boolean showAlt, TaskGroup fonte) {
+        ArrayList<String>[] ret = new ArrayList[oreLavoro];
         for (int i = 0; i < oreLavoro; i++) {
-            ret[i] = "";
+            ret[i] = new ArrayList();
         }
         // Window.alert("in retr task sz =" + current().tasks.size());
         for (Task t : fonte.tasks) {
@@ -258,11 +276,9 @@ public class TaskGroup {
             //   Window.alert("in retr task=" + t.getName() + " " +sta);
             if (sta >= 0) {
                 for (int i = 0; i < t.getDuration(); i++) {
-                    if (ret[sta + i].equals("")) {
-                        ret[sta + i] = t.getName();
-                    } else {
-                        ret[sta + i] += "; " + t.getName();
-                    }
+
+                    ret[sta + i].add(t.getName());
+
                 }
             }
         }
@@ -273,8 +289,8 @@ public class TaskGroup {
                 for (int j = inte.getMin(); j <= inte.getMax(); j++) { // MINORE O MINORE UGUALE?????
                     for (int i = 0; i < ta.getDuration(); i++) {
                         // colora come possibili tutte le caselle dove piazzare task scelto
-                        if (ret[j + i].equals("")) {
-                            ret[j + i] = "***";
+                        if (ret[j + i].isEmpty()) {
+                            ret[j + i].add("***");
                         }
                     }
                 }
@@ -394,9 +410,17 @@ public class TaskGroup {
         //   Window.alert("corrente in esempio"+ current().tasks);
     }
 
-    public static boolean ContainsUser(String user, String task) {
+    public static ArrayList<UiUser> ContainsUser(ArrayList<String> users, String task) {
+        ArrayList<UiUser> ret = new ArrayList();
         Task t = current().get(task);
-        return t == null ? false : t.containsUser(user);
+        if (t != null) {
+            for (String us : users) {
+                if (t.containsUser(us)) {
+                    ret.add(UiUser.find(us));
+                }
+            }
+        }
+        return ret;
     }
 
     public static void lunch() {

@@ -54,6 +54,11 @@
 
 }
 
+.styleHoliday{
+         background-color: #C0C0C0;
+
+}
+
 .styleOwner{
          background-color: #D0B000;
 
@@ -61,6 +66,7 @@
 
 .style1{
          background-color: #A49800;
+         font-weight: bold;
 
 }
 
@@ -98,3 +104,33 @@
     margin-right: 2px;
 }
 
+
+.styleUser1{
+         background-color: #F0A000;
+         
+}
+
+.styleUser2{
+         background-color: #C0B000;
+
+}
+
+.styleUser3{
+         background-color: #A0C000;
+
+}
+
+.styleUser4{
+         background-color: #80D000;
+
+}
+
+.styleUser5{
+         background-color: #60E000;
+
+}
+
+.styleUser6{
+         background-color: #40F000;
+
+}

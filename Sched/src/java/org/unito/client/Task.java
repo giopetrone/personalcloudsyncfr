@@ -150,6 +150,23 @@ public class Task implements IsSerializable {
         }
         //   Window.alert(this.toString());
     }
+
+    public boolean concurrent(Task t2) {
+        return overlap || t2.overlap || disJoint(t2);
+    }
+
+    public boolean disJoint(Task t2) {
+        // if two tasks have no common users, they can be concurrent
+        for (UiUser u1 : users) {
+            for (UiUser u2 : t2.users) {
+                if (u1.getId().equals(u2.getId())) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     /*
     public int getStartHour() {
     return startHour;
@@ -159,13 +176,20 @@ public class Task implements IsSerializable {
     return startHour + duration;
     }
      */
-
     public int getDuration() {
         return duration;
     }
 
     public int getMinStartHour() {
         return getFirstStartHour();
+    }
+
+    static public int dayOf(int hour) {
+        return hour / 12;
+    }
+
+    static public int timeOf(int hour) {
+        return hour % 12;
     }
 
     public int getMaxEndHour() {

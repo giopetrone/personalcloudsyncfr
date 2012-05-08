@@ -26,26 +26,31 @@ public class UiUser implements IsSerializable {
     public static void setUsers(ArrayList<UiUser> aUsers) {
         users = aUsers;
     }
-
     private String id;
+    private String style = "styleUser";
     private double weight = 1.0;
     private static ArrayList<UiUser> users = new ArrayList();
 
     public UiUser() {
         this.id = "anonymous";
         this.weight = 0.0;
-        users.add(this);
+        addUser(this);
+    }
+
+    public static void addUser(UiUser u) {
+        u.setStyle("styleUser" + (users.size() + 1));
+        users.add(u);
     }
 
     public UiUser(String name, double weight) {
         this.id = name;
         this.weight = weight;
-        users.add(this);
+        addUser(this);
     }
 
     public UiUser(String name) {
         this.id = name;
-        users.add(this);
+         addUser(this);
     }
 
     public static UiUser find(String us) {
@@ -99,5 +104,19 @@ public class UiUser implements IsSerializable {
      */
     public void setWeight(double weight) {
         this.weight = weight;
+    }
+
+    /**
+     * @return the style
+     */
+    public String getStyle() {
+        return style;
+    }
+
+    /**
+     * @param style the style to set
+     */
+    public void setStyle(String style) {
+        this.style = style;
     }
 }

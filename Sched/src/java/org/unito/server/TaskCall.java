@@ -42,7 +42,7 @@ public class TaskCall {
         try {
             DefaultHttpClient httpClient = new DefaultHttpClient();
             HttpPost postRequest = new HttpPost(
-                    "http://localhost:3000/modstn/"+mu  + taskNet);
+                    "http://localhost:3000/modstn/" + mu + taskNet);
             //   "http://localhost:3000/modstn/startintervals");   oppure "tasknet"
             StringEntity input = new StringEntity(pr);
             input.setContentType("text/xml");
@@ -55,11 +55,11 @@ public class TaskCall {
             //  System.out.println("risposta=\n");
             //  response.getEntity().writeTo(System.out);
             InputStream is = response.getEntity().getContent();
-          /* OLD:  ArrayList<org.unito.client.Interval> arra = MyDOMParserBean.getIntervals(is);
+            /* OLD:  ArrayList<org.unito.client.Interval> arra = MyDOMParserBean.getIntervals(is);
             TaskGroup ret = new TaskGroup();
             ret.setTaskSchedule(arra);
-           * */
-            TaskGroup ret =  MyDOMParserBean.fillReply(is);
+             * */
+            TaskGroup ret = MyDOMParserBean.fillReply(is);
             httpClient.getConnectionManager().shutdown();
             if (taskNet.equals("tasknet")) {
                 // call Scheduler with result from constraint solver
@@ -77,11 +77,11 @@ public class TaskCall {
         return null;
     }
 
-    private void  createUsers(TaskGroup taskGroup){
-       // create users , duplicates are ignored
+    private void createUsers(TaskGroup taskGroup) {
+        // create users , duplicates are ignored
         for (Task t : taskGroup.getTasks()) {
-            for (UiUser uu: t.getUsers()){
-                new User(uu.getId(),uu.getWeight());
+            for (UiUser uu : t.getUsers()) {
+                new User(uu.getId(), uu.getWeight());
             }
         }
     }
@@ -100,11 +100,22 @@ public class TaskCall {
             for (UiUser u : t.getUsers()) {
                 ts.addActorToTask(t.getName(), User.find(u.getId()));
             }
-            if (!t.getOverlap()) {
-                taskNames.add(t.getName());
+            /*  if (!t.getOverlap()) {
+            taskNames.add(t.getName());
+            }*/
+        }
+        for (Task t1 : taskGroup.getTasks()) {  // avoid overlap bteween disjoint task couples
+            for (Task t2 : taskGroup.getTasks()) {
+                if (t1 != t2
+                        && !t1.isOverlap()
+                        && !t2.isOverlap()
+                        && !t1.disJoint(t2) /* && !taskNames.contains(t1.getName())
+                        && !taskNames.contains(t2.getName())*/) {
+                    ts.imposeNonOverlap(t1.getName(), t2.getName());
+                }
             }
         }
-        ts.imposeNonOverlap(taskNames);
+        //   ts.imposeNonOverlap(taskNames);
         for (Task t : taskGroup.getTasks()) {
             ArrayList<String> bef = t.getBefore();
             for (String se : bef) {
@@ -119,7 +130,18 @@ public class TaskCall {
         }
         // creo il clone e reimpongo i constraint di base
         TaskStore cts = ts.clone();
-        cts.imposeNonOverlap(taskNames);
+        //   cts.imposeNonOverlap(taskNames);
+        for (Task t1 : taskGroup.getTasks()) {  // avoid overlap bteween disjoint task couples
+            for (Task t2 : taskGroup.getTasks()) {
+                if (t1 != t2
+                        && !t1.isOverlap()
+                        && !t2.isOverlap()
+                        && !t1.disJoint(t2) /* && !taskNames.contains(t1.getName())
+                        && !taskNames.contains(t2.getName())*/) {
+                    cts.imposeNonOverlap(t1.getName(), t2.getName());
+                }
+            }
+        }
         //cts.imposeBefore("T1", "T2");
         for (Task t : taskGroup.getTasks()) {
             ArrayList<String> bef = t.getBefore();
@@ -225,5 +247,4 @@ public class TaskCall {
             return null;
         }
     }
-
 }
