@@ -6,6 +6,7 @@ import it.unito.json.JSONObject;
 import it.unito.json.JSONTokener;
 import it.unito.model.Group;
 import it.unito.model.Message;
+import it.unito.model.MessageType;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -67,24 +68,24 @@ public class ProxyUtils {
 			jsRequest.put("tableKey", param);
 		} else
 			System.out.println("ProxyCall, operazione non riconosciuta");
-		System.out.println("ProxyCall, 1");
+		//System.out.println("ProxyCall, 1");
 		HttpEntity entity = new StringEntity(jsRequest.toString());
-		System.out.println("jsRequest: "+jsRequest.toString());
+		//System.out.println("jsRequest: "+jsRequest.toString());
 		post.setEntity(entity);
-		System.out.println("ProxyCall, 3");
+		//System.out.println("ProxyCall, 3");
 		HttpResponse response = client.execute(post);
-		System.out.println("ProxyCall, 4");
+		//System.out.println("ProxyCall, 4");
 		entity = response.getEntity();
-		System.out.println("ProxyCall, 5");
+		//System.out.println("ProxyCall, 5");
 
 		InputStream is = entity.getContent();
-		System.out.println("ProxyCall, 6");
+		//System.out.println("ProxyCall, 6");
 
 		JSONTokener jt;
-		System.out.println("ProxyCall, 7");
+		//System.out.println("ProxyCall, 7");
 
 		jt = new JSONTokener(is);
-		System.out.println("ProxyCall, 8");
+		//System.out.println("ProxyCall, 8");
 
 		JSONObject jsResp = new JSONObject(jt);
 		System.out.println("jsResp= " + jsResp.toString());
@@ -170,6 +171,34 @@ public class ProxyUtils {
 			Log.i("ProxyUtils",e.toString());
 		}
 		return g;
+	}
+	
+	public static List<Message> convertToMessagesList(JSONArray jsMessages) throws JSONException{
+		List<Message> messages= new ArrayList<Message>();
+		if(jsMessages.length()==0){
+			messages.add(new Message("No message",MessageType.INFO,"No message"));
+		}else{
+			for(int i=0;i<=jsMessages.length();i++){
+				JSONObject jsMex=(JSONObject) jsMessages.get(i);
+				messages.add(convertToMessage(jsMex));
+			}
+		}
+		return messages;
+	}
+	
+	public static Message convertToMessage(JSONObject jsMex) throws JSONException{
+		if(jsMex==null) return null;
+		Message mex=new Message(jsMex.getString("author"),(MessageType)jsMex.get("type"),jsMex.getString("content"));
+		return mex;
+	}
+	
+	public static List<ViewTable> convertToViewTableList(JSONArray jsTables) throws JSONException{
+		 List<ViewTable> tables = new LinkedList<ViewTable>();
+			for (int i=0;i<jsTables.length();i++) {
+				JSONObject group=(JSONObject) jsTables.get(i);
+				tables.add(new ViewTable(group.getString("name"), group.getLong("key"),group.getInt("documents"),group.getInt("members")));
+			}
+		 return tables;
 	}
 	
 }

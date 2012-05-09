@@ -42,7 +42,7 @@ public class Message implements Serializable {
 		this.hashcode = 1;
 	}
 
-	protected String getAuthor() {
+	public String getAuthor() {//protected
 		return author;
 	}
 
@@ -50,7 +50,7 @@ public class Message implements Serializable {
 		this.author = author;
 	}
 
-	protected MessageType getType() {
+	public MessageType getType() {//protected
 		return type;
 	}
 
@@ -58,7 +58,7 @@ public class Message implements Serializable {
 		this.type = type;
 	}
 
-	protected String getContent() {
+	public String getContent() {//protected
 		return content;
 	}
 

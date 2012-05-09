@@ -1,17 +1,17 @@
 package it.unito.utility;
 
-import it.unito.gui.R;
 import java.util.List;
+
+import it.unito.gui.R;
+import it.unito.model.Message;
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-public class MyTablesListAdapter extends ArrayAdapter<ViewTable>{
+public class MyMessageListAdapter extends ArrayAdapter<Message>{
 
 	/** Inflater for list items */
     private final LayoutInflater inflater;
@@ -34,10 +34,10 @@ public class MyTablesListAdapter extends ArrayAdapter<ViewTable>{
      * @param textViewResourceId
      * @param objects
      */
-    public MyTablesListAdapter(final Context context,
+    public MyMessageListAdapter(final Context context,
             final int resource,
             final int textViewResourceId,
-            final List<ViewTable> objects) {
+            final List<Message> objects) {
         super(context, resource, textViewResourceId, objects);
 
         this.inflater = LayoutInflater.from(context);
@@ -48,7 +48,7 @@ public class MyTablesListAdapter extends ArrayAdapter<ViewTable>{
 
         View itemView = convertView;
         ViewHolder holder = null;
-        final ViewTable item = getItem(position);
+        final Message item = getItem(position);
 
         if(null == itemView) {
             itemView = this.inflater.inflate(R.layout.tables_row, parent, false);
@@ -63,9 +63,9 @@ public class MyTablesListAdapter extends ArrayAdapter<ViewTable>{
             holder = (ViewHolder)itemView.getTag();
         }
 
-        holder.text1.setText(item.getTableName());
-        holder.text2.setText("Docs: "+item.getNumDocuments());
-        holder.text3.setText("Members: "+item.getNumMembers());
+        holder.text1.setText(item.getContent());
+        holder.text2.setText("Docs: "+item.getType());
+        holder.text3.setText("Members: "+item.getAuthor());
         return itemView;
     }
 }

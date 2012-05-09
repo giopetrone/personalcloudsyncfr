@@ -63,21 +63,13 @@ public class TableList extends ListActivity {
 			
 			JSONObject tables = ProxyUtils.proxyCall("queryTables", tablesKeys);
 			JSONArray jsTables = tables.getJSONArray("results");
-			//Log.i("tables.getClass()", tables.getClass().toString());
+			
 			Log.i("tables", tables.toString());
 			Log.i("jsArray", jsTables.toString());
 		
-			List<ViewTable> nomi = new LinkedList<ViewTable>();
-			for (int i=0;i<jsTables.length();i++) {
-				JSONObject group=(JSONObject) jsTables.get(i);
-				nomi.add(new ViewTable(group.getString("name"), group.getLong("key"),group.getInt("documents"),group.getInt("members")));
-			}
-			/*
-			adapter = new ArrayAdapter<ViewTable>(this,
-					android.R.layout.simple_list_item_1, android.R.id.text1, nomi);
-			setListAdapter(adapter);
-			*/
-			adapter=new MyTablesListAdapter(this,R.layout.tables_row,R.id.title_table,nomi);
+			List<ViewTable> viewTables=ProxyUtils.convertToViewTableList(jsTables);
+			
+			adapter=new MyTablesListAdapter(this,R.layout.tables_row,R.id.title_table,viewTables);
 			setListAdapter(adapter);
 			
 		} catch (Exception e) {
