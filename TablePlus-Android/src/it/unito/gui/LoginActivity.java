@@ -35,7 +35,7 @@ public class LoginActivity extends Activity {
 
 	public void invia(View v)
 	{
-		String mailString="marcoprova91@gmail.com";/*(mail.getText()).toString();*//*"leonard87@gmail.com";*/
+		String mailString="leonard87@gmail.com";/*(mail.getText()).toString();*//*"leonard87@gmail.com";*/
 		String pass=(password.getText()).toString();
 		
 		try{

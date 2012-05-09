@@ -21,6 +21,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 
+import android.R.integer;
 import android.util.Log;
 
 public class ProxyUtils {
@@ -176,19 +177,33 @@ public class ProxyUtils {
 	public static List<Message> convertToMessagesList(JSONArray jsMessages) throws JSONException{
 		List<Message> messages= new ArrayList<Message>();
 		if(jsMessages.length()==0){
-			messages.add(new Message("No message",MessageType.INFO,"No message"));
+			messages.add(new Message((long)-1,MessageType.INFO,"No message"));
 		}else{
-			for(int i=0;i<=jsMessages.length();i++){
+			for(int i=0;i<jsMessages.length();i++){
 				JSONObject jsMex=(JSONObject) jsMessages.get(i);
 				messages.add(convertToMessage(jsMex));
 			}
 		}
+		
 		return messages;
 	}
 	
 	public static Message convertToMessage(JSONObject jsMex) throws JSONException{
 		if(jsMex==null) return null;
-		Message mex=new Message(jsMex.getString("author"),(MessageType)jsMex.get("type"),jsMex.getString("content"));
+		Message mex=new Message();
+		mex.setAuthor(jsMex.getLong("author"));
+		String type=jsMex.getString("type");
+	    if(type.equals("INFO")){
+			mex.setType(MessageType.INFO);
+	    }else if(type.equals("PROBLEM")){
+			mex.setType(MessageType.PROBLEM);
+	    }else if(type.equals("TODO")){
+			mex.setType(MessageType.TODO);
+	    }else if(type.equals("GENERIC")){
+			mex.setType(MessageType.GENERIC);
+	    }
+		mex.setContent(jsMex.getString("content"));
+		mex.setKey(jsMex.getString("key"));
 		return mex;
 	}
 	

@@ -1,5 +1,7 @@
 package it.unito.gui;
 
+import it.unito.json.JSONObject;
+import it.unito.utility.ProxyUtils;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -15,13 +17,21 @@ public class Members extends Activity {
 	String infoCurrentTable;
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        String 	tablekey=getIntent().getStringExtra("key");
         TextView textview = new TextView(this);
         textview.setText("This is the Members Area.");
         setContentView(textview);
     
-        infoCurrentTable=getIntent().getStringExtra("infoCurrentTable");
+    /*    infoCurrentTable=getIntent().getStringExtra("infoCurrentTable");
+    	try{
+			JSONObject request = ProxyUtils.proxyCall("deleteMessage", "ag10YWJsZXBsdXNwbHVzchgLEgVHcm91cBgCDAsSB01lc3NhZ2UYBgw2");
+			JSONObject jsTable = request.getJSONObject("results");
+			Log.i("jsTable= ",  jsTable.toString());
+		} catch (Exception e) {
+			Log.i("Eccezione", e.toString());
+		}*/
 
+        //ag10YWJsZXBsdXNwbHVzchgLEgVHcm91cBgCDAsSB01lc3NhZ2UYBgw
     
     }
     

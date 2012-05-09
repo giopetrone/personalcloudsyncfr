@@ -109,10 +109,9 @@ public class AddMessageActivity extends Activity {
 			} catch (Exception e) {
 				Log.i("Eccezione", e.toString());
 			}
-		    
-		    Intent intent = new Intent(this,BlackBoard.class);
+			Intent intent = new Intent(this,AddMessageActivity.class);
 			startActivity(intent);
-			
+
 			
 	}
 

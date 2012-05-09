@@ -63,12 +63,12 @@ public class BlackBoard extends ListActivity{
 		        JSONArray jsMessages = request.getJSONArray("results");
 				Log.i("jsMessages= ",  jsMessages.toString());
 			    listMessage=ProxyUtils.convertToMessagesList(jsMessages);
-				Log.i("jsMessages= ",  listMessage.toString());
+				Log.i("jsMessages2= ",  listMessage.toString());
 			} catch (Exception e) {
 				Log.i("Eccezione", e.toString());
 			}
 			
-			
+			Log.i("ciao","ciao");
 			//aggiungo gli oggetti alla lista
 			array=new MyMessageListAdapter(this,R.layout.tables_row,R.id.title_table,listMessage);
 			setListAdapter(array);
