@@ -51,7 +51,7 @@ public class MyMessageListAdapter extends ArrayAdapter<Message>{
         final Message item = getItem(position);
 
         if(null == itemView) {
-            itemView = this.inflater.inflate(R.layout.tables_row, parent, false);
+            itemView = this.inflater.inflate(R.layout.blackboard_row, parent, false);
 
             holder = new ViewHolder();
 
@@ -64,8 +64,8 @@ public class MyMessageListAdapter extends ArrayAdapter<Message>{
         }
 
         holder.text1.setText(item.getContent());
-        holder.text2.setText("Docs: "+item.getType());
-        holder.text3.setText("Members: "+item.getAuthor());
+        holder.text2.setText("Type: "+item.getType());
+        holder.text3.setText("Author: "+item.getAuthor());
         return itemView;
     }
 }

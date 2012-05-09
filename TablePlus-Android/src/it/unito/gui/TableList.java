@@ -37,7 +37,6 @@ import android.widget.Toast;
  * @idea Classe che visualizza la lista dei tavoli presenti
  */
 public class TableList extends ListActivity {
-	private String str;
 	private final String TAG = "ListActivity";
 	private List<Group> groups;
 	private ArrayAdapter<ViewTable> adapter;
@@ -91,7 +90,6 @@ public class TableList extends ListActivity {
 		System.out.println("Chiave tavolo: " + s);
 		Intent intent = new Intent(this, HelloTabWidgetActivity.class);
 		intent.putExtra("key", s);
-		intent.putExtra("string",str);
 		startActivity(intent);
 	}
 	

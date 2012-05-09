@@ -1,39 +1,54 @@
 package it.unito.gui;
 
+import it.unito.json.JSONArray;
 import it.unito.json.JSONObject;
+import it.unito.utility.MembersAdapter;
+import it.unito.utility.MyObjectListAdapter;
 import it.unito.utility.ProxyUtils;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 
-public class Members extends Activity {
+public class Members extends ListActivity {
 	String infoCurrentTable;
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        String 	tablekey=getIntent().getStringExtra("key");
-        TextView textview = new TextView(this);
-        textview.setText("This is the Members Area.");
-        setContentView(textview);
-    
-    /*    infoCurrentTable=getIntent().getStringExtra("infoCurrentTable");
     	try{
-			JSONObject request = ProxyUtils.proxyCall("deleteMessage", "ag10YWJsZXBsdXNwbHVzchgLEgVHcm91cBgCDAsSB01lc3NhZ2UYBgw2");
-			JSONObject jsTable = request.getJSONObject("results");
-			Log.i("jsTable= ",  jsTable.toString());
+			JSONObject request = ProxyUtils.MemberStatus("queryUserStatus", 3);
+			Log.i("RICHIESTA= ",  request.toString());
+			JSONObject rispo = request.getJSONObject("results");
+			Log.i("RISPOSTA= ",  rispo.toString());
+			JSONArray online= rispo.getJSONArray("ok");
+			Log.i("ARRAY ONLINE= ", online.toString());
+			
+			//JSONArray online = rispo.getJSONArray("no");
+			Log.i("ARRAY ONLINE= ",  (rispo.getJSONArray("online: ")).toString());
+			JSONArray offline = rispo.getJSONArray("ok");
+		//Log.i("ONLINE ARRAY= ",  online.toString());
+			Log.i("OFFLINE ARRAY= ",  offline.toString());
+
+	     //   JSONArray jsMessages = request.getJSONArray("results");
+		//	Log.i("jsMessages= ",  jsMessages.toString());
 		} catch (Exception e) {
 			Log.i("Eccezione", e.toString());
-		}*/
-
-        //ag10YWJsZXBsdXNwbHVzchgLEgVHcm91cBgCDAsSB01lc3NhZ2UYBgw
+		}
+   }
+      
     
-    }
+	protected void onResume()
+	{
+	 super.onResume();
+	}
     
 	/**
 	 * Chiamato dal sistema la prima volta per creare il menu

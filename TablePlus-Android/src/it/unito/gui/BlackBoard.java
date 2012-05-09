@@ -13,6 +13,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -25,7 +26,9 @@ import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CursorAdapter;
 import android.widget.EditText;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -74,10 +77,10 @@ public class BlackBoard extends ListActivity{
 			setListAdapter(array);
 			 
 			
-		/*	add.setOnClickListener(new View.OnClickListener() {
+			addi.setOnClickListener(new View.OnClickListener() {
 		  		  public void onClick(View view) { 
 		  			add(view); 		  }
-		  		});*/
+		  		});
 
 		}
 	 	
@@ -100,6 +103,8 @@ public class BlackBoard extends ListActivity{
 		intent.putExtra("key",tablekey);
 		startActivity(intent);
 	}
+	
+	
 
 	//-------------------MENU SU LONGCLICK--------------------------------------
 	public void onCreateContextMenu(ContextMenu menu, View v,ContextMenuInfo menuInfo) {  
@@ -109,15 +114,17 @@ public class BlackBoard extends ListActivity{
 	    }  
 	  @Override  
 	    public boolean onContextItemSelected(MenuItem item) {  
-	        if(item.getTitle()=="Delete"){
-	        	function2(item.getItemId());
+	        if(item.getTitle()=="Delete"){	        	
+	        	  function2(item.getItemId());
 	        } else {return false;}  
 	    return true;  
 	    }  
 	    public void function2(int id){
 	    	Toast.makeText(this, "Delete", Toast.LENGTH_SHORT).show(); 
 	    	try{
-				JSONObject del = ProxyUtils.proxyCall("deleteMessage", id);
+	    	
+				Log.i("ID MESSAGGI","id: "+id);
+	    		JSONObject del = ProxyUtils.proxyCall("deleteMessage", id);
 				JSONObject jsTable = del.getJSONObject("results");
 				Log.i("jsTable= ",  jsTable.toString());
 			} catch (Exception e) {

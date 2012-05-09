@@ -56,7 +56,6 @@ public class ExistantTable extends ListActivity{
 	private TextView nomeTavolo;
 	private String infoCurrentTable;
 	private ArrayAdapter<String> array;
-	
 	private EditText newUrl;
 	public void onCreate(Bundle savedInstanceState)
 	{

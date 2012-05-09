@@ -109,7 +109,8 @@ public class AddMessageActivity extends Activity {
 			} catch (Exception e) {
 				Log.i("Eccezione", e.toString());
 			}
-			Intent intent = new Intent(this,AddMessageActivity.class);
+			Intent intent = new Intent(this,HelloTabWidgetActivity.class);
+			intent.putExtra("key", key);
 			startActivity(intent);
 
 			
