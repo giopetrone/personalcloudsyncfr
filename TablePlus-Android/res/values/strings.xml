@@ -17,9 +17,13 @@
     <string name="tab2"></string>
     <string name="add_obj">Add</string>
     <string name="info_tab">Info</string>
+    <string name="top_table_row">top_table_row</string>
     
     <string name="addelem">Inserisci un oggetto da mettere sul tavolo</string>  
     <string name="addel">Indirizzo</string>
     <string name="aggiungi">Add</string>
-    
+    <color name="red">#ff0000</color>
+	<color name="green">#00ff00</color>
+	<color name="blue">#0000ff</color>
+	<string name="addmess">Add Message</string>
 </resources>

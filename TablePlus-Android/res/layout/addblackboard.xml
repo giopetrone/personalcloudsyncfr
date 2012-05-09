@@ -4,45 +4,56 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 	
+    
+		
+    
     	<TableLayout android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
 		android:id="@+id/top_table">
 
 		<TableRow>
 
-		    <CheckBox
-		        android:id="@+id/cinfo"
-		        android:layout_width="wrap_content"
-		        android:layout_height="50dp"
-		        android:text="Info" />
+			<RadioGroup 
+			    	android:layout_width="fill_parent"
+					android:layout_height="wrap_content" 
+					android:id="@+id/radiogroup">
+			
+			<RadioButton
+			    android:id="@+id/rbInfo"
+			    android:layout_width="wrap_content"
+			    android:layout_height="wrap_content"
+			    android:text="Info" />
+			
+			
 
-		    <CheckBox
-		        android:id="@+id/ctodo"
-		        android:layout_width="wrap_content"
-		        android:layout_height="50dp"
-		        android:layout_gravity="center_horizontal"
-		        android:text="Todo" />
+			<RadioButton
+			    android:id="@+id/rbGeneric"
+			    android:layout_width="wrap_content"
+			    android:layout_height="wrap_content"
+			    android:text="Gen" />
 
-		    <CheckBox
-		        android:id="@+id/cgeneric"
-		        android:layout_width="wrap_content"
-		        android:layout_height="50dp"
-		        android:text="Gen" />
+			<RadioButton
+			    android:id="@+id/rbTodo"
+			    android:layout_width="wrap_content"
+			    android:layout_height="wrap_content"
+			    android:text="Todo" />
 
-		    <CheckBox
-		        android:id="@+id/cproblem"
-		        android:layout_width="wrap_content"
-		        android:layout_height="50dp"
-		        android:text="Probl" />
-		</TableRow>
-
+			<RadioButton
+			    android:id="@+id/rbProblem"
+			    android:layout_width="wrap_content"
+			    android:layout_height="wrap_content"
+			    android:text="Probl" />
+	 	</RadioGroup>
+	 			
+			</TableRow>
 	</TableLayout>
-  
+
+   
 
     <EditText
         android:id="@+id/nuovomess"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="50dp"
         android:inputType="textMultiLine" >
     </EditText>
 
@@ -50,7 +61,7 @@
         android:id="@+id/addbutton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="70dp"
+        android:layout_marginBottom="50dp"
         android:onClick="add"
         android:text="@string/aggiungi" />
 

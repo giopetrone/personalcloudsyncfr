@@ -55,27 +55,40 @@ public class ProxyUtils {
 		} else if (operation.equals("queryTable")) {
 			jsRequest.put("request", "queryTable");
 			jsRequest.put("tableKey", param);
-			System.out.println("QUERY TABLES JSON OBJ: "+jsRequest);
-			
+			System.out.println("QUERY TABLES JSON OBJ: "+jsRequest);		
 		} else if (operation.equals("queryTables")) {
 			jsRequest.put("request", "queryTables");
 			jsRequest.put("tablesKeyList", param);
+		} else if (operation.equals("deleteMessage")) {
+			jsRequest.put("request", "deleteMessage");
+			jsRequest.put("messageKey", param);
+		} else if (operation.equals("queryMessages")) {
+			jsRequest.put("request", "queryMessages");
+			jsRequest.put("tableKey", param);
 		} else
 			System.out.println("ProxyCall, operazione non riconosciuta");
-		//System.out.println("ProxyCall, 1");
+		System.out.println("ProxyCall, 1");
 		HttpEntity entity = new StringEntity(jsRequest.toString());
-		//System.out.println("jsRequest: "+jsRequest.toString());
+		System.out.println("jsRequest: "+jsRequest.toString());
 		post.setEntity(entity);
-		//System.out.println("ProxyCall, 3");
+		System.out.println("ProxyCall, 3");
 		HttpResponse response = client.execute(post);
-		//System.out.println("ProxyCall, 4");
+		System.out.println("ProxyCall, 4");
 		entity = response.getEntity();
+		System.out.println("ProxyCall, 5");
+
 		InputStream is = entity.getContent();
+		System.out.println("ProxyCall, 6");
+
 		JSONTokener jt;
+		System.out.println("ProxyCall, 7");
+
 		jt = new JSONTokener(is);
+		System.out.println("ProxyCall, 8");
+
 		JSONObject jsResp = new JSONObject(jt);
 		System.out.println("jsResp= " + jsResp.toString());
-
+		Eccezione(jsResp);
 		// consuma la response, altrimenti non posso fare altre richieste
 		if (response.getEntity() != null) {
 			response.getEntity().consumeContent();
@@ -84,6 +97,12 @@ public class ProxyUtils {
 		return jsResp;
 	}
 	
+	public static void Eccezione(JSONObject resp){
+		String confronto="ERROR";
+	//	Exception risposta=resp.getString("status") ;
+		//if(confronto.equals(risposta)){			
+//		}
+	}
 	
 	public static JSONObject proxyCallM(String operation, Object author,Object tablekey,Object messagetype,Object messagecontent)
 	throws Exception {
@@ -111,7 +130,6 @@ public class ProxyUtils {
 
 			JSONObject jsResponse = new JSONObject(jtok);
 			System.out.println("ProxyCall, 2");
-
 			System.out.println("jsResp= " + jsResponse.toString());
 			// consuma la response, altrimenti non posso fare altre richieste
 			if (response.getEntity() != null) {

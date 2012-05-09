@@ -3,6 +3,7 @@ package it.unito.utility;
 import it.unito.gui.R;
 import java.util.List;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +17,7 @@ public class MyTablesListAdapter extends ArrayAdapter<ViewTable>{
     private static class ViewHolder {
         private TextView text1;
         private TextView text2;
-         
+        private TextView text3;
         ViewHolder() { }
     }
 
@@ -53,15 +54,16 @@ public class MyTablesListAdapter extends ArrayAdapter<ViewTable>{
             holder = new ViewHolder();
 
             holder.text1 = (TextView)itemView.findViewById(R.id.title_table);
-            holder.text2 = (TextView)itemView.findViewById(R.id.subtitle_table);
-          
+            holder.text2 = (TextView)itemView.findViewById(R.id.subtitle_docs);
+            holder.text3 = (TextView)itemView.findViewById(R.id.subtitle_members);
             itemView.setTag(holder);
         } else {
             holder = (ViewHolder)itemView.getTag();
         }
 
         holder.text1.setText(item.getTableName());
-        holder.text2.setText("Docs: "+item.getNumDocuments()+" Members: "+item.getNumMembers());
+        holder.text2.setText("Docs: "+item.getNumDocuments());
+        holder.text3.setText("Members: "+item.getNumMembers());
         return itemView;
     }
 }
