@@ -1,5 +1,7 @@
 package it.unito.gui;
 
+import java.util.List;
+
 import it.unito.json.JSONArray;
 import it.unito.json.JSONObject;
 import it.unito.utility.MembersAdapter;
@@ -15,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
 import android.widget.TextView;
 
 
@@ -30,18 +33,18 @@ public class Members extends ListActivity {
 			Log.i("RISPOSTA= ",  rispo.toString());
 			JSONArray online= rispo.getJSONArray("ok");
 			Log.i("ARRAY ONLINE= ", online.toString());
+			JSONArray offline = rispo.getJSONArray("no");
+			Log.i("ARRAY OFFLINE= ",  offline.toString());
+	
 			
-			//JSONArray online = rispo.getJSONArray("no");
-			Log.i("ARRAY ONLINE= ",  (rispo.getJSONArray("online: ")).toString());
-			JSONArray offline = rispo.getJSONArray("ok");
-		//Log.i("ONLINE ARRAY= ",  online.toString());
-			Log.i("OFFLINE ARRAY= ",  offline.toString());
-
-	     //   JSONArray jsMessages = request.getJSONArray("results");
-		//	Log.i("jsMessages= ",  jsMessages.toString());
 		} catch (Exception e) {
 			Log.i("Eccezione", e.toString());
 		}
+	//	String []utenti =new String[online.length()];
+
+		
+		//ListAdapter array=new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1,online);
+		//setListAdapter(array);
    }
       
     

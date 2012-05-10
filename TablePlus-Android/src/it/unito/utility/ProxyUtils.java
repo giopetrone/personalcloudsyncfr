@@ -110,8 +110,15 @@ public class ProxyUtils {
 			jsRequest.put("tableKey", param);
 		} else
 			System.out.println("ProxyCall, operazione non riconosciuta");
-		String [] online = {"Leo","Marco","Luisa"};
-		String [] offline= {"Tizio","Caio"};
+		JSONArray online= new JSONArray();
+		JSONArray offline= new JSONArray();
+		String [] onlin = {"Leo", "Marco", "Luisa"};
+		String [] offlin= {"Tizio","Caio"};
+		online.put(onlin[0]);
+		online.put(onlin[1]);
+		online.put(onlin[2]);
+		offline.put(offlin[0]);
+		offline.put(offlin[1]);
 		JSONObject table = new JSONObject();
 		JSONObject rj = new JSONObject();
 		rj.put("status", "OK");
