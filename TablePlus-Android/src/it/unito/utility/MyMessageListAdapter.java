@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class MyMessageListAdapter extends ArrayAdapter<Message>{
@@ -62,7 +63,10 @@ public class MyMessageListAdapter extends ArrayAdapter<Message>{
         } else {
             holder = (ViewHolder)itemView.getTag();
         }
-
+		//ImageView image = (ImageView) convertView.findViewById(R.id.image);
+		//
+			//image.setImageResource(R.drawable.user_offline);
+	
         holder.text1.setText(item.getContent());
         holder.text2.setText("Type: "+item.getType());
         holder.text3.setText("Author: "+item.getAuthor());

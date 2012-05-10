@@ -19,13 +19,13 @@
 		            android:id="@+id/subtitle_docs"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:textColor="@color/green1"
+		            android:textColor="@color/blu1"
 		            android:textSize="14sp" />
 		        <TextView
 		            android:id="@+id/subtitle_members"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:textColor="@color/green2"
+		            android:textColor="@color/blu2"
 		            android:textSize="14sp" />
 		    </TableRow>
 
