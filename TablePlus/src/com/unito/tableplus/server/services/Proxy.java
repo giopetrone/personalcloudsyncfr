@@ -53,6 +53,8 @@ public class Proxy extends HttpServlet {
 				writeMessage(jo, pw);
 			else if (request.equals("deleteMessage"))
 				deleteMessage(jo, pw);
+			else if (request.equals("queryUsersStatus"))
+				queryUsersStatus(jo, pw);
 			else {
 				JSONObject rj = new JSONObject();
 				rj.put("status", "ERROR");
@@ -67,6 +69,13 @@ public class Proxy extends HttpServlet {
 			System.err.println(e);
 		}
 	}
+
+	/*@Override
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException {
+		JSONObject jo = new JSONObject();
+		JSONArray ja = new JSONArray();
+	}*/
 
 	private void queryUser(JSONObject jo, PrintWriter pw) {
 		try {
@@ -87,6 +96,7 @@ public class Proxy extends HttpServlet {
 				uj.put("lastname", user.getLastName());
 				uj.put("email", user.getEmail());
 				uj.put("tables", user.getGroups());
+				uj.put("online", user.isOnline());
 
 				rj.put("results", uj);
 			}
@@ -120,32 +130,6 @@ public class Proxy extends HttpServlet {
 				table.put("members", group.getMembers());
 				table.put("creator", group.getCreator());
 				table.put("owner", group.getOwner());
-
-				List<Message> messages = group.getBlackBoard();
-
-				// if there are no messages this key won't be put into the json
-				int n = 1;
-				int size = messages.size();
-				JSONArray ja = new JSONArray();
-				JSONObject jm;
-				Message m;
-
-				while (size - n >= 0 && n < 10) {
-					jm = new JSONObject();
-					m = messages.get(size - n);
-
-					jm.put("key", m.getKey());
-					jm.put("timestamp", m.getDate());
-					jm.put("author", m.getAuthor());
-					jm.put("type", m.getType().toString());
-					jm.put("content", m.getContent());
-
-					ja.put(jm);
-
-					n++;
-				}
-
-				table.put("messages", ja);
 				table.put("documents", group.getDocuments());
 
 				rj.put("results", table);
@@ -162,7 +146,7 @@ public class Proxy extends HttpServlet {
 
 	private void queryTables(JSONObject jo, PrintWriter pw) {
 		try {
-			JSONArray tableKeysArray = jo.getJSONArray("tablesKeyList");
+			JSONArray tableKeysArray = jo.getJSONArray("tableKeysList");
 			List<Long> queryList = new ArrayList<Long>();
 			JSONObject table, rj;
 			JSONArray ja;
@@ -295,6 +279,32 @@ public class Proxy extends HttpServlet {
 
 		} catch (JSONException e) {
 			System.err.println("Error while deleting message.");
+			System.err.println(e);
+		} finally {
+			pw.close();
+		}
+	}
+	
+	private void queryUsersStatus(JSONObject jo, PrintWriter pw) {
+		JSONObject sj, rj; 
+		JSONArray online, offline;
+		Long key;
+		try {
+			key = jo.getLong("tableKey");
+			Group g = groupProxy.queryGroup(key);
+			online = new JSONArray(g.getSelectivePresenceMembers());
+			offline = new JSONArray(g.getHiddenMembers());
+			
+			sj = new JSONObject();
+			sj.put("online", online);
+			sj.put("offline", offline);
+			
+			rj = new JSONObject();
+			rj.put("status", "OK");
+			rj.put("results", sj);
+			
+		} catch (JSONException e) {
+			System.err.println("Error while querying users status.");
 			System.err.println(e);
 		} finally {
 			pw.close();
