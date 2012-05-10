@@ -70,27 +70,26 @@ public class ProxyUtils {
 			jsRequest.put("tableKey", param);
 		} else
 			System.out.println("ProxyCall, operazione non riconosciuta");
-		System.out.println("ProxyCall, 1");
+		//System.out.println("ProxyCall, 1");
 		HttpEntity entity = new StringEntity(jsRequest.toString());
-		System.out.println("jsRequest: " + jsRequest.toString());
+		//System.out.println("jsRequest: " + jsRequest.toString());
 		post.setEntity(entity);
-		System.out.println("ProxyCall, 3");
+		//System.out.println("ProxyCall, 3");
 		HttpResponse response = client.execute(post);
-		System.out.println("ProxyCall, 4");
+		//System.out.println("ProxyCall, 4");
 		entity = response.getEntity();
-		System.out.println("ProxyCall, 5");
+		//System.out.println("ProxyCall, 5");
 
 		InputStream is = entity.getContent();
-		System.out.println("ProxyCall, 6");
+		//System.out.println("ProxyCall, 6");
 
 		JSONTokener jt;
-		System.out.println("ProxyCall, 7");
+		//System.out.println("ProxyCall, 7");
 
 		jt = new JSONTokener(is);
-		System.out.println("ProxyCall, 8");
+		//System.out.println("ProxyCall, 8");
 		JSONObject jsResp = new JSONObject(jt);
 		System.out.println("jsResp= " + jsResp.toString());
-		Eccezione(jsResp);
 		// consuma la response, altrimenti non posso fare altre richieste
 		if (response.getEntity() != null) {
 			response.getEntity().consumeContent();
@@ -99,69 +98,27 @@ public class ProxyUtils {
 		return jsResp;
 	}
 
-	public static JSONObject MemberStatus(String operation, Object param)
-			throws Exception {
-		JSONObject jsRequest = new JSONObject();
+	public static JSONObject MemberStatus(String operation)	throws Exception {
 		System.out.println("proxyCall" + operation);
-		if (operation.equals("queryUserStatus")) {
-			
-
-			jsRequest.put("request", "queryUserStatus");
-			jsRequest.put("tableKey", param);
-		} else
-			System.out.println("ProxyCall, operazione non riconosciuta");
 		JSONArray online= new JSONArray();
 		JSONArray offline= new JSONArray();
-		String [] onlin = {"Leo", "Marco", "Luisa"};
-		String [] offlin= {"Tizio","Caio"};
-		online.put(onlin[0]);
-		online.put(onlin[1]);
-		online.put(onlin[2]);
-		offline.put(offlin[0]);
-		offline.put(offlin[1]);
-		JSONObject table = new JSONObject();
+		Long [] utOn = {(long)7,(long)8,(long)9};
+		Long [] utOff= {(long)1,(long)2};
+		online.put(utOn[0]);
+		online.put(utOn[1]);
+		online.put(utOn[2]);
+		offline.put(utOff[0]);
+		offline.put(utOff[1]);
+		JSONObject res = new JSONObject();
 		JSONObject rj = new JSONObject();
 		rj.put("status", "OK");
-		table.put("ok",online);
-		table.put("no", offline);
-		rj.put("results", table);
+		res.put("ok",online);
+		res.put("no", offline);
+		rj.put("results", res);
 		System.out.println("RJ RISPOSTA MEMBRI: " + rj.toString());
 
-		/*	System.out.println("ProxyCall, 1");
-		HttpEntity entity = new StringEntity(jsRequest.toString());
-		System.out.println("jsRequest: " + jsRequest.toString());
-		post.setEntity(entity);
-		System.out.println("ProxyCall, 3");
-		HttpResponse response = client.execute(post);
-		System.out.println("ProxyCall, 4");
-		entity = response.getEntity();
-		System.out.println("ProxyCall, 5");
-
-		InputStream is = entity.getContent();
-		System.out.println("ProxyCall, 6");
-
-		JSONTokener jt;
-		System.out.println("ProxyCall, 7");
-
-		jt = new JSONTokener(is);
-		System.out.println("ProxyCall, 8");
-		JSONObject jsResp = new JSONObject(jt);
-		System.out.println("jsResp= " + jsResp.toString());
-		Eccezione(jsResp);
-		// consuma la response, altrimenti non posso fare altre richieste
-		if (response.getEntity() != null) {
-			response.getEntity().consumeContent();
-		}
-		is.close();*/
 		return rj;
 		
-	}
-
-	public static void Eccezione(JSONObject resp) {
-		String confronto = "ERROR";
-		// Exception risposta=resp.getString("status") ;
-		// if(confronto.equals(risposta)){
-		// }
 	}
 
 	public static JSONObject proxyCallM(String operation, Object author,

@@ -1,12 +1,15 @@
 package it.unito.gui;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import it.unito.json.JSONArray;
 import it.unito.json.JSONObject;
 import it.unito.utility.MembersAdapter;
 import it.unito.utility.MyObjectListAdapter;
+import it.unito.utility.MyTablesListAdapter;
 import it.unito.utility.ProxyUtils;
+import it.unito.utility.ViewMembers;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListActivity;
@@ -23,28 +26,43 @@ import android.widget.TextView;
 
 public class Members extends ListActivity {
 	String infoCurrentTable;
-
+	ArrayAdapter<ViewMembers> array;
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        /**
+         * Richiesta Members è da fare nella onCreate perchè il Proxy sul server non aggiorna 
+         * i dati.
+         */
     	try{
-			JSONObject request = ProxyUtils.MemberStatus("queryUserStatus", 3);
-			Log.i("RICHIESTA= ",  request.toString());
+			JSONObject request = ProxyUtils.MemberStatus("queryUserStatus");
+			Log.i("Members","RICHIESTA= "+ request.toString());
 			JSONObject rispo = request.getJSONObject("results");
-			Log.i("RISPOSTA= ",  rispo.toString());
+			Log.i("Members","RISPOSTA= "+rispo.toString());
 			JSONArray online= rispo.getJSONArray("ok");
-			Log.i("ARRAY ONLINE= ", online.toString());
-			JSONArray offline = rispo.getJSONArray("no");
-			Log.i("ARRAY OFFLINE= ",  offline.toString());
+			Log.i("Members","ARRAY ONLINE= "+ online.toString());
+			JSONArray offline= rispo.getJSONArray("no");
+			Log.i("Members","ARRAY OFFLINE= "+  offline.toString());
 	
+			List<ViewMembers> members=new LinkedList<ViewMembers>();
+			for(int i=0;i<online.length();i++){
+				Long onlineMemberKey = (Long) online.get(i);
+				members.add(new ViewMembers(onlineMemberKey,"online"));
+			}
 			
+			for(int j=0;j<offline.length();j++){
+				Long offlineMemberKey = (Long) offline.get(j);
+				members.add(new ViewMembers(offlineMemberKey,"offline"));
+			}
+				
+			array=new MembersAdapter(this,members);
+			setListAdapter(array);			
 		} catch (Exception e) {
 			Log.i("Eccezione", e.toString());
 		}
-	//	String []utenti =new String[online.length()];
+	
 
 		
-		//ListAdapter array=new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1,online);
-		//setListAdapter(array);
+		
    }
       
     

@@ -10,9 +10,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 
-public class MembersAdapter extends ArrayAdapter<String> {
+public class MembersAdapter extends ArrayAdapter<ViewMembers> {
 
-	public MembersAdapter(Context context, List<String> objects){
+	public MembersAdapter(Context context, List<ViewMembers> objects){
 		super(context, R.layout.object_row, R.id.title,objects);
 	}
 	
@@ -21,13 +21,13 @@ public class MembersAdapter extends ArrayAdapter<String> {
 	{
 		
 		convertView = super.getView(position, convertView, parent);
-		String item = getItem(position);
+		ViewMembers item = getItem(position);
 		ImageView image = (ImageView) convertView.findViewById(R.id.image);
 		
-		if (item.contains("ONLINE"))
-			image.setImageResource(R.drawable.user_offline);
+		if (item.getStatus().contains("online"))
+			image.setImageResource(R.drawable.online);
 		else
-			image.setImageResource(R.drawable.user_online);
+			image.setImageResource(R.drawable.offline);
 		return convertView;
 		
 	}
