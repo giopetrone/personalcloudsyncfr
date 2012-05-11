@@ -70,13 +70,6 @@ public class Proxy extends HttpServlet {
 		}
 	}
 
-	/*@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
-		JSONObject jo = new JSONObject();
-		JSONArray ja = new JSONArray();
-	}*/
-
 	private void queryUser(JSONObject jo, PrintWriter pw) {
 		try {
 			String email = jo.getString("userEmail");
@@ -302,6 +295,9 @@ public class Proxy extends HttpServlet {
 			rj = new JSONObject();
 			rj.put("status", "OK");
 			rj.put("results", sj);
+			
+			pw.print(rj.toString());
+			pw.flush();
 			
 		} catch (JSONException e) {
 			System.err.println("Error while querying users status.");
