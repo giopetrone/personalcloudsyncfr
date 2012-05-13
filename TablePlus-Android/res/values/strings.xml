@@ -5,7 +5,6 @@
     <string name="hello">Hello World, Main!</string>
     <string name="app_name">TablePlus-Android</string>
 	<string name="Bottone1">Salva</string>
-    
     <string name="reset">Reset</string>
     <string name="invia">Invia</string>
     <string name="resta_connesso">Resta connesso</string>
@@ -18,16 +17,22 @@
     <string name="add_obj">Add</string>
     <string name="info_tab">Info</string>
     <string name="top_table_row">top_table_row</string>
-    
     <string name="addelem">Inserisci un oggetto da mettere sul tavolo</string>  
     <string name="addel">Indirizzo</string>
     <string name="aggiungi">Add</string>
-    <color name="red">#ff0000</color>
+	<string name="addmess">Add Message</string>
+	<string name="mtype">Message Type</string>
+	<string name="mcontent">Message Content</string>
+	<string name="gen">Gen</string>
+	<string name="todo">Todo</string>
+	<string name="info">Info</string>
+	<string name="probl">Probl</string>
+	
+	<color name="red">#ff0000</color>
     <color name="red1">#660000</color>
 	<color name="green1">#00CC00</color>
 	<color name="green2">#33FF00</color>
 	<color name="blue">#0000ff</color>
 	<color name="blue1">#3399FF</color>
 	<color name="blue2">#3333CC</color>
-	<string name="addmess">Add Message</string>
 </resources>

@@ -24,6 +24,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.widget.Adapter;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CursorAdapter;
@@ -60,28 +62,7 @@ public class BlackBoard extends ListActivity{
 		 infoCurrentTable=getIntent().getStringExtra("infoCurrentTable");
 	     tablekey=getIntent().getStringExtra("key");
 	     Log.i("TABLEKEY",tablekey);
-	     List<Message> listMessage=null;
-			try{
-				JSONObject request = ProxyUtils.proxyCall("queryMessages", tablekey);
-		        JSONArray jsMessages = request.getJSONArray("results");
-				Log.i("jsMessages= ",  jsMessages.toString());
-			    listMessage=ProxyUtils.convertToMessagesList(jsMessages);
-				Log.i("jsMessages2= ",  listMessage.toString());
-			} catch (Exception e) {
-				Log.i("Eccezione", e.toString());
-			}
-			
-			Log.i("ciao","ciao");
-			//aggiungo gli oggetti alla lista
-			array=new MyMessageListAdapter(this,R.layout.tables_row,R.id.title_table,listMessage);
-			setListAdapter(array);
-			 
-			
-			addi.setOnClickListener(new View.OnClickListener() {
-		  		  public void onClick(View view) { 
-		  			add(view); 		  }
-		  		});
-
+	     loadMessage();
 		}
 	 	
 	/**
@@ -108,28 +89,51 @@ public class BlackBoard extends ListActivity{
 
 	//-------------------MENU SU LONGCLICK--------------------------------------
 	public void onCreateContextMenu(ContextMenu menu, View v,ContextMenuInfo menuInfo) {  
-	    super.onCreateContextMenu(menu, v, menuInfo);  
+		    super.onCreateContextMenu(menu, v, menuInfo);  
+		    // Get the info on which item was selected
+		    AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
+
+		    // Get the Adapter behind your ListView (this assumes you're using
+		    // a ListActivity; if you're not, you'll have to store the Adapter yourself
+		    // in some way that can be accessed here.)
+		    Adapter adapter = getListAdapter();
+
+		    // Retrieve the item that was clicked on
+		    Object item = adapter.getItem(info.position);
+	        Log.i("Balckboard","hai cliccato: "+item.toString());
+	        
 	        menu.setHeaderTitle("Context Menu");  
 	        menu.add(0, v.getId(), 0, "Delete");  
 	    }  
 	  @Override  
 	    public boolean onContextItemSelected(MenuItem item) {  
-	        if(item.getTitle()=="Delete"){	        	
-	        	  function2(item.getItemId());
+	        if(item.getTitle()=="Delete"){
+	        	String status="";
+	        	// Here's how you can get the correct item in onContextItemSelected()
+	            AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+	            Object listItem = getListAdapter().getItem(info.position);
+	            Message deletingMex=(Message)listItem;
+	        	Log.i("BalckBoard","listItem :"+listItem.toString());
+	        	Log.i("BalckBoard","deletingMex :"+deletingMex.toString());
+		    	try{
+		    		JSONObject del = ProxyUtils.proxyCall("deleteMessage",deletingMex.getKey());
+		    		Log.i("BalckBoard","del :"+del.toString());
+		    		status=del.getString("status");
+					Log.i("status= ",  status);
+				} catch (Exception e) {
+					Log.i("Eccezione", e.toString());
+				}
+		    	if(status.equals("OK")){
+		    		Log.i("End ",  "elemento cancellato");
+		    		loadMessage();
+		    		Toast.makeText(this, "Delete avvenuta", Toast.LENGTH_SHORT).show();
+		    	}else
+		    		Toast.makeText(this, "Delete non riuscita", Toast.LENGTH_SHORT).show();
 	        } else {return false;}  
 	    return true;  
 	    }  
 	    public void function2(int id){
-	    	Toast.makeText(this, "Delete", Toast.LENGTH_SHORT).show(); 
-	    	try{
 	    	
-				Log.i("ID MESSAGGI","id: "+id);
-	    		JSONObject del = ProxyUtils.proxyCall("deleteMessage", id);
-				JSONObject jsTable = del.getJSONObject("results");
-				Log.i("jsTable= ",  jsTable.toString());
-			} catch (Exception e) {
-				Log.i("Eccezione", e.toString());
-			}
 	    } 
 	    
 	    
@@ -153,4 +157,29 @@ public class BlackBoard extends ListActivity{
             return super.onOptionsItemSelected(item);
         }
     }   
+	/**
+	 * Carica la listView con i messaggi del tavolo.
+	 */
+	public void loadMessage(){
+		 List<Message> listMessage=null;
+			try{
+				JSONObject request = ProxyUtils.proxyCall("queryMessages", tablekey);
+		        JSONArray jsMessages = request.getJSONArray("results");
+				Log.i("jsMessages= ",  jsMessages.toString());
+			    listMessage=ProxyUtils.convertToMessagesList(jsMessages);
+				Log.i("jsMessages2= ",  listMessage.toString());
+			} catch (Exception e) {
+				Log.i("Eccezione", e.toString());
+			}
+			
+			//aggiungo gli oggetti alla lista
+			array=new MyMessageListAdapter(this,R.layout.tables_row,R.id.title_table,listMessage);
+			setListAdapter(array);
+			 
+			
+			addi.setOnClickListener(new View.OnClickListener() {
+		  		  public void onClick(View view) { 
+		  			add(view); 		  }
+		  		});
+	}
 }

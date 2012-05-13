@@ -3,58 +3,72 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-	
-    
-		
-    
-    	<TableLayout android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:id="@+id/top_table">
 
-		<TableRow>
+    <TableLayout
+        android:id="@+id/top_table"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" >
 
-			<RadioGroup 
-			    	android:layout_width="fill_parent"
-					android:layout_height="wrap_content" 
-					android:id="@+id/radiogroup">
-			
-			<RadioButton
-			    android:id="@+id/rbInfo"
-			    android:layout_width="wrap_content"
-			    android:layout_height="wrap_content"
-			    android:text="Info" />
-			
-			
+        <TextView
+                    android:id="@+id/textView1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/mtype"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TableRow>
 
-			<RadioButton
-			    android:id="@+id/rbGeneric"
-			    android:layout_width="wrap_content"
-			    android:layout_height="wrap_content"
-			    android:text="Gen" />
+            <RadioGroup
+                android:id="@+id/radiogroup"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content" >
 
-			<RadioButton
-			    android:id="@+id/rbTodo"
-			    android:layout_width="wrap_content"
-			    android:layout_height="wrap_content"
-			    android:text="Todo" />
+                
 
-			<RadioButton
-			    android:id="@+id/rbProblem"
-			    android:layout_width="wrap_content"
-			    android:layout_height="wrap_content"
-			    android:text="Probl" />
-	 	</RadioGroup>
-	 			
-			</TableRow>
-	</TableLayout>
+                <RadioButton
+                    android:id="@+id/rbGeneric"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/gen" />
 
-   
+            </RadioGroup>
+
+            <RadioButton
+                android:id="@+id/rbTodo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/todo" />
+
+            <RadioButton
+                android:id="@+id/rbInfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/info" />
+
+            <RadioButton
+                android:id="@+id/rbProblem"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/probl" />
+
+        </TableRow>
+    </TableLayout>
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/mcontent"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <EditText
         android:id="@+id/nuovomess"
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:layout_weight="0.15"
+        android:ems="10"
         android:inputType="textMultiLine" >
+
+        <requestFocus />
     </EditText>
 
     <Button
