@@ -35,9 +35,11 @@ public class Task implements IsSerializable {
             ret += "\" dur=\"";
             ret += getDuration();
             ret += "\" end=\"";
-            ret += new Interval(getName(), getFirstStartHour(), getLastEndHour()).toRequest();
+            // causa reasoner di Gianluca, non si accettano 0
+            // per inizio, quindi aggiungo 1
+            ret += new Interval(getName(), getFirstStartHour() + 1, getLastEndHour()).toRequest();
             ret += "\" start=\"";
-            ret += new Interval(getName(), getFirstStartHour(), getLastEndHour()).toRequest();
+            ret += new Interval(getName(), getFirstStartHour() + 1, getLastEndHour()).toRequest();
             ret += "\"\nusers=\"";
             for (int i = 0; i < users.size(); i++) {
                 UiUser uu = users.get(i);

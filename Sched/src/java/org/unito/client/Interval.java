@@ -78,7 +78,7 @@ public class Interval implements IsSerializable {
     }
 
     public void addUser(String n) {
-            getUsers().add(n);
+        getUsers().add(n);
     }
 
     /**
@@ -93,5 +93,21 @@ public class Interval implements IsSerializable {
      */
     public void setUsers(ArrayList<String> users) {
         this.users = users;
+    }
+
+    public static ArrayList<Interval> sort(Interval[] param) {
+        ArrayList<Interval> ret = new ArrayList();
+        for (int i = 0; i < param.length; i++) {
+            Interval intMin = param[i];
+            int quale = i;
+            for (int j = i + 1; j < param.length; j++) {
+                Interval intCurr = param[j];
+                if (intCurr.min < intMin.min) {
+                    quale = j;
+                }
+            }
+            ret.add(param[quale]);
+        }
+        return ret;
     }
 }

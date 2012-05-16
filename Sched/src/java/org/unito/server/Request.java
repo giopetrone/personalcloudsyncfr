@@ -23,6 +23,8 @@ public class Request {
     // StartInterval choice = new StartInterval("",0,0);
     StartInterval choice = null;
     String requestString1 = "<request>\n";
+    String userString1 ="<user name =\"";
+    String userString2 = "\" />\n";
     String actionString1 = "<action task=\"";
     String actionString2 = "\" type=\"";
     String actionString3 = "\" />\n";    // era con un \" in piu' al fondo???
@@ -73,12 +75,18 @@ public class Request {
     public String toServerString() {
         String ret = requestString1;
         if (!mu.equals("")) {
-            ret += "<user name =\"";
+            ret += userString1;
             ret += user;
-            ret += "\"/>\n<action type=\"insert\">\n";
-            Task tata = TaskGroup.get(task);
+            ret += userString2;
+          /*  ret += "\"/>\n<action type=\"insert\">\n";
+            Task tata = tasks.getI(task);
             ret += tata.toRequest(true) + "\n";
-            ret += "</action>\n";
+            ret += "</action>\n"; */
+            ret += actionString1;
+            ret += task;
+            ret += actionString2;
+            ret += action;
+            ret += actionString3;
         } else {
             ret += actionString1;
             ret += task;
@@ -108,7 +116,9 @@ public class Request {
         //  <stask name="A1" start="15" />
         if (tasks != null) {
             for (Task t : tasks.getTasks()) {
-                int sta = tasks.getOfficialSchedule(t.getName());
+                // causa reasoner di Gianluca, non si accettano 0
+                // per inizio, quindi aggiungo 1
+                int sta = tasks.getOfficialSchedule(t.getName()) + 1;
                 ret += "<stask name=\"" + t.getName() + "\" start=\"" + sta + "\" />\n";
             }
         }

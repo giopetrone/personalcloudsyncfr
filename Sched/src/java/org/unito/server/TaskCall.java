@@ -37,12 +37,15 @@ public class TaskCall {
         // have to be moved to make room for it in the specified interval;
         // the resulting net is then passes to jacop for generating a schedule
 
+        System.err.println("in dorequest task="+taskName+"\n"+"tasknet="+taskNet+"\n"+"mu="+mu+"\n"+"mode="+mode+"\n"+"user="+user+"\n");
         String pr = new Request(iTask, taskName, taskNet, mu, mode, user).toServerString();
         System.err.println("in dorequest request=\n" + pr);
         try {
             DefaultHttpClient httpClient = new DefaultHttpClient();
-            HttpPost postRequest = new HttpPost(
-                    "http://localhost:3000/modstn/" + mu + taskNet);
+            String req = "http://localhost:3000/modstn/" + mu + taskNet;
+            System.err.println("in dorequest url=" + req +"\n");
+            HttpPost postRequest = new HttpPost(req);
+                    
             //   "http://localhost:3000/modstn/startintervals");   oppure "tasknet"
             StringEntity input = new StringEntity(pr);
             input.setContentType("text/xml");
@@ -60,6 +63,7 @@ public class TaskCall {
             ret.setTaskSchedule(arra);
              * */
             TaskGroup ret = MyDOMParserBean.fillReply(is);
+            ret.setSelectedTask(taskName);
             httpClient.getConnectionManager().shutdown();
             if (taskNet.equals("tasknet")) {
                 // call Scheduler with result from constraint solver

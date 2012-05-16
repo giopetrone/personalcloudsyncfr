@@ -5,13 +5,14 @@
 package org.unito.client;
 
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.IsSerializable;
 import java.util.ArrayList;
 
 /**
  *
  * @author marino
  */
-public class TaskGroup {
+public class TaskGroup implements IsSerializable {
 
     static int giornata = 12;
     static int oreLavoro = 60;
@@ -20,6 +21,7 @@ public class TaskGroup {
     private ArrayList<Interval> taskSchedule = new ArrayList();  // possible starting intervals for a task
     private ArrayList<Task> tasks = new ArrayList();
     private StartInterval choice = null;
+    private String selectedTask = null;
     static boolean lunch = false;
 
     public static TaskGroup addTaskGroup() {
@@ -38,7 +40,7 @@ public class TaskGroup {
     public void setChoiceForTask(String tName) {
         Task t = get(tName);
         choice = new StartInterval(tName, t.getOfficialSchedule(), t.getOfficialSchedule() + 1);
-        Window.alert("in taskgroup.setChoiceForTas task: " + tName + " " + choice.getMin() + ", " + choice.getMax());
+        //   Window.alert("in taskgroup.setChoiceForTas task: " + tName + " " + choice.getMin() + ", " + choice.getMax());
     }
 
     public TaskGroup(ViaVai via) { // copia task del parametro
@@ -55,6 +57,7 @@ public class TaskGroup {
             taskSchedule.add(taskScheduli[i]);
         }
         choice = via.getChoice();
+        selectedTask = via.getSelectedTask();
     }
 
     public static void reset() {
@@ -79,9 +82,11 @@ public class TaskGroup {
     public int setSchedule(Task t) {
         // find time to schedule as early as possible the task
         // set to -1 if no time has been found;
-        // first try user schedulke (if any, then try any poossible iunterval
+        // first try user schedulke (if any), then try any poossible iunterval
         int sta = possibileInizio(t.getName(), t.getSchedule());
         if (sta == -1) {
+            // deschedula
+            removeSchedule(t.getName());
             return -1;
         }
         //   Window.alert("setschedule task= "+t.getName() +" sta="+sta);
@@ -101,6 +106,7 @@ public class TaskGroup {
     public static int addScheduleTask(String name, String firstStartHour, String lastEndHour, String duration, String before, String after, String schedule, String users, boolean overlap) {
         Task tat = new Task(name, firstStartHour, lastEndHour, duration, before, after, schedule, users, overlap);
         TaskGroup.add(tat);
+        Window.alert("lastendhour="+lastEndHour);
         int sched = TaskGroup.current().setSchedule(tat);
         return sched;
     }
@@ -115,12 +121,24 @@ public class TaskGroup {
         if (duration.equals("")) {
             duration = "0";
         }
-
-        int dur = Integer.parseInt(duration);
-
-        if (dur < 1 || dur > oreLavoro) {
-            msg += "invalid duration: must be 1 <= VALUE <= " + oreLavoro + "\n";
+        int dur = -1;
+        try {
+            dur = Integer.parseInt(duration);
+        } catch (NumberFormatException ex) {
+            msg += "invalid duration: " + duration + "\n";
         }
+        if (dur < 1 || dur > oreLavoro) {
+            msg += "invalid duration: must be 1 <= " + dur + "  <= " + oreLavoro + "\n";
+        }
+
+        if (!schedule.equals("")) {
+            int sche = Integer.parseInt(schedule);
+            if (sche < fis || sche + dur > las) {
+                msg += "invalid schedule. must be " + fis + "<= " + sche + "<= " + (las - dur) + "\n";
+            }
+        }
+
+
         String[] tmp = before.split(" ", -1);
         for (int i = 0; i < tmp.length; i++) {
             if (!tmp[i].equals("") && !tmp[i].equals(" ")) {
@@ -177,6 +195,12 @@ public class TaskGroup {
 
     public void clearSchedule() {
         globalSchedule.clear();
+    }
+
+    public void updateWith(ViaVai result) {
+        selectedTask = result.getSelectedTask();
+        updateTaskSlots(new TaskGroup(result));
+     /* non funziona e non so perche'!!!!  */  //taskSchedule = Interval.sort(result.getTaskSchedule());
     }
 
     public void updateTaskSlots(TaskGroup tg) {
@@ -265,15 +289,15 @@ public class TaskGroup {
         return -1;
     }
 
-    public static ArrayList<String>[] retr(boolean showAlt, TaskGroup fonte) {
+    public static ArrayList<String>[] nomiCaselle(boolean showAlt, TaskGroup fonte) {
         ArrayList<String>[] ret = new ArrayList[oreLavoro];
         for (int i = 0; i < oreLavoro; i++) {
             ret[i] = new ArrayList();
         }
-        // Window.alert("in retr task sz =" + current().tasks.size());
+        // Window.alert("in nomiCaselle task sz =" + current().tasks.size());
         for (Task t : fonte.tasks) {
             int sta = fonte.getOfficialSchedule(t.getName());
-            //   Window.alert("in retr task=" + t.getName() + " " +sta);
+            //   Window.alert("in nomiCaselle task=" + t.getName() + " " +sta);
             if (sta >= 0) {
                 for (int i = 0; i < t.getDuration(); i++) {
 
@@ -282,12 +306,86 @@ public class TaskGroup {
                 }
             }
         }
+        return ret;
+    }
+
+    public static ArrayList<String>[] stiliCaselle(boolean showAlt, TaskGroup fonte) {
+        ArrayList<String>[] ret = new ArrayList[oreLavoro];
+        for (int i = 0; i < oreLavoro; i++) {
+            ret[i] = new ArrayList();
+        }
+        if (showAlt) {
+            if (!fonte.taskSchedule.isEmpty()) {
+                for (Interval inte : fonte.taskSchedule) {
+                    Task ta = fonte.get(inte.getName());
+                    for (int j = inte.getMin(); j <= inte.getMax(); j++) { // MINORE O MINORE UGUALE?????
+                        for (int i = 0; i < ta.getDuration(); i++) {
+                            // colora come possibili tutte le caselle dove piazzare task scelto
+                            if (ret[j + i].isEmpty()) {
+                                if (inte.getUsers().isEmpty()) {
+                                    //    Window.alert("empty users, good"+ (j+i));
+                                    ret[j + i].add("styleAvailable");
+                                } else {
+                                    ret[j + i].add("styleConflict");
+                                }
+                            }
+                        }
+                    }
+                }
+                // fill also current task positions , to be discussed.
+                Task tat = fonte.getI(fonte.getSelectedTask());
+                //   Window.alert("taskfonte="+tat);
+                int ende = tat.getOfficialSchedule() + tat.getDuration();
+                for (int k = tat.getOfficialSchedule(); k < ende; k++) {
+                    if (ret[k].isEmpty()) {
+                        ret[k].add("styleAvailable");
+                    }
+                }
+
+            } else {
+                Task lui = fonte.getI(fonte.getSelectedTask());
+                for (int i = lui.getFirstStartHour(); i < lui.getLastEndHour(); i++) {
+                    ret[i].add("styleConflict");
+                }
+            }
+        }
+        for (int i = 0;
+                i < oreLavoro;
+                i++) {
+            if (ret[i].isEmpty()) {
+                ret[i].add("styleUnused");
+            }
+        }
+        return ret;
+    }
+
+    public static ArrayList<String>[] nomiCaselleOLD(boolean showAlt, TaskGroup fonte) {
+        ArrayList<String>[] ret = new ArrayList[oreLavoro];
+
+
+        for (int i = 0; i
+                < oreLavoro; i++) {
+            ret[i] = new ArrayList();
+
+
+        } // Window.alert("in nomiCaselle task sz =" + current().tasks.size());
+        for (Task t : fonte.tasks) {
+            int sta = fonte.getOfficialSchedule(t.getName());
+            //   Window.alert("in nomiCaselle task=" + t.getName() + " " +sta);
+            if (sta >= 0) {
+                for (int i = 0; i < t.getDuration(); i++) {
+                    ret[sta + i].add(t.getName());
+                }
+            }
+        }
         if (showAlt) {
             for (Interval inte : fonte.taskSchedule) {
                 Task ta = fonte.get(inte.getName());
                 //  Window.alert("task, min max dur"+ta.getName()+ " "+inte.getMin()+ " "+inte.getMax()+" "+ + ta.getDuration());
-                for (int j = inte.getMin(); j <= inte.getMax(); j++) { // MINORE O MINORE UGUALE?????
-                    for (int i = 0; i < ta.getDuration(); i++) {
+                for (int j = inte.getMin(); j
+                        <= inte.getMax(); j++) { // MINORE O MINORE UGUALE?????
+                    for (int i = 0; i
+                            < ta.getDuration(); i++) {
                         // colora come possibili tutte le caselle dove piazzare task scelto
                         if (ret[j + i].isEmpty()) {
                             ret[j + i].add("***");
@@ -311,7 +409,7 @@ public class TaskGroup {
     public Task getI(String name) {
 
         for (Task t : tasks) {
-            System.out.println("task=" + name);
+            // System.out.println("task=" + name);
             if (t.getName().equals(name)) {
                 return t;
             }
@@ -341,6 +439,7 @@ public class TaskGroup {
 
     public static String change(Task t) {
         String ret = "";
+        //  Window.alert("change,task new duration=" + t.getDuration());
         for (Task c : current().tasks) {
             if (t.getName().equals(c.getName())) {
                 current().tasks.remove(c);
@@ -477,5 +576,19 @@ public class TaskGroup {
      */
     public void setChoice(StartInterval choice) {
         this.choice = choice;
+    }
+
+    /**
+     * @return the selectedTask
+     */
+    public String getSelectedTask() {
+        return selectedTask;
+    }
+
+    /**
+     * @param selectedTask the selectedTask to set
+     */
+    public void setSelectedTask(String selectedTask) {
+        this.selectedTask = selectedTask;
     }
 }
