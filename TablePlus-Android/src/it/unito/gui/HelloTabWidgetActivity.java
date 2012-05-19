@@ -45,7 +45,7 @@ public class HelloTabWidgetActivity extends TabActivity {
 		}
 
 		// Create an Intent to launch an Activity for the tab (to be reused)
-		intent = new Intent().setClass(this, ExistantTable.class);
+		intent = new Intent().setClass(this, ExistantTableActivity.class);
 		intent.putStringArrayListExtra("TableDoc",(ArrayList<String>) currentTable.getDocuments());
 		intent.putExtra("infoCurrentTable", currentTable.toString());
 		// Initialize a TabSpec for each tab and add it to the TabHost
@@ -56,7 +56,7 @@ public class HelloTabWidgetActivity extends TabActivity {
 
 		//Log.i("infoCurrentTable= ", currentTable.toString() );
 		// Do the same for the other tabs
-		intent = new Intent().setClass(this, BlackBoard.class);
+		intent = new Intent().setClass(this, BlackBoardActivity.class);
 		intent.putExtra("infoCurrentTable", currentTable.toString());
 		intent.putExtra("key", key);		
 		spec = tabHost.newTabSpec("BlackBoard").setIndicator("Blackboard",

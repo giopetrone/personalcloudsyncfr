@@ -52,7 +52,7 @@ public class LoginActivity extends Activity {
 			if (jsUser.getString("email").equals(mailString))
 			{
 				Toast.makeText(this, "Login effettuato", Toast.LENGTH_LONG).show();
-				Intent intent = new Intent(this,TableList.class);
+				Intent intent = new Intent(this,TableListActivity.class);
 				intent.putExtra("user",jsUser.toString());
 				startActivity(intent);
 			}
