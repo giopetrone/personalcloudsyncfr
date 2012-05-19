@@ -64,7 +64,7 @@ public class HelloTabWidgetActivity extends TabActivity {
 				.setContent(intent);
 		tabHost.addTab(spec);
 
-		intent = new Intent().setClass(this, Members.class);
+		intent = new Intent().setClass(this, MembersActivity.class);
 		intent.putExtra("infoCurrentTable", currentTable.toString());
 		intent.putExtra("key", currentTable.getKey());
 		spec = tabHost.newTabSpec("Members").setIndicator("Members",
