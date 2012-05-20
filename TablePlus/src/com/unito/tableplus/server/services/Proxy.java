@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -12,7 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -43,6 +43,10 @@ public class Proxy extends HttpServlet {
 
 			if (request.equals("queryUser"))
 				queryUser(jo, pw);
+			else if (request.equals("queryUsers"))
+				queryUsers(jo, pw);
+			else if (request.equals("queryUsersStatus"))
+				queryUsersStatus(jo, pw);
 			else if (request.equals("queryTable"))
 				queryTable(jo, pw);
 			else if (request.equals("queryTables"))
@@ -53,18 +57,20 @@ public class Proxy extends HttpServlet {
 				writeMessage(jo, pw);
 			else if (request.equals("deleteMessage"))
 				deleteMessage(jo, pw);
-			else if (request.equals("queryUsersStatus"))
-				queryUsersStatus(jo, pw);
+			else if (request.equals("toggleHide"))
+				toggleHide(jo, pw);
+			else if (request.equals("switchTable"))
+				switchTable(jo, pw);
 			else {
 				JSONObject rj = new JSONObject();
 				rj.put("status", "ERROR");
 				rj.put("error", "Request unkown.");
-				pw.print(rj.toString());
+				pw.print(rj);
 				pw.flush();
 				pw.close();
 			}
 
-		} catch (JSONException e) {
+		} catch (Exception e) {
 			System.err.println("Error while processing post request.");
 			System.err.println(e);
 		}
@@ -94,11 +100,45 @@ public class Proxy extends HttpServlet {
 				rj.put("results", uj);
 			}
 
-			pw.print(rj.toString());
+			pw.print(rj);
 			pw.flush();
 
-		} catch (JSONException e) {
+		} catch (Exception e) {
 			System.err.println("Error while querying user");
+			System.err.println(e);
+		} finally {
+			pw.close();
+		}
+	}
+
+	private void queryUsers(JSONObject jo, PrintWriter pw) {
+		try {
+			JSONArray kja, uja;
+			JSONObject uj, rj;
+
+			kja = jo.getJSONArray("userKeysList");
+			int size = kja.length();
+			List<Long> keys = new LinkedList<Long>();
+			for (int i = 0; i < size; i++) {
+				keys.add(kja.getLong(i));
+			}
+
+			List<User> users = userProxy.queryUsers(keys);
+			uja = new JSONArray();
+			for (User user : users) {
+				uj = new JSONObject(user);
+				uja.put(uj);
+			}
+
+			rj = new JSONObject();
+			rj.put("status", "OK");
+			rj.put("results", uja);
+
+			pw.print(rj);
+			pw.flush();
+
+		} catch (Exception e) {
+			System.err.println("Error while querying users");
 			System.err.println(e);
 		} finally {
 			pw.close();
@@ -127,9 +167,9 @@ public class Proxy extends HttpServlet {
 
 				rj.put("results", table);
 			}
-			pw.print(rj.toString());
+			pw.print(rj);
 			pw.flush();
-		} catch (JSONException e) {
+		} catch (Exception e) {
 			System.err.println("Error while querying table");
 			System.err.println(e);
 		} finally {
@@ -172,10 +212,10 @@ public class Proxy extends HttpServlet {
 				rj.put("results", ja);
 			}
 
-			pw.print(rj.toString());
+			pw.print(rj);
 			pw.flush();
 
-		} catch (JSONException e) {
+		} catch (Exception e) {
 			System.err.println("Error while querying tables");
 			System.err.println(e);
 		} finally {
@@ -220,10 +260,10 @@ public class Proxy extends HttpServlet {
 
 				rj.put("results", ja);
 
-				pw.print(rj.toString());
+				pw.print(rj);
 				pw.flush();
 			}
-		} catch (JSONException e) {
+		} catch (Exception e) {
 			System.err.println("Error while querying messages");
 			System.err.println(e);
 		} finally {
@@ -248,10 +288,10 @@ public class Proxy extends HttpServlet {
 			groupProxy.storeGroup(group);
 
 			rj.put("status", "OK");
-			pw.print(rj.toString());
+			pw.print(rj);
 			pw.flush();
 
-		} catch (JSONException e) {
+		} catch (Exception e) {
 			System.err.println("Error while writing message.");
 			System.err.println(e);
 		} finally {
@@ -267,39 +307,98 @@ public class Proxy extends HttpServlet {
 			groupProxy.removeMessage(key);
 
 			rj.put("status", "OK");
-			pw.print(rj.toString());
+			pw.print(rj);
 			pw.flush();
 
-		} catch (JSONException e) {
+		} catch (Exception e) {
 			System.err.println("Error while deleting message.");
 			System.err.println(e);
 		} finally {
 			pw.close();
 		}
 	}
-	
+
 	private void queryUsersStatus(JSONObject jo, PrintWriter pw) {
-		JSONObject sj, rj; 
+		List<Long> visible, others;
+		JSONObject sj, rj;
 		JSONArray online, offline;
 		Long key;
 		try {
 			key = jo.getLong("tableKey");
 			Group g = groupProxy.queryGroup(key);
-			online = new JSONArray(g.getSelectivePresenceMembers());
-			offline = new JSONArray(g.getHiddenMembers());
-			
+
+			visible = g.getSelectivePresenceMembers();
+			visible.removeAll(g.getHiddenMembers());
+			online = new JSONArray(visible);
+			others = g.getMembers();
+			others.removeAll(visible);
+			offline = new JSONArray(others);
+
 			sj = new JSONObject();
 			sj.put("online", online);
 			sj.put("offline", offline);
-			
+
 			rj = new JSONObject();
 			rj.put("status", "OK");
 			rj.put("results", sj);
+
+			pw.print(rj);
+			pw.flush();
+
+		} catch (Exception e) {
+			System.err.println("Error while querying users status.");
+			System.err.println(e);
+		} finally {
+			pw.close();
+		}
+	}
+
+	private void toggleHide(JSONObject jo, PrintWriter pw) {
+		try {
+			Long user = jo.getLong("userKey");
+			Long table = jo.getLong("tableKey");
+			Group group = groupProxy.queryGroup(table);
+			List<Long> hiddenMembers = group.getHiddenMembers();
 			
-			pw.print(rj.toString());
+			if (hiddenMembers.contains(user))
+				hiddenMembers.remove(user);
+			else
+				hiddenMembers.add(user);
+			groupProxy.storeGroup(group);
+			
+			JSONObject rj = new JSONObject();
+			rj.put("status", "OK");
+			pw.print(rj);
 			pw.flush();
 			
-		} catch (JSONException e) {
+		} catch (Exception e) {
+			System.err.println("Error while querying users status.");
+			System.err.println(e);
+		} finally {
+			pw.close();
+		}
+	}
+
+	private void switchTable(JSONObject jo, PrintWriter pw) {
+		try {
+			Long user = jo.getLong("userKey");
+			Long currentTable = jo.getLong("currentTable");
+			Long prevTable = jo.getLong("prevTable");
+			
+			Group group = groupProxy.queryGroup(prevTable);
+			group.getSelectivePresenceMembers().remove(user);
+			groupProxy.storeGroup(group);
+			
+			group = groupProxy.queryGroup(currentTable);
+			group.getSelectivePresenceMembers().add(user);
+			groupProxy.storeGroup(group);
+			
+			JSONObject rj = new JSONObject();
+			rj.put("status", "OK");
+			pw.print(rj);
+			pw.flush();
+		
+		} catch (Exception e) {
 			System.err.println("Error while querying users status.");
 			System.err.println(e);
 		} finally {
