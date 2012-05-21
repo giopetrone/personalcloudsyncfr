@@ -116,16 +116,20 @@ public class ProxyUtils {
 		return jsResp;
 	}
 	
-
+	//{"request": toggleStatus, "userKey":Userkey,”status”:offline/online} 
 	//create the JSON Object for hideMe request
-	public static JSONObject hideMe(String operation, Object userKey, Object tableKey)
+	public static JSONObject UserStatus(String operation, Object userKey, Object Key)
 			throws Exception {
 		JSONObject jsRequest = new JSONObject();
 		if (operation.equals("toggleHide")) {
 			jsRequest.put("request", "toggleHide");
 			jsRequest.put("userKey", userKey);
-			jsRequest.put("tableKey", tableKey);
-		} else
+			jsRequest.put("tableKey", Key);
+		}else if (operation.equals("toggleStatus")) {
+			jsRequest.put("request", "toggleStatus");
+			jsRequest.put("userKey", userKey);
+			jsRequest.put("status", Key);
+		}else
 			System.out.println("ProxyCall, operazione non riconosciuta");
 		HttpEntity entity = new StringEntity(jsRequest.toString());
 		post.setEntity(entity);

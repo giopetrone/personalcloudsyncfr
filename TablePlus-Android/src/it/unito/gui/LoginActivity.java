@@ -41,61 +41,51 @@ public class LoginActivity extends Activity {
 		restaConnesso= (CheckBox) findViewById(R.id.resta_connesso);
 		// carica le preferences
 		updatePreferencesData();
-	
-		
+		Log.i("LOGIN "," PASSA QUI");
+/*		try{
+			JSONObject user = ProxyUtils.UserStatus("toggleStatus", ,);
+		}catch(Exception e){ Log.i("Eccezione Login",e.toString());}
+	*/	
 	}
 	
-
-	public void invia(View v)
-	{
-		String mailString=(mail.getText()).toString();
-		String pass=(password.getText()).toString();
-
-		if(!mailString.equals("")){//mettere funzione per LOGIN,(!mailString.equals("")) && (!pass.equals(""))
-			try{
-				JSONObject user = ProxyUtils.proxyCall("queryUser", mailString);
-				JSONObject jsUser = user.getJSONObject("results");
-				//Inizializzo la Session
-				session=(TablePlusAndroid) this.getApplication();
-				session.setUserKey(jsUser.getLong("key"));
-				if (jsUser.getString("email").equals(mailString))
-				{
-					Toast.makeText(this, "Login effettuato", Toast.LENGTH_LONG).show();
-					if (restaConnesso.isChecked()) {
-						//save login and preferences in session 
-						savePreferencesData(v);
-			        }
-					
-					Intent intent = new Intent(this,TableListActivity.class);
-					intent.putExtra("user",jsUser.toString());
-					startActivity(intent);
-				}
-				else Toast.makeText(this, "Login errato", Toast.LENGTH_LONG).show();
-			}catch(Exception e){ Log.i("Eccezione Login",e.toString());}
-		}
-
-		
-		try{
-			JSONObject user = ProxyUtils.proxyCall("queryUser", mailString);
-			Log.i("ciao","ciao");
-			JSONObject jsUser = user.getJSONObject("results");
-			Log.i("loginActivity", "USER= " + jsUser.toString());
-			Log.i("loginActivity", "email= " + jsUser.getString("email"));
-			//Inizializzo la Session
-			session=(TablePlusAndroid) this.getApplication();
-			session.setUserKey(jsUser.getLong("key"));
-			Log.i("session.getUserKey()",session.getUserKey().toString());
-			
-			if (jsUser.getString("email").equals(mailString))
-			{
-				Toast.makeText(this, "Login effettuato", Toast.LENGTH_LONG).show();
-				Intent intent = new Intent(this,TableListActivity.class);
-				intent.putExtra("user",jsUser.toString());
-				startActivity(intent);
+	  public void onResume(){
+		   super.onResume();
+			Log.i("LOGIN "," PASSA QUI 2");
+	   }
+	
+	  public void invia(View v)
+		{
+			String mailString=(mail.getText()).toString();
+			String pass=(password.getText()).toString();
+			if(!mailString.equals("")){//mettere funzione per LOGIN,(!mailString.equals("")) && (!pass.equals(""))
+				try{
+					JSONObject user = ProxyUtils.proxyCall("queryUser", mailString);
+					JSONObject jsUser = user.getJSONObject("results");
+					//Inizializzo la Session
+					session=(TablePlusAndroid) this.getApplication();
+					session.setUserKey(jsUser.getLong("key"));
+					if (jsUser.getString("email").equals(mailString))
+					{
+						Toast.makeText(this, "Login effettuato", Toast.LENGTH_LONG).show();
+						if (restaConnesso.isChecked()) {
+							//save login and preferences in session 
+							savePreferencesData(v);
+				        }
+						
+						Intent intent = new Intent(this,TableListActivity.class);
+						intent.putExtra("user",jsUser.toString());
+						startActivity(intent);
+					}
+					else Toast.makeText(this, "Login errato", Toast.LENGTH_LONG).show();
+				}catch(Exception e){ Log.i("Eccezione Login",e.toString());}
 			}
-			else Toast.makeText(this, "Login errato", Toast.LENGTH_LONG).show();
-		}catch(Exception e){ Log.i("Eccezione Login",e.toString());}
-
+		//Put user Status online/Offline
+	/*	try{
+			JSONObject user = ProxyUtils.UserStatus("toggleStatus", session.getUserKey().toString(),"offline");
+		}catch(Exception e){ Log.i("Eccezione Login",e.toString());
+		}
+	
+		*/
 	}
 
 	public void reset(View v)

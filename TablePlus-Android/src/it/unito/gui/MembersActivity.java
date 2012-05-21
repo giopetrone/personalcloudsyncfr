@@ -88,7 +88,7 @@ public class MembersActivity extends ListActivity {
 	public void hideMe(){
 		try{
 			session=(TablePlusAndroid) this.getApplication();
-			JSONObject request = ProxyUtils.hideMe("toggleHide", session.getUserKey().toString(),session.getCurrentTableKey().toString());
+			JSONObject request = ProxyUtils.UserStatus("toggleHide", session.getUserKey().toString(),session.getCurrentTableKey().toString());
 		} catch (Exception e) {
 			Log.i("Eccezione", e.toString());
 		}
