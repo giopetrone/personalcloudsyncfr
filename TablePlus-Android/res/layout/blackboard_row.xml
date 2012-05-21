@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+	<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		    android:id="@+id/top_table_row"
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:layout_gravity="left" >
+
+		    <TableRow>
+
+		        <TextView
+		            android:id="@+id/title_table"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:textSize="20sp" />
+		    </TableRow>
+
+		    <TableRow>
+		        <TextView
+		            android:id="@+id/subtitle_docs"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:textColor="@color/blue1"
+		            android:textSize="10sp" />
+		        <TextView
+		            android:id="@+id/subtitle_members"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:textColor="@color/blue2"
+		            android:textSize="10sp" />
+		    </TableRow>
+
+		</TableLayout>
