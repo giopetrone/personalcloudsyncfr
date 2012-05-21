@@ -59,6 +59,8 @@ public class Proxy extends HttpServlet {
 				deleteMessage(jo, pw);
 			else if (request.equals("toggleHide"))
 				toggleHide(jo, pw);
+			else if (request.equals("toggleStatus"))
+				toggleStatus(jo, pw);
 			else if (request.equals("switchTable"))
 				switchTable(jo, pw);
 			else {
@@ -359,18 +361,43 @@ public class Proxy extends HttpServlet {
 			Long table = jo.getLong("tableKey");
 			Group group = groupProxy.queryGroup(table);
 			List<Long> hiddenMembers = group.getHiddenMembers();
-			
+
 			if (hiddenMembers.contains(user))
 				hiddenMembers.remove(user);
 			else
 				hiddenMembers.add(user);
 			groupProxy.storeGroup(group);
+
+			JSONObject rj = new JSONObject();
+			rj.put("status", "OK");
+			pw.print(rj);
+			pw.flush();
+
+		} catch (Exception e) {
+			System.err.println("Error while querying users status.");
+			System.err.println(e);
+		} finally {
+			pw.close();
+		}
+	}
+	
+	private void toggleStatus(JSONObject jo, PrintWriter pw){
+		try {
+			Long user = jo.getLong("userKey");
+			String status = jo.getString("status");
+
+			User u = userProxy.queryUser(user);
+			if(status.equals("online"))
+				u.setOnline(true);
+			else
+				u.setOnline(false);
+			userProxy.storeUser(u);
 			
 			JSONObject rj = new JSONObject();
 			rj.put("status", "OK");
 			pw.print(rj);
 			pw.flush();
-			
+
 		} catch (Exception e) {
 			System.err.println("Error while querying users status.");
 			System.err.println(e);
@@ -381,23 +408,27 @@ public class Proxy extends HttpServlet {
 
 	private void switchTable(JSONObject jo, PrintWriter pw) {
 		try {
+			Group group;
+
 			Long user = jo.getLong("userKey");
 			Long currentTable = jo.getLong("currentTable");
-			Long prevTable = jo.getLong("prevTable");
-			
-			Group group = groupProxy.queryGroup(prevTable);
-			group.getSelectivePresenceMembers().remove(user);
-			groupProxy.storeGroup(group);
-			
+
+			if (jo.has("prevTable")) {
+				Long prevTable = jo.getLong("prevTable");
+				group = groupProxy.queryGroup(prevTable);
+				group.getSelectivePresenceMembers().remove(user);
+				groupProxy.storeGroup(group);
+			}
+
 			group = groupProxy.queryGroup(currentTable);
 			group.getSelectivePresenceMembers().add(user);
 			groupProxy.storeGroup(group);
-			
+
 			JSONObject rj = new JSONObject();
 			rj.put("status", "OK");
 			pw.print(rj);
 			pw.flush();
-		
+
 		} catch (Exception e) {
 			System.err.println("Error while querying users status.");
 			System.err.println(e);
