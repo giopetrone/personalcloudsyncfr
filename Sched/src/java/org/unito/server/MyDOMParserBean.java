@@ -23,7 +23,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.unito.client.Interval;
-import org.unito.client.StartInterval;
+import org.unito.client.Interval;
 import org.unito.client.Task;
 import org.unito.client.TaskGroup;
 import org.w3c.dom.*;
@@ -118,7 +118,7 @@ public class MyDOMParserBean
                     // per inizio, quindi sottraggo 1
                     int min = Integer.parseInt(pars[1]) - 1;
                     int max = Integer.parseInt(pars[2]);
-                    Interval inte = new StartInterval(taskName, min, max);
+                    Interval inte = new Interval(taskName, min, max);
                     inter.add(inte);
                     if (debug) {
                         System.out.print("intervallo " + s1);
@@ -357,7 +357,7 @@ public class MyDOMParserBean
                         String[] pars = s1.split(" ");
                         int min = Integer.parseInt(pars[1]);
                         int max = Integer.parseInt(pars[2]);
-                        Interval inte = new StartInterval(taskName, min, max);
+                        Interval inte = new Interval(taskName, min, max);
                         inter.add(inte);
                         if (debug) {
                             System.out.print("intervallo " + s1);

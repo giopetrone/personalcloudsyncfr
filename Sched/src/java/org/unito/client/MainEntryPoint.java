@@ -223,9 +223,9 @@ public class MainEntryPoint implements EntryPoint {
                     return;
                 }
                 //  Window.alert("giornoSelezionato: " + dayStart.getSelectedIndex());
-                String vStart = stringVal(dayStart, timeStart,0);
+                String vStart = stringVal(dayStart, timeStart, 0);
                 String vEnd = stringVal(dayEnd, timeEnd, 0);
-                String vSched = stringVal(daySchedule, timeSchedule, 0 );
+                String vSched = stringVal(daySchedule, timeSchedule, 0);
                 String msg = TaskGroup.checkTask(tName.getText(), vStart, vEnd, tDuration.getText(), tBefore.getText(), tAfter.getText(), vSched, tUsers.getText(), cOverlap.getValue());
                 if (!msg.equals("")) {
                     Window.alert(msg);
@@ -495,9 +495,9 @@ public class MainEntryPoint implements EntryPoint {
             dayStart.setSelectedIndex(Task.dayOf(ta.getMinStartHour()));
             timeStart.setSelectedIndex(Task.timeOf(ta.getMinStartHour()));
             // te4.setText("" + ta.getMaxEndHour());
-            dayEnd.setSelectedIndex(Task.dayOf(ta.getMaxEndHour() -1));
-        //    Window.alert("timeof="+);
-            timeEnd.setSelectedIndex(Task.timeOf(ta.getMaxEndHour() -1) + 1);
+            dayEnd.setSelectedIndex(Task.dayOf(ta.getMaxEndHour() - 1));
+            //    Window.alert("timeof="+);
+            timeEnd.setSelectedIndex(Task.timeOf(ta.getMaxEndHour() - 1) + 1);
             tBefore.setText(ta.beforeString());
             tAfter.setText(ta.afterString());
 
@@ -554,7 +554,7 @@ public class MainEntryPoint implements EntryPoint {
     private void riempi(FlexTable t, boolean showAlt, TaskGroup tg) {
 
         FlexTable.CellFormatter form = t.getCellFormatter();
-        ArrayList<String>[] nomiCaselle = TaskGroup.nomiCaselle(showAlt, tg);
+        ArrayList<String>[] nomiCaselle = TaskGroup.nomiCaselle(tg);
         //  if (true) return;
         ArrayList<String>[] stiliCaselle = TaskGroup.stiliCaselle(showAlt, tg);
 
@@ -566,10 +566,11 @@ public class MainEntryPoint implements EntryPoint {
                 if (currSt.isEmpty()) {
                     Window.alert("empyst:" + k);
                 }
+
                 if (curr.isEmpty()) {
                     t.setText(i + 1, j + 1, "");
                 } else {
-                    t.setWidget(i + 1, j + 1, bottoni(curr));
+                    t.setWidget(i + 1, j + 1, bottoni(curr, TaskGroup.current().usersForInterval(i * 12 + j)));
                     /* VECCHIO
                     t.setText(i + 1, j + 1, curr.get(0));
                     UiUser uu = TaskGroup.ContainsUser(currentUsers, curr.get(0));
@@ -594,12 +595,20 @@ public class MainEntryPoint implements EntryPoint {
         }
     }
 
-    private Widget bottoni(ArrayList<String> tas) {
+    private Widget bottoni(ArrayList<String> tas, ArrayList<String> conflictingUsers) {
+        // if conflicting users != null it means that we want to show in this
+        // position the users whoae schedule is conflicting with the selected task
+        // to do so, we add a color coded label, in the same way when
+        // we want to show user calendars
+        //   Window.alert("conflictingUsers: " + conflictingUsers);
         ArrayList<UiUser> thisBox = new ArrayList();
         HorizontalPanel oriz = new HorizontalPanel();
         for (String ta : tas) {
             final Button bu = new Button(ta);
             Task t = TaskGroup.get(ta);
+            if (t.isOverlap()) {
+                bu.addStyleName("overlapping");
+            }
 
             // bu.addMouseListener(
             //          new TooltipListener(
@@ -623,12 +632,26 @@ public class MainEntryPoint implements EntryPoint {
             }
             oriz.add(bu);
         }
-        // add colors for all users busy in this interval
-        for (UiUser ui : thisBox) {
-            Label l = new Label("");
-            l.setSize("10px", "22px");
-            l.setStyleName(ui.getStyle());
-            oriz.add(l);
+
+        if (conflictingUsers != null) {
+            ArrayList<UiUser> uuu = new ArrayList();
+            for (String ss : conflictingUsers) {
+                uuu.add(UiUser.find(ss));
+            }
+            for (UiUser ui : uuu) {
+                Label l = new Label("");
+                l.setSize("10px", "22px");
+                l.setStyleName(ui.getStyle());
+                oriz.add(l);
+            }
+        } else {
+            // add colors for all users busy in this interval
+            for (UiUser ui : thisBox) {
+                Label l = new Label("");
+                l.setSize("10px", "22px");
+                l.setStyleName(ui.getStyle());
+                oriz.add(l);
+            }
         }
         return oriz;
     }
@@ -715,7 +738,7 @@ public class MainEntryPoint implements EntryPoint {
 
     private String stringVal(ListBox day, ListBox time, int subtract) {
 
-        return "" + (day.getSelectedIndex() * 12 + time.getSelectedIndex()- subtract);
+        return "" + (day.getSelectedIndex() * 12 + time.getSelectedIndex() - subtract);
     }
 
     class MyDialog extends DialogBox implements ClickHandler {

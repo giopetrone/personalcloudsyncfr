@@ -4,7 +4,7 @@
  */
 package org.unito.server;
 
-import org.unito.client.StartInterval;
+import org.unito.client.Interval;
 import org.unito.client.Task;
 import org.unito.client.TaskGroup;
 
@@ -20,10 +20,10 @@ public class Request {
     String mu = null; //move";
     String user = "";
     String task = "";
-    // StartInterval choice = new StartInterval("",0,0);
-    StartInterval choice = null;
+    // Interval choice = new Interval("",0,0);
+    Interval choice = null;
     String requestString1 = "<request>\n";
-    String userString1 ="<user name =\"";
+    String userString1 = "<user name =\"";
     String userString2 = "\" />\n";
     String actionString1 = "<action task=\"";
     String actionString2 = "\" type=\"";
@@ -78,7 +78,7 @@ public class Request {
             ret += userString1;
             ret += user;
             ret += userString2;
-          /*  ret += "\"/>\n<action type=\"insert\">\n";
+            /*  ret += "\"/>\n<action type=\"insert\">\n";
             Task tata = tasks.getI(task);
             ret += tata.toRequest(true) + "\n";
             ret += "</action>\n"; */
@@ -119,6 +119,10 @@ public class Request {
                 // causa reasoner di Gianluca, non si accettano 0
                 // per inizio, quindi aggiungo 1
                 int sta = tasks.getOfficialSchedule(t.getName()) + 1;
+                if (sta == 0) {
+                    // means that the task has no valid schedule
+                    System.err.println("WARNING: task" + t.getName() + " has schedule == 0    !!");
+                }
                 ret += "<stask name=\"" + t.getName() + "\" start=\"" + sta + "\" />\n";
             }
         }
@@ -126,5 +130,4 @@ public class Request {
         ret += requestString2;
         return ret;
     }
-
 }

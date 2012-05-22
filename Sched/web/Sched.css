@@ -12,14 +12,14 @@
 */
 .gwt-root {
     display: block;
-     background-color: #ABB0FF;
-   color: black;
+    background-color: #ABB0FF;
+    color: black;
 }
 
 .gwt-DialogBox {
-  border: 2px outset;
-  background-color: white;
-   color: black;
+    border: 2px outset;
+    background-color: white;
+    color: black;
 }
 
 .MainLabel {
@@ -39,39 +39,50 @@
     margin-right: 2px;
 }
 
+.gwt-ButtonOLD{
+
+    font-weight: bold;
+    font-size: 24px;
+    font-style:italic;
+}
+
+.overlapping{
+    font-style:italic;
+}
+
 .styleAvailable{
-         background-color: #50EA00;
+    background-color: #50EA00;
 
 }
 
 .styleUnused{
-         background-color: #F0F0F0;
+    background-color: #F0F0F0;
 
 }
 
 .styleBusy{
-         background-color: #F498DB;
+    background-color: #F498DB;
 
 }
 
 .styleHoliday{
-         background-color: #C0C0C0;
+    background-color: #C0C0C0;
 
 }
 
 .styleOwner{
-         background-color: #D0B000;
+    background-color: #D0B000;
 
 }
 
 .styleConflict{
-         background-color: #FF6688;
+    background-color: #FF6688;
 
 }
 
 .style1{
-         background-color: #A49800;
-         font-weight: bold;
+    background-color: #A49800;
+    font-weight: bold;
 
 }
 
@@ -111,31 +122,31 @@
 
 
 .styleUser1{
-         background-color: #F0A000;
-         
+    background-color: #F0A000;
+
 }
 
 .styleUser2{
-         background-color: #C0B000;
+    background-color: #C0B000;
 
 }
 
 .styleUser3{
-         background-color: #A0C000;
+    background-color: #A0C000;
 
 }
 
 .styleUser4{
-         background-color: #80D000;
+    background-color: #80D000;
 
 }
 
 .styleUser5{
-         background-color: #60E000;
+    background-color: #60E000;
 
 }
 
 .styleUser6{
-         background-color: #40F000;
+    background-color: #40F000;
 
 }

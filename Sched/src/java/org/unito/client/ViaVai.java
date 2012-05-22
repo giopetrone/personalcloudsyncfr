@@ -15,7 +15,7 @@ public class ViaVai implements IsSerializable {
     private Task[] tasks = null;
     private Interval[] globalSchedule = null;
     private Interval[] taskSchedule = null;
-    private StartInterval choice = null;
+    private Interval choice = null;
     private String selectedTask = null;
 
     public ViaVai() {
@@ -33,11 +33,11 @@ public class ViaVai implements IsSerializable {
         }
         i = 0;
         for (Interval inte : t.getCurrSchedule()) {
-           // System.out.println("creo viavai sche= "+ inte.getMin());
+            // System.out.println("creo viavai sche= "+ inte.getMin());
             globalSchedule[i++] = inte;
         }
         for (Interval inte : t.getTaskSchedule()) {
-           // System.out.println("creo viavai sche user conflicts= "+ inte.getUsers().size());
+            // System.out.println("creo viavai sche user conflicts= "+ inte.getUsers().size());
             taskSchedule[i++] = inte;
         }
     }
@@ -101,14 +101,14 @@ public class ViaVai implements IsSerializable {
     /**
      * @return the choice
      */
-    public StartInterval getChoice() {
+    public Interval getChoice() {
         return choice;
     }
 
     /**
      * @param choice the choice to set
      */
-    public void setChoice(StartInterval choice) {
+    public void setChoice(Interval choice) {
         this.choice = choice;
     }
 
@@ -125,5 +125,4 @@ public class ViaVai implements IsSerializable {
     public void setSelectedTask(String selectedTask) {
         this.selectedTask = selectedTask;
     }
-
 }
