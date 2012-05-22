@@ -41,16 +41,22 @@ public class LoginActivity extends Activity {
 		restaConnesso= (CheckBox) findViewById(R.id.resta_connesso);
 		// carica le preferences
 		updatePreferencesData();
-		Log.i("LOGIN "," PASSA QUI");
-/*		try{
-			JSONObject user = ProxyUtils.UserStatus("toggleStatus", ,);
-		}catch(Exception e){ Log.i("Eccezione Login",e.toString());}
-	*/	
+		Log.i("LOGIN "," PASSA QUI ONCREATE");
+					
 	}
 	
 	  public void onResume(){
 		   super.onResume();
-			Log.i("LOGIN "," PASSA QUI 2");
+			 //notify user presence offline at server
+		   try{
+			   session=(TablePlusAndroid) this.getApplication();
+			   if(session.getUserKey()!=null){
+				   JSONObject userStatus = ProxyUtils.UserStatus("toggleStatus", session.getUserKey(),"offline");
+				   Log.i("LOGIN", "Oncreate, userStatus: "+userStatus);
+			   }
+
+		   }catch(Exception e){ Log.i("Eccezione Login",e.toString());}
+		   Log.i("LOGIN "," PASSA QUI ONRESUME");
 	   }
 	
 	  public void invia(View v)
@@ -61,31 +67,30 @@ public class LoginActivity extends Activity {
 				try{
 					JSONObject user = ProxyUtils.proxyCall("queryUser", mailString);
 					JSONObject jsUser = user.getJSONObject("results");
-					//Inizializzo la Session
+					long userKey=jsUser.getLong("key");
+					//get session from Application
 					session=(TablePlusAndroid) this.getApplication();
-					session.setUserKey(jsUser.getLong("key"));
+					session.setUserKey(userKey);
 					if (jsUser.getString("email").equals(mailString))
 					{
-						Toast.makeText(this, "Login effettuato", Toast.LENGTH_LONG).show();
+						Toast.makeText(this, "Login success", Toast.LENGTH_LONG).show();
 						if (restaConnesso.isChecked()) {
 							//save login and preferences in session 
 							savePreferencesData(v);
 				        }
 						
+						//notify current user presence online at server
+						JSONObject status = ProxyUtils.UserStatus("toggleStatus", userKey,"online");	
+						Log.i("Login","userStatus"+status);
+						
 						Intent intent = new Intent(this,TableListActivity.class);
 						intent.putExtra("user",jsUser.toString());
 						startActivity(intent);
 					}
-					else Toast.makeText(this, "Login errato", Toast.LENGTH_LONG).show();
-				}catch(Exception e){ Log.i("Eccezione Login",e.toString());}
+					else Toast.makeText(this, "Login fail", Toast.LENGTH_LONG).show();
+				}catch(Exception e){ Log.i("Exception Login",e.toString());}
 			}
-		//Put user Status online/Offline
-	/*	try{
-			JSONObject user = ProxyUtils.UserStatus("toggleStatus", session.getUserKey().toString(),"offline");
-		}catch(Exception e){ Log.i("Eccezione Login",e.toString());
-		}
-	
-		*/
+		
 	}
 
 	public void reset(View v)
@@ -98,34 +103,34 @@ public class LoginActivity extends Activity {
 
 
 	private void updatePreferencesData() {
-		// Leggiamo le Preferences
+		// Read Preferences
 		SharedPreferences prefs = getSharedPreferences(MY_PREFERENCES,
 				Context.MODE_PRIVATE);
-		// Leggiamo l'informazione associate a Login e Password nelle preferences
+		//Read preferences about Login and Password in preferences
 		currentLogin = prefs.getString(LOGIN, "yourmail@gmail.com");
 		currentPwd=prefs.getString(PWD, "0000");
 		mail.setText(currentLogin);
 		password.setText(currentPwd);
 	}
 	
-	/** Metodo di gestione del pulsante che salva le preferences */
+	/** Management method of the button that saves your preferences */
 	public void savePreferencesData(View view) {
-		// Otteniamo il riferimento alle Preferences
+		// get current Preferences
 		SharedPreferences prefs = getSharedPreferences(MY_PREFERENCES,
 				Context.MODE_PRIVATE);
-		// Otteniamo il corrispondente Editor
+		// get Editor
 		SharedPreferences.Editor editor = prefs.edit();
-		// Modifichiamo il valore con quello inserito nell'EditText
+		// change value whith EditText value
 		CharSequence textData = mail.getText();
 		if (textData != null) {
-			// Lo salviamo nelle Preferences
+			// save value in Preferences
 			editor.putString(LOGIN, textData.toString());
 			editor.commit();
 		}
 		
 		CharSequence textData1 = password.getText();
 		if (textData != null) {
-			// Lo salviamo nelle Preferences
+			// save value in Preferences
 			editor.putString(PWD, textData1.toString());
 			editor.commit();
 		}
