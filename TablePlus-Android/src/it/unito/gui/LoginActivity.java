@@ -41,7 +41,7 @@ public class LoginActivity extends Activity {
 		restaConnesso= (CheckBox) findViewById(R.id.resta_connesso);
 		// carica le preferences
 		updatePreferencesData();
-		Log.i("LOGIN "," PASSA QUI ONCREATE");
+		Log.i("LOGIN ","ONCREATE");
 					
 	}
 	
@@ -52,11 +52,11 @@ public class LoginActivity extends Activity {
 			   session=(TablePlusAndroid) this.getApplication();
 			   if(session.getUserKey()!=null){
 				   JSONObject userStatus = ProxyUtils.UserStatus("toggleStatus", session.getUserKey(),"offline");
-				   Log.i("LOGIN", "Oncreate, userStatus: "+userStatus);
+				   Log.i("LOGIN", "OnResume, userStatus offline: "+userStatus);
 			   }
 
-		   }catch(Exception e){ Log.i("Eccezione Login",e.toString());}
-		   Log.i("LOGIN "," PASSA QUI ONRESUME");
+		   }catch(Exception e){ Log.i("Exception Login",e.toString());}
+		   Log.i("LOGIN ","ONRESUME");
 	   }
 	
 	  public void invia(View v)
@@ -81,7 +81,7 @@ public class LoginActivity extends Activity {
 						
 						//notify current user presence online at server
 						JSONObject status = ProxyUtils.UserStatus("toggleStatus", userKey,"online");	
-						Log.i("Login","userStatus"+status);
+						Log.i("Login","userStatus online: "+status);
 						
 						Intent intent = new Intent(this,TableListActivity.class);
 						intent.putExtra("user",jsUser.toString());
