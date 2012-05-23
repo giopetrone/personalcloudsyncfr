@@ -87,7 +87,7 @@ public class AddMessageActivity extends Activity {
 		    	tipo= MessageType.GENERIC;
 		    }
 		    try{	
-		    	JSONObject request = ProxyUtils.newMessage("addBlackBoard",UserKey ,key ,tipo, testo);
+		    	JSONObject request = ProxyUtils.newMessage(UserKey ,key ,tipo, testo);//addBlackBoard
 			} catch (Exception e) {
 				Log.i("Eccezione", e.toString());
 			}

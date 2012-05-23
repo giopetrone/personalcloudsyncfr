@@ -10,9 +10,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 
 //Adapter for show in ExistantTable at the left of Object name different images
-public class MyObjectListAdapter extends ArrayAdapter<String> {
+public class MyObjectListAdapter extends ArrayAdapter<ViewDoc> {
 
-	public MyObjectListAdapter(Context context, List<String> objects){
+	public MyObjectListAdapter(Context context, List<ViewDoc> objects){
 		super(context, R.layout.object_row, R.id.title,objects);
 	}
 	
@@ -20,9 +20,10 @@ public class MyObjectListAdapter extends ArrayAdapter<String> {
 	public View getView(int position, View convertView, ViewGroup parent)
 	{	
 		convertView = super.getView(position, convertView, parent);
-		String item = getItem(position);
+		ViewDoc item = getItem(position);
 		ImageView image = (ImageView) convertView.findViewById(R.id.image);
-		if (item.contains("https:") || item.contains("http:"))
+
+		if (item.getLink().contains("https:") || item.getLink().contains("http:"))
 			image.setImageResource(R.drawable.world48);
 		else
 			image.setImageResource(R.drawable.doc48);

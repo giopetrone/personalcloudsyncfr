@@ -40,14 +40,7 @@ public class TableListActivity extends ListActivity {
 	
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		   //requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-	        //getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.mytitle2);
-
-		
-		registerForContextMenu(getListView());
-		//custom title of activity
-		
+		registerForContextMenu(getListView());		
 	}
 
 	protected void onResume() {
@@ -68,6 +61,7 @@ public class TableListActivity extends ListActivity {
 		try{
 		session=(TablePlusAndroid) this.getApplication();
 		Log.i("session.getCurrentTableKey()",session.getCurrentTableKey().toString());
+		JSONObject switchTables =ProxyUtils.setPresence(session.getUserKey(),session.getCurrentTableKey(),false);
 		}catch(Exception e1){
 			Log.i("Eccezione current table", e1.toString());
 		}
@@ -79,19 +73,19 @@ public class TableListActivity extends ListActivity {
 		
 		ViewTable tmp = (ViewTable) adapter.getItem(position);
 		String s = tmp.getKey().toString();
-		//call method switchTable in ProxyUtils for change presence on table 
-		try {
-			JSONObject switchTables =ProxyUtils.switchTable("switchTable", session.getUserKey().toString(),session.getCurrentTableKey(),tmp.getKey());//TavoloCliccato);
-			Log.i("SWITCHTABLE "," ris:"+switchTables);
-		} catch (Exception e) {
-			Log.i("Eccezione", e.toString());
-		}
 		
-		
-		//imposto tavolo corrente
+		//imposed current table in session
 		session=(TablePlusAndroid) this.getApplication();
 		session.setCurrentTableKey(tmp.getKey());
 		Log.i("session.getCurrentTableKey()",session.getCurrentTableKey().toString());
+				
+		//call method switchTable in ProxyUtils for change presence on table 
+		try {
+			JSONObject currentPres =ProxyUtils.setPresence(session.getUserKey(),session.getCurrentTableKey(),true);
+			Log.i("setPresence ",currentPres.toString());
+		} catch (Exception e) {
+			Log.i("Eccezione", e.toString());
+		}
 		
 		Intent intent = new Intent(this, HelloTabWidgetActivity.class);
 		intent.putExtra("key", s);
@@ -112,12 +106,12 @@ public class TableListActivity extends ListActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
         case R.id.create_table:
-            Log.i(TAG,"create_table");
-            /*
+        	Toast.makeText(this, "Create Table", Toast.LENGTH_SHORT).show(); 
+            /**
              * 
              * INSTERT HERE CODE FOR DELETE A TABLE
              * 
-             * */
+             */
             return true;
         default:
             return super.onOptionsItemSelected(item);

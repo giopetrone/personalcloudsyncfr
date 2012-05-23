@@ -1,57 +1,35 @@
 package it.unito.gui;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import it.unito.utility.MyObjectListAdapter;
+import it.unito.utility.ViewDoc;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
+import java.util.ArrayList;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ListActivity;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.view.ContextMenu;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.Window;
-import android.view.ContextMenu.ContextMenuInfo;
-import android.view.ViewGroup.LayoutParams;
-import android.view.View;
-
-import it.unito.json.*;
-
-import android.app.Activity;	
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import it.unito.model.*;
-import it.unito.utility.MyObjectListAdapter;
-import it.unito.utility.ProxyUtils;
-import it.unito.utility.ViewTable;
-
 //Function of the class: Show an ExistantTable and its objects
 public class ExistantTableActivity extends ListActivity{
-	private ArrayAdapter<String> array;
-	private EditText newUrl;
+	private ArrayAdapter<ViewDoc> array;
+	private EditText newLocalDoc;
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
@@ -63,13 +41,16 @@ public class ExistantTableActivity extends ListActivity{
 		{
 		 super.onResume();
 		 	Log.i("ExTable",getIntent().getStringArrayListExtra("TableDoc").getClass().toString());
-		 	ArrayList tableDocs=getIntent().getStringArrayListExtra("TableDoc");
-		 	
+		 	ArrayList<ViewDoc> tableDocs= (ArrayList<ViewDoc>) getIntent().getSerializableExtra("TableDoc");
+		 	/*
+		 	for(int i=0;i<tableDocs.size();i++)
+		 		Log.i("ExistatntTable TableDoc",tableDocs.get(i).toString());
+		 	*/
 		 	if(tableDocs.isEmpty())
 		 		Toast.makeText(this, "No Object Uploaded", Toast.LENGTH_LONG).show(); 
 		 	
-	 		 array=new MyObjectListAdapter(this,tableDocs);
-			 setListAdapter(array);
+	 		array=new MyObjectListAdapter(this,tableDocs);
+			setListAdapter(array);
 		 	
 	      
 		}
@@ -80,9 +61,14 @@ public class ExistantTableActivity extends ListActivity{
 	 		{
 	 			System.out.println("position: "+position);
 	 			System.out.println("id: "+id);
-	 			String url="http://"+l.getItemAtPosition(position).toString();
-	 			Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-	 			startActivity(myIntent);
+	 			//Log.i("CLick",l.getItemAtPosition(position).getClass().toString());
+	 			ViewDoc clickedItem=(ViewDoc) l.getItemAtPosition(position);
+	 			String url=clickedItem.getLink();
+	 			if(url!=""){
+	 				Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+		 			startActivity(myIntent);
+	 			}
+	 			
 	 		}
 	 			    
 	 		
@@ -143,18 +129,20 @@ public class ExistantTableActivity extends ListActivity{
 				        textView.setText("Insert new web address");
 				        LayoutParams textViewLayoutParams=new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 				        textView.setLayoutParams(textViewLayoutParams);
-				        newUrl = new EditText(ExistantTableActivity.this);
+				        newLocalDoc = new EditText(ExistantTableActivity.this);
 				        LayoutParams editTextLayoutParams=new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
-				        newUrl.setLayoutParams(editTextLayoutParams);
+				        newLocalDoc.setLayoutParams(editTextLayoutParams);
 				        LinearLayout layout=new LinearLayout(ExistantTableActivity.this);
 				        layout.setOrientation(LinearLayout.VERTICAL);
 				        layout.addView(textView);
-				        layout.addView(newUrl);
+				        layout.addView(newLocalDoc);
 				        myDialog.setView(layout);
 				        myDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 				            public void onClick(DialogInterface arg0, int arg1) {
-				              String url=newUrl.getText().toString();   
-				              array.add(url);
+				              String title=newLocalDoc.getText().toString();   
+				              ViewDoc current=new ViewDoc();
+				              current.setTitle(title);
+				              array.add(current);  
 				            }
 				            });
 				        

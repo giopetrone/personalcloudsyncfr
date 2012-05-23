@@ -4,7 +4,6 @@ import it.unito.json.JSONArray;
 import it.unito.json.JSONException;
 import it.unito.json.JSONObject;
 import it.unito.json.JSONTokener;
-import it.unito.model.Document;
 import it.unito.model.Group;
 import it.unito.model.Message;
 import it.unito.model.MessageType;
@@ -21,7 +20,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import android.R.integer;
 import android.util.Log;
 
 public class ProxyUtils {
@@ -52,9 +50,6 @@ public class ProxyUtils {
 		if (operation.equals("queryUser")) {
 			jsRequest.put("request", "queryUser");
 			jsRequest.put("userEmail", param);
-		} else if (operation.equals("queryTable")) {
-			jsRequest.put("request", "queryTable");
-			jsRequest.put("tableKey", param);
 		} else if (operation.equals("queryTables")) {
 			jsRequest.put("request", "queryTables");
 			jsRequest.put("tableKeysList", param);
@@ -88,18 +83,15 @@ public class ProxyUtils {
 		return jsResp;
 	}
 	
-	//create the JSON Object for switchTable request
-	public static JSONObject switchTable(String operation, Object UserKey, Object prevTableKey, Object currentTableKey)
-			throws Exception {
+	public static JSONObject queryTable(Long userKey,Long tableKey) throws Exception{
+		
 		JSONObject jsRequest = new JSONObject();
-		if (operation.equals("switchTable")) {
-			jsRequest.put("request", "switchTable");
-			jsRequest.put("userKey", UserKey);
-			jsRequest.put("prevTable", prevTableKey);
-			jsRequest.put("currentTable", currentTableKey);
-		}  else
-			System.out.println("ProxyCall, operazione non riconosciuta");
-		Log.i("switchTable"," " +jsRequest);
+		
+		jsRequest.put("request", "queryTable");
+		jsRequest.put("userKey", userKey);
+		jsRequest.put("tableKey", tableKey);
+		Log.i("queryTable request",jsRequest.toString());
+		
 		HttpEntity entity = new StringEntity(jsRequest.toString());
 		post.setEntity(entity);
 		HttpResponse response = client.execute(post);
@@ -108,7 +100,32 @@ public class ProxyUtils {
 		JSONTokener jt;
 		jt = new JSONTokener(is);
 		JSONObject jsResp = new JSONObject(jt);
-		Log.i("switchTable jsResp",""+jsResp);
+		// use response so i can do more request
+		if (response.getEntity() != null) {
+			response.getEntity().consumeContent();
+		}
+		is.close();
+		return jsResp;
+	}
+	//create the JSON Object for change table presence request 
+	public static JSONObject setPresence(Long userKey, Long tableKey, Boolean presence)
+			throws Exception {
+		JSONObject jsRequest = new JSONObject();
+		
+		jsRequest.put("request", "setPresence");
+		jsRequest.put("userKey", userKey);
+		jsRequest.put("tableKey", tableKey);
+		jsRequest.put("presence", presence);
+		
+		//Log.i("setPresences",jsRequest.toString());
+		HttpEntity entity = new StringEntity(jsRequest.toString());
+		post.setEntity(entity);
+		HttpResponse response = client.execute(post);
+		entity = response.getEntity();
+		InputStream is = entity.getContent();
+		JSONTokener jt;
+		jt = new JSONTokener(is);
+		JSONObject jsResp = new JSONObject(jt);
 		if (response.getEntity() != null) {
 			response.getEntity().consumeContent();
 		}
@@ -128,9 +145,9 @@ public class ProxyUtils {
 		}else if (operation.equals("toggleStatus")) {
 			jsRequest.put("request", "toggleStatus");
 			jsRequest.put("userKey", userKey);
-			jsRequest.put("status", Key);
+			jsRequest.put("online", Key);
 		}else
-			System.out.println("ProxyCall, operazione non riconosciuta");
+			System.out.println("UserStatus, operation faild");
 		HttpEntity entity = new StringEntity(jsRequest.toString());
 		post.setEntity(entity);
 		HttpResponse response = client.execute(post);
@@ -148,18 +165,18 @@ public class ProxyUtils {
 	
 	
 	//create a JSON Object for requeste for adding a message in the BlackBoard
-	public static JSONObject newMessage(String operation, Object author,Object tablekey, Object messagetype, Object messagecontent)
+	public static JSONObject newMessage( Object author,Object tablekey, Object messagetype, Object messagecontent)//String operation,
 			throws Exception {
 		JSONObject jsRequest = new JSONObject();
-		System.out.println("proxyCall: " + operation);
-		if (operation.equals("addBlackBoard")) {
+		//System.out.println("proxyCall: " + operation);
+		//if (operation.equals("addBlackBoard")) {
 			jsRequest.put("request", "writeMessage");
 			jsRequest.put("authorKey", author);
 			jsRequest.put("tableKey", tablekey);
 			jsRequest.put("messageType", messagetype);
 			jsRequest.put("messageContent", messagecontent);
-		} else
-			System.out.println("ProxyCall, operazione non riconosciuta");
+		//} else
+			//System.out.println("ProxyCall, operazione non riconosciuta");
 		HttpEntity entity = new StringEntity(jsRequest.toString());
 		post.setEntity(entity);
 		HttpResponse response = client.execute(post);
@@ -174,8 +191,8 @@ public class ProxyUtils {
 		istream.close();
 		return jsResponse;
 	}
-	
-	// convert a JSON Object to a Group Object (if is compatible)	 
+	/*
+	// convert a JSON Object to a Group Object (if is compatible)	 //---MODIFICARE----
 	public static Group convertToGroup(JSONObject jsGroup) {
 		if (jsGroup == null)
 			return null;
@@ -192,8 +209,10 @@ public class ProxyUtils {
 			g.setCreator(jsGroup.getLong("creator"));
 			g.setOwner(jsGroup.getLong("owner"));
 			JSONArray jsDocs = jsGroup.getJSONArray("documents");
-			List<String> docs = new ArrayList<String>();
 			
+			//---MODIFICARE----
+			List<String> docs = new ArrayList<String>();
+			//List<ViewDocs> docs = new ArrayList<ViewDocs>();
 			for (int i = 0; i < jsDocs.length(); i++) {
 				docs.add(jsDocs.getString(i));
 			}
@@ -204,6 +223,7 @@ public class ProxyUtils {
 		}
 		return g;
 	}
+	*/
 
 	// convert a JSON Array to a List of Message (if is compatible)	 
 	public static List<Message> convertToMessagesList(JSONArray jsMessages)
@@ -250,6 +270,13 @@ public class ProxyUtils {
 					.getInt("members")));
 		}
 		return tables;
+	}
+	
+	public static String clearMail(String s)
+	{
+	    int last = s.indexOf('@');
+	    String headless = s.substring(0,last);
+	    return headless.trim();
 	}
 
 }

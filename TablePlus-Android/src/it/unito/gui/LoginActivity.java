@@ -30,11 +30,8 @@ public class LoginActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		  //requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-	      setContentView(R.layout.main);
-	      //getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.mytitle);
-		
 		setContentView(R.layout.login);
+		
 		ProxyUtils.init();
 		mail= (EditText) findViewById(R.id.mail);
 		password= (EditText) findViewById(R.id.password);
@@ -51,7 +48,7 @@ public class LoginActivity extends Activity {
 		   try{
 			   session=(TablePlusAndroid) this.getApplication();
 			   if(session.getUserKey()!=null){
-				   JSONObject userStatus = ProxyUtils.UserStatus("toggleStatus", session.getUserKey(),"offline");
+				   JSONObject userStatus = ProxyUtils.UserStatus("toggleStatus", session.getUserKey(),"false");
 				   Log.i("LOGIN", "OnResume, userStatus offline: "+userStatus);
 			   }
 
@@ -80,7 +77,7 @@ public class LoginActivity extends Activity {
 				        }
 						
 						//notify current user presence online at server
-						JSONObject status = ProxyUtils.UserStatus("toggleStatus", userKey,"online");	
+						JSONObject status = ProxyUtils.UserStatus("toggleStatus", userKey,"true");	
 						Log.i("Login","userStatus online: "+status);
 						
 						Intent intent = new Intent(this,TableListActivity.class);

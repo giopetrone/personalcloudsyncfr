@@ -154,7 +154,7 @@ public class MembersActivity extends ListActivity {
 				JSONObject jo = users.getJSONObject(i);
 				String email=jo.getString("email");
 				
-				String newMail=clearMail(email);
+				String newMail=ProxyUtils.clearMail(email);
 				Log.i("Members","email: "+newMail);
 				ViewMembers current=members.get(i);
 				current.setEmail(newMail);
@@ -162,11 +162,6 @@ public class MembersActivity extends ListActivity {
 		}catch(Exception e){Log.i("Eccezione", e.toString());}
 		return members;
 	}
-	public String clearMail(String s)
-	{
-	    int last = s.indexOf('@');
-	    String headless = s.substring(0,last);
-	    return headless.trim();
-	}
+	
 
 }
