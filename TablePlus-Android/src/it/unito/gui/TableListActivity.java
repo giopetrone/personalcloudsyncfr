@@ -1,21 +1,19 @@
 package it.unito.gui;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.LinkedList;
+import it.unito.json.JSONArray;
+import it.unito.json.JSONObject;
+import it.unito.utility.MyTablesListAdapter;
+import it.unito.utility.ProxyUtils;
+import it.unito.utility.TablePlusAndroid;
+import it.unito.utility.ViewTable;
+
 import java.util.List;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.entity.StringEntity;
-
-
-import it.unito.model.*;
-import it.unito.json.*;
-import it.unito.utility.*;
-
-
 import android.app.ListActivity;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,22 +23,39 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
 //Function of the class: show a list of existant table and their attribute
 public class TableListActivity extends ListActivity {
-	private final String TAG = "ListActivity";
+
 	private ArrayAdapter<ViewTable> adapter;
 	private TablePlusAndroid session;
+	private static final int HELLO_ID = 1;
 	
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		registerForContextMenu(getListView());		
+		registerForContextMenu(getListView());	
+		
+		//notification-bar standard message
+		String ns = Context.NOTIFICATION_SERVICE;
+		NotificationManager mNotificationManager = (NotificationManager) getSystemService(ns);
+		
+		int icon = android.R.drawable.stat_notify_chat;
+		CharSequence tickerText = "Hello";
+		long when = System.currentTimeMillis();
+
+		Notification notification = new Notification(icon, tickerText, when);
+
+		Context context = getApplicationContext();
+		CharSequence contentTitle = "TablePlus-Android";
+		CharSequence contentText = "Now you are Online!";
+		Intent notificationIntent = new Intent(this, TableListActivity.class);
+		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+
+		notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
+		mNotificationManager.notify(HELLO_ID, notification);
 	}
 
 	protected void onResume() {
