@@ -191,40 +191,7 @@ public class ProxyUtils {
 		istream.close();
 		return jsResponse;
 	}
-	/*
-	// convert a JSON Object to a Group Object (if is compatible)	 //---MODIFICARE----
-	public static Group convertToGroup(JSONObject jsGroup) {
-		if (jsGroup == null)
-			return null;
-		Group g = new Group();
-		try {
-			g.setKey(jsGroup.getLong("key"));
-			g.setName(jsGroup.getString("name"));
-			JSONArray jsMembers = jsGroup.getJSONArray("members");
-			List<Long> members = new ArrayList<Long>();
-			for (int i = 0; i < jsMembers.length(); i++) {
-				members.add(jsMembers.getLong(i));
-			}
-			g.setMembers(members);
-			g.setCreator(jsGroup.getLong("creator"));
-			g.setOwner(jsGroup.getLong("owner"));
-			JSONArray jsDocs = jsGroup.getJSONArray("documents");
-			
-			//---MODIFICARE----
-			List<String> docs = new ArrayList<String>();
-			//List<ViewDocs> docs = new ArrayList<ViewDocs>();
-			for (int i = 0; i < jsDocs.length(); i++) {
-				docs.add(jsDocs.getString(i));
-			}
-			
-			g.setDocuments(docs);
-		} catch (JSONException e) {
-			Log.i("ProxyUtils", e.toString());
-		}
-		return g;
-	}
-	*/
-
+	
 	// convert a JSON Array to a List of Message (if is compatible)	 
 	public static List<Message> convertToMessagesList(JSONArray jsMessages)
 			throws JSONException {
