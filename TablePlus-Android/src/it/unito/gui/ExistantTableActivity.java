@@ -40,12 +40,9 @@ public class ExistantTableActivity extends ListActivity{
 		protected void onResume()
 		{
 		 super.onResume();
-		 	Log.i("ExTable",getIntent().getStringArrayListExtra("TableDoc").getClass().toString());
-		 	ArrayList<ViewDoc> tableDocs= (ArrayList<ViewDoc>) getIntent().getSerializableExtra("TableDoc");
-		 	/*
-		 	for(int i=0;i<tableDocs.size();i++)
-		 		Log.i("ExistatntTable TableDoc",tableDocs.get(i).toString());
-		 	*/
+		 	@SuppressWarnings("unchecked")
+			ArrayList<ViewDoc> tableDocs= (ArrayList<ViewDoc>) getIntent().getSerializableExtra("TableDoc");
+		 	
 		 	if(tableDocs.isEmpty())
 		 		Toast.makeText(this, "No Object Uploaded", Toast.LENGTH_LONG).show(); 
 		 	

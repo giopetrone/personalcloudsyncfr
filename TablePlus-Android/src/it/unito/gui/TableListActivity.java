@@ -58,7 +58,7 @@ public class TableListActivity extends ListActivity {
 		mNotificationManager.notify(HELLO_ID, notification);
 	}
 
-	protected void onResume() {
+	public void onResume() {
 		super.onResume();
 		try {
 			JSONObject jsUser=new JSONObject(getIntent().getStringExtra("user"));

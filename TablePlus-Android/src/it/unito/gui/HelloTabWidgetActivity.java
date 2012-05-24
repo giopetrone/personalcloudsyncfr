@@ -56,6 +56,7 @@ public class HelloTabWidgetActivity extends TabActivity {
 			List<Long> usersKeys=new ArrayList<Long>();
 			usersKeys.add(jsTable.getLong("creator"));
 			usersKeys.add(jsTable.getLong("owner"));
+			
 			//Proxy request
 			JSONObject request1 = ProxyUtils.proxyCall("queryUsers",usersKeys);
 			JSONArray users = request1.getJSONArray("results");
@@ -71,11 +72,12 @@ public class HelloTabWidgetActivity extends TabActivity {
 			
 			info="Table Name: "+jsTable.getString("name")+" - "+"Creator: "+newMail[0]+" - "+"Owner: "+newMail[1];
 			Log.i("queryTable INFO HelloTab",info);
-			/*
+			
+			
 			Log.i("queryTable response HelloTab",jsTable.toString());
 			Log.i("queryTable response jsDocs",jsDocs.toString());
 			Log.i("queryTable response tableDocs",tableDocs.toString());
-			*/
+			
 		} catch (Exception e) {
 			Log.i("Eccezione", e.toString());
 		}
@@ -83,9 +85,6 @@ public class HelloTabWidgetActivity extends TabActivity {
 		
 			
 		// Create an Intent to launch an Activity the first tab
-		intent = new Intent().setClass(this, ExistantTableActivity.class);
-
-		// Create an Intent to launch an Activity for the tab (to be reused)
 		intent = new Intent().setClass(this, ExistantTableActivity.class);
 
 		
@@ -101,11 +100,6 @@ public class HelloTabWidgetActivity extends TabActivity {
 		// second tab
 		intent = new Intent().setClass(this, BlackBoardActivity.class);
 
-
-
-		// Do the same for the other tabs
-		intent = new Intent().setClass(this, BlackBoardActivity.class);
-
 		intent.putExtra("infoCurrentTable", info);
 		intent.putExtra("key", key);		
 		spec = tabHost.newTabSpec("Messages").setIndicator("Messages",
@@ -118,8 +112,6 @@ public class HelloTabWidgetActivity extends TabActivity {
 		intent = new Intent().setClass(this, MembersActivity.class);
 
 
-		intent = new Intent().setClass(this, MembersActivity.class);
-
 		intent.putExtra("infoCurrentTable", info);
 		intent.putExtra("key", key);
 		spec = tabHost.newTabSpec("Members").setIndicator("Members",
@@ -130,7 +122,6 @@ public class HelloTabWidgetActivity extends TabActivity {
 
 		//This is the number of the tab which is the first Activity opened when we call HelloTabWidget
 		tabHost.setCurrentTab(0);
-
 		
 	}
 
