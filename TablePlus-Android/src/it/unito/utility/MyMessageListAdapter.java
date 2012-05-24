@@ -13,7 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 //Adapter for show in BlackBoard with the message its type and the author which writed that message
-public class MyMessageListAdapter extends ArrayAdapter<Message>{
+public class MyMessageListAdapter extends ArrayAdapter<ViewMessage>{
 
 	/** Inflater for list items */
     private final LayoutInflater inflater;
@@ -30,7 +30,7 @@ public class MyMessageListAdapter extends ArrayAdapter<Message>{
     public MyMessageListAdapter(final Context context,
             final int resource,
             final int textViewResourceId,
-            final List<Message> objects) {
+            final List<ViewMessage> objects) {
         super(context, resource, textViewResourceId, objects);
 
         this.inflater = LayoutInflater.from(context);
@@ -40,7 +40,7 @@ public class MyMessageListAdapter extends ArrayAdapter<Message>{
     public View getView(final int position, final View convertView, final ViewGroup parent) {
         View itemView = convertView;
         ViewHolder holder = null;
-        final Message item = getItem(position);
+        ViewMessage item = getItem(position);
         if(null == itemView) {
             itemView = this.inflater.inflate(R.layout.blackboard_row, parent, false);
             holder = new ViewHolder();
@@ -53,7 +53,7 @@ public class MyMessageListAdapter extends ArrayAdapter<Message>{
         }
 	    holder.text1.setText(item.getContent());
         holder.text2.setText("Type: "+item.getType());
-        holder.text3.setText("Author: "+item.getAuthor());
+        holder.text3.setText(item.getAuthor());
         return itemView;
     }
 }
