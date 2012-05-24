@@ -8,6 +8,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.unito.tableplus.client.TablePlus;
+import com.unito.tableplus.client.gui.windows.GroupChatWindow;
 import com.unito.tableplus.client.gui.windows.GroupResourcesWindow;
 import com.unito.tableplus.client.gui.windows.WindowPlus;
 import com.unito.tableplus.client.services.GroupService;
@@ -27,6 +28,7 @@ public class Table {
 	public RightPanel rightPanel;
 	private List<WindowPlus> windows = new ArrayList<WindowPlus>();
 	private List<Shortcut> shortcuts = new ArrayList<Shortcut>();
+	public WindowPlus groupChatWindow;
 
 	// informazioni
 	public String groupName;
@@ -74,6 +76,8 @@ public class Table {
 		// aggiunte al desktop, siano inizialmente invisibili
 		WindowPlus groupResourcesWindow = new GroupResourcesWindow();// createGridWindow();
 		addWindow(groupResourcesWindow);
+		groupChatWindow = new GroupChatWindow(this);
+		addWindow(groupChatWindow);
 
 		// group resources
 		Shortcut s = new Shortcut();
@@ -81,6 +85,13 @@ public class Table {
 		s.setId("groupresources-win-shortcut");
 		s.setData("window", groupResourcesWindow);
 		this.addShortcut(s);
+
+		// group chat
+		Shortcut s2 = new Shortcut();
+		s2.setText("Group Chat");
+		s2.setId("chat-win-shortcut");
+		s2.setData("window", groupChatWindow);
+		this.addShortcut(s2);
 
 		createMembersList(group);
 		createGoogleDocsList(group);

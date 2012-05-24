@@ -16,4 +16,6 @@ public interface ChatServiceAsync {
 	void sendMessage(String sender, String content, MessageType type,
 			List<String> recipients, AsyncCallback<String> callback);
 
+	void sendMessage(String sender, String content, MessageType type,
+			List<String> recipients, Long groupKey, AsyncCallback<String> callback);
 }

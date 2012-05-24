@@ -95,15 +95,15 @@ public class WalletPanel extends ContentPanel {
 				.addSelectionListener(new SelectionListener<ButtonEvent>() {
 					public void componentSelected(ButtonEvent ce) {
 						// Azioni da eseguire alla pressione del button
-						AsyncCallback<String> callback = new AsyncCallback<String>() {
+						tokenService.getRequestTokenURL(homepageURL, new AsyncCallback<String>() {
 							public void onFailure(Throwable caught) {
 							}
 
 							public void onSuccess(String result) {
 								redirect(result);
 							}
-						};
-						tokenService.getRequestTokenURL(homepageURL, callback);
+						});
+						
 					}
 				});
 		// item (1)

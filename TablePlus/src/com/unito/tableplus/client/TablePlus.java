@@ -12,6 +12,7 @@ import com.extjs.gxt.ui.client.widget.Info;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
+import com.google.gwt.appengine.channel.client.ChannelFactory;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.CloseEvent;
@@ -46,6 +47,10 @@ public class TablePlus implements EntryPoint {
 	protected final NotificationServiceAsync notificationService = GWT
 			.create(NotificationService.class);
 
+	// crea il servizio per la chat
+	protected final ChatServiceAsync chatService = GWT
+			.create(ChatService.class);
+
 	private String loginUrl;
 
 	private String logoutUrl;
@@ -65,6 +70,14 @@ public class TablePlus implements EntryPoint {
 	// ******************************************************************************
 
 	public void onModuleLoad() {
+
+//		System.out.println("GWT.getHostPageBaseURL() = "
+//				+ GWT.getHostPageBaseURL());
+//		System.out
+//				.println("GWT.getModuleBaseURL() = " + GWT.getModuleBaseURL());
+//		System.out
+//				.println("com.google.gwt.user.client.Window.Location.getHref() = "
+//						+ com.google.gwt.user.client.Window.Location.getHref());
 
 		com.google.gwt.user.client.Window
 				.addCloseHandler(new CloseHandler<com.google.gwt.user.client.Window>() {
@@ -122,10 +135,13 @@ public class TablePlus implements EntryPoint {
 	public void verifyLoginStatus() {
 		// URL della home
 		final String homepageURL;
-		if (GWT.getHostPageBaseURL().contains("127.0.0.1"))
-			homepageURL = "http://127.0.0.1:8888/TablePlus.html?gwt.codesvr=127.0.0.1:9997";
-		else
-			homepageURL = GWT.getHostPageBaseURL();
+		// if (GWT.getHostPageBaseURL().contains("127.0.0.1"))
+		// homepageURL =
+		// "http://127.0.0.1:8888/TablePlus.html?gwt.codesvr=127.0.0.1:9997";
+		// else
+		// homepageURL = GWT.getHostPageBaseURL();
+
+		homepageURL = com.google.gwt.user.client.Window.Location.getHref();
 
 		userService.isLoggedIn(homepageURL, new AsyncCallback<String>() {
 			@Override
@@ -165,6 +181,8 @@ public class TablePlus implements EntryPoint {
 			public void onSuccess(User result) {
 				// Auto-generated method stub
 				user = result;
+				
+				
 
 				// Notifica di utente online
 				Notification n = new Notification();
@@ -281,7 +299,97 @@ public class TablePlus implements EntryPoint {
 	// ******************************************************************************
 	// ******************************************************************************
 
+	Long tmp;
+
 	public void loadActiveDesktop() {
+
+		// controlla se nell'url c'è un codice di invito, e procede di
+		// conseguenza...
+		if (!com.google.gwt.user.client.Window.Location.getHref().contains(
+				"code="))
+			loadActiveDesktop2();
+		else {
+			// recupera il codice dall'url
+			String code = com.google.gwt.user.client.Window.Location
+					.getParameter("code");
+
+			notificationService.getInvitedGroupKey(code, user.getEmail(),
+					new AsyncCallback<Long>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+							// Auto-generated method stub
+
+						}
+
+						@Override
+						public void onSuccess(Long result) {
+
+							// se al codice fornito corrisponde un invito
+							if (result > 0) {
+
+								tmp = result;
+								// Auto-generated method stub
+								groupService.addMemberToGroup(user.getKey(),
+										result, new AsyncCallback<Boolean>() {
+
+											@Override
+											public void onFailure(
+													Throwable caught) {
+												// Auto-generated method stub
+
+											}
+
+											@Override
+											public void onSuccess(Boolean result) {
+
+												// crea una notifica
+												Notification n = new Notification();
+												n.setSenderEmail(TablePlus.user
+														.getEmail());
+												n.setSenderKey(TablePlus.user
+														.getKey());
+												n.setEventKind("MEMBERGROUPADD");
+												n.setMemberEmail(user
+														.getEmail());
+												n.setGroupKey(tmp);
+												n.setStatus(user.isOnline() ? "ONLINE"
+														: "OFFLINE");
+
+												// la spedisce
+												throwNotification(n);
+
+												// (10)aggiorna l'utente
+												// corrente
+												userService.queryUser(
+														user.getKey(),
+														new AsyncCallback<User>() {
+															@Override
+															public void onFailure(
+																	Throwable caught) {
+															}
+
+															@Override
+															public void onSuccess(
+																	User result) {
+																user=result;
+																loadActiveDesktop2();
+															}
+														});
+
+											}
+
+										});
+							} else
+								loadActiveDesktop2();
+						}
+
+					});
+		}
+
+	}
+
+	public void loadActiveDesktop2() {
 		timer = new Timer() {
 			@Override
 			public void run() {
@@ -302,6 +410,11 @@ public class TablePlus implements EntryPoint {
 		// carica il personal table
 		desktop.loadPersonalTable(personalTable);
 
+		caricaListaGruppi();
+
+	}
+
+	public void caricaListaGruppi() {
 		// carica la lista di gruppi dell'utente corrente
 		groupService.queryGroups(user.getGroups(),
 				new AsyncCallback<List<Group>>() {
@@ -321,9 +434,107 @@ public class TablePlus implements EntryPoint {
 						}
 						personalTable.getRightPanel().myGroupsPanel.addData();
 						startNotificationListener();
+
+						// vediamo di gestire il canale di comunicazione
+						// delle
+						// chat...
+						// Per il momento, per semplicità, facciamo che ogni
+						// utente che logga apre un canale
+						// per la chat. Quindi in questo momento io ho un
+						// utente
+						// collegato e ho creato
+						// tutti i suoi tavoli
+						startCommunicationChannel();
 					}
 				});
+	}
 
+	public void startCommunicationChannel() {
+
+		// utilizzo come id del mittente l'email dell'utente loggato in questo
+		// istante
+		// sappiamo che l'email è un identificatore univoco per gli utenti,
+		// quindi
+		// va bene
+		String senderID = user.getEmail();
+		System.out.println("USEREMAIL: " + user.getEmail());
+
+		chatService.createChannel(senderID, new AsyncCallback<String>() {
+			// senderID deve essere unico per ogni utente (email, userID...)
+
+			@Override
+			public void onFailure(Throwable caught) {
+				// Fallimento nella creazione del canale sul server
+				System.out.println("Failed gainind channel API token");// Failed
+																		// creating
+																		// channel");
+			}
+
+			@Override
+			public void onSuccess(String token) {
+				// Se il canale viene creato con successo sul server
+				// Il token è restituito dal server e deve essere mantenuto
+				// segreto
+
+				ChannelFactory.createChannel(token,
+						new ChannelCreatedCallbackImpl(messaggioDiProva));
+				// obj è l’oggetto in cui verranno visualizzati i messaggi
+				// ricevuti
+				//
+
+				// chatService
+				// .getUsersList(new AsyncCallback<List<String>>() {
+				// @Override
+				// public void onFailure(
+				// Throwable caught) {
+				// System.out.println("Could not get users list: "
+				// + caught.getMessage());
+				// }
+				//
+				// @Override
+				// public void onSuccess(
+				// List<String> result) {
+				// System.out.println("Users' number is... "+result.size());
+				// System.out.println("First user is... " + result.get(0));
+				// }
+				// });
+
+				/*
+				 * System.out.println("ChannelAPI token received");
+				 * System.out.println("USEREMAIL: "+user.getEmail());
+				 */
+				// testMessage();
+			}
+		});
+
+	}
+
+	String messaggioDiProva = "";
+
+	public void testMessage() {
+		System.out.println("USEREMAIL: " + user.getEmail());
+
+		chatService.sendMessage(user.getEmail(), "" + user.getEmail()
+				+ " saluta tutti!", MessageType.GENERIC,
+				new AsyncCallback<String>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						//  Auto-generated method stub
+						System.out
+								.println("chatService.sendMessage() failure da "
+										+ user.getEmail());
+					}
+
+					@Override
+					public void onSuccess(String result) {
+						//  Auto-generated method stub
+						System.out
+								.println("chatService.sendMessage() happy ending da "
+										+ user.getEmail() + ": " + result);
+					}
+
+				});
 	}
 
 	// ******************************************************************************
@@ -342,7 +553,7 @@ public class TablePlus implements EntryPoint {
 
 		if (timer != null) {
 			timer.cancel();
-			timer.schedule(50000);
+			timer.schedule(40000);
 		}
 
 		// fa partire il listener delle notifiche
@@ -414,8 +625,8 @@ public class TablePlus implements EntryPoint {
 		Info.display("Notification Received",
 				n.getEventKind() + " from " + n.getSenderEmail());
 
-		if (//n.getEventKind().equals("MEMBERONLINE")||
-				n.getEventKind().equals("MEMBEROFFLINE")) {
+		if (// n.getEventKind().equals("MEMBERONLINE")||
+		n.getEventKind().equals("MEMBEROFFLINE")) {
 			for (Table t : desktop.getGroupTables())
 				for (Long memberGroup : n.getOwningGroups())
 					if (t.groupKey.compareTo(memberGroup) == 0)

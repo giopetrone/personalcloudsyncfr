@@ -166,3 +166,9 @@
 	height: 64px;
 	background-image: url(../images/Folder_FTP.png);
 }
+
+#chat-win-shortcut img {
+	width: 64px;
+	height: 64px;
+	background-image: url(../images/Application.png);
+}

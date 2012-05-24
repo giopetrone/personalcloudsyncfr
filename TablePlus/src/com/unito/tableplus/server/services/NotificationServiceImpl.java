@@ -3,13 +3,20 @@ package com.unito.tableplus.server.services;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Logger;
+
+import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
 import com.google.appengine.api.mail.MailService;
 import com.google.appengine.api.mail.MailServiceFactory;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.unito.tableplus.client.services.NotificationService;
+import com.unito.tableplus.shared.model.Group;
+import com.unito.tableplus.shared.model.Invitation;
 import com.unito.tableplus.shared.model.Notification;
+import com.unito.tableplus.shared.model.User;
 import com.google.appengine.api.mail.MailService.Message;
 
 public class NotificationServiceImpl extends RemoteServiceServlet implements
@@ -27,26 +34,72 @@ public class NotificationServiceImpl extends RemoteServiceServlet implements
 			.getLogger(NotificationServiceImpl.class.getName());
 
 	@Override
-	public boolean sendEmail(List<String> recipientList, String emailSubject,
-			String emailBody) {
+	public boolean sendEmail(String sender, String recipient,
+			String emailSubject, String emailBody, Long groupKey) {
+
+		String code = UUID.randomUUID().toString();
+
+		// Crea un oggetto "invito"
+		Invitation i = new Invitation();
+		i.setCode(code);
+		i.setGroupKey(groupKey);
 
 		try {
-			sendMail("luigi.cortese00@gmail.com", "subject", "body",
-					"htmlBody", "attachment");
+			MailService mailService = MailServiceFactory.getMailService();
+
+			Message mail = new Message(
+					"luigi.cortese00@gmail.com",//
+					recipient, //
+					"TablePlusPlus - New Invitation",//
+					"You have been invited by "
+							+ sender
+							+ " to join his/her table in TablePlusPlus environment."
+							+ "Don't lose the chance, join now TablePlusPlus and start interacting with "
+							+ sender
+							+ " "
+							+ "and many others, from all over the world! "
+							+ "Click here or copy-paste in your addresses bar: <a href=\"http://tableplusplus.appspot.com/?code="
+							+ code
+							+ "\">http://tableplusplus.appspot.com/?code="
+							+ code + "</a>");//
+
+			mail.setHtmlBody("You have been invited by "
+					+ sender
+					+ " to join his/her table in TablePlusPlus environment."
+					+ " Don't lose this chance, join now TablePlusPlus and start interacting with "
+					+ sender
+					+ " "
+					+ "and many others, from all over the world! "
+					+ "Click here or copy-paste in your addresses bar: <a href=\"http://tableplusplus.appspot.com/?code="
+					+ code + "\">http://tableplusplus.appspot.com/?code="
+					+ code + "</a>");
+			System.out.println("1) " + mail.getHtmlBody());
+			System.out.println("2) " + mail.getTextBody());
+			mailService.send(mail);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
+		storeInvitation(i);
+
 		return true;
 	}
 
-	private void sendMail(String recipient, String subject, String body,
-			String htmlBody, String attachment) throws IOException {
-		MailService mailService = MailServiceFactory.getMailService();
-		Message mail = new Message("luigi.cortese00@gmail.com", recipient,
-				subject, body);
-		mailService.send(mail);
+	public Long storeInvitation(Invitation invitation) {
+		Long key = null;
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try {
+			pm.makePersistent(invitation);
+			key = invitation.getKey();
+		} catch (Exception e) {
+			System.err
+					.println("There has been an error storing the invitation: "
+							+ e);
+		} finally {
+			pm.close();
+		}
+		return key;
 	}
 
 	@Override
@@ -197,4 +250,51 @@ public class NotificationServiceImpl extends RemoteServiceServlet implements
 		return false;
 	}
 
+	@Override
+	public Long getInvitedGroupKey(String code, String email) {
+
+		Invitation i = queryInvitationByCode("code", code);
+		if (i == null)
+			return (long) -1;
+		else {
+			deleteInvitation(i.getKey());
+			return i.getGroupKey();
+		}
+	}
+
+	public void deleteInvitation(Long key) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+
+		try {
+			Invitation i = pm.getObjectById(Invitation.class, key);
+			pm.deletePersistentAll(i);
+		} catch (Exception e) {
+			System.err.println("Something gone wrong deleting the Invitation: "
+					+ e);
+		} finally {
+			pm.close();
+		}
+	}
+
+	public Invitation queryInvitationByCode(String fieldName, String fieldValue) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		Query query = pm.newQuery(Invitation.class);
+		query.setFilter(fieldName + " == param");
+		query.declareParameters("String param");
+		Invitation detachedInvitation = null;
+		try {
+			@SuppressWarnings("unchecked")
+			List<Invitation> results = (List<Invitation>) query
+					.execute(fieldValue);
+			if (!results.isEmpty())
+				detachedInvitation = pm.detachCopy(results.get(0));
+		} catch (Exception e) {
+			System.err.println("Something gone wrong querying the invitation: "
+					+ e);
+		} finally {
+			query.closeAll();
+			pm.close();
+		}
+		return detachedInvitation;
+	}
 }

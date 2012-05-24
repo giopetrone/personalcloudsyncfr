@@ -33,7 +33,7 @@ import com.unito.tableplus.client.services.NotificationServiceAsync;
 import com.unito.tableplus.shared.model.Notification;
 
 public class RightPanel extends ContentPanel {
-
+	
 	// servizi
 	public final GroupServiceAsync groupService = GWT
 			.create(GroupService.class);
@@ -217,6 +217,10 @@ public class RightPanel extends ContentPanel {
 
 							@Override
 							public void onSuccess(Boolean result) {
+								//(01) Aggiorno la lista di documenti nella classe Table
+								
+								
+								//(02) Aggiorno la vista dei documenti nel groupResourcesPanel
 							}
 						});
 				super.dragDrop(e);

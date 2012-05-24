@@ -1,5 +1,5 @@
 package com.unito.tableplus.shared.model;
-
+   
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Date;

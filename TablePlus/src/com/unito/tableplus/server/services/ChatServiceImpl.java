@@ -45,12 +45,15 @@ public class ChatServiceImpl extends RemoteServiceServlet implements
 	
 	@Override
 	public String sendMessage(String sender, String content, MessageType type) {
+		System.out.println("Dentro ChatServiceImpl.sendMessage()");
 		try {
 			JSONObject jsonMessage =  JSONMessageBuilder(sender, type.toString(), content);
-			for (String user : users)
-				if(!user.equals(sender))
+			for (String user : users){
+				System.out.println(" --> "+user);
+				//if(!user.equals(sender))
 					channelService.sendMessage(new ChannelMessage(user,
 							jsonMessage.toString()));
+			}
 			return "Message sent";
 		} catch (JSONException e) {
 			return "Error creating JSON";
@@ -63,7 +66,7 @@ public class ChatServiceImpl extends RemoteServiceServlet implements
 		try {
 			JSONObject jsonMessage =  JSONMessageBuilder(sender, type.toString(), content);
 			for (String user : recipients)
-				if(!user.equals(sender))
+				//if(!user.equals(sender))
 					channelService.sendMessage(new ChannelMessage(user,
 							jsonMessage.toString()));
 			return "Message sent";
@@ -72,6 +75,21 @@ public class ChatServiceImpl extends RemoteServiceServlet implements
 		}
 	}
 
+	@Override
+	public String sendMessage(String sender, String content, MessageType type,
+			List<String> recipients, Long groupKey) {
+		try {
+			JSONObject jsonMessage =  JSONMessageBuilder(sender, type.toString(), content,groupKey.toString());
+			for (String user : recipients)
+				//if(!user.equals(sender))
+					channelService.sendMessage(new ChannelMessage(user,
+							jsonMessage.toString()));
+			return "Message sent";
+		} catch (JSONException e) {
+			return "Error creating JSON";
+		}
+	}
+	
 	@Override
 	public List<String> getUsersList() {
 		return users;
@@ -133,6 +151,16 @@ public class ChatServiceImpl extends RemoteServiceServlet implements
 		jsonMessage.append("sender", sender);
 		jsonMessage.append("type", type);
 		jsonMessage.append("content", content);
+		return jsonMessage;
+	}
+	
+	private static JSONObject JSONMessageBuilder(String sender, String type,
+			String content,String groupKey) throws JSONException {
+		JSONObject jsonMessage = new JSONObject();
+		jsonMessage.append("sender", sender);
+		jsonMessage.append("type", type);
+		jsonMessage.append("content", content);
+		jsonMessage.append("groupKey", groupKey);
 		return jsonMessage;
 	}
 }

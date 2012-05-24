@@ -17,6 +17,7 @@ public class ConnectionServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
+		System.out.println("dentro ConnectionServlet.doPost()");
 		ChannelService channelService = ChannelServiceFactory.getChannelService();
 		ChannelPresence presence = channelService.parsePresence(req);
 		ChatServiceImpl.addUser(presence.clientId());		

@@ -7,7 +7,7 @@ import com.unito.tableplus.shared.model.Notification;
 
 public interface NotificationServiceAsync {
 
-	void sendEmail(List<String> recipientList, String emailSubject,String emailBody,
+	void sendEmail(String sender, String recipient,String emailSubject, String emailBody, Long groupKey,
 			AsyncCallback<Boolean> callback);
 
 	void waitForNotification(List<Long> groupKeySubscription,
@@ -15,5 +15,8 @@ public interface NotificationServiceAsync {
 
 	void sendNotification(Notification notification,
 			AsyncCallback<Boolean> callback);
+
+	void getInvitedGroupKey(String code, String email,
+			AsyncCallback<Long> callback);
 
 }

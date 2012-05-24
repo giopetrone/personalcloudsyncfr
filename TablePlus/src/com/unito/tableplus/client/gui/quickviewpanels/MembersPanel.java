@@ -1,5 +1,6 @@
 package com.unito.tableplus.client.gui.quickviewpanels;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.extjs.gxt.ui.client.Style.Orientation;
@@ -47,8 +48,8 @@ public class MembersPanel extends ContentPanel {
 	public LayoutContainer rightLayoutContainer = new LayoutContainer();
 	public TreePanel<ModelData> treePanel;
 	public TreeStore<ModelData> treeStore = new TreeStore<ModelData>();
-//	public BaseTreeModel onlineMembersRoot;
-//	public BaseTreeModel offlineMembersRoot;
+	// public BaseTreeModel onlineMembersRoot;
+	// public BaseTreeModel offlineMembersRoot;
 	public ToggleButton setHidden;
 
 	// servizi
@@ -60,6 +61,7 @@ public class MembersPanel extends ContentPanel {
 
 	// altro
 	public User tmpNewUser;
+	public String toBeInvited;
 
 	/**
 	 * Costruttore
@@ -131,6 +133,7 @@ public class MembersPanel extends ContentPanel {
 
 							// (10)controlla se all'email corrisponde un utente
 							// iscritto
+							toBeInvited = be.getValue();
 							userService.queryUser("email", be.getValue(),
 									new AsyncCallback<User>() {
 										@Override
@@ -151,11 +154,12 @@ public class MembersPanel extends ContentPanel {
 																		Button btn = ce
 																				.getButtonClicked();
 																		if (btn.getText()
-																				.equals("Yes"))
+																				.equals("Yes")) {
 																			Info.display(
 																					"MessageBox",
 																					"The 'Yes' button was pressed");
-																		else
+																			sendInvitationByMail();
+																		} else
 																			Info.display(
 																					"MessageBox",
 																					"The 'No' button was pressed");
@@ -266,7 +270,6 @@ public class MembersPanel extends ContentPanel {
 		((ContentPanel) rightLayoutContainer.getParent()).layout();
 	}
 
-	
 	/**
 	 * Popola l'area di destra, quella con le informazioni. Non inserisce però
 	 * l'elenco degli utenti, perchè questo richiederebbe una chiamata di
@@ -294,15 +297,15 @@ public class MembersPanel extends ContentPanel {
 		});
 		treePanel.setDisplayProperty("name");
 
-//		onlineMembersRoot = new BaseTreeModel();
-//		onlineMembersRoot.set("name", "Online Users");
-//		onlineMembersRoot.set("icon", "lightbulb");
-//		treeStore.add(onlineMembersRoot, false);
+		// onlineMembersRoot = new BaseTreeModel();
+		// onlineMembersRoot.set("name", "Online Users");
+		// onlineMembersRoot.set("icon", "lightbulb");
+		// treeStore.add(onlineMembersRoot, false);
 
-//		offlineMembersRoot = new BaseTreeModel();
-//		offlineMembersRoot.set("name", "Offline Users");
-//		offlineMembersRoot.set("icon", "lightbulb_off");
-//		treeStore.add(offlineMembersRoot, false);
+		// offlineMembersRoot = new BaseTreeModel();
+		// offlineMembersRoot.set("name", "Offline Users");
+		// offlineMembersRoot.set("icon", "lightbulb_off");
+		// treeStore.add(offlineMembersRoot, false);
 
 		// qui aggiungevo i membri
 
@@ -638,6 +641,29 @@ public class MembersPanel extends ContentPanel {
 		n.setSenderKey(TablePlus.user.getKey());
 		n.setGroupKey(rightPanel.table.groupKey);
 		throwNotification(n);
+	}
+
+	public void sendInvitationByMail() {
+		if (toBeInvited != null) {
+			List<String> recipientList = new ArrayList<String>();
+			recipientList.add(toBeInvited);
+			notificationService.sendEmail(TablePlus.user.getEmail(),
+					toBeInvited,
+					"",
+					"",
+					this.rightPanel.table.groupKey,
+					new AsyncCallback<Boolean>() {
+						@Override
+						public void onFailure(Throwable caught) {
+						}
+
+						@Override
+						public void onSuccess(Boolean result) {
+							System.out.println("EMAIL INVIATA: " + result);
+						}
+					});
+		}
+
 	}
 
 }
