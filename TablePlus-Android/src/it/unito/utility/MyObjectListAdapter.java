@@ -23,10 +23,10 @@ public class MyObjectListAdapter extends ArrayAdapter<ViewDoc> {
 		ViewDoc item = getItem(position);
 		ImageView image = (ImageView) convertView.findViewById(R.id.image);
 
-		if (item.getLink().contains("https:") || item.getLink().contains("http:"))
-			image.setImageResource(R.drawable.world48);
-		else
+		if (item.getLink().contains("https://docs") || item.getLink().contains("https://drive"))
 			image.setImageResource(R.drawable.doc48);
+		else
+			image.setImageResource(R.drawable.world48);
 		return convertView;
 		
 	}
