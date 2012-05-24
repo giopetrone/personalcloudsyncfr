@@ -10,7 +10,7 @@ import com.google.gwt.json.client.JSONString;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.Window;
 import com.unito.tableplus.client.TablePlus;
-import com.unito.tableplus.client.gui.Table;
+import com.unito.tableplus.client.gui.TableUI;
 import com.unito.tableplus.client.gui.windows.GroupChatWindow;
 
 public class SocketListenerImpl implements SocketListener {
@@ -63,7 +63,7 @@ public class SocketListenerImpl implements SocketListener {
         
         System.out.println(sender+" -- "+content+" -- "+groupKey);
 		
-		for(Table t:TablePlus.desktop.getGroupTables())
+		for(TableUI t:TablePlus.desktop.getGroupTables())
 			if(t.groupKey.compareTo(groupKey)==0){
 				System.out.println("TROVATO: "+groupKey);
 				((GroupChatWindow)t.groupChatWindow).manageNewMessage(sender,content);

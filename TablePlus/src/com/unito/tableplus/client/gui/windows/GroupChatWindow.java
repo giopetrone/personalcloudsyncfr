@@ -25,7 +25,7 @@ import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.unito.tableplus.client.TablePlus;
-import com.unito.tableplus.client.gui.Table;
+import com.unito.tableplus.client.gui.TableUI;
 import com.unito.tableplus.client.services.ChatService;
 import com.unito.tableplus.client.services.ChatServiceAsync;
 import com.unito.tableplus.shared.model.MessageType;
@@ -38,7 +38,7 @@ public class GroupChatWindow extends WindowPlus {
 	protected final ChatServiceAsync chatService = GWT
 			.create(ChatService.class);
 
-	public Table table;
+	public TableUI table;
 
 	HtmlContainer allTextTA;
 	TextArea myTextTA;
@@ -46,7 +46,7 @@ public class GroupChatWindow extends WindowPlus {
 
 	LayoutContainer lc;
 
-	public GroupChatWindow(Table table_) {
+	public GroupChatWindow(TableUI table_) {
 		super();
 		this.table = table_;
 		setHeading("Group Chat");

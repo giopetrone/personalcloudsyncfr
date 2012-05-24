@@ -26,7 +26,7 @@ public class TablePlus implements EntryPoint {
 	// crea l'utente corrente
 	public static User user = new User();
 
-	public static Table personalTable;
+	public static TableUI personalTable;
 
 	// finestra che compare se accedi al sistema non loggato
 	private Window loginWindow = new Window();
@@ -405,7 +405,7 @@ public class TablePlus implements EntryPoint {
 		desktop.addFixedShortcuts();
 
 		// crea il personalTable
-		personalTable = new Table();
+		personalTable = new TableUI();
 
 		// carica il personal table
 		desktop.loadPersonalTable(personalTable);
@@ -428,7 +428,7 @@ public class TablePlus implements EntryPoint {
 						// Auto-generated method stub
 						for (Group g : result) {
 
-							Table gt = new Table(g);
+							TableUI gt = new TableUI(g);
 
 							desktop.addGroupTable(gt);
 						}
@@ -627,7 +627,7 @@ public class TablePlus implements EntryPoint {
 
 		if (// n.getEventKind().equals("MEMBERONLINE")||
 		n.getEventKind().equals("MEMBEROFFLINE")) {
-			for (Table t : desktop.getGroupTables())
+			for (TableUI t : desktop.getGroupTables())
 				for (Long memberGroup : n.getOwningGroups())
 					if (t.groupKey.compareTo(memberGroup) == 0)
 						t.getRightPanel().membersPanel.refreshMembersTree(n);
@@ -635,7 +635,7 @@ public class TablePlus implements EntryPoint {
 
 		if (n.getEventKind().equals("MEMBERGROUPADD")) {
 
-			for (Table t : desktop.getGroupTables())
+			for (TableUI t : desktop.getGroupTables())
 				if (t.groupKey.compareTo(n.getGroupKey()) == 0)
 					t.getRightPanel().membersPanel.refreshMembersTree(n);
 
@@ -645,14 +645,14 @@ public class TablePlus implements EntryPoint {
 
 		if (n.getEventKind().equals("MEMBERHIDDEN")
 				|| n.getEventKind().equals("MEMBERVISIBLE")) {
-			for (Table t : desktop.getGroupTables())
+			for (TableUI t : desktop.getGroupTables())
 				if (t.groupKey.compareTo(n.getGroupKey()) == 0)
 					t.getRightPanel().membersPanel.refreshMembersTree(n);
 		}
 
 		if (n.getEventKind().equals("SELECTIVEPRESENCEOFF")
 				|| n.getEventKind().equals("SELECTIVEPRESENCEON")) {
-			for (Table t : desktop.getGroupTables())
+			for (TableUI t : desktop.getGroupTables())
 				if (t.groupKey.compareTo(n.getGroupKey()) == 0)
 					t.getRightPanel().membersPanel.refreshMembersTree(n);
 		}
@@ -687,7 +687,7 @@ public class TablePlus implements EntryPoint {
 			@Override
 			public void onSuccess(Group result) {
 				// (15)crea un grouptable sulla base del gruppo
-				Table gt = new Table(result);
+				TableUI gt = new TableUI(result);
 
 				// (20)aggiungi il nuovo table al desktop
 				desktop.addGroupTable(gt);

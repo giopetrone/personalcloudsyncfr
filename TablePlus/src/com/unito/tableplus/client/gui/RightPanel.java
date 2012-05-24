@@ -42,7 +42,7 @@ public class RightPanel extends ContentPanel {
 
 	// componenti
 	private ToolBar toolBar = null;
-	public Table table;
+	public TableUI table;
 	public WalletPanel walletPanel;
 	public MyResourcesPanel myResourcesPanel;
 	public MembersPanel membersPanel;
@@ -58,7 +58,7 @@ public class RightPanel extends ContentPanel {
 	 * @return void
 	 */
 
-	public RightPanel(Table table_, boolean isGroupTable_) {
+	public RightPanel(TableUI table_, boolean isGroupTable_) {
 		this.table = table_;
 		this.isGroupTable = isGroupTable_;
 

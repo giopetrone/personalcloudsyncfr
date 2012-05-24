@@ -35,8 +35,8 @@ import com.unito.tableplus.shared.model.User;
 
 public class DesktopPlus extends Desktop {
 
-	private List<Table> groupTables = new ArrayList<Table>();
-	private Table currentTable;
+	private List<TableUI> groupTables = new ArrayList<TableUI>();
+	private TableUI currentTable;
 	private RightPanel currentRightPanel;
 	// listener dedicato al menu
 	private SelectionListener<MenuEvent> menuListener;
@@ -148,6 +148,16 @@ public class DesktopPlus extends Desktop {
 		s.setText("My Resources");
 		s.setId("myresources-win-shortcut");
 		s.setData("window", myResourcesWindow);
+		s.addSelectionListener(shortcutListener);
+		this.addShortcut(s);
+		
+		//DropBox
+		WindowPlus dropBox = new DropBox();
+		addWindow(dropBox);
+		s = new Shortcut();
+		s.setText("DropBox");
+		s.setId("dropbox");
+		s.setData("window", dropBox);
 		s.addSelectionListener(shortcutListener);
 		this.addShortcut(s);
 	}
@@ -281,7 +291,7 @@ public class DesktopPlus extends Desktop {
 
 	}
 
-	public void loadPersonalTable(Table personalTable_) {
+	public void loadPersonalTable(TableUI personalTable_) {
 
 		currentTable = TablePlus.personalTable;
 		currentRightPanel = currentTable.getRightPanel();
@@ -302,14 +312,14 @@ public class DesktopPlus extends Desktop {
 		if (s.equals("Personal Table"))
 			loadTable(TablePlus.personalTable);
 		else
-			for (Table t : groupTables) {
+			for (TableUI t : groupTables) {
 				if (t.groupName.equals(s))
 					loadTable(t);
 			}
 
 	}
 
-	public Table tableToLeave;
+	public TableUI tableToLeave;
 
 	public void unloadCurrentTable() {
 
@@ -344,9 +354,9 @@ public class DesktopPlus extends Desktop {
 		currentRightPanel.removeFromParent();
 	}
 
-	public Table tableToJoin;
+	public TableUI tableToJoin;
 
-	public void loadTable(Table table) {
+	public void loadTable(TableUI table) {
 		this.currentTable = table;
 
 		// ferma il timer della presence selettiva (a meno che non sia il
@@ -454,15 +464,15 @@ public class DesktopPlus extends Desktop {
 		this.currentRightPanel = rightPanel;
 	}
 
-	public List<Table> getGroupTables() {
+	public List<TableUI> getGroupTables() {
 		return groupTables;
 	}
 
-	public void setGroupTables(List<Table> groupTables) {
+	public void setGroupTables(List<TableUI> groupTables) {
 		this.groupTables = groupTables;
 	}
 
-	public void addGroupTable(Table t) {
+	public void addGroupTable(TableUI t) {
 		this.groupTables.add(t);
 		for (Shortcut s : t.getShortcuts()) {
 			this.addShortcut(s);
@@ -472,7 +482,7 @@ public class DesktopPlus extends Desktop {
 		updateGroupsList(t);
 	}
 
-	public void updateGroupsList(Table t) {
+	public void updateGroupsList(TableUI t) {
 		MenuItem item_ = new MenuItem(t.groupName);
 		item_.addSelectionListener(groupMenuListener);
 		menuItems.add(item_);

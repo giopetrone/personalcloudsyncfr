@@ -27,7 +27,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.unito.tableplus.client.TablePlus;
 import com.unito.tableplus.client.gui.RightPanel;
-import com.unito.tableplus.client.gui.Table;
+import com.unito.tableplus.client.gui.TableUI;
 import com.unito.tableplus.client.services.GroupService;
 import com.unito.tableplus.client.services.GroupServiceAsync;
 import com.unito.tableplus.client.services.NotificationService;
@@ -138,7 +138,7 @@ public class MyGroupsPanel extends ContentPanel {
 						
 						
 						
-						TablePlus.desktop.switchToTable(((Table) be.getItem()
+						TablePlus.desktop.switchToTable(((TableUI) be.getItem()
 								.get("table")).groupName);
 					};
 				});
@@ -244,7 +244,7 @@ public class MyGroupsPanel extends ContentPanel {
 	public void createNewTable(Group g) {
 
 		// (30)crea il tavolo corrispondente Table table1 = new
-		Table table1 = new Table(g);
+		TableUI table1 = new TableUI(g);
 
 		// (40)aggiunge il nuovo tavolo al desktop
 		TablePlus.desktop.addGroupTable(table1);
@@ -300,7 +300,7 @@ public class MyGroupsPanel extends ContentPanel {
 
 	public void addData() {
 		ModelData m;
-		for (Table t : TablePlus.desktop.getGroupTables()) {
+		for (TableUI t : TablePlus.desktop.getGroupTables()) {
 			m = new BaseModelData();
 			m.set("name", t.groupName);
 			m.set("icon", "monitor");
@@ -315,7 +315,7 @@ public class MyGroupsPanel extends ContentPanel {
 	 * @return void
 	 */
 
-	public void addNewGroupToTree(Table t) {
+	public void addNewGroupToTree(TableUI t) {
 		ModelData m = new BaseModelData();
 		m.set("name", t.groupName);
 		m.set("icon", "monitor");
