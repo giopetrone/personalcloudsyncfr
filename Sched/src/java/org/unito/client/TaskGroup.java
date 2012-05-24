@@ -35,6 +35,10 @@ public class TaskGroup implements IsSerializable {
 
     public TaskGroup(TaskGroup tg) { // copisa task del parametro
         tasks = tg.tasks;
+        globalSchedule = tg.globalSchedule;
+        taskSchedule = tg.taskSchedule;
+        choice = tg.choice;
+        selectedTask = tg.selectedTask;
     }
 
     public void setChoiceForTask(String tName) {
@@ -90,21 +94,12 @@ public class TaskGroup implements IsSerializable {
             return -1;
         }
         //   Window.alert("setschedule task= "+t.getName() +" sta="+sta);
-        Interval inte = findIntervalForTask(t.getName());
-        if (inte == null) {
-            globalSchedule.add(new Interval(t.getName(), sta, sta));
-        } else {
-            inte.setMin(sta);
-            inte.setMax(sta);
-            //   Window.alert("cambio schedule:"+t.getDefaultSchedule());
-            // inte.setMin(t.getDefaultSchedule());
-            //  inte.setMax(t.getDefaultSchedule());
-        }
+        setSchedule(t.getName(),sta);
         return sta;
     }
 
-    public static int addScheduleTask(String name, String firstStartHour, String lastEndHour, String duration, String before, String after, String schedule, String users, boolean overlap) {
-        Task tat = new Task(name, firstStartHour, lastEndHour, duration, before, after, schedule, users, overlap);
+    public static int addScheduleTask(String name, String firstStartHour, String lastEndHour, String duration, String before, String after, String schedule, String users, boolean overlap, String description) {
+        Task tat = new Task(name, firstStartHour, lastEndHour, duration, before, after, schedule, users, overlap, description);
         TaskGroup.add(tat);
         //  Window.alert("lastendhour="+lastEndHour);
         int sched = TaskGroup.current().setSchedule(tat);
@@ -182,10 +177,14 @@ public class TaskGroup implements IsSerializable {
         globalSchedule.add(interval);
     }
 
-    public void changeSchedule(Interval interval) {
-        Interval inte = findIntervalForTask(interval.getName());
-        inte.setMin(interval.getMin());
-        inte.setMax(interval.getMax());
+    public void setSchedule(String taskName, int time) {
+        Interval inte = findIntervalForTask(taskName);
+        if (inte == null) {
+            addSchedule(new Interval(taskName, time, time + 1));
+        } else {
+            inte.setMin(time);
+            inte.setMax(time + 1);
+        }
     }
 
     public void removeSchedule(String task) {
@@ -197,14 +196,19 @@ public class TaskGroup implements IsSerializable {
         globalSchedule.clear();
     }
 
-    public ArrayList<String> usersForInterval(int time) {
+    public ArrayList<String> conflictingSchedules(int time) {
         // retrun list of users conflicting with schedule at certain time
+        // we assume all Intervals are disjunct
+
         for (Interval inte : taskSchedule) {
+            
+         //   Window.alert("conflicting:"+ time +" "+ inte.getMin() + " "+ inte.getUsers());
+     
             if (inte.getMin() == time) {
                 return inte.getUsers();
             }
         }
-        return null;
+        return new ArrayList();
     }
 
     public void updateWith(ViaVai result) {
@@ -225,7 +229,7 @@ public class TaskGroup implements IsSerializable {
         }
     }
 
-    private Interval findIntervalForTask(String name) {
+    public Interval findIntervalForTask(String name) {
         for (Interval inte : globalSchedule) {
             if (inte.getName().equals(name)) {
                 return inte;
@@ -320,28 +324,32 @@ public class TaskGroup implements IsSerializable {
         return ret;
     }
 
-    public static ArrayList<String>[] stiliCaselle(boolean showAlt, TaskGroup fonte) {
+    public static ArrayList<String>[] stiliCaselle(boolean showAvailability, TaskGroup fonte) {
         ArrayList<String>[] ret = new ArrayList[oreLavoro];
         for (int i = 0; i < oreLavoro; i++) {
             ret[i] = new ArrayList();
         }
         //   String stam = "";
-        if (showAlt) {
-            if (!fonte.taskSchedule.isEmpty()) {
+        if (showAvailability) {
+            if (fonte.taskSchedule.isEmpty()) { // empty --> no solutions
+                Task lui = fonte.getI(fonte.getSelectedTask());
+                for (int i = lui.getFirstStartHour(); i < lui.getLastEndHour(); i++) {
+                    ret[i].add("styleConflict");
+                }
+            } else {
                 for (Interval inte : fonte.taskSchedule) {
                     Task ta = fonte.get(inte.getName());
                     if (inte.getMin() == inte.getMax()) {
                         Window.alert("stilicaselle: limiti == !!! " + ta.getName() + " " + inte.getMin());
                     }
-                    for (int j = inte.getMin(); j < inte.getMax(); j++) { // MINORE O MINORE UGUALE?????
+                    for (int j = inte.getMin(); j < inte.getMax(); j++) {
                         for (int i = 0; i < ta.getDuration(); i++) {
                             if (j + i >= oreLavoro) {
                                 break;
                             }
                             // colora come possibili tutte le caselle dove piazzare task scelto
                             if (ret[j + i].isEmpty()) {
-
-                                if (inte.getUsers().isEmpty()) {
+                                if (inte.getUsers().isEmpty()) { // no user conflict
                                     //    Window.alert("empty users, good"+ (j+i));
                                     ret[j + i].add("styleAvailable");
                                     //    stam += (j + i) + "L";
@@ -363,17 +371,9 @@ public class TaskGroup implements IsSerializable {
                         ret[k].add("styleAvailable");
                     }
                 }
-
-            } else {
-                Task lui = fonte.getI(fonte.getSelectedTask());
-                for (int i = lui.getFirstStartHour(); i < lui.getLastEndHour(); i++) {
-                    ret[i].add("styleConflict");
-                }
             }
         }
-        for (int i = 0;
-                i < oreLavoro;
-                i++) {
+        for (int i = 0; i < oreLavoro; i++) {
             if (ret[i].isEmpty()) {
                 ret[i].add("styleUnused");
             }
@@ -519,14 +519,17 @@ public class TaskGroup implements IsSerializable {
         Task task = new Task("T1", 0, 10, 4);
         task.addUser(UiUser.find("liliana"));
         task.addUser(UiUser.find("marino"));
+        task.setDescription("discuss artcile");
         tg.addScheduledTask(task, 6, 10);
 
         task = new Task("T2", 24, 40, 2);
         task.addUser(UiUser.find("balbo"));
+        task.setDescription("meeting with CSI");
         tg.addScheduledTask(task, 24, 26);
 
         task = new Task("T3", 20, 50, 4);
         task.addUser(UiUser.find("gianluca"));
+        task.setDescription("analyze constraint solver");
         tg.addScheduledTask(task, 36, 40);
         //   Window.alert("corrente in esempio"+ current().tasks);
     }

@@ -15,6 +15,7 @@ import java.util.ArrayList;
 public class Task implements IsSerializable {
 
     private String name;
+    private String description;
     private int firstStartHour = 0;
     private int lastEndHour = 1;
     private int duration = 1;
@@ -110,8 +111,9 @@ public class Task implements IsSerializable {
         return "name: " + getName() + " start: " + getFirstStartHour() + " end: " + getLastEndHour() + "duration: " + getDuration() + "schedule: " + getSchedule();
     }
 
-    public Task(String name, String firstStartHour, String lastEndHour, String duration, String before, String after, String schedule, String users, boolean overlap) {
+    public Task(String name, String firstStartHour, String lastEndHour, String duration, String before, String after, String schedule, String users, boolean overlap, String description) {
         this.name = name;
+        this.description = description;
         this.overlap = overlap;
         this.duration = Integer.parseInt(duration);
         if (Integer.parseInt(firstStartHour) >= 0) {
@@ -376,5 +378,19 @@ public class Task implements IsSerializable {
             }
         }
         return false;
+    }
+
+    /**
+     * @return the description
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * @param description the description to set
+     */
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
