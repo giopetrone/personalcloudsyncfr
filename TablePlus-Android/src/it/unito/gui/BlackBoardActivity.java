@@ -107,7 +107,7 @@ public class BlackBoardActivity extends ListActivity{
 			// Here's how you can get the correct item in onContextItemSelected()
 			AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
 			Object listItem = getListAdapter().getItem(info.position);
-			Message deletingMex=(Message)listItem;
+			ViewMessage deletingMex=(ViewMessage)listItem;
 			Log.i("BalckBoard","listItem :"+listItem.toString());
 			Log.i("BalckBoard","deletingMex :"+deletingMex.toString());
 			try{
