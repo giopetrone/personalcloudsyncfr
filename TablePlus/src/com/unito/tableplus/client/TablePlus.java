@@ -59,38 +59,27 @@ public class TablePlus implements EntryPoint {
 
 	static boolean legalPageChange = false;
 
-	// ******************************************************************************
-	// ******************************************************************************
-	// ******************************************************************************
-	// ******
-	// ****** onModuleLoad()
-	// ******
-	// ******************************************************************************
-	// ******************************************************************************
-	// ******************************************************************************
+	/**
+	 * E' il primo metodo che viene eseguito. 
+	 * Aggiunge alla pagina un "CloseHandler" che gestisce la chiusura del browser (o di un tab) 
+	 * da parte dell'utente: se si verifica uno dei due eventi, setta l'utente corrente OFFLINE 
+	 * nel DB.
+	 * 
+	 */
 
 	public void onModuleLoad() {
-
-//		System.out.println("GWT.getHostPageBaseURL() = "
-//				+ GWT.getHostPageBaseURL());
-//		System.out
-//				.println("GWT.getModuleBaseURL() = " + GWT.getModuleBaseURL());
-//		System.out
-//				.println("com.google.gwt.user.client.Window.Location.getHref() = "
-//						+ com.google.gwt.user.client.Window.Location.getHref());
 
 		com.google.gwt.user.client.Window
 				.addCloseHandler(new CloseHandler<com.google.gwt.user.client.Window>() {
 
+					//sequenza di azioni da eseguire alla chiusura della pagina
 					@Override
 					public void onClose(
 							CloseEvent<com.google.gwt.user.client.Window> event) {
-						// Auto-generated method stub
+
 						if (!legalPageChange) {
-							System.out.println("ABBIAMO CHIUSO I BATTENTI");
-							// redirect(logoutUrl);
-							// desktop.logoutUser();
-							// notifica di un utente offline
+							
+							// invio notifica di utente offline
 							Notification n = new Notification();
 							n.setSenderEmail(user.getEmail());
 							n.setSenderKey(user.getKey());
@@ -115,32 +104,21 @@ public class TablePlus implements EntryPoint {
 
 				});
 
-		// verifico se è loggato con google
-		// se è loggato carico il desktop vuoto
-		// se non è loggato carico la finestra di login
+		// verifico lo stato di login dell'utente
 		verifyLoginStatus();
 
 	}
 
-	// ******************************************************************************
-	// ******************************************************************************
-	// ******************************************************************************
-	// ******
-	// ****** verifyLoginStatus()
-	// ******
-	// ******************************************************************************
-	// ******************************************************************************
-	// ******************************************************************************
+	/**
+	 * Verifica se l'utente che ha aperto la pagina è loggato con google: 
+     * - se è loggato viene caricato tutto l'ambinte e visualizzato il personal table 
+     * - se non è loggato carico la finestra di login
+	 */
 
 	public void verifyLoginStatus() {
 		// URL della home
 		final String homepageURL;
-		// if (GWT.getHostPageBaseURL().contains("127.0.0.1"))
-		// homepageURL =
-		// "http://127.0.0.1:8888/TablePlus.html?gwt.codesvr=127.0.0.1:9997";
-		// else
-		// homepageURL = GWT.getHostPageBaseURL();
-
+		
 		homepageURL = com.google.gwt.user.client.Window.Location.getHref();
 
 		userService.isLoggedIn(homepageURL, new AsyncCallback<String>() {
@@ -150,10 +128,15 @@ public class TablePlus implements EntryPoint {
 
 			@Override
 			public void onSuccess(String result) {
+				// se l'utente risulta loggato, viene restituito l'url di logout, 
+				// con un carattere "y" aggiunto come prefisso
 				if (result.startsWith("y")) {
 					logoutUrl = result.substring(1);
 					initUser();
-				} else if (result.startsWith("n")) {
+				}
+				// se l'utente risulta non loggato, viene restituito l'url di login, 
+				// con un carattere "n" aggiunto come prefisso
+				else if (result.startsWith("n")) {
 					loginUrl = result.substring(1);
 					loadLoginWindow();
 				}
@@ -161,16 +144,15 @@ public class TablePlus implements EntryPoint {
 		});
 	}
 
-	// ******************************************************************************
-	// ******************************************************************************
-	// ******************************************************************************
-	// ******
-	// ****** initUser()
-	// ******
-	// ******************************************************************************
-	// ******************************************************************************
-	// ******************************************************************************F
-
+	/**
+	 * Questo metodo viene eseguito se l'utente risulta loggato (nel nostro sistema) con google.
+	 * Si occupa di istanziare l'oggetto "user", che rappresenta l'utente corrente:
+	 *  - viene inviata la notifica di utente online
+	 *  - se del DB abbiamo già un suo token, recuperioamo i suoi Google Docs
+	 *  - se nell'URL corrente c'è un token, lo recupera e lo gestisce tramite manageNewToken();
+	 * 
+	 */
+	
 	public void initUser() {
 		userService.getCurrentUser(new AsyncCallback<User>() {
 			@Override
@@ -203,7 +185,7 @@ public class TablePlus implements EntryPoint {
 								@Override
 								public void onSuccess(List<Document> result) {
 									user.setDocuments(result);
-									loadActiveDesktop();
+									manageInvitation();
 								}
 							});
 
@@ -214,12 +196,18 @@ public class TablePlus implements EntryPoint {
 					manageNewToken();
 
 				else
-					loadActiveDesktop();
+					manageInvitation();
 
 			}
 		});
 
 	}
+	
+	/**
+	 * Invia una notifica
+	 * 
+	 * @param notification
+	 */
 
 	public void throwNotification(Notification notification) {
 		notificationService.sendNotification(notification,
@@ -234,15 +222,10 @@ public class TablePlus implements EntryPoint {
 				});
 	}
 
-	// ******************************************************************************
-	// ******************************************************************************
-	// ******************************************************************************
-	// ******
-	// ****** manageNewToken()
-	// ******
-	// ******************************************************************************
-	// ******************************************************************************
-	// ******************************************************************************
+	/**
+	 * Nel caso in cui venga rilevata la presenza del parametro "token" nell'url,
+	 * lo recupera e lo memorizza nel DB
+	 */
 
 	public void manageNewToken() {
 		// -(1)- estrai il token
@@ -281,7 +264,7 @@ public class TablePlus implements EntryPoint {
 										});
 
 								user.setDocuments(result);
-								loadActiveDesktop();
+								manageInvitation();
 							}
 						});
 			}
@@ -289,25 +272,22 @@ public class TablePlus implements EntryPoint {
 
 	}
 
-	// ******************************************************************************
-	// ******************************************************************************
-	// ******************************************************************************
-	// ******
-	// ****** loadActiveDesktop()
-	// ******
-	// ******************************************************************************
-	// ******************************************************************************
-	// ******************************************************************************
+	/**
+	 * Controlla che l'URL corrente contenga il parametro "code", che identifica un invito 
+	 * ad un table (tramite link ricevuto via email). Se è presente, aggiunge il table 
+	 * all'utente corrente ed elimina la notifica dal DB.
+	 * 
+	 */
 
 	Long tmp;
 
-	public void loadActiveDesktop() {
+	public void manageInvitation() {
 
 		// controlla se nell'url c'è un codice di invito, e procede di
 		// conseguenza...
 		if (!com.google.gwt.user.client.Window.Location.getHref().contains(
 				"code="))
-			loadActiveDesktop2();
+			loadActiveDesktop();
 		else {
 			// recupera il codice dall'url
 			String code = com.google.gwt.user.client.Window.Location
@@ -373,7 +353,7 @@ public class TablePlus implements EntryPoint {
 															public void onSuccess(
 																	User result) {
 																user=result;
-																loadActiveDesktop2();
+																loadActiveDesktop();
 															}
 														});
 
@@ -381,15 +361,21 @@ public class TablePlus implements EntryPoint {
 
 										});
 							} else
-								loadActiveDesktop2();
+								loadActiveDesktop();
 						}
 
 					});
 		}
 
 	}
+	
+	/**
+	 * Inizia a preparare l'ambiente. Istanzia il timer delle notifiche: 
+	 * eviterà che una richiesta client -> server impieghi più di 60 secondi a ricevere risposta.
+	 * 
+	 */
 
-	public void loadActiveDesktop2() {
+	public void loadActiveDesktop() {
 		timer = new Timer() {
 			@Override
 			public void run() {
@@ -413,6 +399,10 @@ public class TablePlus implements EntryPoint {
 		caricaListaGruppi();
 
 	}
+	
+	/**
+	 * Carica i tavoli degli utenti: per ognuno crea un oggetto tableUI. 
+	 */
 
 	public void caricaListaGruppi() {
 		// carica la lista di gruppi dell'utente corrente
@@ -448,6 +438,10 @@ public class TablePlus implements EntryPoint {
 					}
 				});
 	}
+	
+	/**
+	 * avvia il canale di comunicazione per la chat
+	 */
 
 	public void startCommunicationChannel() {
 
@@ -478,32 +472,7 @@ public class TablePlus implements EntryPoint {
 
 				ChannelFactory.createChannel(token,
 						new ChannelCreatedCallbackImpl(messaggioDiProva));
-				// obj è l’oggetto in cui verranno visualizzati i messaggi
-				// ricevuti
-				//
 
-				// chatService
-				// .getUsersList(new AsyncCallback<List<String>>() {
-				// @Override
-				// public void onFailure(
-				// Throwable caught) {
-				// System.out.println("Could not get users list: "
-				// + caught.getMessage());
-				// }
-				//
-				// @Override
-				// public void onSuccess(
-				// List<String> result) {
-				// System.out.println("Users' number is... "+result.size());
-				// System.out.println("First user is... " + result.get(0));
-				// }
-				// });
-
-				/*
-				 * System.out.println("ChannelAPI token received");
-				 * System.out.println("USEREMAIL: "+user.getEmail());
-				 */
-				// testMessage();
 			}
 		});
 
@@ -511,43 +480,14 @@ public class TablePlus implements EntryPoint {
 
 	String messaggioDiProva = "";
 
-	public void testMessage() {
-		System.out.println("USEREMAIL: " + user.getEmail());
-
-		chatService.sendMessage(user.getEmail(), "" + user.getEmail()
-				+ " saluta tutti!", MessageType.GENERIC,
-				new AsyncCallback<String>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						//  Auto-generated method stub
-						System.out
-								.println("chatService.sendMessage() failure da "
-										+ user.getEmail());
-					}
-
-					@Override
-					public void onSuccess(String result) {
-						//  Auto-generated method stub
-						System.out
-								.println("chatService.sendMessage() happy ending da "
-										+ user.getEmail() + ": " + result);
-					}
-
-				});
-	}
-
-	// ******************************************************************************
-	// ******************************************************************************
-	// ******************************************************************************
-	// ******
-	// ****** startNotificationListener()
-	// ******
-	// ******************************************************************************
-	// ******************************************************************************
-	// ******************************************************************************
+	
 
 	Timer timer = null;
+	
+	/**
+	 * Avvia il listener delle notifiche
+	 * 
+	 */
 
 	public void startNotificationListener() {
 
@@ -557,7 +497,6 @@ public class TablePlus implements EntryPoint {
 		}
 
 		// fa partire il listener delle notifiche
-		// System.out.println(user.getEmail() + " attende news...");
 		try {
 			notificationService.waitForNotification(user.getGroups(), new Long(
 					clientSeqNumber), user.getEmail(),
@@ -574,10 +513,6 @@ public class TablePlus implements EntryPoint {
 							if (result != null) {
 								clientSeqNumber = result.get(0)
 										.getSequenceNumber();
-								// if (user.getGroups() != null
-								// && user.getGroups().size() > 0)
-								// System.out.println("PROVA "
-								// + user.getGroups().get(0));
 
 								// il blocco sottostante
 								// (1) fa ripartire immediatamente il
@@ -609,15 +544,11 @@ public class TablePlus implements EntryPoint {
 		}
 	}
 
-	// ******************************************************************************
-	// ******************************************************************************
-	// ******************************************************************************
-	// ******
-	// ****** manageNotification()
-	// ******
-	// ******************************************************************************
-	// ******************************************************************************
-	// ******************************************************************************
+	/**
+	 * Gestisce le notifiche sulla base del tipo notification.eventKind
+	 * 
+	 * @param nList
+	 */
 
 	public void manageNotification(List<Notification> nList) {
 		Notification n = nList.get(0);
@@ -657,11 +588,11 @@ public class TablePlus implements EntryPoint {
 					t.getRightPanel().membersPanel.refreshMembersTree(n);
 		}
 
-		// System.out.println("\n" + user.getEmail()
-		// + " riceve una notifica:\n------ " + n.getSequenceNumber()
-		// + "\n------ " + n.getEventKind() + "\n------ "
-		// + n.getMemberEmail() + "\n");
 	}
+	
+	/**
+	 *
+	 */
 
 	public void invitedToNewGroup(Notification n) {
 

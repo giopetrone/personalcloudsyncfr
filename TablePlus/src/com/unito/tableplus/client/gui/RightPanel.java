@@ -2,6 +2,8 @@ package com.unito.tableplus.client.gui;
 
 import com.extjs.gxt.ui.client.Style.Orientation;
 import com.extjs.gxt.ui.client.data.ModelData;
+import com.extjs.gxt.ui.client.dnd.DragSource;
+import com.extjs.gxt.ui.client.dnd.DropTarget;
 import com.extjs.gxt.ui.client.dnd.TreePanelDragSource;
 import com.extjs.gxt.ui.client.dnd.TreePanelDropTarget;
 import com.extjs.gxt.ui.client.dnd.DND.Operation;
@@ -33,7 +35,7 @@ import com.unito.tableplus.client.services.NotificationServiceAsync;
 import com.unito.tableplus.shared.model.Notification;
 
 public class RightPanel extends ContentPanel {
-	
+
 	// servizi
 	public final GroupServiceAsync groupService = GWT
 			.create(GroupService.class);
@@ -42,7 +44,7 @@ public class RightPanel extends ContentPanel {
 
 	// componenti
 	private ToolBar toolBar = null;
-	public TableUI table;
+	public TableUI tableUI;
 	public WalletPanel walletPanel;
 	public MyResourcesPanel myResourcesPanel;
 	public MembersPanel membersPanel;
@@ -58,8 +60,8 @@ public class RightPanel extends ContentPanel {
 	 * @return void
 	 */
 
-	public RightPanel(TableUI table_, boolean isGroupTable_) {
-		this.table = table_;
+	public RightPanel(TableUI tableUI_, boolean isGroupTable_) {
+		this.tableUI = tableUI_;
 		this.isGroupTable = isGroupTable_;
 
 		setLayout(new FillLayout(Orientation.VERTICAL));
@@ -104,17 +106,17 @@ public class RightPanel extends ContentPanel {
 
 	public void groupPanel() {
 
-		setHeading("Quick View - "+table.groupName);
-		
+		setHeading("Quick View - " + tableUI.groupName);
+
 		membersPanel = new MembersPanel(this);
 		add(membersPanel);
-		
+
 		myResourcesPanel = new MyResourcesPanel(this);
 		add(myResourcesPanel);
 
 		groupResourcesPanel = new GroupResourcesPanel(this);
 		add(groupResourcesPanel);
-		
+
 		addDnd();
 	}
 
@@ -191,6 +193,7 @@ public class RightPanel extends ContentPanel {
 			@SuppressWarnings({ "unchecked", "rawtypes" })
 			@Override
 			public void dragStart(DNDEvent e) {
+
 				TreePanel tree = ((TreePanel) e.getComponent());
 				ModelData sel = tree.getSelectionModel().getSelectedItem();
 
@@ -204,26 +207,48 @@ public class RightPanel extends ContentPanel {
 
 			@Override
 			public void dragDrop(DNDEvent e) {
-				@SuppressWarnings("rawtypes")
-				TreePanel tree = ((TreePanel) e.getComponent());
-				ModelData sel = tree.getSelectionModel().getSelectedItem();
+				
+				//se il rilascio dell'oggetto avviene nella lista dei Group objects...
+				if (e.getDropTarget().getClass().toString()
+						.contains("TreePanelDropTarget")) {
+					@SuppressWarnings("rawtypes")
+					TreePanel tree = ((TreePanel) e.getComponent());
+					ModelData sel = tree.getSelectionModel().getSelectedItem();
 
-				groupService.addDocumentToGroup((String) sel.get("docId"),
-						TablePlus.user, table.groupKey,
-						new AsyncCallback<Boolean>() {
-							@Override
-							public void onFailure(Throwable caught) {
-							}
+					groupService.addDocumentToGroup((String) sel.get("docId"),
+							TablePlus.user, tableUI.groupKey,
+							new AsyncCallback<Boolean>() {
+								@Override
+								public void onFailure(Throwable caught) {
+								}
 
-							@Override
-							public void onSuccess(Boolean result) {
-								//(01) Aggiorno la lista di documenti nella classe Table
-								
-								
-								//(02) Aggiorno la vista dei documenti nel groupResourcesPanel
-							}
-						});
-				super.dragDrop(e);
+								@Override
+								public void onSuccess(Boolean result) {
+									// (01) Aggiorno la lista di documenti nella
+									// classe Table
+
+									// (02) Aggiorno la vista dei documenti nel
+									// groupResourcesPanel
+								}
+							});
+					super.dragDrop(e);
+				}
+				
+				// se il rilascio dell'oggetto avviene sul desktop
+				else if (e.getTarget().getId().equals("x-desktop")){
+					
+					//recupero l'oggetto
+					@SuppressWarnings("rawtypes")
+					TreePanel tree = ((TreePanel) e.getComponent());
+					ModelData sel = tree.getSelectionModel().getSelectedItem();
+					
+					//chiamo il metodo di tableUI che si occupa di aggiungere
+					//lo shortcut
+					tableUI.addGdocShortcut((String) sel.get("name"),(String) sel.get("link"),(String) sel.get("docId"));
+					
+					super.dragDrop(e);
+				}
+				
 			}
 		};
 
@@ -234,7 +259,15 @@ public class RightPanel extends ContentPanel {
 		TreePanelDropTarget target = new TreePanelDropTarget(
 				groupResourcesPanel.treePanel);
 		target.setOperation(Operation.COPY);
+
+		DropTarget dropTarget = new DropTarget(TablePlus.desktop.getDesktop());
+		dropTarget.setOperation(Operation.COPY);
+
 		// target.setFeedback(Feedback.BOTH);
+	}
+
+	public void addDndFromQuickviewToDesktop() {
+		// DragSource source=new dragSource();
 	}
 
 }

@@ -76,7 +76,7 @@ public class MembersPanel extends ContentPanel {
 		setCollapsible(true);
 		setTitleCollapse(true);
 		setBodyStyle("backgroundColor: white;");
-		setLayout(new RowLayout(Orientation.HORIZONTAL));
+		setLayout(new RowLayout(Orientation.VERTICAL));
 
 		populateLeftLayoutContainer();
 		populateRightLayoutContainer();
@@ -98,8 +98,10 @@ public class MembersPanel extends ContentPanel {
 
 	public void populateLeftLayoutContainer() {
 		leftLayoutContainer = new LayoutContainer();
+		leftLayoutContainer.setHeight(22);
+		leftLayoutContainer.setLayout(new RowLayout(Orientation.HORIZONTAL));
 		Button inviteUser = new Button();
-		inviteUser.setToolTip(new ToolTipConfig("Invite a new user"));
+		inviteUser.setToolTip(new ToolTipConfig("Invite new member"));
 		inviteUser.setIcon(IconHelper.createStyle("invite-user"));
 		inviteUser.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
@@ -230,23 +232,23 @@ public class MembersPanel extends ContentPanel {
 		leftLayoutContainer.add(alfabetical);
 		add(leftLayoutContainer);
 
-		Button refresh = new Button();
-		refresh.setToolTip(new ToolTipConfig("Invite a new user"));
-		refresh.setIcon(IconHelper.createStyle("invite-user"));
-		refresh.addSelectionListener(new SelectionListener<ButtonEvent>() {
-
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				treeStore = new TreeStore<ModelData>();
-				rightLayoutContainer.removeFromParent();
-				rightLayoutContainer = new LayoutContainer();
-				populateRightLayoutContainer();
-				addData();
-				((ContentPanel) rightLayoutContainer.getParent()).layout();
-			}
-
-		});
-		leftLayoutContainer.add(refresh);
+		Button deleteButton = new Button();
+		deleteButton.setToolTip(new ToolTipConfig("Delete member"));
+		deleteButton.setIcon(IconHelper.createStyle("delete-user"));
+//		deleteButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+//
+//			@Override
+//			public void componentSelected(ButtonEvent ce) {
+//				treeStore = new TreeStore<ModelData>();
+//				rightLayoutContainer.removeFromParent();
+//				rightLayoutContainer = new LayoutContainer();
+//				populateRightLayoutContainer();
+//				addData();
+//				((ContentPanel) rightLayoutContainer.getParent()).layout();
+//			}
+//
+//		});
+		leftLayoutContainer.add(deleteButton);
 
 	}
 
@@ -313,7 +315,7 @@ public class MembersPanel extends ContentPanel {
 		// treePanel.setExpanded(offlineMembersRoot, true);
 		rightLayoutContainer.add(treePanel);
 		rightLayoutContainer.setHeight("100%");
-		rightLayoutContainer.setWidth(300);
+		rightLayoutContainer.setWidth(322);
 		add(rightLayoutContainer);
 
 		// rightLayoutContainer.layout();
@@ -333,7 +335,7 @@ public class MembersPanel extends ContentPanel {
 
 	public void addData() {
 		ModelData m_son;
-		for (String userEmail : rightPanel.table.onlineMembersEmail) {
+		for (String userEmail : rightPanel.tableUI.onlineMembersEmail) {
 			m_son = new BaseModelData();
 			m_son.set("name", userEmail);
 
@@ -342,7 +344,7 @@ public class MembersPanel extends ContentPanel {
 
 		}
 
-		for (String userEmail : rightPanel.table.offlineMembersEmail) {
+		for (String userEmail : rightPanel.tableUI.offlineMembersEmail) {
 			m_son = new BaseModelData();
 			m_son.set("name", userEmail);
 
@@ -354,7 +356,7 @@ public class MembersPanel extends ContentPanel {
 			}
 
 		}
-		setHidden.toggle(rightPanel.table.hiddenUser);
+		setHidden.toggle(rightPanel.tableUI.hiddenUser);
 		layout();
 	}
 
@@ -367,7 +369,7 @@ public class MembersPanel extends ContentPanel {
 	public void addExistingUserToGroup() {
 
 		groupService.addMemberToGroup(tmpNewUser.getKey(),
-				rightPanel.table.groupKey, new AsyncCallback<Boolean>() {
+				rightPanel.tableUI.groupKey, new AsyncCallback<Boolean>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -384,7 +386,7 @@ public class MembersPanel extends ContentPanel {
 						n.setSenderKey(TablePlus.user.getKey());
 						n.setEventKind("MEMBERGROUPADD");
 						n.setMemberEmail(tmpNewUser.getEmail());
-						n.setGroupKey(rightPanel.table.groupKey);
+						n.setGroupKey(rightPanel.tableUI.groupKey);
 						n.setStatus(tmpNewUser.isOnline() ? "ONLINE"
 								: "OFFLINE");
 
@@ -454,27 +456,27 @@ public class MembersPanel extends ContentPanel {
 
 	public void print(Notification n) {
 		System.out.println(TablePlus.user.getEmail() + " in "
-				+ rightPanel.table.groupName + " (" + n.getEventKind()
+				+ rightPanel.tableUI.groupName + " (" + n.getEventKind()
 				+ "):\n ------ onlineMembersEmail["
-				+ rightPanel.table.onlineMembersEmail.size() + "] = "
-				+ rightPanel.table.onlineMembersEmail
+				+ rightPanel.tableUI.onlineMembersEmail.size() + "] = "
+				+ rightPanel.tableUI.onlineMembersEmail
 				+ "\n ------ offlineMembersEmail["
-				+ rightPanel.table.offlineMembersEmail.size() + "] = "
-				+ rightPanel.table.offlineMembersEmail
+				+ rightPanel.tableUI.offlineMembersEmail.size() + "] = "
+				+ rightPanel.tableUI.offlineMembersEmail
 				+ "\n ------ hiddenMembersEmail["
-				+ rightPanel.table.hiddenMembersEmail.size() + "] = "
-				+ rightPanel.table.hiddenMembersEmail
+				+ rightPanel.tableUI.hiddenMembersEmail.size() + "] = "
+				+ rightPanel.tableUI.hiddenMembersEmail
 				+ "\n ------ selectivePresenceMembers["
-				+ rightPanel.table.selectivePresenceMembers.size() + "] = "
-				+ rightPanel.table.selectivePresenceMembers + "\n ------ ");
+				+ rightPanel.tableUI.selectivePresenceMembers.size() + "] = "
+				+ rightPanel.tableUI.selectivePresenceMembers + "\n ------ ");
 	}
 
 	public void refreshMembersTree(Notification n) {
 
-		List<String> off = rightPanel.table.offlineMembersEmail;
-		List<String> on = rightPanel.table.onlineMembersEmail;
-		List<String> hid = rightPanel.table.hiddenMembersEmail;
-		List<String> sel = rightPanel.table.selectivePresenceMembers;
+		List<String> off = rightPanel.tableUI.offlineMembersEmail;
+		List<String> on = rightPanel.tableUI.onlineMembersEmail;
+		List<String> hid = rightPanel.tableUI.hiddenMembersEmail;
+		List<String> sel = rightPanel.tableUI.selectivePresenceMembers;
 		String em = n.getMemberEmail();
 
 		// (10) MEMBERONLINE
@@ -578,7 +580,7 @@ public class MembersPanel extends ContentPanel {
 	 */
 
 	public void makeMeHidden() {
-		rightPanel.table.hiddenUser = true;
+		rightPanel.tableUI.hiddenUser = true;
 		// (10) mi sposto localmente nella lista di utenti offline
 		// String toRemove=null;
 		// for(String s:rightPanel.table.onlineMembersEmail)
@@ -591,7 +593,7 @@ public class MembersPanel extends ContentPanel {
 
 		// (20) aggiorno l'oggetto Group nel DB
 		groupService.addHiddenMemberToGroup(TablePlus.user.getKey(),
-				rightPanel.table.groupKey, new AsyncCallback<Boolean>() {
+				rightPanel.tableUI.groupKey, new AsyncCallback<Boolean>() {
 					@Override
 					public void onFailure(Throwable caught) {
 					}
@@ -608,7 +610,7 @@ public class MembersPanel extends ContentPanel {
 		n.setSenderEmail(TablePlus.user.getEmail());
 		n.setMemberEmail(TablePlus.user.getEmail());
 		n.setSenderKey(TablePlus.user.getKey());
-		n.setGroupKey(rightPanel.table.groupKey);
+		n.setGroupKey(rightPanel.tableUI.groupKey);
 		throwNotification(n);
 	}
 
@@ -619,10 +621,10 @@ public class MembersPanel extends ContentPanel {
 	 */
 
 	public void makeMeVisible() {
-		rightPanel.table.hiddenUser = false;
+		rightPanel.tableUI.hiddenUser = false;
 		// (20) aggiorno l'oggetto Group nel DB
 		groupService.removeHiddenMemberFromGroup(TablePlus.user.getKey(),
-				rightPanel.table.groupKey, new AsyncCallback<Boolean>() {
+				rightPanel.tableUI.groupKey, new AsyncCallback<Boolean>() {
 					@Override
 					public void onFailure(Throwable caught) {
 					}
@@ -639,7 +641,7 @@ public class MembersPanel extends ContentPanel {
 		n.setSenderEmail(TablePlus.user.getEmail());
 		n.setMemberEmail(TablePlus.user.getEmail());
 		n.setSenderKey(TablePlus.user.getKey());
-		n.setGroupKey(rightPanel.table.groupKey);
+		n.setGroupKey(rightPanel.tableUI.groupKey);
 		throwNotification(n);
 	}
 
@@ -651,7 +653,7 @@ public class MembersPanel extends ContentPanel {
 					toBeInvited,
 					"",
 					"",
-					this.rightPanel.table.groupKey,
+					this.rightPanel.tableUI.groupKey,
 					new AsyncCallback<Boolean>() {
 						@Override
 						public void onFailure(Throwable caught) {

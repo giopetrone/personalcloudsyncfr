@@ -42,7 +42,7 @@ public class DesktopPlus extends Desktop {
 	private SelectionListener<MenuEvent> menuListener;
 	private SelectionListener<MenuEvent> groupMenuListener;
 	// listener dedicato agli shortcut
-	private SelectionListener<ComponentEvent> shortcutListener;
+	public SelectionListener<ComponentEvent> shortcutListener;
 	protected StartMenu startMenu;
 	private List<MenuItem> menuItems = new ArrayList<MenuItem>();
 	public Menu groupsSubMenu = new Menu();

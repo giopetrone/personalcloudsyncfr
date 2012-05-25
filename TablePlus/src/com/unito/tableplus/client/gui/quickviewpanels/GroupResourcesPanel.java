@@ -165,8 +165,8 @@ public class GroupResourcesPanel extends ContentPanel {
 	public void addData() {
 		ModelData m_son;
 
-		if (rightPanel.table.googleDocuments != null)
-			for (Document document : rightPanel.table.googleDocuments) {
+		if (rightPanel.tableUI.googleDocuments != null)
+			for (Document document : rightPanel.tableUI.googleDocuments) {
 				m_son = new BaseModelData();
 				m_son.set("name", document.getTitle());
 				m_son.set("icon", "document_font");

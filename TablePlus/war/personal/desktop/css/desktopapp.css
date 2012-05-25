@@ -91,6 +91,10 @@
 	background-image: url(../images/user_add.png) !important;
 }
 
+.delete-user {
+	background-image: url(../images/user_delete.png) !important;
+}
+
 .set-hidden {
 	background-image: url(../images/user_silhouette.png) !important;
 }
@@ -171,4 +175,10 @@
 	width: 64px;
 	height: 64px;
 	background-image: url(../images/Application.png);
+}
+
+#doc-win-shortcut img {
+	width: 64px;
+	height: 64px;
+	background-image: url(../images/Doc.png);
 }

@@ -8,6 +8,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.unito.tableplus.client.TablePlus;
+import com.unito.tableplus.client.gui.windows.DocWindow;
 import com.unito.tableplus.client.gui.windows.GroupChatWindow;
 import com.unito.tableplus.client.gui.windows.GroupResourcesWindow;
 import com.unito.tableplus.client.gui.windows.WindowPlus;
@@ -275,6 +276,35 @@ public class TableUI {
                                 });
         }
 
+        /**
+         * Questo metodo viene invocato come conseguenza di un drag n drop
+         * che termina sul desktop, quindi qui viene creato lo shortcut
+         * corrispondente al documento che è stato trascinato e rilasciato.
+         * 
+         * @param docName il titolo del documento
+         * @param docLink l'url al quale reperire il documento
+         * @param docId id google-generated che identifica il documento
+         */
+        
+        public void addGdocShortcut(String docName, String docLink, String docId){
+        	System.out.println("dentro TableUI.addGdocShortcut()");
+        	DocWindow docWindow = new DocWindow(docLink);
+            addWindow(docWindow);
+            
+            Shortcut s = new Shortcut();
+            s.setText(docName);
+            s.setId("doc-win-shortcut");
+            s.setData("window", docWindow);
+            this.addShortcut(s);
+            
+            TablePlus.desktop.addShortcut(s);
+            //s.addSelectionListener(shortcutListener);
+			s.setVisible(true);
+			s.addSelectionListener(TablePlus.desktop.shortcutListener);
+			
+            TablePlus.desktop.getDesktop().layout();
+        }
+        
         /**
          * Vari setters e getters
          *
