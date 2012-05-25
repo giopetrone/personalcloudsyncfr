@@ -16,7 +16,7 @@
       
          <activity
             android:name=".LoginActivity"
-            android:label="@string/app_name"
+            android:label="Login on Table Plus Plus"
              >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,13 +26,13 @@
         
            <activity
             android:name=".TableListActivity"
-            android:label="TableListActivity"  >   
+            android:label="Table List"  >   
             
          </activity>
        
          <activity
             android:name=".HelloTabWidgetActivity"
-            android:label="HelloTabWidgetActivity" >
+            android:label="Browse Table" >
         </activity>
          <activity
             android:name=".BlackBoardActivity"
@@ -48,7 +48,7 @@
         </activity>
          <activity
             android:name=".AddMessageActivity"
-            android:label="AddActivity" >
+            android:label="Add message to BlackBoard" >
         </activity>
     </application>
 
