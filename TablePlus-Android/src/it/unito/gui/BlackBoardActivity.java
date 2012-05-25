@@ -45,18 +45,11 @@ public class BlackBoardActivity extends ListActivity{
 		registerForContextMenu(getListView());
 		tablekey=getIntent().getStringExtra("key");
 		infoCurrentTable=getIntent().getStringExtra("infoCurrentTable");
-
 	}
-
-
 	@Override
 	protected void onResume()
 	{
 		super.onResume();
-
-		infoCurrentTable=getIntent().getStringExtra("infoCurrentTable");
-		tablekey=getIntent().getStringExtra("key");
-		Log.i("TABLEKEY",tablekey);
 		loadMessage();
 	}
 
@@ -81,22 +74,9 @@ public class BlackBoardActivity extends ListActivity{
 	}
 
 
-
 	//-------------------MENU SU LONGCLICK--------------------------------------
 	public void onCreateContextMenu(ContextMenu menu, View v,ContextMenuInfo menuInfo) {  
 		super.onCreateContextMenu(menu, v, menuInfo);  
-		// Get the info on which item was selected
-		AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
-
-		// Get the Adapter behind your ListView (this assumes you're using
-		// a ListActivity; if you're not, you'll have to store the Adapter yourself
-		// in some way that can be accessed here.)
-		Adapter adapter = getListAdapter();
-
-		// Retrieve the item that was clicked on
-		Object item = adapter.getItem(info.position);
-		Log.i("Balckboard","hai cliccato: "+item.toString());
-
 		menu.setHeaderTitle("Context Menu");  
 		menu.add(0, v.getId(), 0, "Delete");  
 	}  
@@ -108,18 +88,13 @@ public class BlackBoardActivity extends ListActivity{
 			AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
 			Object listItem = getListAdapter().getItem(info.position);
 			ViewMessage deletingMex=(ViewMessage)listItem;
-			Log.i("BalckBoard","listItem :"+listItem.toString());
-			Log.i("BalckBoard","deletingMex :"+deletingMex.toString());
 			try{
 				JSONObject del = ProxyUtils.proxyCall("deleteMessage",deletingMex.getKey());
-				Log.i("BalckBoard","del :"+del.toString());
 				status=del.getString("status");
-				Log.i("status= ",  status);
 			} catch (Exception e) {
 				Log.i("Eccezione", e.toString());
 			}
 			if(status.equals("OK")){
-				Log.i("End ",  "elemento cancellato");
 				loadMessage();
 				Toast.makeText(this, "Delete avvenuta", Toast.LENGTH_SHORT).show();
 			}else
@@ -127,10 +102,6 @@ public class BlackBoardActivity extends ListActivity{
 		} else {return false;}  
 		return true;  
 	}  
-	public void function2(int id){
-
-	} 
-
 
 	//------------------------------------MENU DA TASTO MENU---------------------------------------------
 	/**
@@ -140,10 +111,9 @@ public class BlackBoardActivity extends ListActivity{
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.info_tab:
-			Log.i("Info","info_table");
 			AlertDialog.Builder builder=new AlertDialog.Builder(this);
 			builder.setTitle("Inform Table"); 
-			builder.setMessage(getIntent().getStringExtra("infoCurrentTable"));
+			builder.setMessage(infoCurrentTable);
 			builder.setCancelable(true);
 			AlertDialog alert=builder.create();
 			alert.show();
@@ -160,18 +130,13 @@ public class BlackBoardActivity extends ListActivity{
 		List<Long> usersKeys=new LinkedList<Long>();
 		List<ViewMessage> listViewMessage=new LinkedList<ViewMessage>();
 
-
 		try{
 			JSONObject request = ProxyUtils.proxyCall("queryMessages", tablekey);
 			JSONArray jsMessages = request.getJSONArray("results");
-			Log.i("jsMessages= ",  jsMessages.toString());
 			listMessage=ProxyUtils.convertToMessagesList(jsMessages);
-			Log.i("jsMessages2= ",  listMessage.toString());
-
 			if(listMessage.isEmpty()){
 				Toast.makeText(this, "No Messages uploaded", Toast.LENGTH_LONG).show(); 
 			}
-
 			//load keys
 			for(Message m:listMessage){
 				usersKeys.add(m.getAuthor());
@@ -181,22 +146,17 @@ public class BlackBoardActivity extends ListActivity{
 				tmp.setType(m.getType());
 				listViewMessage.add(tmp);
 			}
-			Log.i("Members","Userskeys: "+usersKeys);
 			//Proxy request
 			JSONObject request1 = ProxyUtils.proxyCall("queryUsers",usersKeys);
 			JSONArray users = request1.getJSONArray("results");
-			Log.i("Members","Users: "+users);
-
 			//load data in ViewMessage list
 			for(int i=0;i<listViewMessage.size();i++){
 				JSONObject jo = users.getJSONObject(i);
 				String email=jo.getString("email");
 				String author=ProxyUtils.clearMail(email);
 				listViewMessage.get(i).setAuthor(author);
-
 			}
-
-			//aggiungo gli oggetti alla lista
+			//Add Object to List
 			array=new MyMessageListAdapter(this,R.layout.tables_row,R.id.title_table,listViewMessage);
 			setListAdapter(array);
 		} catch (Exception e) {
