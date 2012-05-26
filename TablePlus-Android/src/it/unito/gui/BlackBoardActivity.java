@@ -7,10 +7,8 @@ import it.unito.utility.MyMessageListAdapter;
 import it.unito.utility.ProxyUtils;
 import it.unito.utility.ViewMessage;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;
@@ -23,7 +21,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Adapter;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ArrayAdapter;
 import android.widget.Button;

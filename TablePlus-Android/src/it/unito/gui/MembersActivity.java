@@ -1,30 +1,24 @@
 package it.unito.gui;
 
+import it.unito.json.JSONArray;
+import it.unito.json.JSONObject;
+import it.unito.utility.MembersAdapter;
+import it.unito.utility.ProxyUtils;
+import it.unito.utility.TablePlusAndroid;
+import it.unito.utility.ViewMembers;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import it.unito.json.JSONArray;
-import it.unito.json.JSONObject;
-import it.unito.utility.MembersAdapter;
-import it.unito.utility.MyObjectListAdapter;
-import it.unito.utility.MyTablesListAdapter;
-import it.unito.utility.ProxyUtils;
-import it.unito.utility.TablePlusAndroid;
-import it.unito.utility.ViewMembers;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListActivity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.Window;
 import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
-import android.widget.TextView;
 import android.widget.Toast;
 
 //Function of the class: show a list member of the member of the table (where we are in that moment) highlighting online and offline members 

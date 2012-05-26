@@ -5,19 +5,12 @@ import it.unito.model.MessageType;
 import it.unito.utility.ProxyUtils;
 import it.unito.utility.TablePlusAndroid;
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 //Function of the class: Add a message at the BlackBoard

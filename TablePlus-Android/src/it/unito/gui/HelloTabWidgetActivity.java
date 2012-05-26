@@ -1,15 +1,14 @@
 package it.unito.gui;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import it.unito.json.JSONArray;
 import it.unito.json.JSONObject;
-import it.unito.model.Group;
 import it.unito.utility.ProxyUtils;
 import it.unito.utility.TablePlusAndroid;
 import it.unito.utility.ViewDoc;
-import it.unito.utility.ViewMembers;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.TabActivity;
 import android.content.Intent;
 import android.content.res.Resources;

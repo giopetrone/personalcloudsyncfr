@@ -1,15 +1,14 @@
 package it.unito.utility;
 
+import it.unito.gui.R;
+
 import java.util.List;
 
-import it.unito.gui.R;
-import it.unito.model.Message;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 //Adapter for show in BlackBoard with the message its type and the author which writed that message
