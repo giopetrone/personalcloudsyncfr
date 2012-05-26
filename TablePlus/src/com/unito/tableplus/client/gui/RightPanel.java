@@ -207,7 +207,7 @@ public class RightPanel extends ContentPanel {
 
 			@Override
 			public void dragDrop(DNDEvent e) {
-				
+				System.out.println("ID ---> "+e.getTarget().getId());
 				//se il rilascio dell'oggetto avviene nella lista dei Group objects...
 				if (e.getDropTarget().getClass().toString()
 						.contains("TreePanelDropTarget")) {
@@ -235,7 +235,7 @@ public class RightPanel extends ContentPanel {
 				}
 				
 				// se il rilascio dell'oggetto avviene sul desktop
-				else if (e.getTarget().getId().equals("x-desktop")){
+				else if (e.getTarget().getId().equals("x-desktop")||e.getTarget().getId().equals("x-auto-2")){
 					
 					//recupero l'oggetto
 					@SuppressWarnings("rawtypes")
