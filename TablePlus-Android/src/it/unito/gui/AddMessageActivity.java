@@ -68,7 +68,8 @@ public class AddMessageActivity extends Activity {
 		  };
 		  //Method for adding the message
 		public void add (View v)
-	{
+		{
+			boolean flag=true;
 			testo=newMess.getText().toString();  	    
 		    if(rbInfo.isChecked()){
 		    	tipo= MessageType.INFO;
@@ -78,15 +79,20 @@ public class AddMessageActivity extends Activity {
 		    	tipo= MessageType.TODO;
 		    }else if(rbGeneric.isChecked()){
 		    	tipo= MessageType.GENERIC;
-		    }
-		    try{	
-		    	JSONObject request = ProxyUtils.newMessage(UserKey ,key ,tipo, testo);//addBlackBoard
-			} catch (Exception e) {
-				Log.i("Eccezione", e.toString());
-			}
-			//finish() stop the current activity
-			finish();
-	}
+		    }else{flag=false; }
+		    	
+		    if(flag && !testo.isEmpty()){
+		    	try{	
+			    	JSONObject request = ProxyUtils.newMessage(UserKey ,key ,tipo, testo);//addBlackBoard
+				} catch (Exception e) {
+					Log.i("Eccezione", e.toString());
+				}
+		    	//finish(), stop the current activity
+				finish();
+		    }else
+		    	Toast.makeText(AddMessageActivity.this,"Check a Type or isert text", Toast.LENGTH_LONG).show();
+			
+		}
 	
 }
 

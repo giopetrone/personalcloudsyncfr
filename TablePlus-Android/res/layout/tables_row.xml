@@ -15,18 +15,23 @@
 		    </TableRow>
 
 		    <TableRow>
-		        <TextView
-		            android:id="@+id/subtitle_docs"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:textColor="@color/blue1"
-		            android:textSize="14sp" />
-		        <TextView
-		            android:id="@+id/subtitle_members"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:textColor="@color/blue2"
-		            android:textSize="14sp" />
+		        <TableLayout>
+
+		            <TableRow>
+				        <TextView
+				            android:id="@+id/subtitle_docs"
+				            android:layout_width="wrap_content"
+				            android:layout_height="wrap_content"
+				            android:textColor="@color/blue1"
+				            android:textSize="14sp" />
+				        <TextView
+				            android:id="@+id/subtitle_members"
+				            android:layout_width="wrap_content"
+				            android:layout_height="wrap_content"
+				            android:textColor="@color/blue2"
+				            android:textSize="14sp" />
+				   </TableRow>
+			</TableLayout>
 		    </TableRow>
 
 		</TableLayout>

@@ -53,7 +53,7 @@ public class MyTablesListAdapter extends ArrayAdapter<ViewTable>{
 
         holder.text1.setText(item.getTableName());
         holder.text2.setText(" Docs: "+item.getNumDocuments());
-        holder.text3.setText(" Members: "+item.getNumMembers());
+        holder.text3.setText("      Members: "+item.getNumMembers());
         return itemView;
     }
 }

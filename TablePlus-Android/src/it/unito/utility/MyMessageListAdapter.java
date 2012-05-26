@@ -51,8 +51,8 @@ public class MyMessageListAdapter extends ArrayAdapter<ViewMessage>{
             holder = (ViewHolder)itemView.getTag();
         }
 	    holder.text1.setText(item.getContent());
-        holder.text2.setText("Type: "+item.getType());
-        holder.text3.setText(item.getAuthor());
+        holder.text2.setText(" Type: "+item.getType());
+        holder.text3.setText("      Author: "+item.getAuthor());
         return itemView;
     }
 }
