@@ -19,46 +19,46 @@ import com.google.gdata.data.docs.DocumentListEntry;
 import com.google.gdata.data.docs.DocumentListFeed;
 import com.google.gdata.util.ServiceException;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-import com.unito.tableplus.client.services.GroupService;
+import com.unito.tableplus.client.services.TableService;
 import com.unito.tableplus.shared.model.Document;
-import com.unito.tableplus.shared.model.Group;
+import com.unito.tableplus.shared.model.Table;
 import com.unito.tableplus.shared.model.Message;
 import com.unito.tableplus.shared.model.User;
 
-public class GroupServiceImpl extends RemoteServiceServlet implements
-		GroupService {
+public class TableServiceImpl extends RemoteServiceServlet implements
+		TableService {
 
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	public List<Group> queryGroups(List<Long> keys) {
+	public List<Table> queryTables(List<Long> keys) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		List<Group> groups = new LinkedList<Group>();
+		List<Table> tables = new LinkedList<Table>();
 		try {
 			for (Long key : keys) {
-				Group g = pm.getObjectById(Group.class, key);
+				Table t = pm.getObjectById(Table.class, key);
 				// because of lazy behaviour the BlackBoard must be "touched"
 				// for being detached
-				g.getBlackBoard();
-				groups.add(pm.detachCopy(g));
+				t.getBlackBoard();
+				tables.add(pm.detachCopy(t));
 			}
 		} catch (Exception e) {
-			System.err.println("There has been an error querying groups: " + e);
+			System.err.println("There has been an error querying tables: " + e);
 		} finally {
 			pm.close();
 		}
-		return groups;
+		return tables;
 	}
 
 	@Override
-	public Long storeGroup(Group group) {
+	public Long storeTable(Table table) {
 		Long key = null;
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
-			pm.makePersistent(group);
-			key = group.getKey();
+			pm.makePersistent(table);
+			key = table.getKey();
 		} catch (Exception e) {
-			System.err.println("There has been an error storing the group: "
+			System.err.println("There has been an error storing the table: "
 					+ e);
 		} finally {
 			pm.close();
@@ -67,36 +67,19 @@ public class GroupServiceImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public Long storeGroupProva(Group group) {
-		group.setName(group.getName() + "++");
-		Long key = null;
+	public Table queryTable(Long key) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
+		Table detached = null;
 		try {
-			pm.makePersistent(group);
-			key = group.getKey();
-		} catch (Exception e) {
-			System.err.println("There has been an error storing the group: "
-					+ e);
-		} finally {
-			pm.close();
-		}
-		return key;
-	}
-
-	@Override
-	public Group queryGroup(Long key) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Group detached = null;
-		try {
-			Group group = pm.getObjectById(Group.class, key);
-			if (group == null)
-				return group;
+			Table table = pm.getObjectById(Table.class, key);
+			if (table == null)
+				return table;
 			// because of lazy behaviour the BlackBoard must be "touched"
 			// for being detached
-			group.getBlackBoard();
-			detached = pm.detachCopy(group);
+			table.getBlackBoard();
+			detached = pm.detachCopy(table);
 		} catch (Exception e) {
-			System.err.println("There has been an error querying groups: " + e);
+			System.err.println("There has been an error querying tables: " + e);
 		} finally {
 			pm.close();
 		}
@@ -104,13 +87,13 @@ public class GroupServiceImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public void deleteGroup(Long key) {
+	public void deleteTable(Long key) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
-			Group group = pm.getObjectById(Group.class, key);
-			pm.deletePersistentAll(group);
+			Table table = pm.getObjectById(Table.class, key);
+			pm.deletePersistentAll(table);
 		} catch (Exception e) {
-			System.err.println("Something gone wrong deleting the Group: " + e);
+			System.err.println("Something gone wrong deleting the Table: " + e);
 		} finally {
 			pm.close();
 		}
@@ -121,11 +104,11 @@ public class GroupServiceImpl extends RemoteServiceServlet implements
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Transaction tx = pm.currentTransaction();
 		try {
-			Group g = pm.getObjectById(Group.class, key);
-			if (g == null)
+			Table t = pm.getObjectById(Table.class, key);
+			if (t == null)
 				return false;
 			tx.begin();
-			g.getBlackBoard().add(message);
+			t.getBlackBoard().add(message);
 			tx.commit();
 		} catch (Exception e) {
 			System.err.println("There has been an error adding message: " + e);
@@ -156,10 +139,10 @@ public class GroupServiceImpl extends RemoteServiceServlet implements
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		List<Message> blackboard = null;
 		try {
-			Group group = pm.getObjectById(Group.class, key);
-			if (group == null)
+			Table table = pm.getObjectById(Table.class, key);
+			if (table == null)
 				return false;
-			blackboard = group.getBlackBoard();
+			blackboard = table.getBlackBoard();
 			blackboard.clear();
 		} catch (Exception e) {
 			System.err.println("There has been an error clearing messages: "
@@ -171,9 +154,9 @@ public class GroupServiceImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public boolean addDocumentToGroup(String DocId, User user, Long groupKey) {
+	public boolean addDocumentToTable(String DocId, User user, Long tableKey) {
 
-		Group group = this.queryGroup(groupKey);
+		Table table = this.queryTable(tableKey);
 
 		DocsService client = new DocsService("yourCo-yourAppName-v1");
 		client.setAuthSubToken(user.getToken());
@@ -200,7 +183,7 @@ public class GroupServiceImpl extends RemoteServiceServlet implements
 
 			// Ho recuperato il doc da condividere, devo recuperare gli utenti
 			// del gruppo con cui condividere il doc
-			List<User> usersToShare_ = (new UserServiceImpl()).queryUsers(group
+			List<User> usersToShare_ = (new UserServiceImpl()).queryUsers(table
 					.getMembers());
 
 			URL url = new URL("https://docs.google.com/feeds/acl/private/full/"
@@ -242,20 +225,20 @@ public class GroupServiceImpl extends RemoteServiceServlet implements
 			e.printStackTrace();
 		}
 
-		group.addDocument(DocId);
+		table.addDocument(DocId);
 
-		storeGroup(group);
+		storeTable(table);
 
 		return true;
 	}
 
 	@Override
-	public boolean docAccessToNewMember(User newMember, Group group) {
+	public boolean docAccessToNewMember(User newMember, Table table) {
 
-		// User groupOwner=new UserServiceImpl().queryUser(group.getOwner());
+		// User tableOwner=new UserServiceImpl().queryUser(table.getOwner());
 		//
 		// DocsService client = new DocsService("yourCo-yourAppName-v1");
-		// client.setAuthSubToken(groupOwner.getToken());
+		// client.setAuthSubToken(tableOwner.getToken());
 		// client.setProtocolVersion(DocsService.Versions.V2);
 		//
 		// URL feedUri;
@@ -266,11 +249,11 @@ public class GroupServiceImpl extends RemoteServiceServlet implements
 		// DocumentListFeed feed = client.getFeed(feedUri,
 		// DocumentListFeed.class);
 		//
-		// //per ogni documento del groupOwner
+		// //per ogni documento del tableOwner
 		// for (DocumentListEntry entry : feed.getEntries()) {
 		//
 		// //se questo documento appartiene al gruppo
-		// for(String docId:group.getDocuments()){
+		// for(String docId:table.getDocuments()){
 		// if(entry.getDocId().equals(docId)){
 		//
 		// URL url = new URL("https://docs.google.com/feeds/acl/private/full/"
@@ -317,49 +300,49 @@ public class GroupServiceImpl extends RemoteServiceServlet implements
 		// System.out.println("tre");
 		// }
 
-		storeGroup(group);
+		storeTable(table);
 		new UserServiceImpl().storeUser(newMember);
 
 		return false;
 	}
 
 	@Override
-	public List<Document> getGroupDocuments(Group group) {
+	public List<Document> getTableDocuments(Table table) {
 		// Auto-generated method stub
-		List<Document> groupDocuments = new ArrayList<Document>();
+		List<Document> tableDocuments = new ArrayList<Document>();
 
-		User groupOwner = new UserServiceImpl().queryUser(group.getOwner());
+		User tableOwner = new UserServiceImpl().queryUser(table.getOwner());
 
 		// e se il gruppo è appena stato creato e il proprietario non ha
 		// token???
-		if (groupOwner.getToken() != null)
+		if (tableOwner.getToken() != null)
 			for (Document doc : new TokenServiceImpl()
-					.getDocumentList(groupOwner.getToken()))
-				for (String docId : group.getDocuments())
+					.getDocumentList(tableOwner.getToken()))
+				for (String docId : table.getDocuments())
 					if (doc.getDocId().equals(docId))
-						groupDocuments.add(doc);
+						tableDocuments.add(doc);
 
-		if (groupDocuments.size() == 0)
+		if (tableDocuments.size() == 0)
 			return null;
 		else
-			return groupDocuments;
+			return tableDocuments;
 	}
 
 	@Override
-	public boolean addMemberToGroup(Long userKey, Long groupKey) {
+	public boolean addMemberToTable(Long userKey, Long tableKey) {
 
-		// System.out.println("Aggiunto utente"+userKey +" a gruppo"+ groupKey);
+		// System.out.println("Aggiunto utente"+userKey +" a gruppo"+ tableKey);
 
 		// recupera gli oggetti gruppo e utente
-		Group g = this.queryGroup(groupKey);
+		Table t = this.queryTable(tableKey);
 		User u = new UserServiceImpl().queryUser(userKey);
 
 		// aggiunge il membro al gruppo e lo salva
-		g.addMember(u.getKey());
-		this.storeGroup(g);
+		t.addMember(u.getKey());
+		this.storeTable(t);
 
 		// aggiunge il gruppo all'utente e lo salva
-		u.addGroup(g.getKey());
+		u.addTable(t.getKey());
 		new UserServiceImpl().storeUser(u);
 
 		// fornisco all'utente gli accessi in scrittura a tutti i doc
@@ -368,59 +351,59 @@ public class GroupServiceImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public boolean addHiddenMemberToGroup(Long userKey, Long groupKey) {
+	public boolean addHiddenMemberToTable(Long userKey, Long tableKey) {
 		// recupera l'oggetto gruppo
-		Group g = this.queryGroup(groupKey);
+		Table t = this.queryTable(tableKey);
 
 		// aggiunge il membro al gruppo e lo salva
-		g.addHiddenMember(userKey);
-		this.storeGroup(g);
+		t.addHiddenMember(userKey);
+		this.storeTable(t);
 
 		return false;
 	}
 
 	@Override
-	public boolean removeHiddenMemberFromGroup(Long userKey, Long groupKey) {
+	public boolean removeHiddenMemberFromTable(Long userKey, Long tableKey) {
 		// recupera l'oggetto gruppo
-		Group g = this.queryGroup(groupKey);
+		Table t = this.queryTable(tableKey);
 
 		// rimuove l'utente dal gruppo e lo salva
-		g.removeHiddenMember(userKey);
-		this.storeGroup(g);
+		t.removeHiddenMember(userKey);
+		this.storeTable(t);
 
 		return false;
 	}
 
 	@Override
-	public boolean addSelectivePresenceMemberToGroup(Long userKey, Long groupKey) {
+	public boolean addSelectivePresenceMemberToTable(Long userKey, Long tableKey) {
 		// recupera l'oggetto gruppo
-		Group g = this.queryGroup(groupKey);
+		Table t = this.queryTable(tableKey);
 
 		// aggiunge il membro al gruppo e lo salva
-		if (!g.getSelectivePresenceMembers().contains(userKey)) {
-			g.addSelectivePresenceMember(userKey);
-			this.storeGroup(g);
+		if (!t.getSelectivePresenceMembers().contains(userKey)) {
+			t.addSelectivePresenceMember(userKey);
+			this.storeTable(t);
 			return true;
 		} else
 			return false;
 	}
 
 	@Override
-	public boolean removeSelectivePresenceMemberFromGroup(Long userKey,
-			Long groupKey) {
+	public boolean removeSelectivePresenceMemberFromTable(Long userKey,
+			Long tableKey) {
 		// recupera l'oggetto gruppo
-		Group g = this.queryGroup(groupKey);
+		Table t = this.queryTable(tableKey);
 
 		// System.out
-		// .println("removeSelectivePresenceMemberFromGroup:\n------ userKey = "
+		// .println("removeSelectivePresenceMemberFromTable:\n------ userKey = "
 		// + userKey
-		// + "\n------ groupKey = "
-		// + groupKey
-		// + "\n------ group = " + (g!=null?g.getName():"null"));
+		// + "\n------ tableKey = "
+		// + tableKey
+		// + "\n------ table = " + (g!=null?g.getName():"null"));
 
 		// rimuove l'utente dal gruppo e lo salva
-		g.removeSelectivePresenceMember(userKey);
-		this.storeGroup(g);
+		t.removeSelectivePresenceMember(userKey);
+		this.storeTable(t);
 
 		return false;
 	}

@@ -39,9 +39,9 @@ public class TablePlus implements EntryPoint {
 	// crea il servizio per l'utente
 	private final UserServiceAsync userService = GWT.create(UserService.class);
 
-	// crea il servizio per il group
-	private final GroupServiceAsync groupService = GWT
-			.create(GroupService.class);
+	// crea il servizio per il table
+	private final TableServiceAsync tableService = GWT
+			.create(TableService.class);
 
 	// crea il servizio per il notification
 	protected final NotificationServiceAsync notificationService = GWT
@@ -84,7 +84,7 @@ public class TablePlus implements EntryPoint {
 							n.setSenderEmail(user.getEmail());
 							n.setSenderKey(user.getKey());
 							n.setEventKind("MEMBEROFFLINE");
-							n.setOwningGroups(user.getGroups());
+							n.setOwningTables(user.getTables());
 							n.setMemberEmail(user.getEmail());
 							throwNotification(n);
 
@@ -171,7 +171,7 @@ public class TablePlus implements EntryPoint {
 				n.setSenderEmail(user.getEmail());
 				n.setSenderKey(user.getKey());
 				n.setEventKind("MEMBERONLINE");
-				n.setOwningGroups(user.getGroups());
+				n.setOwningTables(user.getTables());
 				n.setMemberEmail(user.getEmail());
 				throwNotification(n);
 
@@ -293,7 +293,7 @@ public class TablePlus implements EntryPoint {
 			String code = com.google.gwt.user.client.Window.Location
 					.getParameter("code");
 
-			notificationService.getInvitedGroupKey(code, user.getEmail(),
+			notificationService.getInvitedTableKey(code, user.getEmail(),
 					new AsyncCallback<Long>() {
 
 						@Override
@@ -310,7 +310,7 @@ public class TablePlus implements EntryPoint {
 
 								tmp = result;
 								// Auto-generated method stub
-								groupService.addMemberToGroup(user.getKey(),
+								tableService.addMemberToTable(user.getKey(),
 										result, new AsyncCallback<Boolean>() {
 
 											@Override
@@ -329,10 +329,10 @@ public class TablePlus implements EntryPoint {
 														.getEmail());
 												n.setSenderKey(TablePlus.user
 														.getKey());
-												n.setEventKind("MEMBERGROUPADD");
+												n.setEventKind("MEMBERTABLEADD");
 												n.setMemberEmail(user
 														.getEmail());
-												n.setGroupKey(tmp);
+												n.setTableKey(tmp);
 												n.setStatus(user.isOnline() ? "ONLINE"
 														: "OFFLINE");
 
@@ -396,7 +396,7 @@ public class TablePlus implements EntryPoint {
 		// carica il personal table
 		desktop.loadPersonalTable(personalTable);
 
-		caricaListaGruppi();
+		loadTablesList();
 
 	}
 	
@@ -404,25 +404,25 @@ public class TablePlus implements EntryPoint {
 	 * Carica i tavoli degli utenti: per ognuno crea un oggetto tableUI. 
 	 */
 
-	public void caricaListaGruppi() {
+	public void loadTablesList() {
 		// carica la lista di gruppi dell'utente corrente
-		groupService.queryGroups(user.getGroups(),
-				new AsyncCallback<List<Group>>() {
+		tableService.queryTables(user.getTables(),
+				new AsyncCallback<List<Table>>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						// Auto-generated method stub
 					}
 
 					@Override
-					public void onSuccess(List<Group> result) {
+					public void onSuccess(List<Table> result) {
 						// Auto-generated method stub
-						for (Group g : result) {
+						for (Table t : result) {
 
-							TableUI gt = new TableUI(g);
+							TableUI gt = new TableUI(t);
 
-							desktop.addGroupTable(gt);
+							desktop.addTable(gt);
 						}
-						personalTable.getRightPanel().myGroupsPanel.addData();
+						personalTable.getRightPanel().myTablesPanel.addData();
 						startNotificationListener();
 
 						// vediamo di gestire il canale di comunicazione
@@ -498,7 +498,7 @@ public class TablePlus implements EntryPoint {
 
 		// fa partire il listener delle notifiche
 		try {
-			notificationService.waitForNotification(user.getGroups(), new Long(
+			notificationService.waitForNotification(user.getTables(), new Long(
 					clientSeqNumber), user.getEmail(),
 					new AsyncCallback<List<Notification>>() {
 
@@ -523,13 +523,13 @@ public class TablePlus implements EntryPoint {
 								// perchè,
 								// nel caso in cui la notifica riguardi il MIO
 								// essere
-								// stato aggiunto a un gruppo, prima di far
+								// stato aggiunto a un tavolo, prima di far
 								// ripartire il
 								// listener devo aggiornare le mie
 								// sottoscrizioni,
-								// aggiungendo questo nuovo gruppo
+								// aggiungendo questo nuovo tavolo
 								if (!(result.get(0).getEventKind()
-										.equals("MEMBERGROUPADD") && result
+										.equals("MEMBERTABLEADD") && result
 										.get(0).getMemberEmail()
 										.equals(user.getEmail())))
 									startNotificationListener();
@@ -558,33 +558,33 @@ public class TablePlus implements EntryPoint {
 
 		if (// n.getEventKind().equals("MEMBERONLINE")||
 		n.getEventKind().equals("MEMBEROFFLINE")) {
-			for (TableUI t : desktop.getGroupTables())
-				for (Long memberGroup : n.getOwningGroups())
-					if (t.groupKey.compareTo(memberGroup) == 0)
+			for (TableUI t : desktop.getTables())
+				for (Long memberTable : n.getOwningTables())
+					if (t.tableKey.compareTo(memberTable) == 0)
 						t.getRightPanel().membersPanel.refreshMembersTree(n);
 		}
 
-		if (n.getEventKind().equals("MEMBERGROUPADD")) {
+		if (n.getEventKind().equals("MEMBERTABLEADD")) {
 
-			for (TableUI t : desktop.getGroupTables())
-				if (t.groupKey.compareTo(n.getGroupKey()) == 0)
+			for (TableUI t : desktop.getTables())
+				if (t.tableKey.compareTo(n.getTableKey()) == 0)
 					t.getRightPanel().membersPanel.refreshMembersTree(n);
 
 			if (n.getMemberEmail().equals(user.getEmail()))
-				invitedToNewGroup(n);
+				invitedToNewTable(n);
 		}
 
 		if (n.getEventKind().equals("MEMBERHIDDEN")
 				|| n.getEventKind().equals("MEMBERVISIBLE")) {
-			for (TableUI t : desktop.getGroupTables())
-				if (t.groupKey.compareTo(n.getGroupKey()) == 0)
+			for (TableUI t : desktop.getTables())
+				if (t.tableKey.compareTo(n.getTableKey()) == 0)
 					t.getRightPanel().membersPanel.refreshMembersTree(n);
 		}
 
 		if (n.getEventKind().equals("SELECTIVEPRESENCEOFF")
 				|| n.getEventKind().equals("SELECTIVEPRESENCEON")) {
-			for (TableUI t : desktop.getGroupTables())
-				if (t.groupKey.compareTo(n.getGroupKey()) == 0)
+			for (TableUI t : desktop.getTables())
+				if (t.tableKey.compareTo(n.getTableKey()) == 0)
 					t.getRightPanel().membersPanel.refreshMembersTree(n);
 		}
 
@@ -594,7 +594,7 @@ public class TablePlus implements EntryPoint {
 	 *
 	 */
 
-	public void invitedToNewGroup(Notification n) {
+	public void invitedToNewTable(Notification n) {
 
 		// (10)aggiorna l'utente corrente
 		userService.queryUser(user.getKey(), new AsyncCallback<User>() {
@@ -609,23 +609,23 @@ public class TablePlus implements EntryPoint {
 			}
 		});
 
-		// (13)recupera il gruppo
-		groupService.queryGroup(n.getGroupKey(), new AsyncCallback<Group>() {
+		// (13)recupera il tavolo
+		tableService.queryTable(n.getTableKey(), new AsyncCallback<Table>() {
 			@Override
 			public void onFailure(Throwable caught) {
 			}
 
 			@Override
-			public void onSuccess(Group result) {
-				// (15)crea un grouptable sulla base del gruppo
+			public void onSuccess(Table result) {
+				// (15)crea un table sulla base del tavolo
 				TableUI gt = new TableUI(result);
 
 				// (20)aggiungi il nuovo table al desktop
-				desktop.addGroupTable(gt);
+				desktop.addTable(gt);
 
 				// (30)aggiorna l'elenco gruppi in personalpanel
-				personalTable.getRightPanel().myGroupsPanel
-						.addNewGroupToTree(gt);
+				personalTable.getRightPanel().myTablesPanel
+						.addNewTableToTree(gt);
 			}
 		});
 

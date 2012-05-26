@@ -24,7 +24,7 @@ import com.unito.tableplus.client.TablePlus;
 import com.unito.tableplus.client.gui.RightPanel;
 import com.unito.tableplus.shared.model.Document;
 
-public class GroupResourcesPanel extends ContentPanel {
+public class TableResourcesPanel extends ContentPanel {
 
 	public RightPanel rightPanel;
 
@@ -41,7 +41,7 @@ public class GroupResourcesPanel extends ContentPanel {
 	 * @return void
 	 */
 
-	public GroupResourcesPanel(RightPanel rightPanel_) {
+	public TableResourcesPanel(RightPanel rightPanel_) {
 		this.rightPanel = rightPanel_;
 
 		setHeading("Table Objects");
@@ -62,18 +62,18 @@ public class GroupResourcesPanel extends ContentPanel {
 
 	public void populateLeftLayoutContainer() {
 		// button per il refresh dei miei documenti
-		Button refreshGroupResources = new Button();
-		refreshGroupResources.setToolTip(new ToolTipConfig(
+		Button refreshTableResources = new Button();
+		refreshTableResources.setToolTip(new ToolTipConfig(
 				"Refresh objects list"));
-		refreshGroupResources.setIcon(IconHelper.createStyle("arrow_refresh"));
-		refreshGroupResources
+		refreshTableResources.setIcon(IconHelper.createStyle("arrow_refresh"));
+		refreshTableResources
 				.addSelectionListener(new SelectionListener<ButtonEvent>() {
 					@Override
 					public void componentSelected(ButtonEvent ce) {
-						// refreshGroupResourcesTree();
+						// refreshTableResourcesTree();
 					}
 				});
-		leftLayoutContainer.add(refreshGroupResources);
+		leftLayoutContainer.add(refreshTableResources);
 
 		// button per tornare al personal table
 		Button backToPersonalTable = new Button();
@@ -158,8 +158,8 @@ public class GroupResourcesPanel extends ContentPanel {
 		rightLayoutContainer.setHeight("100%");
 		rightLayoutContainer.setWidth(300);
 		add(rightLayoutContainer);
-		// groupObjectTreeLc.layout();
-		// groupResources.layout();
+		// tableObjectTreeLc.layout();
+		// tableResources.layout();
 	}
 
 	public void addData() {

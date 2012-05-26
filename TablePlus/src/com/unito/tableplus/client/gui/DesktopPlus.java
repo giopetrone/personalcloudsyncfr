@@ -35,17 +35,17 @@ import com.unito.tableplus.shared.model.User;
 
 public class DesktopPlus extends Desktop {
 
-	private List<TableUI> groupTables = new ArrayList<TableUI>();
+	private List<TableUI> tables = new ArrayList<TableUI>();
 	private TableUI currentTable;
 	private RightPanel currentRightPanel;
 	// listener dedicato al menu
 	private SelectionListener<MenuEvent> menuListener;
-	private SelectionListener<MenuEvent> groupMenuListener;
+	private SelectionListener<MenuEvent> tableMenuListener;
 	// listener dedicato agli shortcut
 	public SelectionListener<ComponentEvent> shortcutListener;
 	protected StartMenu startMenu;
 	private List<MenuItem> menuItems = new ArrayList<MenuItem>();
-	public Menu groupsSubMenu = new Menu();
+	public Menu tablesSubMenu = new Menu();
 	String logoutUrl;
 	// crea il servizio per l'utente
 	private final UserServiceAsync userService = GWT.create(UserService.class);
@@ -68,7 +68,7 @@ public class DesktopPlus extends Desktop {
 			public void componentSelected(MenuEvent me) {
 				String s = ((MenuItem) me.getItem()).getText();
 
-				if (s.contains("Group") || s.contains("Personal Table")) {
+				if (s.contains("Table") || s.contains("Personal Table")) {
 					switchToTable(s);
 				} else if (s.equals("Add Table")) {
 					createTable();
@@ -79,7 +79,7 @@ public class DesktopPlus extends Desktop {
 		});
 
 		// (3)setta il listener per il cambio dei tavoli
-		groupMenuListener = new SelectionListener<MenuEvent>() {
+		tableMenuListener = new SelectionListener<MenuEvent>() {
 			@Override
 			public void componentSelected(MenuEvent me) {
 				String s = ((MenuItem) me.getItem()).getText();
@@ -121,13 +121,13 @@ public class DesktopPlus extends Desktop {
 		s.addSelectionListener(shortcutListener);
 		this.addShortcut(s);
 
-		// groups manager
-		WindowPlus groupsManagerWindow = new GroupsManagerWindow();
-		addWindow(groupsManagerWindow);
+		// tables manager
+		WindowPlus tablesManagerWindow = new TablesManagerWindow();
+		addWindow(tablesManagerWindow);
 		s = new Shortcut();
-		s.setText("Groups Manager");
-		s.setId("groupsmanager-win-shortcut");
-		s.setData("window", groupsManagerWindow);
+		s.setText("Tables Manager");
+		s.setId("tablesmanager-win-shortcut");
+		s.setData("window", tablesManagerWindow);
 		s.addSelectionListener(shortcutListener);
 		this.addShortcut(s);
 
@@ -150,16 +150,6 @@ public class DesktopPlus extends Desktop {
 		s.setData("window", myResourcesWindow);
 		s.addSelectionListener(shortcutListener);
 		this.addShortcut(s);
-		
-		//DropBox
-		WindowPlus dropBox = new DropBox();
-		addWindow(dropBox);
-		s = new Shortcut();
-		s.setText("DropBox");
-		s.setId("dropbox");
-		s.setData("window", dropBox);
-		s.addSelectionListener(shortcutListener);
-		this.addShortcut(s);
 	}
 
 	public void setStartMenu() {
@@ -175,8 +165,8 @@ public class DesktopPlus extends Desktop {
 		startMenu.add(menuItem);
 
 		menuItem = new MenuItem("Switch Table");
-		setGroupSubMenu();
-		menuItem.setSubMenu(groupsSubMenu);
+		setTableSubMenu();
+		menuItem.setSubMenu(tablesSubMenu);
 		startMenu.add(menuItem);
 
 		menuItem = new MenuItem("Tab Window");
@@ -262,7 +252,7 @@ public class DesktopPlus extends Desktop {
 				n.setSenderEmail(user.getEmail());
 				n.setSenderKey(user.getKey());
 				n.setEventKind("MEMBEROFFLINE");
-				n.setOwningGroups(user.getGroups());
+				n.setOwningTables(user.getTables());
 				n.setMemberEmail(user.getEmail());
 				throwNotification(n);
 
@@ -280,11 +270,11 @@ public class DesktopPlus extends Desktop {
 		});
 	}
 
-	public void setGroupSubMenu() {
+	public void setTableSubMenu() {
 		MenuItem item_ = new MenuItem("Personal Table");
-		item_.addSelectionListener(groupMenuListener);
+		item_.addSelectionListener(tableMenuListener);
 		menuItems.add(item_);
-		groupsSubMenu.add(item_);
+		tablesSubMenu.add(item_);
 	}
 
 	public void createTable() {
@@ -312,8 +302,8 @@ public class DesktopPlus extends Desktop {
 		if (s.equals("Personal Table"))
 			loadTable(TablePlus.personalTable);
 		else
-			for (TableUI t : groupTables) {
-				if (t.groupName.equals(s))
+			for (TableUI t : tables) {
+				if (t.tableName.equals(s))
 					loadTable(t);
 			}
 
@@ -326,7 +316,7 @@ public class DesktopPlus extends Desktop {
 		// parte il timer della presence selettiva (a meno che non sia il
 		// personal table)
 
-		if (currentTable.groupKey != null) {
+		if (currentTable.tableKey != null) {
 			tableToLeave = currentTable;
 			tableToLeave.timer = new Timer() {
 				@Override
@@ -362,7 +352,7 @@ public class DesktopPlus extends Desktop {
 		// ferma il timer della presence selettiva (a meno che non sia il
 		// personal table)
 
-		if (currentTable.groupName != null) {
+		if (currentTable.tableName != null) {
 			tableToJoin = currentTable;
 			// System.out.println("AAA");
 			// se il timer è attivo (ma non ho un modo per controllare)
@@ -464,29 +454,29 @@ public class DesktopPlus extends Desktop {
 		this.currentRightPanel = rightPanel;
 	}
 
-	public List<TableUI> getGroupTables() {
-		return groupTables;
+	public List<TableUI> getTables() {
+		return tables;
 	}
 
-	public void setGroupTables(List<TableUI> groupTables) {
-		this.groupTables = groupTables;
+	public void setTables(List<TableUI> tables) {
+		this.tables = tables;
 	}
 
-	public void addGroupTable(TableUI t) {
-		this.groupTables.add(t);
+	public void addTable(TableUI t) {
+		this.tables.add(t);
 		for (Shortcut s : t.getShortcuts()) {
 			this.addShortcut(s);
 			s.addSelectionListener(shortcutListener);
 			s.setVisible(false);
 		}
-		updateGroupsList(t);
+		updateTablesList(t);
 	}
 
-	public void updateGroupsList(TableUI t) {
-		MenuItem item_ = new MenuItem(t.groupName);
-		item_.addSelectionListener(groupMenuListener);
+	public void updateTablesList(TableUI t) {
+		MenuItem item_ = new MenuItem(t.tableName);
+		item_.addSelectionListener(tableMenuListener);
 		menuItems.add(item_);
-		groupsSubMenu.add(item_);
+		tablesSubMenu.add(item_);
 		taskBar.layout();
 	}
 

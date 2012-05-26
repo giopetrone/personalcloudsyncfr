@@ -24,7 +24,7 @@ public class Invitation implements Serializable{
 	private String code;
 	
 	@Persistent
-	private Long groupKey;
+	private Long tableKey;
 
 	public Long getKey() {
 		return key;
@@ -42,12 +42,12 @@ public class Invitation implements Serializable{
 		this.code = code;
 	}
 
-	public Long getGroupKey() {
-		return groupKey;
+	public Long getTableKey() {
+		return tableKey;
 	}
 
-	public void setGroupKey(Long groupKey) {
-		this.groupKey = groupKey;
+	public void setTableKey(Long tableKey) {
+		this.tableKey = tableKey;
 	}
 	
 	

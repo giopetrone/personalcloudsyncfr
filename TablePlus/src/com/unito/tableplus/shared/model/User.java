@@ -31,7 +31,7 @@ public class User implements Serializable {
 	private String email;
 
 	@Persistent
-	private List<Long> groups=new ArrayList<Long>();
+	private List<Long> tables=new ArrayList<Long>();
 
 	@Persistent
 	private String token;
@@ -113,16 +113,16 @@ public class User implements Serializable {
 		this.loginProvider = loginProvider;
 	}
 
-	public List<Long> getGroups() {
-		return groups;
+	public List<Long> getTables() {
+		return tables;
 	}
 
-	public void setGroups(List<Long> groups) {
-		this.groups = groups;
+	public void setTables(List<Long> tables) {
+		this.tables = tables;
 	}
 	
-	public void addGroup(Long group){
-		this.groups.add(group);
+	public void addTable(Long table){
+		this.tables.add(table);
 	}
 
 }

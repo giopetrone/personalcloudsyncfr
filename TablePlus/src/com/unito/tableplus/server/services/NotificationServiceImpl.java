@@ -13,7 +13,7 @@ import com.google.appengine.api.mail.MailService;
 import com.google.appengine.api.mail.MailServiceFactory;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.unito.tableplus.client.services.NotificationService;
-import com.unito.tableplus.shared.model.Group;
+import com.unito.tableplus.shared.model.Table;
 import com.unito.tableplus.shared.model.Invitation;
 import com.unito.tableplus.shared.model.Notification;
 import com.unito.tableplus.shared.model.User;
@@ -35,14 +35,14 @@ public class NotificationServiceImpl extends RemoteServiceServlet implements
 
 	@Override
 	public boolean sendEmail(String sender, String recipient,
-			String emailSubject, String emailBody, Long groupKey) {
+			String emailSubject, String emailBody, Long tableKey) {
 
 		String code = UUID.randomUUID().toString();
 
 		// Crea un oggetto "invito"
 		Invitation i = new Invitation();
 		i.setCode(code);
-		i.setGroupKey(groupKey);
+		i.setTableKey(tableKey);
 
 		try {
 			MailService mailService = MailServiceFactory.getMailService();
@@ -104,7 +104,7 @@ public class NotificationServiceImpl extends RemoteServiceServlet implements
 
 	@Override
 	public List<Notification> waitForNotification(
-			List<Long> groupKeySubscription, Long clientSeqNumber,
+			List<Long> tableKeySubscription, Long clientSeqNumber,
 			String clientEmail) {
 
 		log.warning("DENTROOOO: clientSeqNumber=" + clientSeqNumber
@@ -119,8 +119,8 @@ public class NotificationServiceImpl extends RemoteServiceServlet implements
 		// }, 5000);
 
 		// String sub = "";
-		// for (Long myGroup : groupKeySubscription)
-		// sub = sub + ", " + myGroup;
+		// for (Long myTable : tableKeySubscription)
+		// sub = sub + ", " + myTable;
 		// System.out.println(clientEmail + " ("
 		// + Thread.currentThread().getName()
 		// +
@@ -175,31 +175,31 @@ public class NotificationServiceImpl extends RemoteServiceServlet implements
 			// appartiene ad almeno un mio stesso gruppo
 			if (n.getEventKind().equals("MEMBERONLINE")
 					|| n.getEventKind().equals("MEMBEROFFLINE")) {
-				for (Long memberGroup : n.getOwningGroups())
-					for (Long myGroup : groupKeySubscription)
-						if (myGroup.compareTo(memberGroup) == 0)
+				for (Long memberTable : n.getOwningTables())
+					for (Long myTable : tableKeySubscription)
+						if (myTable.compareTo(memberTable) == 0)
 							needed = true;
 			}
 
 			if (n.getEventKind().equals("MEMBERVISIBLE")
 					|| n.getEventKind().equals("MEMBERHIDDEN"))
-				for (Long myGroup : groupKeySubscription)
-					if (myGroup.compareTo(n.getGroupKey()) == 0)
+				for (Long myTable : tableKeySubscription)
+					if (myTable.compareTo(n.getTableKey()) == 0)
 						needed = true;
 
 			if (n.getEventKind().equals("SELECTIVEPRESENCEON")
 					|| n.getEventKind().equals("SELECTIVEPRESENCEOFF"))
-				for (Long myGroup : groupKeySubscription)
-					if (myGroup.compareTo(n.getGroupKey()) == 0)
+				for (Long myTable : tableKeySubscription)
+					if (myTable.compareTo(n.getTableKey()) == 0)
 						needed = true;
 
 			// quando viene aggiunto un membro ad un gruppo è interessante
 			// se
 			// 1) io appartengo a quel gruppo
 			// 2) io non appartengo a quel gruppo, ma sono l'invitato
-			if (n.getEventKind().equals("MEMBERGROUPADD")) {
-				for (Long myGroup : groupKeySubscription)
-					if (myGroup.compareTo(n.getGroupKey()) == 0)
+			if (n.getEventKind().equals("MEMBERTABLEADD")) {
+				for (Long myTable : tableKeySubscription)
+					if (myTable.compareTo(n.getTableKey()) == 0)
 						needed = true;
 
 				if (n.getMemberEmail().equals(clientEmail))
@@ -251,14 +251,14 @@ public class NotificationServiceImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public Long getInvitedGroupKey(String code, String email) {
+	public Long getInvitedTableKey(String code, String email) {
 
 		Invitation i = queryInvitationByCode("code", code);
 		if (i == null)
 			return (long) -1;
 		else {
 			deleteInvitation(i.getKey());
-			return i.getGroupKey();
+			return i.getTableKey();
 		}
 	}
 

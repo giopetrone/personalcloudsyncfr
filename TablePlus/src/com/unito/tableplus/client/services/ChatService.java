@@ -49,6 +49,6 @@ public interface ChatService extends RemoteService {
 			List<String> recipients);
 	
 	String sendMessage(String sender, String content, MessageType type, 
-			List<String> recipients,Long groupKey);
+			List<String> recipients,Long tableKey);
 
 }

@@ -77,9 +77,9 @@ public class ChatServiceImpl extends RemoteServiceServlet implements
 
 	@Override
 	public String sendMessage(String sender, String content, MessageType type,
-			List<String> recipients, Long groupKey) {
+			List<String> recipients, Long tableKey) {
 		try {
-			JSONObject jsonMessage =  JSONMessageBuilder(sender, type.toString(), content,groupKey.toString());
+			JSONObject jsonMessage =  JSONMessageBuilder(sender, type.toString(), content,tableKey.toString());
 			for (String user : recipients)
 				//if(!user.equals(sender))
 					channelService.sendMessage(new ChannelMessage(user,
@@ -155,12 +155,12 @@ public class ChatServiceImpl extends RemoteServiceServlet implements
 	}
 	
 	private static JSONObject JSONMessageBuilder(String sender, String type,
-			String content,String groupKey) throws JSONException {
+			String content,String tableKey) throws JSONException {
 		JSONObject jsonMessage = new JSONObject();
 		jsonMessage.append("sender", sender);
 		jsonMessage.append("type", type);
 		jsonMessage.append("content", content);
-		jsonMessage.append("groupKey", groupKey);
+		jsonMessage.append("tableKey", tableKey);
 		return jsonMessage;
 	}
 }

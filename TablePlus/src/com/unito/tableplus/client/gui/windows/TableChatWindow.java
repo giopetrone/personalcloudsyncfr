@@ -30,7 +30,7 @@ import com.unito.tableplus.client.services.ChatService;
 import com.unito.tableplus.client.services.ChatServiceAsync;
 import com.unito.tableplus.shared.model.MessageType;
 
-public class GroupChatWindow extends WindowPlus {
+public class TableChatWindow extends WindowPlus {
 
 	Html allText = new Html("");
 
@@ -46,15 +46,15 @@ public class GroupChatWindow extends WindowPlus {
 
 	LayoutContainer lc;
 
-	public GroupChatWindow(TableUI table_) {
+	public TableChatWindow(TableUI table_) {
 		super();
 		this.table = table_;
-		setHeading("Group Chat");
+		setHeading("Table Chat");
 
 		BorderLayout borderLayout = new BorderLayout();
 		setLayout(new RowLayout(Orientation.VERTICAL));
 
-		// (01) Al centro l'area dei messaggi che arrivano dal gruppo
+		// (01) Al centro l'area dei messaggi che arrivano dal tavolo
 		lc = new LayoutContainer();
 
 		lc.setLayout(new FitLayout());
@@ -147,7 +147,7 @@ public class GroupChatWindow extends WindowPlus {
 		if (myTextTA.getValue() != null)
 			chatService.sendMessage(TablePlus.user.getEmail(),
 					myTextTA.getValue() + "\n", MessageType.GENERIC,
-					table.selectivePresenceMembers, table.groupKey,
+					table.selectivePresenceMembers, table.tableKey,
 					new AsyncCallback<String>() {
 
 						@Override

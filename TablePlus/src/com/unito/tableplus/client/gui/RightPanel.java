@@ -23,13 +23,13 @@ import com.extjs.gxt.ui.client.widget.treepanel.TreePanel;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.unito.tableplus.client.TablePlus;
-import com.unito.tableplus.client.gui.quickviewpanels.GroupResourcesPanel;
+import com.unito.tableplus.client.gui.quickviewpanels.TableResourcesPanel;
 import com.unito.tableplus.client.gui.quickviewpanels.MembersPanel;
-import com.unito.tableplus.client.gui.quickviewpanels.MyGroupsPanel;
+import com.unito.tableplus.client.gui.quickviewpanels.MyTablesPanel;
 import com.unito.tableplus.client.gui.quickviewpanels.MyResourcesPanel;
 import com.unito.tableplus.client.gui.quickviewpanels.WalletPanel;
-import com.unito.tableplus.client.services.GroupService;
-import com.unito.tableplus.client.services.GroupServiceAsync;
+import com.unito.tableplus.client.services.TableService;
+import com.unito.tableplus.client.services.TableServiceAsync;
 import com.unito.tableplus.client.services.NotificationService;
 import com.unito.tableplus.client.services.NotificationServiceAsync;
 import com.unito.tableplus.shared.model.Notification;
@@ -37,8 +37,8 @@ import com.unito.tableplus.shared.model.Notification;
 public class RightPanel extends ContentPanel {
 
 	// servizi
-	public final GroupServiceAsync groupService = GWT
-			.create(GroupService.class);
+	public final TableServiceAsync tableService = GWT
+			.create(TableService.class);
 	public final NotificationServiceAsync notificationService = GWT
 			.create(NotificationService.class);
 
@@ -48,11 +48,11 @@ public class RightPanel extends ContentPanel {
 	public WalletPanel walletPanel;
 	public MyResourcesPanel myResourcesPanel;
 	public MembersPanel membersPanel;
-	public MyGroupsPanel myGroupsPanel;
-	public GroupResourcesPanel groupResourcesPanel;
+	public MyTablesPanel myTablesPanel;
+	public TableResourcesPanel tableResourcesPanel;
 
 	// altro
-	public boolean isGroupTable = true;
+	public boolean isTable = true;
 
 	/**
 	 * Costruttore
@@ -60,9 +60,9 @@ public class RightPanel extends ContentPanel {
 	 * @return void
 	 */
 
-	public RightPanel(TableUI tableUI_, boolean isGroupTable_) {
+	public RightPanel(TableUI tableUI_, boolean isTable_) {
 		this.tableUI = tableUI_;
-		this.isGroupTable = isGroupTable_;
+		this.isTable = isTable_;
 
 		setLayout(new FillLayout(Orientation.VERTICAL));
 		setCollapsible(true);
@@ -72,8 +72,8 @@ public class RightPanel extends ContentPanel {
 
 		addToolBar();
 
-		if (isGroupTable)
-			groupPanel();
+		if (isTable)
+			tablePanel();
 		else
 			personalPanel();
 	}
@@ -94,19 +94,19 @@ public class RightPanel extends ContentPanel {
 		myResourcesPanel = new MyResourcesPanel(this);
 		add(myResourcesPanel);
 
-		myGroupsPanel = new MyGroupsPanel(this);
-		add(myGroupsPanel);
+		myTablesPanel = new MyTablesPanel(this);
+		add(myTablesPanel);
 	}
 
 	/**
-	 * Istruzioni riservate al group table
+	 * Istruzioni riservate al table table
 	 * 
 	 * @return void
 	 */
 
-	public void groupPanel() {
+	public void tablePanel() {
 
-		setHeading("Quick View - " + tableUI.groupName);
+		setHeading("Quick View - " + tableUI.tableName);
 
 		membersPanel = new MembersPanel(this);
 		add(membersPanel);
@@ -114,8 +114,8 @@ public class RightPanel extends ContentPanel {
 		myResourcesPanel = new MyResourcesPanel(this);
 		add(myResourcesPanel);
 
-		groupResourcesPanel = new GroupResourcesPanel(this);
-		add(groupResourcesPanel);
+		tableResourcesPanel = new TableResourcesPanel(this);
+		add(tableResourcesPanel);
 
 		addDnd();
 	}
@@ -208,15 +208,15 @@ public class RightPanel extends ContentPanel {
 			@Override
 			public void dragDrop(DNDEvent e) {
 				System.out.println("ID ---> "+e.getTarget().getId());
-				//se il rilascio dell'oggetto avviene nella lista dei Group objects...
+				//se il rilascio dell'oggetto avviene nella lista dei Table objects...
 				if (e.getDropTarget().getClass().toString()
 						.contains("TreePanelDropTarget")) {
 					@SuppressWarnings("rawtypes")
 					TreePanel tree = ((TreePanel) e.getComponent());
 					ModelData sel = tree.getSelectionModel().getSelectedItem();
 
-					groupService.addDocumentToGroup((String) sel.get("docId"),
-							TablePlus.user, tableUI.groupKey,
+					tableService.addDocumentToTable((String) sel.get("docId"),
+							TablePlus.user, tableUI.tableKey,
 							new AsyncCallback<Boolean>() {
 								@Override
 								public void onFailure(Throwable caught) {
@@ -228,7 +228,7 @@ public class RightPanel extends ContentPanel {
 									// classe Table
 
 									// (02) Aggiorno la vista dei documenti nel
-									// groupResourcesPanel
+									// tableResourcesPanel
 								}
 							});
 					super.dragDrop(e);
@@ -257,7 +257,7 @@ public class RightPanel extends ContentPanel {
 		source.addDNDListener(listener);
 
 		TreePanelDropTarget target = new TreePanelDropTarget(
-				groupResourcesPanel.treePanel);
+				tableResourcesPanel.treePanel);
 		target.setOperation(Operation.COPY);
 
 		DropTarget dropTarget = new DropTarget(TablePlus.desktop.getDesktop());

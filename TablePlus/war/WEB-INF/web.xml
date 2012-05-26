@@ -9,13 +9,13 @@
 	<!-- GROUP SERVLET -->
 
 	<servlet>
-		<servlet-name>groupServlet</servlet-name>
-		<servlet-class>com.unito.tableplus.server.services.GroupServiceImpl</servlet-class>
+		<servlet-name>tableServlet</servlet-name>
+		<servlet-class>com.unito.tableplus.server.services.TableServiceImpl</servlet-class>
 	</servlet>
 
 	<servlet-mapping>
-		<servlet-name>groupServlet</servlet-name>
-		<url-pattern>/tableplus/group-service</url-pattern>
+		<servlet-name>tableServlet</servlet-name>
+		<url-pattern>/tableplus/table-service</url-pattern>
 	</servlet-mapping>
 
 	<!-- OBJECT SERVLET -->

@@ -9,12 +9,12 @@ import com.unito.tableplus.shared.model.Notification;
 @RemoteServiceRelativePath("notification-service")
 public interface NotificationService extends RemoteService{
 
-	boolean sendEmail(String sender, String recipient,String emailSubject, String emailBody, Long groupKey);
+	boolean sendEmail(String sender, String recipient,String emailSubject, String emailBody, Long tableKey);
 	
-	List<Notification> waitForNotification(List<Long> groupKeySubscription, Long clientSeqNumber, String clientEmail);
+	List<Notification> waitForNotification(List<Long> tableKeySubscription, Long clientSeqNumber, String clientEmail);
 	
 	boolean sendNotification(Notification notification);
 	
-	Long getInvitedGroupKey(String code,String email);
+	Long getInvitedTableKey(String code,String email);
 	
 }

@@ -31,7 +31,7 @@ public class Message implements Serializable {
 	@Persistent
 	private int hashcode;
 	@Persistent
-	private Group group;
+	private Table table;
 
 	public Message(Long author, MessageType type, String content) {
 		date = new Timestamp(new Date().getTime()).toString();
@@ -100,7 +100,7 @@ public class Message implements Serializable {
 		return key;
 	}
 
-	public Group getTable() {
-		return group;
+	public Table getTable() {
+		return table;
 	}
 }

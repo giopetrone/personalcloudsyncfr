@@ -9,17 +9,17 @@ import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.unito.tableplus.client.TablePlus;
 import com.unito.tableplus.client.gui.windows.DocWindow;
-import com.unito.tableplus.client.gui.windows.GroupChatWindow;
-import com.unito.tableplus.client.gui.windows.GroupResourcesWindow;
+import com.unito.tableplus.client.gui.windows.TableChatWindow;
+import com.unito.tableplus.client.gui.windows.TableResourcesWindow;
 import com.unito.tableplus.client.gui.windows.WindowPlus;
-import com.unito.tableplus.client.services.GroupService;
-import com.unito.tableplus.client.services.GroupServiceAsync;
+import com.unito.tableplus.client.services.TableService;
+import com.unito.tableplus.client.services.TableServiceAsync;
 import com.unito.tableplus.client.services.NotificationService;
 import com.unito.tableplus.client.services.NotificationServiceAsync;
 import com.unito.tableplus.client.services.UserService;
 import com.unito.tableplus.client.services.UserServiceAsync;
 import com.unito.tableplus.shared.model.Document;
-import com.unito.tableplus.shared.model.Group;
+import com.unito.tableplus.shared.model.Table;
 import com.unito.tableplus.shared.model.Notification;
 import com.unito.tableplus.shared.model.User;
 
@@ -29,11 +29,11 @@ public class TableUI {
         public RightPanel rightPanel;
         private List<WindowPlus> windows = new ArrayList<WindowPlus>();
         private List<Shortcut> shortcuts = new ArrayList<Shortcut>();
-        public WindowPlus groupChatWindow;
+        public WindowPlus tableChatWindow;
 
         // informazioni
-        public String groupName;
-        public Long groupKey;
+        public String tableName;
+        public Long tableKey;
         public List<String> onlineMembersEmail = new ArrayList<String>();
         public List<String> offlineMembersEmail = new ArrayList<String>();
         public List<String> hiddenMembersEmail = new ArrayList<String>();
@@ -42,8 +42,8 @@ public class TableUI {
 
         // servizi
         public final UserServiceAsync userService = GWT.create(UserService.class);
-        public final GroupServiceAsync groupService = GWT
-                        .create(GroupService.class);
+        public final TableServiceAsync tableService = GWT
+                        .create(TableService.class);
         public final NotificationServiceAsync notificationService = GWT
                         .create(NotificationService.class);
 
@@ -63,39 +63,39 @@ public class TableUI {
         }
 
         /**
-         * Costruttore per group table
+         * Costruttore per table table
          *
          * @return void
          */
 
-        public TableUI(Group group) {
-                this.groupName = group.getName();
-                this.groupKey = group.getKey();
+        public TableUI(Table table) {
+                this.tableName = table.getName();
+                this.tableKey = table.getKey();
                 this.rightPanel = new RightPanel(this, true);
 
                 // -(1)- crea delle finestre; credo che di default, una volta
                 // aggiunte al desktop, siano inizialmente invisibili
-                WindowPlus groupResourcesWindow = new GroupResourcesWindow();// createGridWindow();
-                addWindow(groupResourcesWindow);
-                groupChatWindow = new GroupChatWindow(this);
-                addWindow(groupChatWindow);
+                WindowPlus tableResourcesWindow = new TableResourcesWindow();// createGridWindow();
+                addWindow(tableResourcesWindow);
+                tableChatWindow = new TableChatWindow(this);
+                addWindow(tableChatWindow);
 
-                // group resources
+                // table resources
                 Shortcut s = new Shortcut();
-                s.setText("Group Resources");
-                s.setId("groupresources-win-shortcut");
-                s.setData("window", groupResourcesWindow);
+                s.setText("Table Resources");
+                s.setId("tableresources-win-shortcut");
+                s.setData("window", tableResourcesWindow);
                 this.addShortcut(s);
 
-                // group chat
+                // table chat
                 Shortcut s2 = new Shortcut();
-                s2.setText("Group Chat");
+                s2.setText("Table Chat");
                 s2.setId("chat-win-shortcut");
-                s2.setData("window", groupChatWindow);
+                s2.setData("window", tableChatWindow);
                 this.addShortcut(s2);
 
-                createMembersList(group);
-                createGoogleDocsList(group);
+                createMembersList(table);
+                createGoogleDocsList(table);
 
         }
 
@@ -105,9 +105,9 @@ public class TableUI {
          * @return void
          */
 
-        public void createMembersList(Group group_) {
-                final Group group = group_;
-                userService.queryUsers(group.getMembers(),
+        public void createMembersList(Table table_) {
+                final Table table = table_;
+                userService.queryUsers(table.getMembers(),
                                 new AsyncCallback<List<User>>() {
                                         @Override
                                         public void onFailure(Throwable caught) {
@@ -126,9 +126,9 @@ public class TableUI {
                                                                 // --- && con presenceSelective
 
                                                                 if (u.isOnline()
-                                                                                && !(group.getHiddenMembers()
+                                                                                && !(table.getHiddenMembers()
                                                                                                 .contains(u.getKey()))
-                                                                                && group.getSelectivePresenceMembers()
+                                                                                && table.getSelectivePresenceMembers()
                                                                                                 .contains(u.getKey()))
                                                                         onlineMembersEmail.add(u.getEmail());
 
@@ -140,14 +140,14 @@ public class TableUI {
 
                                                                 // (30) aggiungo i membri invisibili a
                                                                 // hiddenMembers
-                                                                if (group.getHiddenMembers().contains(
+                                                                if (table.getHiddenMembers().contains(
                                                                                 u.getKey()))
                                                                         hiddenMembersEmail.add(u.getEmail());
 
                                                                 // (40) aggiungo i membri con presenceSelective
                                                                 // a
                                                                 // selectivePresenceMembers
-                                                                if (group.getSelectivePresenceMembers()
+                                                                if (table.getSelectivePresenceMembers()
                                                                                 .contains(u.getKey()))
                                                                         selectivePresenceMembers.add(u.getEmail());
                                                         }
@@ -163,13 +163,13 @@ public class TableUI {
         }
 
         /**
-         * Crea la lista dei google documents del gruppo
+         * Crea la lista dei google documents del tavolo
          *
          * @return void
          */
 
-        public void createGoogleDocsList(Group group) {
-                groupService.getGroupDocuments(group,
+        public void createGoogleDocsList(Table table) {
+                tableService.getTableDocuments(table,
                                 new AsyncCallback<List<Document>>() {
                                         @Override
                                         public void onFailure(Throwable caught) {
@@ -179,7 +179,7 @@ public class TableUI {
                                         public void onSuccess(List<Document> result) {
                                                 googleDocuments = result;
 
-                                                rightPanel.groupResourcesPanel.addData();
+                                                rightPanel.tableResourcesPanel.addData();
                                         }
                                 });
         }
@@ -194,9 +194,9 @@ public class TableUI {
                 // (10) aggiorno il flag
                 selectivePresence = false;
 
-                // (20) aggiorno l'oggetto Group nel DB
-                groupService.removeSelectivePresenceMemberFromGroup(
-                                TablePlus.user.getKey(), groupKey,
+                // (20) aggiorno l'oggetto Table nel DB
+                tableService.removeSelectivePresenceMemberFromTable(
+                                TablePlus.user.getKey(), tableKey,
                                 new AsyncCallback<Boolean>() {
                                         @Override
                                         public void onFailure(Throwable caught) {
@@ -213,7 +213,7 @@ public class TableUI {
                 n.setSenderEmail(TablePlus.user.getEmail());
                 n.setMemberEmail(TablePlus.user.getEmail());
                 n.setSenderKey(TablePlus.user.getKey());
-                n.setGroupKey(groupKey);
+                n.setTableKey(tableKey);
                 throwNotification(n);
         }
 
@@ -229,9 +229,9 @@ public class TableUI {
                 // (10) aggiorno il flag
                 selectivePresence = true;
 
-                // (20) aggiorno l'oggetto Group nel DB
-                groupService.addSelectivePresenceMemberToGroup(TablePlus.user.getKey(),
-                                groupKey, new AsyncCallback<Boolean>() {
+                // (20) aggiorno l'oggetto Table nel DB
+                tableService.addSelectivePresenceMemberToTable(TablePlus.user.getKey(),
+                                tableKey, new AsyncCallback<Boolean>() {
                                         @Override
                                         public void onFailure(Throwable caught) {
                                         }
@@ -247,7 +247,7 @@ public class TableUI {
                 n.setSenderEmail(TablePlus.user.getEmail());
                 n.setMemberEmail(TablePlus.user.getEmail());
                 n.setSenderKey(TablePlus.user.getKey());
-                n.setGroupKey(groupKey);
+                n.setTableKey(tableKey);
                 throwNotification(n);
         }
 

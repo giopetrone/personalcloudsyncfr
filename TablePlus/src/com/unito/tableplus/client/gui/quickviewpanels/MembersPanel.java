@@ -30,8 +30,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.unito.tableplus.client.TablePlus;
 import com.unito.tableplus.client.gui.RightPanel;
-import com.unito.tableplus.client.services.GroupService;
-import com.unito.tableplus.client.services.GroupServiceAsync;
+import com.unito.tableplus.client.services.TableService;
+import com.unito.tableplus.client.services.TableServiceAsync;
 import com.unito.tableplus.client.services.NotificationService;
 import com.unito.tableplus.client.services.NotificationServiceAsync;
 import com.unito.tableplus.client.services.UserService;
@@ -54,8 +54,8 @@ public class MembersPanel extends ContentPanel {
 
 	// servizi
 	public final UserServiceAsync userService = GWT.create(UserService.class);
-	public final GroupServiceAsync groupService = GWT
-			.create(GroupService.class);
+	public final TableServiceAsync tableService = GWT
+			.create(TableService.class);
 	public final NotificationServiceAsync notificationService = GWT
 			.create(NotificationService.class);
 
@@ -174,7 +174,7 @@ public class MembersPanel extends ContentPanel {
 												MessageBox
 														.confirm(
 																"Confirm",
-																"This address is in our database, the corrisponding user will gain access to every document shared by this group. Do you wish to continue?",
+																"This address is in our database, the corrisponding user will gain access to every document shared by this table. Do you wish to continue?",
 																new Listener<MessageBoxEvent>() {
 																	public void handleEvent(
 																			MessageBoxEvent ce) {
@@ -185,7 +185,7 @@ public class MembersPanel extends ContentPanel {
 																			Info.display(
 																					"MessageBox",
 																					"The 'Yes' button was pressed");
-																			addExistingUserToGroup();
+																			addExistingUserToTable();
 
 																		} else
 																			Info.display(
@@ -209,7 +209,7 @@ public class MembersPanel extends ContentPanel {
 
 		// ToggleButton per settarsi invisibile
 		setHidden = new ToggleButton();
-		setHidden.setToolTip(new ToolTipConfig("Hidden for this group"));
+		setHidden.setToolTip(new ToolTipConfig("Hidden for this table"));
 		setHidden.setIcon(IconHelper.createStyle("set-hidden"));
 		setHidden.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
@@ -361,15 +361,15 @@ public class MembersPanel extends ContentPanel {
 	}
 
 	/**
-	 * Aggiunge l'utente tmpNewUser al gruppo corrente
+	 * Aggiunge l'utente tmpNewUser al tavolo corrente
 	 * 
 	 * @return void
 	 */
 
-	public void addExistingUserToGroup() {
+	public void addExistingUserToTable() {
 
-		groupService.addMemberToGroup(tmpNewUser.getKey(),
-				rightPanel.tableUI.groupKey, new AsyncCallback<Boolean>() {
+		tableService.addMemberToTable(tmpNewUser.getKey(),
+				rightPanel.tableUI.tableKey, new AsyncCallback<Boolean>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -384,9 +384,9 @@ public class MembersPanel extends ContentPanel {
 						Notification n = new Notification();
 						n.setSenderEmail(TablePlus.user.getEmail());
 						n.setSenderKey(TablePlus.user.getKey());
-						n.setEventKind("MEMBERGROUPADD");
+						n.setEventKind("MEMBERTABLEADD");
 						n.setMemberEmail(tmpNewUser.getEmail());
-						n.setGroupKey(rightPanel.tableUI.groupKey);
+						n.setTableKey(rightPanel.tableUI.tableKey);
 						n.setStatus(tmpNewUser.isOnline() ? "ONLINE"
 								: "OFFLINE");
 
@@ -396,21 +396,21 @@ public class MembersPanel extends ContentPanel {
 					}
 
 				});
-		// // (10) aggiungo all'utente il gruppo corrente
-		// this.tmpNewUser.addGroup(group.getKey());
-		// System.out.println(tmpNewUser.getGroups().get(
-		// tmpNewUser.getGroups().size() - 1));
+		// // (10) aggiungo all'utente il tavolo corrente
+		// this.tmpNewUser.addTable(table.getKey());
+		// System.out.println(tmpNewUser.getTables().get(
+		// tmpNewUser.getTables().size() - 1));
 		//
-		// // (15) dovrei recuperare la versione aggiornata del gruppo...
+		// // (15) dovrei recuperare la versione aggiornata del tavolo...
 		// // Ha senso??? Tutte queste richieste al DB...
 		//
-		// // (20) aggiungo al gruppo il nuovo utente
-		// group.addMember(this.tmpNewUser.getKey());
+		// // (20) aggiungo al tavolo il nuovo utente
+		// table.addMember(this.tmpNewUser.getKey());
 		//
 		// // (30) fornisco all'utente gli accessi in scrittura a tutti i doc
 		// del
-		// // gruppo
-		// groupService.docAccessToNewMember(tmpNewUser, group,
+		// // tavolo
+		// tableService.docAccessToNewMember(tmpNewUser, table,
 		// new AsyncCallback<Boolean>() {
 		// @Override
 		// public void onFailure(Throwable caught) {
@@ -456,7 +456,7 @@ public class MembersPanel extends ContentPanel {
 
 	public void print(Notification n) {
 		System.out.println(TablePlus.user.getEmail() + " in "
-				+ rightPanel.tableUI.groupName + " (" + n.getEventKind()
+				+ rightPanel.tableUI.tableName + " (" + n.getEventKind()
 				+ "):\n ------ onlineMembersEmail["
 				+ rightPanel.tableUI.onlineMembersEmail.size() + "] = "
 				+ rightPanel.tableUI.onlineMembersEmail
@@ -529,9 +529,9 @@ public class MembersPanel extends ContentPanel {
 			}
 		}
 
-		// (50) MEMBERGROUPADD
+		// (50) MEMBERTABLEADD
 
-		if (n.getEventKind().equals("MEMBERGROUPADD")) {
+		if (n.getEventKind().equals("MEMBERTABLEADD")) {
 			if (!off.contains(em))
 				off.add(em);
 		}
@@ -574,7 +574,7 @@ public class MembersPanel extends ContentPanel {
 	}
 
 	/**
-	 * Rende invisibile l'utente corrente per il gruppo corrente
+	 * Rende invisibile l'utente corrente per il tavolo corrente
 	 * 
 	 * @return void
 	 */
@@ -591,9 +591,9 @@ public class MembersPanel extends ContentPanel {
 		// rightPanel.table.offlineMembersEmail.add(toRemove);
 		// }
 
-		// (20) aggiorno l'oggetto Group nel DB
-		groupService.addHiddenMemberToGroup(TablePlus.user.getKey(),
-				rightPanel.tableUI.groupKey, new AsyncCallback<Boolean>() {
+		// (20) aggiorno l'oggetto Table nel DB
+		tableService.addHiddenMemberToTable(TablePlus.user.getKey(),
+				rightPanel.tableUI.tableKey, new AsyncCallback<Boolean>() {
 					@Override
 					public void onFailure(Throwable caught) {
 					}
@@ -610,21 +610,21 @@ public class MembersPanel extends ContentPanel {
 		n.setSenderEmail(TablePlus.user.getEmail());
 		n.setMemberEmail(TablePlus.user.getEmail());
 		n.setSenderKey(TablePlus.user.getKey());
-		n.setGroupKey(rightPanel.tableUI.groupKey);
+		n.setTableKey(rightPanel.tableUI.tableKey);
 		throwNotification(n);
 	}
 
 	/**
-	 * Rende invisibile l'utente corrente per il gruppo corrente
+	 * Rende invisibile l'utente corrente per il tavolo corrente
 	 * 
 	 * @return void
 	 */
 
 	public void makeMeVisible() {
 		rightPanel.tableUI.hiddenUser = false;
-		// (20) aggiorno l'oggetto Group nel DB
-		groupService.removeHiddenMemberFromGroup(TablePlus.user.getKey(),
-				rightPanel.tableUI.groupKey, new AsyncCallback<Boolean>() {
+		// (20) aggiorno l'oggetto Table nel DB
+		tableService.removeHiddenMemberFromTable(TablePlus.user.getKey(),
+				rightPanel.tableUI.tableKey, new AsyncCallback<Boolean>() {
 					@Override
 					public void onFailure(Throwable caught) {
 					}
@@ -641,7 +641,7 @@ public class MembersPanel extends ContentPanel {
 		n.setSenderEmail(TablePlus.user.getEmail());
 		n.setMemberEmail(TablePlus.user.getEmail());
 		n.setSenderKey(TablePlus.user.getKey());
-		n.setGroupKey(rightPanel.tableUI.groupKey);
+		n.setTableKey(rightPanel.tableUI.tableKey);
 		throwNotification(n);
 	}
 
@@ -653,7 +653,7 @@ public class MembersPanel extends ContentPanel {
 					toBeInvited,
 					"",
 					"",
-					this.rightPanel.tableUI.groupKey,
+					this.rightPanel.tableUI.tableKey,
 					new AsyncCallback<Boolean>() {
 						@Override
 						public void onFailure(Throwable caught) {

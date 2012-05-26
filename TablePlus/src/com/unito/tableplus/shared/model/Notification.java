@@ -11,9 +11,9 @@ public class Notification implements Serializable{
 	private static final long serialVersionUID = 1L;
 
 	private long sequenceNumber;
-	private long groupKey;
+	private long tableKey;
 	private String eventKind;
-	private List<Long> owningGroups;
+	private List<Long> owningTables;
 	private String memberEmail;
 	private String status;
 	private Long senderKey;
@@ -25,11 +25,11 @@ public class Notification implements Serializable{
 	}
 	
 
-	public long getGroupKey() {
-		return groupKey;
+	public long getTableKey() {
+		return tableKey;
 	}
-	public void setGroupKey(long groupKey) {
-		this.groupKey = groupKey;
+	public void setTableKey(long tableKey) {
+		this.tableKey = tableKey;
 	}
 	public String getEventKind() {
 		return eventKind;
@@ -44,11 +44,11 @@ public class Notification implements Serializable{
 	public void setMemberEmail(String memberEmail) {
 		this.memberEmail = memberEmail;
 	}
-	public List<Long> getOwningGroups() {
-		return owningGroups;
+	public List<Long> getOwningTables() {
+		return owningTables;
 	}
-	public void setOwningGroups(List<Long> owningGroups) {
-		this.owningGroups = owningGroups;
+	public void setOwningTables(List<Long> owningTables) {
+		this.owningTables = owningTables;
 	}
 	public String getStatus() {
 		return status;

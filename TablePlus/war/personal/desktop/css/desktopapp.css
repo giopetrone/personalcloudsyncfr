@@ -147,7 +147,7 @@
 	background-image: url(../images/Address_Book.png);
 }
 
-#groupsmanager-win-shortcut img {
+#tablesmanager-win-shortcut img {
 	width: 64px;
 	height: 64px;
 	background-image: url(../images/User.png);
@@ -165,7 +165,7 @@
 	background-image: url(../images/Folder_Web.png);
 }
 
-#groupresources-win-shortcut img {
+#tableresources-win-shortcut img {
 	width: 64px;
 	height: 64px;
 	background-image: url(../images/Folder_FTP.png);

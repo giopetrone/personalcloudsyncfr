@@ -11,7 +11,7 @@ import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.Window;
 import com.unito.tableplus.client.TablePlus;
 import com.unito.tableplus.client.gui.TableUI;
-import com.unito.tableplus.client.gui.windows.GroupChatWindow;
+import com.unito.tableplus.client.gui.windows.TableChatWindow;
 
 public class SocketListenerImpl implements SocketListener {
 	
@@ -34,39 +34,39 @@ public class SocketListenerImpl implements SocketListener {
 		
 		//in realtà dovrei chiamare solo il tavolo a cui è stato
 		//mandato il messaggio, nella send dovrei indicare, OLTRE 
-		//ai mittenti, anche il gruppo/tavolo di destinazione
+		//ai mittenti, anche il tavolo di destinazione
 		
         JSONValue jv = JSONParser.parseStrict(message);
         JSONObject jo = jv.isObject();
         
         JSONValue jvSender = jo.get("sender");
         JSONValue jvContent = jo.get("content");
-        JSONValue jvGroupKey = jo.get("groupKey");
+        JSONValue jvTableKey = jo.get("tableKey");
         
         JSONArray jaSender = jvSender.isArray();
         JSONArray jaContent = jvContent.isArray();
-        JSONArray jaGroupKey = jvGroupKey.isArray();
+        JSONArray jaTableKey = jvTableKey.isArray();
         
         jvSender = jaSender.get(0);
         jvContent = jaContent.get(0);
-        jvGroupKey = jaGroupKey.get(0);
+        jvTableKey = jaTableKey.get(0);
         
         JSONString jsSender = jvSender.isString();
         JSONString jsContent = jvContent.isString();
-        JSONString jsGroupKey = jvGroupKey.isString();
+        JSONString jsTableKey = jvTableKey.isString();
         
         String sender = jsSender.stringValue();
         String content =  jsContent.stringValue();
-        Long groupKey = Long.valueOf(jsGroupKey.stringValue());
+        Long tableKey = Long.valueOf(jsTableKey.stringValue());
         
         //Window.alert(sender+": "+content); 
         
-        System.out.println(sender+" -- "+content+" -- "+groupKey);
+        System.out.println(sender+" -- "+content+" -- "+tableKey);
 		
-		for(TableUI t:TablePlus.desktop.getGroupTables())
-			if(t.groupKey.compareTo(groupKey)==0){
-				System.out.println("TROVATO: "+groupKey);
-				((GroupChatWindow)t.groupChatWindow).manageNewMessage(sender,content);
+		for(TableUI t:TablePlus.desktop.getTables())
+			if(t.tableKey.compareTo(tableKey)==0){
+				System.out.println("TROVATO: "+tableKey);
+				((TableChatWindow)t.tableChatWindow).manageNewMessage(sender,content);
 			}
 	}
 

@@ -19,7 +19,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import com.unito.tableplus.shared.model.Document;
-import com.unito.tableplus.shared.model.Group;
+import com.unito.tableplus.shared.model.Table;
 import com.unito.tableplus.shared.model.Message;
 import com.unito.tableplus.shared.model.MessageType;
 import com.unito.tableplus.shared.model.User;
@@ -28,7 +28,7 @@ public class Proxy extends HttpServlet {
 
 	private static final long serialVersionUID = -6455653509373554816L;
 
-	GroupServiceImpl groupProxy = new GroupServiceImpl();
+	TableServiceImpl tableProxy = new TableServiceImpl();
 	UserServiceImpl userProxy = new UserServiceImpl();
 	TokenServiceImpl tokenProxy = new TokenServiceImpl();
 
@@ -99,7 +99,7 @@ public class Proxy extends HttpServlet {
 				uj.put("firstname", user.getFirstName());
 				uj.put("lastname", user.getLastName());
 				uj.put("email", user.getEmail());
-				uj.put("tables", user.getGroups());
+				uj.put("tables", user.getTables());
 				uj.put("online", user.isOnline());
 
 				rj.put("results", uj);
@@ -154,22 +154,22 @@ public class Proxy extends HttpServlet {
 		try {
 			Long tableKey = jo.getLong("tableKey");
 			Long userKey = jo.getLong("userKey");
-			Group group = groupProxy.queryGroup(tableKey);
+			Table table = tableProxy.queryTable(tableKey);
 			JSONObject rj = new JSONObject();
-			JSONObject table = new JSONObject();
+			JSONObject tableJSON = new JSONObject();
 			JSONArray jDocuments = new JSONArray();
 			JSONObject jDoc;
 
-			if (group == null) {
+			if (table == null) {
 				rj.put("status", "ERROR");
 				rj.put("error", "No table found for requested key");
 			} else {
 
-				table.put("key", group.getKey());
-				table.put("name", group.getName());
-				table.put("members", group.getMembers());
-				table.put("creator", group.getCreator());
-				table.put("owner", group.getOwner());
+				tableJSON.put("key", table.getKey());
+				tableJSON.put("name", table.getName());
+				tableJSON.put("members", table.getMembers());
+				tableJSON.put("creator", table.getCreator());
+				tableJSON.put("owner", table.getOwner());
 
 				User user = userProxy.queryUser(userKey);
 				String userToken = user.getToken();
@@ -177,15 +177,15 @@ public class Proxy extends HttpServlet {
 				Map<String, Document> docsMap = new HashMap<String, Document>();
 				for (Document d : docList)
 					docsMap.put(d.getDocId(), d);
-				List<String> groupDocuments = group.getDocuments();
-				for (String d : groupDocuments) {
+				List<String> tableDocuments = table.getDocuments();
+				for (String d : tableDocuments) {
 					jDoc = new JSONObject(docsMap.get(d));
 					jDocuments.put(jDoc);
 				}
 
-				table.put("documents", jDocuments);
+				tableJSON.put("documents", jDocuments);
 
-				rj.put("results", table);
+				rj.put("results", tableJSON);
 				rj.put("status", "OK");
 			}
 			pw.print(rj);
@@ -202,33 +202,33 @@ public class Proxy extends HttpServlet {
 		try {
 			JSONArray tableKeysArray = jo.getJSONArray("tableKeysList");
 			List<Long> queryList = new ArrayList<Long>();
-			JSONObject table, rj;
+			JSONObject tableJSON, rj;
 			JSONArray ja;
 
 			for (int i = 0; i < tableKeysArray.length(); i++) {
-				queryList.add((Long) tableKeysArray.getLong(i));
+				queryList.add(tableKeysArray.getLong(i));
 			}
 
-			List<Group> groups = groupProxy.queryGroups(queryList);
+			List<Table> tables = tableProxy.queryTables(queryList);
 
 			rj = new JSONObject();
 
-			if (groups == null) {
+			if (tables == null) {
 				rj.put("status", "ERROR");
 				rj.put("error", "No tables found for requested key");
 			} else {
 				rj.put("status", "OK");
 				ja = new JSONArray();
-				for (Group group : groups) {
-					table = new JSONObject();
-					table.put("key", group.getKey());
-					table.put("name", group.getName());
-					table.put("members", group.getMembers().size());
-					table.put("creator", group.getCreator());
-					table.put("owner", group.getOwner());
-					table.put("messages", group.getBlackBoard().size());
-					table.put("documents", group.getDocuments().size());
-					ja.put(table);
+				for (Table table : tables) {
+					tableJSON = new JSONObject();
+					tableJSON.put("key", table.getKey());
+					tableJSON.put("name", table.getName());
+					tableJSON.put("members", table.getMembers().size());
+					tableJSON.put("creator", table.getCreator());
+					tableJSON.put("owner", table.getOwner());
+					tableJSON.put("messages", table.getBlackBoard().size());
+					tableJSON.put("documents", table.getDocuments().size());
+					ja.put(tableJSON);
 				}
 				rj.put("results", ja);
 			}
@@ -250,13 +250,13 @@ public class Proxy extends HttpServlet {
 		JSONObject rj = new JSONObject();
 		try {
 			tableKey = jo.getLong("tableKey");
-			Group group = groupProxy.queryGroup(tableKey);
-			if (group == null) {
+			Table table = tableProxy.queryTable(tableKey);
+			if (table == null) {
 				rj.put("status", "ERROR");
 				rj.put("error", "No table found for requested key");
 			} else {
 				rj.put("status", "OK");
-				List<Message> messages = group.getBlackBoard();
+				List<Message> messages = table.getBlackBoard();
 
 				int n = 1;
 				int size = messages.size();
@@ -295,7 +295,7 @@ public class Proxy extends HttpServlet {
 	private void writeMessage(JSONObject jo, PrintWriter pw) {
 		try {
 			JSONObject rj = new JSONObject();
-			Long table = jo.getLong("tableKey");
+			Long tableKey = jo.getLong("tableKey");
 			Long author = jo.getLong("authorKey");
 			String type = jo.getString("messageType");
 			String content = jo.getString("messageContent");
@@ -304,9 +304,9 @@ public class Proxy extends HttpServlet {
 
 			Message message = new Message(author, mType, content);
 
-			Group group = groupProxy.queryGroup(table);
-			group.getBlackBoard().add(message);
-			groupProxy.storeGroup(group);
+			Table table = tableProxy.queryTable(tableKey);
+			table.getBlackBoard().add(message);
+			tableProxy.storeTable(table);
 
 			rj.put("status", "OK");
 			pw.print(rj);
@@ -325,7 +325,7 @@ public class Proxy extends HttpServlet {
 		String key;
 		try {
 			key = jo.getString("messageKey");
-			groupProxy.removeMessage(key);
+			tableProxy.removeMessage(key);
 
 			rj.put("status", "OK");
 			pw.print(rj);
@@ -343,15 +343,15 @@ public class Proxy extends HttpServlet {
 		List<Long> visible, others;
 		JSONObject sj, rj;
 		JSONArray online, offline;
-		Long key;
+		Long tableKey;
 		try {
-			key = jo.getLong("tableKey");
-			Group g = groupProxy.queryGroup(key);
+			tableKey = jo.getLong("tableKey");
+			Table t = tableProxy.queryTable(tableKey);
 
-			visible = g.getSelectivePresenceMembers();
-			visible.removeAll(g.getHiddenMembers());
+			visible = t.getSelectivePresenceMembers();
+			visible.removeAll(t.getHiddenMembers());
 			online = new JSONArray(visible);
-			others = g.getMembers();
+			others = t.getMembers();
 			others.removeAll(visible);
 			offline = new JSONArray(others);
 
@@ -377,15 +377,15 @@ public class Proxy extends HttpServlet {
 	private void toggleHide(JSONObject jo, PrintWriter pw) {
 		try {
 			Long user = jo.getLong("userKey");
-			Long table = jo.getLong("tableKey");
-			Group group = groupProxy.queryGroup(table);
-			List<Long> hiddenMembers = group.getHiddenMembers();
+			Long tableKey = jo.getLong("tableKey");
+			Table table = tableProxy.queryTable(tableKey);
+			List<Long> hiddenMembers = table.getHiddenMembers();
 
 			if (hiddenMembers.contains(user))
 				hiddenMembers.remove(user);
 			else
 				hiddenMembers.add(user);
-			groupProxy.storeGroup(group);
+			tableProxy.storeTable(table);
 
 			JSONObject rj = new JSONObject();
 			rj.put("status", "OK");
@@ -424,20 +424,20 @@ public class Proxy extends HttpServlet {
 
 	private void setPresence(JSONObject jo, PrintWriter pw) {
 		try {
-			Group group;
+			Table table;
 
 			Long user = jo.getLong("userKey");
-			Long table = jo.getLong("tableKey");
+			Long tableKey = jo.getLong("tableKey");
 			Boolean presence = jo.getBoolean("presence");
 
-			group = groupProxy.queryGroup(table);
+			table = tableProxy.queryTable(tableKey);
 			
 			if(presence)
-				group.getSelectivePresenceMembers().add(user);
+				table.getSelectivePresenceMembers().add(user);
 			else
-				group.getSelectivePresenceMembers().remove(user);
+				table.getSelectivePresenceMembers().remove(user);
 			
-			groupProxy.storeGroup(group);
+			tableProxy.storeTable(table);
 
 			JSONObject rj = new JSONObject();
 			rj.put("status", "OK");

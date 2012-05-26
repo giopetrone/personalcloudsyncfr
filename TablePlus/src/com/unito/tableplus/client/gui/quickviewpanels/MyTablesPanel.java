@@ -28,17 +28,17 @@ import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.unito.tableplus.client.TablePlus;
 import com.unito.tableplus.client.gui.RightPanel;
 import com.unito.tableplus.client.gui.TableUI;
-import com.unito.tableplus.client.services.GroupService;
-import com.unito.tableplus.client.services.GroupServiceAsync;
+import com.unito.tableplus.client.services.TableService;
+import com.unito.tableplus.client.services.TableServiceAsync;
 import com.unito.tableplus.client.services.NotificationService;
 import com.unito.tableplus.client.services.NotificationServiceAsync;
 import com.unito.tableplus.client.services.UserService;
 import com.unito.tableplus.client.services.UserServiceAsync;
-import com.unito.tableplus.shared.model.Group;
+import com.unito.tableplus.shared.model.Table;
 import com.unito.tableplus.shared.model.Notification;
 import com.unito.tableplus.shared.model.User;
 
-public class MyGroupsPanel extends ContentPanel {
+public class MyTablesPanel extends ContentPanel {
 
 	public RightPanel rightPanel;
 
@@ -49,8 +49,8 @@ public class MyGroupsPanel extends ContentPanel {
 	public TreeStore<ModelData> treeStore = new TreeStore<ModelData>();
 
 	// servizi
-	protected final GroupServiceAsync groupService = GWT
-			.create(GroupService.class);
+	protected final TableServiceAsync tableService = GWT
+			.create(TableService.class);
 	protected final UserServiceAsync userService = GWT
 			.create(UserService.class);
 	protected final NotificationServiceAsync notificationService = GWT
@@ -62,7 +62,7 @@ public class MyGroupsPanel extends ContentPanel {
 	 * @return void
 	 */
 
-	public MyGroupsPanel(RightPanel rightPanel_) {
+	public MyTablesPanel(RightPanel rightPanel_) {
 		this.rightPanel = rightPanel_;
 
 		setHeading("My Tables");
@@ -82,11 +82,11 @@ public class MyGroupsPanel extends ContentPanel {
 	 */
 
 	public void populateLeftLayoutContainer() {
-		// Button per creare un gruppo
-		Button addGroup = new Button();
-		addGroup.setToolTip(new ToolTipConfig("Create new Table"));
-		addGroup.setIcon(IconHelper.createStyle("monitor_add"));
-		addGroup.addSelectionListener(new SelectionListener<ButtonEvent>() {
+		// Button per creare un tavolo
+		Button addTable = new Button();
+		addTable.setToolTip(new ToolTipConfig("Create new Table"));
+		addTable.setIcon(IconHelper.createStyle("monitor_add"));
+		addTable.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
 				final MessageBox box = MessageBox.prompt("New Table",
@@ -98,14 +98,14 @@ public class MyGroupsPanel extends ContentPanel {
 					public void handleEvent(MessageBoxEvent be) {
 						// Auto-generated method stub
 						if (be.getButtonClicked().getItemId().equals(Dialog.OK)) {
-							createNewGroup(be.getValue());
+							createNewTable(be.getValue());
 						}
 					}
 
 				});
 			}
 		});
-		leftLayoutContainer.add(addGroup);
+		leftLayoutContainer.add(addTable);
 		add(leftLayoutContainer);
 	}
 
@@ -139,7 +139,7 @@ public class MyGroupsPanel extends ContentPanel {
 						
 						
 						TablePlus.desktop.switchToTable(((TableUI) be.getItem()
-								.get("table")).groupName);
+								.get("table")).tableName);
 					};
 				});
 
@@ -148,25 +148,25 @@ public class MyGroupsPanel extends ContentPanel {
 		rightLayoutContainer.setWidth(300);
 		add(rightLayoutContainer);
 
-		// myGroups.layout();
+		// myTables.layout();
 	}
 
 	/**
-	 * Crea un nuovo gruppo: (1) crea l'oggetto Group; (2) lo memorizza nel DB
+	 * Crea un nuovo tavolo: (1) crea l'oggetto Table; (2) lo memorizza nel DB
 	 * 
 	 * @return void
 	 */
 
-	private Group newGroup = null;
+	private Table newTable = null;
 
-	public void createNewGroup(String groupName) {
+	public void createNewTable(String tableName) {
 
-		// (10)crea un nuovo gruppo
-		newGroup = new Group(TablePlus.user.getKey());
-		newGroup.setName(groupName);
+		// (10)crea un nuovo tavolo
+		newTable = new Table(TablePlus.user.getKey());
+		newTable.setName(tableName);
 
-		// (20)aggiunge il nuovo gruppo al db
-		groupService.storeGroup(newGroup, new AsyncCallback<Long>() {
+		// (20)aggiunge il nuovo tavolo al db
+		tableService.storeTable(newTable, new AsyncCallback<Long>() {
 			@Override
 			public void onFailure(Throwable caught) {
 			}
@@ -174,23 +174,23 @@ public class MyGroupsPanel extends ContentPanel {
 			@Override
 			public void onSuccess(Long result) {
 
-				createNewGroup_20(result);
+				createNewTable_20(result);
 			}
 		});
 
 	}
 
 	/**
-	 * Crea un nuovo gruppo -2-: (1) aggiorna l'utente corrente in locale; (2)
-	 * aggiunge all'utente il gruppo; (3) aggiorna l'utente corrente nel db.
+	 * Crea un nuovo tavolo -2-: (1) aggiorna l'utente corrente in locale; (2)
+	 * aggiunge all'utente il tavolo; (3) aggiorna l'utente corrente nel db.
 	 * 
 	 * @return void
 	 */
 
-	private Long newGroupKey;
+	private Long newTableKey;
 
-	public void createNewGroup_20(Long newGroupKey_) {
-		this.newGroupKey = newGroupKey_;
+	public void createNewTable_20(Long newTableKey_) {
+		this.newTableKey = newTableKey_;
 		// (24)aggiorna l'utente corrente
 		userService.queryUser(TablePlus.user.getKey(),
 				new AsyncCallback<User>() {
@@ -202,8 +202,8 @@ public class MyGroupsPanel extends ContentPanel {
 					public void onSuccess(User result_) {
 						//TablePlus.user = result_;
 
-						// (25)aggiunge all'utente il gruppo appena creato
-						TablePlus.user.addGroup(newGroupKey);
+						// (25)aggiunge all'utente il tavolo appena creato
+						TablePlus.user.addTable(newTableKey);
 
 						// (27)aggiorna l'utente nel db
 						userService.storeUser(TablePlus.user,
@@ -214,8 +214,8 @@ public class MyGroupsPanel extends ContentPanel {
 
 									@Override
 									public void onSuccess(Void result) {
-										groupService.queryGroup(newGroupKey,
-												new AsyncCallback<Group>() {
+										tableService.queryTable(newTableKey,
+												new AsyncCallback<Table>() {
 													@Override
 													public void onFailure(
 															Throwable caught) {
@@ -223,7 +223,7 @@ public class MyGroupsPanel extends ContentPanel {
 
 													@Override
 													public void onSuccess(
-															Group result) {
+															Table result) {
 														createNewTable(result);
 													}
 												});
@@ -236,32 +236,32 @@ public class MyGroupsPanel extends ContentPanel {
 	}
 
 	/**
-	 * Crea un tavolo sulla base di un gruppo, aggiorna la vista corrente
+	 * Crea un tavolo sulla base di un tavolo, aggiorna la vista corrente
 	 * 
 	 * @return void
 	 */
 
-	public void createNewTable(Group g) {
+	public void createNewTable(Table t) {
 
 		// (30)crea il tavolo corrispondente Table table1 = new
-		TableUI table1 = new TableUI(g);
+		TableUI table1 = new TableUI(t);
 
 		// (40)aggiunge il nuovo tavolo al desktop
-		TablePlus.desktop.addGroupTable(table1);
+		TablePlus.desktop.addTable(table1);
 
 		// (50)carica il nuovo table
-		Info.display("Group added: " + table1.groupName, "Ready to join!");
-		// desktop.switchToTable(table1.getGroup().getName());
+		Info.display("Table added: " + table1.tableName, "Ready to join!");
+		// desktop.switchToTable(table1.getTable().getName());
 
 		// (60)aggiunge il nuovo table alla lista del personalpanel
-		addNewGroupToTree(table1);
+		addNewTableToTree(table1);
 
 		// (70)lancia una notifica di creazione nuovo tavolo
 		Notification n = new Notification();
 		n.setSenderEmail(TablePlus.user.getEmail());
 		n.setSenderKey(TablePlus.user.getKey());
 		n.setEventKind("NEWTABLE");
-		n.setGroupKey(g.getKey());
+		n.setTableKey(t.getKey());
 
 		this.throwNotification(n);
 
@@ -300,9 +300,9 @@ public class MyGroupsPanel extends ContentPanel {
 
 	public void addData() {
 		ModelData m;
-		for (TableUI t : TablePlus.desktop.getGroupTables()) {
+		for (TableUI t : TablePlus.desktop.getTables()) {
 			m = new BaseModelData();
-			m.set("name", t.groupName);
+			m.set("name", t.tableName);
 			m.set("icon", "monitor");
 			m.set("table", t);
 			treeStore.add(m, false);
@@ -310,14 +310,14 @@ public class MyGroupsPanel extends ContentPanel {
 	}
 
 	/**
-	 * Aggiunge un gruppo all'elenco
+	 * Aggiunge un tavolo all'elenco
 	 * 
 	 * @return void
 	 */
 
-	public void addNewGroupToTree(TableUI t) {
+	public void addNewTableToTree(TableUI t) {
 		ModelData m = new BaseModelData();
-		m.set("name", t.groupName);
+		m.set("name", t.tableName);
 		m.set("icon", "monitor");
 		m.set("table", t);
 		treeStore.add(m, false);

@@ -11,7 +11,7 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 @PersistenceCapable(detachable = "true")
-public class Group implements Serializable {
+public class Table implements Serializable {
 	
 	private static final long serialVersionUID = -4489608881786573961L;
 
@@ -37,13 +37,13 @@ public class Group implements Serializable {
 	@Persistent
 	private Long owner = null;
 
-	@Persistent(mappedBy = "group")
+	@Persistent(mappedBy = "table")
 	private List<Message> blackboard;
 
 	@Persistent
 	private List<String> documents;
 
-	public Group(Long creator) {
+	public Table(Long creator) {
 		this.creator = creator;
 		this.owner = creator;
 		this.blackboard = new LinkedList<Message>();
@@ -54,7 +54,7 @@ public class Group implements Serializable {
 		this.members.add(creator);
 	}
 
-	public Group() {
+	public Table() {
 
 	}
 
