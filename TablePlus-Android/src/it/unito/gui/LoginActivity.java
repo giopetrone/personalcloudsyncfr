@@ -62,13 +62,16 @@ public class LoginActivity extends Activity {
 			if(!mailString.equals("")){//mettere funzione per LOGIN,(!mailString.equals("")) && (!pass.equals(""))
 				try{
 					JSONObject user = ProxyUtils.proxyCall("queryUser", mailString);
-					JSONObject jsUser = user.getJSONObject("results");
-					long userKey=jsUser.getLong("key");
-					//get session from Application
-					session=(TablePlusAndroid) this.getApplication();
-					session.setUserKey(userKey);
-					if (jsUser.getString("email").equals(mailString))
-					{
+									
+					String jsStatus = user.getString("status");
+					Log.i("Login","jsStatus: "+jsStatus);
+					if(!jsStatus.equals("ERROR")){
+						JSONObject jsUser = user.getJSONObject("results");
+						long userKey=jsUser.getLong("key");
+						//get session from Application
+						session=(TablePlusAndroid) this.getApplication();
+						session.setUserKey(userKey);
+						
 						Toast.makeText(this, "Login success", Toast.LENGTH_LONG).show();
 						if (restaConnesso.isChecked()) {
 							//save login and preferences in session 
@@ -82,8 +85,8 @@ public class LoginActivity extends Activity {
 						Intent intent = new Intent(this,TableListActivity.class);
 						intent.putExtra("user",jsUser.toString());
 						startActivity(intent);
-					}
-					else Toast.makeText(this, "Login fail", Toast.LENGTH_LONG).show();
+					}else
+						Toast.makeText(this, "Login fail", Toast.LENGTH_LONG).show();
 				}catch(Exception e){ Log.i("Exception Login",e.toString());}
 			}
 		

@@ -15,6 +15,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TabHost;
+import android.widget.Toast;
 
 //Function of the class: create tab for see and use 3 different Activity (relating the same table): ExistantTable, Members and BlackBoard
 @SuppressWarnings("deprecation")
@@ -23,6 +24,7 @@ public class HelloTabWidgetActivity extends TabActivity {
 	private JSONObject jsTable;
 	private ArrayList<ViewDoc> tableDocs;
 	private String info;
+	private boolean noException=true;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -79,49 +81,51 @@ public class HelloTabWidgetActivity extends TabActivity {
 			
 		} catch (Exception e) {
 			Log.i("Eccezione", e.toString());
+			noException=false;
 		}
 		
-		
+		if(noException){
 			
-		// Create an Intent to launch an Activity the first tab
-		intent = new Intent().setClass(this, ExistantTableActivity.class);
-
-		
-		intent.putExtra("TableDoc",tableDocs);
-		intent.putExtra("infoCurrentTable",info);
-		// Initialize a TabSpec for each tab and add it to the TabHost
-		spec = tabHost.newTabSpec("Objects").setIndicator("Objects",
-				res.getDrawable(R.drawable.tab_existanttable))
-				.setContent(intent);
-		tabHost.addTab(spec);
-
-		
-		// second tab
-		intent = new Intent().setClass(this, BlackBoardActivity.class);
-
-		intent.putExtra("infoCurrentTable", info);
-		intent.putExtra("key", key);		
-		spec = tabHost.newTabSpec("Messages").setIndicator("Messages",
-				res.getDrawable(R.drawable.message))
-				.setContent(intent);
-		tabHost.addTab(spec);
-
-		
-		//third tab
-		intent = new Intent().setClass(this, MembersActivity.class);
-
-
-		intent.putExtra("infoCurrentTable", info);
-		intent.putExtra("key", key);
-		spec = tabHost.newTabSpec("Members").setIndicator("Members",
-				res.getDrawable(R.drawable.tab_info))
-				.setContent(intent);
-		tabHost.addTab(spec);
-
-
-		//This is the number of the tab which is the first Activity opened when we call HelloTabWidget
-		tabHost.setCurrentTab(0);
-		
+			// Create an Intent to launch an Activity the first tab
+			intent = new Intent().setClass(this, ExistantTableActivity.class);
+	
+			
+			intent.putExtra("TableDoc",tableDocs);
+			intent.putExtra("infoCurrentTable",info);
+			// Initialize a TabSpec for each tab and add it to the TabHost
+			spec = tabHost.newTabSpec("Objects").setIndicator("Objects",
+					res.getDrawable(R.drawable.tab_existanttable))
+					.setContent(intent);
+			tabHost.addTab(spec);
+	
+			
+			// second tab
+			intent = new Intent().setClass(this, BlackBoardActivity.class);
+	
+			intent.putExtra("infoCurrentTable", info);
+			intent.putExtra("key", key);		
+			spec = tabHost.newTabSpec("Messages").setIndicator("Messages",
+					res.getDrawable(R.drawable.message))
+					.setContent(intent);
+			tabHost.addTab(spec);
+	
+			
+			//third tab
+			intent = new Intent().setClass(this, MembersActivity.class);
+	
+	
+			intent.putExtra("infoCurrentTable", info);
+			intent.putExtra("key", key);
+			spec = tabHost.newTabSpec("Members").setIndicator("Members",
+					res.getDrawable(R.drawable.tab_info))
+					.setContent(intent);
+			tabHost.addTab(spec);
+	
+	
+			//This is the number of the tab which is the first Activity opened when we call HelloTabWidget
+			tabHost.setCurrentTab(0);
+		}else
+			Toast.makeText(this, "Exception Occurred", Toast.LENGTH_LONG).show();
 	}
 
 }

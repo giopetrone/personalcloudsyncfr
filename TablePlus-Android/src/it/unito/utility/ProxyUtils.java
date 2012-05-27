@@ -25,8 +25,8 @@ import android.util.Log;
 public class ProxyUtils {
 	private static HttpClient client;
 	private static HttpPost post;
-	private static final String PROXY_URL = "http://tableplusplus.appspot.com/tableplus/proxy";
-											/**"http://10.0.2.2:8888/tableplus/proxy";*/
+	//private static final String PROXY_URL = "http://tableplusplus.appspot.com/tableplus/proxy";
+	private static final String PROXY_URL ="http://10.0.2.2:8888/tableplus/proxy";
 
 	/**
 	 * Method: first time only create object
