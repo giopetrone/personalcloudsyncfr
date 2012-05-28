@@ -35,9 +35,7 @@ public class LoginActivity extends Activity {
 		mail= (EditText) findViewById(R.id.mail);
 		password= (EditText) findViewById(R.id.password);
 		restaConnesso= (CheckBox) findViewById(R.id.resta_connesso);
-		// carica le preferences
 		updatePreferencesData();
-		Log.i("LOGIN ","ONCREATE");
 					
 	}
 	
@@ -48,23 +46,20 @@ public class LoginActivity extends Activity {
 			   session=(TablePlusAndroid) this.getApplication();
 			   if(session.getUserKey()!=null){
 				   JSONObject userStatus = ProxyUtils.UserStatus("toggleStatus", session.getUserKey(),"false");
-				   Log.i("LOGIN", "OnResume, userStatus offline: "+userStatus);
 			   }
 
 		   }catch(Exception e){ Log.i("Exception Login",e.toString());}
-		   Log.i("LOGIN ","ONRESUME");
 	   }
 	
 	  public void invia(View v)
 		{
 			String mailString=(mail.getText()).toString();
 			String pass=(password.getText()).toString();
-			if(!mailString.equals("")){//mettere funzione per LOGIN,(!mailString.equals("")) && (!pass.equals(""))
+			if(!mailString.equals("")){
 				try{
 					JSONObject user = ProxyUtils.proxyCall("queryUser", mailString);
 									
 					String jsStatus = user.getString("status");
-					Log.i("Login","jsStatus: "+jsStatus);
 					if(!jsStatus.equals("ERROR")){
 						JSONObject jsUser = user.getJSONObject("results");
 						long userKey=jsUser.getLong("key");
@@ -80,7 +75,6 @@ public class LoginActivity extends Activity {
 						
 						//notify current user presence online at server
 						JSONObject status = ProxyUtils.UserStatus("toggleStatus", userKey,"true");	
-						Log.i("Login","userStatus online: "+status);
 						
 						Intent intent = new Intent(this,TableListActivity.class);
 						intent.putExtra("user",jsUser.toString());

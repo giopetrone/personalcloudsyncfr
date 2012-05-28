@@ -51,7 +51,7 @@ public class BlackBoardActivity extends ListActivity{
 	}
 
 	/**
-	 * Chiamato dal sistema la prima volta per creare il menu
+	 *Call in the first time for create OptionMenu
 	 */
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -65,13 +65,12 @@ public class BlackBoardActivity extends ListActivity{
 	public void add (View v)
 	{
 		Intent intent = new Intent(this,AddMessageActivity.class);
-		intent.putExtra("infoCurrentTable",infoCurrentTable);
 		intent.putExtra("key",tablekey);
 		startActivity(intent);
 	}
 
 
-	//-------------------MENU SU LONGCLICK--------------------------------------
+	/** Menu on LongClick*/
 	public void onCreateContextMenu(ContextMenu menu, View v,ContextMenuInfo menuInfo) {  
 		super.onCreateContextMenu(menu, v, menuInfo);  
 		menu.setHeaderTitle("Context Menu");  
@@ -100,7 +99,7 @@ public class BlackBoardActivity extends ListActivity{
 		return true;  
 	}  
 
-	//------------------------------------MENU DA TASTO MENU---------------------------------------------
+	
 	/**
 	 * Chiamato dal sistema quando viene cliccato un item del menu
 	 */
@@ -120,7 +119,7 @@ public class BlackBoardActivity extends ListActivity{
 		}
 	}   
 	/**
-	 * Carica la listView con i messaggi del tavolo.
+	 * Load ListView for show message
 	 */
 	public void loadMessage(){
 		List<Message> listMessage=null;

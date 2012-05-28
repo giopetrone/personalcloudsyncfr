@@ -2,7 +2,7 @@ package it.unito.utility;
 
 import android.app.Application;
 
-//Save User Data in  pplication's context
+//Save User Data in  application's context
 public class TablePlusAndroid extends Application{
 	private Long userKey;
 	private String userName;

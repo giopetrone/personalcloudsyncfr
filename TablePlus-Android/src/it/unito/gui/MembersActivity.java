@@ -23,18 +23,13 @@ import android.widget.Toast;
 
 //Function of the class: show a list member of the member of the table (where we are in that moment) highlighting online and offline members 
 public class MembersActivity extends ListActivity {
-	String infoCurrentTable;
 	String key;
 	ArrayAdapter<ViewMembers> array;
 	private TablePlusAndroid session;
 
 
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        /**
-         * Memebers is on onCreate because Proxy on server dont reload user status
-         */
-        
+        super.onCreate(savedInstanceState);   
    }
     
    public void onResume(){
@@ -89,12 +84,11 @@ public class MembersActivity extends ListActivity {
 	}
 	
 	public void loadMembers(){
-		Log.i("Members","Load Members");
     	try{
     		key=getIntent().getStringExtra("key");
 			JSONObject request = ProxyUtils.proxyCall("queryUsersStatus",key);
 			JSONObject rispo = request.getJSONObject("results");
-			Log.i("Members","key: "+key+" Risposta: "+rispo);
+
 			JSONArray online= rispo.getJSONArray("online");
 			JSONArray offline= rispo.getJSONArray("offline");
 			List<ViewMembers> members=new LinkedList<ViewMembers>();
@@ -136,12 +130,10 @@ public class MembersActivity extends ListActivity {
 		
 		//JSON request for user name
 		JSONArray users=null;
-		Log.i("Members","usersKeys: "+usersKeys);
 		try{
 			//Proxy request
 			JSONObject request = ProxyUtils.proxyCall("queryUsers",usersKeys);
 			users = request.getJSONArray("results");
-			Log.i("Members","Users: "+users);
 		
 			//load data on the return list
 			for(int i=0;i<users.length();i++){
@@ -149,7 +141,6 @@ public class MembersActivity extends ListActivity {
 				String email=jo.getString("email");
 				
 				String newMail=ProxyUtils.clearMail(email);
-				Log.i("Members","email: "+newMail);
 				ViewMembers current=members.get(i);
 				current.setEmail(newMail);
 			}

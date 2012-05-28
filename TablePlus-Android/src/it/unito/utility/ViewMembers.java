@@ -32,7 +32,6 @@ public class ViewMembers {
 	}
 	
 	public String toString(){
-		//return "Status: "+status+"-- Username: "+ email;
 		return email;
 	}
 	

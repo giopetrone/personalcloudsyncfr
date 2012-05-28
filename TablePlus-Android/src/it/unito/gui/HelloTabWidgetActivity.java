@@ -30,8 +30,6 @@ public class HelloTabWidgetActivity extends TabActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.tab);
 		
-		Log.i("HelloTab","HelloTab");
-		
 		String key=getIntent().getStringExtra("key");
 		Long tableKey=Long.parseLong(key);
 		
@@ -61,7 +59,6 @@ public class HelloTabWidgetActivity extends TabActivity {
 			//Proxy request
 			JSONObject request1 = ProxyUtils.proxyCall("queryUsers",usersKeys);
 			JSONArray users = request1.getJSONArray("results");
-			Log.i("Members","Users: "+users);
 		
 			String[] newMail=new String[2];
 			//load data on the return list
@@ -72,12 +69,6 @@ public class HelloTabWidgetActivity extends TabActivity {
 			}
 			
 			info="Table Name: "+jsTable.getString("name")+" - "+"Creator: "+newMail[0]+" - "+"Owner: "+newMail[1];
-			Log.i("queryTable INFO HelloTab",info);
-			
-			
-			Log.i("queryTable response HelloTab",jsTable.toString());
-			Log.i("queryTable response jsDocs",jsDocs.toString());
-			Log.i("queryTable response tableDocs",tableDocs.toString());
 			
 		} catch (Exception e) {
 			Log.i("Eccezione", e.toString());

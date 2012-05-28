@@ -72,10 +72,9 @@ public class TableListActivity extends ListActivity {
 			Log.i("Eccezione", e.toString());
 		}		
 		
-		/**Quando funziona switchTable cancellare il try..catch()*/
+
 		try{
 		session=(TablePlusAndroid) this.getApplication();
-		Log.i("session.getCurrentTableKey()",session.getCurrentTableKey().toString());
 		JSONObject switchTables =ProxyUtils.setPresence(session.getUserKey(),session.getCurrentTableKey(),false);
 		}catch(Exception e1){
 			Log.i("Eccezione current table", e1.toString());
@@ -92,12 +91,10 @@ public class TableListActivity extends ListActivity {
 		//imposed current table in session
 		session=(TablePlusAndroid) this.getApplication();
 		session.setCurrentTableKey(tmp.getKey());
-		Log.i("session.getCurrentTableKey()",session.getCurrentTableKey().toString());
 				
 		//call method switchTable in ProxyUtils for change presence on table 
 		try {
 			JSONObject currentPres =ProxyUtils.setPresence(session.getUserKey(),session.getCurrentTableKey(),true);
-			Log.i("setPresence ",currentPres.toString());
 		} catch (Exception e) {
 			Log.i("Eccezione", e.toString());
 		}

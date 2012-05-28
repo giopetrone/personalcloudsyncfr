@@ -56,9 +56,6 @@ public class ExistantTableActivity extends ListActivity{
 	 		@Override
 	 		protected void onListItemClick(ListView l, View v, int position, long id)
 	 		{
-	 			System.out.println("position: "+position);
-	 			System.out.println("id: "+id);
-	 			//Log.i("CLick",l.getItemAtPosition(position).getClass().toString());
 	 			ViewDoc clickedItem=(ViewDoc) l.getItemAtPosition(position);
 	 			String url=clickedItem.getLink();
 	 			if(url!=""){
@@ -151,7 +148,6 @@ public class ExistantTableActivity extends ListActivity{
 			        	myDialog.show();    
 			        	return true;
 			        case R.id.info_tab:
-			        	Log.i("Info","info_table");
 			        	AlertDialog.Builder builder=new AlertDialog.Builder(ExistantTableActivity.this);
 			        	builder.setTitle("Inform Table"); 
 			        	builder.setMessage(getIntent().getStringExtra("infoCurrentTable"));

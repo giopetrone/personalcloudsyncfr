@@ -25,8 +25,8 @@ import android.util.Log;
 public class ProxyUtils {
 	private static HttpClient client;
 	private static HttpPost post;
-	//private static final String PROXY_URL = "http://tableplusplus.appspot.com/tableplus/proxy";
-	private static final String PROXY_URL ="http://10.0.2.2:8888/tableplus/proxy";
+	private static final String PROXY_URL = "http://tableplusplus.appspot.com/tableplus/proxy";
+	//private static final String PROXY_URL ="http://10.0.2.2:8888/tableplus/proxy";
 
 	/**
 	 * Method: first time only create object
@@ -64,8 +64,8 @@ public class ProxyUtils {
 			jsRequest.put("request", "queryUsersStatus");
 			jsRequest.put("tableKey", param);
 		} else if (operation.equals("queryUsers")) {
-            jsRequest.put("request", "queryUsers");
-            jsRequest.put("userKeysList", param);
+			jsRequest.put("request", "queryUsers");
+			jsRequest.put("userKeysList", param);
 		}else
 			System.out.println("ProxyCall, operazione non riconosciuta");
 		HttpEntity entity = new StringEntity(jsRequest.toString());
@@ -83,16 +83,15 @@ public class ProxyUtils {
 		is.close();
 		return jsResp;
 	}
-	
+
 	public static JSONObject queryTable(Long userKey,Long tableKey) throws Exception{
-		
+
 		JSONObject jsRequest = new JSONObject();
-		
+
 		jsRequest.put("request", "queryTable");
 		jsRequest.put("userKey", userKey);
 		jsRequest.put("tableKey", tableKey);
-		Log.i("queryTable request",jsRequest.toString());
-		
+
 		HttpEntity entity = new StringEntity(jsRequest.toString());
 		post.setEntity(entity);
 		HttpResponse response = client.execute(post);
@@ -112,13 +111,12 @@ public class ProxyUtils {
 	public static JSONObject setPresence(Long userKey, Long tableKey, Boolean presence)
 			throws Exception {
 		JSONObject jsRequest = new JSONObject();
-		
+
 		jsRequest.put("request", "setPresence");
 		jsRequest.put("userKey", userKey);
 		jsRequest.put("tableKey", tableKey);
 		jsRequest.put("presence", presence);
-		
-		//Log.i("setPresences",jsRequest.toString());
+
 		HttpEntity entity = new StringEntity(jsRequest.toString());
 		post.setEntity(entity);
 		HttpResponse response = client.execute(post);
@@ -133,8 +131,7 @@ public class ProxyUtils {
 		is.close();
 		return jsResp;
 	}
-	
-	//{"request": toggleStatus, "userKey":Userkey,”status”:offline/online} 
+
 	//create the JSON Object for hideMe request
 	public static JSONObject UserStatus(String operation, Object userKey, Object Key)
 			throws Exception {
@@ -163,21 +160,19 @@ public class ProxyUtils {
 		is.close();
 		return jsResp;
 	}
-	
-	
+
+
 	//create a JSON Object for requeste for adding a message in the BlackBoard
 	public static JSONObject newMessage( Object author,Object tablekey, Object messagetype, Object messagecontent)//String operation,
 			throws Exception {
 		JSONObject jsRequest = new JSONObject();
-		//System.out.println("proxyCall: " + operation);
-		//if (operation.equals("addBlackBoard")) {
-			jsRequest.put("request", "writeMessage");
-			jsRequest.put("authorKey", author);
-			jsRequest.put("tableKey", tablekey);
-			jsRequest.put("messageType", messagetype);
-			jsRequest.put("messageContent", messagecontent);
-		//} else
-			//System.out.println("ProxyCall, operazione non riconosciuta");
+
+		jsRequest.put("request", "writeMessage");
+		jsRequest.put("authorKey", author);
+		jsRequest.put("tableKey", tablekey);
+		jsRequest.put("messageType", messagetype);
+		jsRequest.put("messageContent", messagecontent);
+
 		HttpEntity entity = new StringEntity(jsRequest.toString());
 		post.setEntity(entity);
 		HttpResponse response = client.execute(post);
@@ -192,12 +187,12 @@ public class ProxyUtils {
 		istream.close();
 		return jsResponse;
 	}
-	
+
 	// convert a JSON Array to a List of Message (if is compatible)	 
 	public static List<Message> convertToMessagesList(JSONArray jsMessages)
 			throws JSONException {
 		List<Message> messages = new ArrayList<Message>();
-		
+
 		for (int i = 0; i < jsMessages.length(); i++) {
 			JSONObject jsMex = (JSONObject) jsMessages.get(i);
 			messages.add(convertToMessage(jsMex));
@@ -239,12 +234,12 @@ public class ProxyUtils {
 		}
 		return tables;
 	}
-	
+
 	public static String clearMail(String s)
 	{
-	    int last = s.indexOf('@');
-	    String headless = s.substring(0,last);
-	    return headless.trim();
+		int last = s.indexOf('@');
+		String headless = s.substring(0,last);
+		return headless.trim();
 	}
 
 }
