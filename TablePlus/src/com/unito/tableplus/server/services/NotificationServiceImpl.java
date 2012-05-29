@@ -107,9 +107,9 @@ public class NotificationServiceImpl extends RemoteServiceServlet implements
 			List<Long> tableKeySubscription, Long clientSeqNumber,
 			String clientEmail) {
 
-		log.warning("DENTROOOO: clientSeqNumber=" + clientSeqNumber
+		log.info("DENTROOOO: clientSeqNumber=" + clientSeqNumber
 				+ ", seqNumber=" + seqNumber);
-		System.out.println("DENTRO");
+		//System.out.println("DENTRO");
 
 		// Timer timer=new Timer();
 		// timer.schedule(new TimerTask(){
@@ -160,14 +160,23 @@ public class NotificationServiceImpl extends RemoteServiceServlet implements
 				// nuove notifiche sono più di una, ma al momento
 				// do per scontato che sia una sola
 
-				n = notificationsList.get(notificationsList.size() - 1);
-
+				
+				
+				n = notificationsList.get((int) (notificationsList.size() - (seqNumber-clientSeqNumber)));
+				log.info(clientEmail+" ha questo clientSeqNum="+clientSeqNumber+" e si appresta a leggere la notifica con seqNumber="+n.getSequenceNumber());
+				
+				
+				
+				
 			}
 			// l'ultima notifica aggiunta è interessante?
+			log.info(clientEmail+" sta per analizzare la notifica: eventKind="+n.getEventKind()+" --- senderMail="+n.getSenderEmail());
+			
+			
 
 			if (n.getEventKind().equals("ANSWERNOW")
 					&& n.getSenderEmail().equals(clientEmail)) {
-				log.warning("Forzo la risposta");
+				log.info("Forzo la risposta");
 				needed = true;
 			}
 
@@ -230,6 +239,7 @@ public class NotificationServiceImpl extends RemoteServiceServlet implements
 
 	@Override
 	public boolean sendNotification(Notification notification) {
+		log.info("Sta per mandare la notifica: eventKind="+notification.getEventKind()+" --- senderMail="+notification.getSenderEmail());
 		synchronized (this) {
 			seqNumber++;
 
@@ -241,7 +251,12 @@ public class NotificationServiceImpl extends RemoteServiceServlet implements
 			// + notification.getMemberEmail() + "\n");
 
 			notification.setSequenceNumber(seqNumber);
+			
+			log.info("Sto per aggiungere una notifica alla lista, la lista ha dimensione "+notificationsList.size());
+			
 			notificationsList.add(notification);
+			
+			log.info("Adesso la lista ha dimensione "+notificationsList.size());
 
 			// comporta l’estrazione di tutti i thread
 			// da wait set ed il loro inserimento in entry set.

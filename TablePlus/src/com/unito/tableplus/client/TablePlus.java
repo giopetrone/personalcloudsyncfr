@@ -111,7 +111,7 @@ public class TablePlus implements EntryPoint {
 
 	/**
 	 * Verifica se l'utente che ha aperto la pagina è loggato con google: 
-     * - se è loggato viene caricato tutto l'ambinte e visualizzato il personal table 
+     * - se è loggato viene caricato tutto l'ambiente e visualizzato il personal table 
      * - se non è loggato carico la finestra di login
 	 */
 
