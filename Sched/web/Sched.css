@@ -28,7 +28,7 @@
 }
 
 .labella {
-    border: 2px solid black;
+    border: 3px solid blueviolet;
 }
 
 .MainLabel {
@@ -46,6 +46,10 @@
     border:3px;
     border-bottom: 2px solid #87ffff;
     margin-right: 2px;
+}
+
+.gwt-ButtonSmall{
+    font-size: 12px;
 }
 
 .gwt-ButtonOLD{

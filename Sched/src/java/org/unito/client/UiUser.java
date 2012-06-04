@@ -67,7 +67,7 @@ public class UiUser implements IsSerializable {
         new UiUser("giovanna");
         new UiUser("gianluca");
         new UiUser("marino");
-        new UiUser("balbo", 10.0);
+        new UiUser("prof. Rossi", 10.0);
     }
 
     public static ArrayList<String> getUserIds() {

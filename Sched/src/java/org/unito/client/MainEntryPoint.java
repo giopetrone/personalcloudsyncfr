@@ -90,11 +90,11 @@ public class MainEntryPoint implements EntryPoint {
         Label spazio = new Label("         ");
         spazio.setWidth("100px");
         uroz.add(spazio);
-        uroz.add(new Label(" welcome:"));
+        uroz.add(new Label(" You are logged as:"));
         uroz.add(userName);
         RootPanel.get().add(uroz);
         TaskGroup.addTaskGroup();
-        TaskGroup.esempio();
+        TaskGroup.esempioTest();
         iniziaTable(taskTable, TaskGroup.current(), false);
         VerticalPanel pannVertTask = pannelloTask();
         HorizontalPanel buttonPanel = pannelloBottoni();
@@ -202,7 +202,7 @@ public class MainEntryPoint implements EntryPoint {
         h = new HorizontalPanel();
         Label label6 = new Label("After:");
         Label label7 = new Label("Schedule:");
-        Label label8 = new Label("Users:");
+        Label label8 = new Label("Attendees:");
         Label label9 = new Label("Description:");
         label6.setWidth("100px");
         h.add(label6);
@@ -625,14 +625,16 @@ public class MainEntryPoint implements EntryPoint {
         for (String ta : tas) {
             final Button bu = new Button(ta);
             Task t = TaskGroup.get(ta);
+            bu.addStyleName("gwt-ButtonSmall");
             if (t.isOverlap()) {
                 bu.addStyleName("overlapping");
             }
 
+
             // bu.addMouseListener(
             //          new TooltipListener(
             //          t.userString(), 5000 /* timeout in milliseconds*/, "yourcssclass"));
-            TooltipListener tip = new TooltipListener(t.userString(), 5000, "yourcssclass");
+            TooltipListener tip = new TooltipListener(t.userString(), 5000, "gwt-root");
             bu.addMouseOverHandler(tip);
             bu.addMouseOutHandler(tip);
             bu.addClickHandler(new ClickHandler() {
@@ -683,7 +685,6 @@ public class MainEntryPoint implements EntryPoint {
             if (result == null) {
                 Window.alert("no solutions");
             } else {
-
                 DialogBox dlg = new MyDialog("New Schedule", new TaskGroup(result), "proposal");
                 dlg.center();
                 /*

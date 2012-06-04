@@ -179,6 +179,7 @@ public class TaskCall {
             if (result) {
                 ArrayList<MyTask> tasks = ts.getTasks();
                 TaskGroup ret = new TaskGroup(taskGroup);
+                ret.getCurrSchedule().clear();
                 for (int k = 0; k < tasks.size(); k++) {
                     MyTask st = tasks.get(k);
                     //    System.out.println("miotaskstartinput=" + st.getName() + ";"+ st.getStart() +";min="+
@@ -193,7 +194,7 @@ public class TaskCall {
                     int start = st.getStart().dom().min();
                     int end = st.getEnd().dom().min();
                     int dura = st.getDuration().dom().min();
-                    ret.addSchedule(new org.unito.client.Interval(st.getName(), start, end));
+                    ret.setSchedule(st.getName(), start, end);
                     //  curr.setDuration(dura);
                     System.out.println("Miotask=" + st.getName() + " " + start + " " + end + " " + dura);
                 }
@@ -224,7 +225,7 @@ public class TaskCall {
                     int start = st.getStart().dom().min();
                     int end = st.getEnd().dom().min();
                     int dura = st.getDuration().dom().min();
-                    ret.addSchedule(new org.unito.client.Interval(st.getName(), start, end));
+                    ret.setSchedule(st.getName(), start, end);
                     System.out.println("Miotask=" + st.getName() + " " + start + " " + end + " " + dura);
                 }
                 return ret;
