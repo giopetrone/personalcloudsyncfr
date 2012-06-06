@@ -611,19 +611,19 @@ public class TaskGroup implements IsSerializable {
 
         // ora prof rossi
          task = new Task("BUSY1", 24,30,6);
-        task.addUser(UiUser.find("prof. Rossi"));
+        task.addUser(UiUser.find("prof.Rossi"));
         task.setDescription("Very busy");
         tg.addScheduledTask(task, 24,30);
           task = new Task("BUSY2", 32,36,4);
-        task.addUser(UiUser.find("prof. Rossi"));
+        task.addUser(UiUser.find("prof.Rossi"));
         task.setDescription("critical");
         tg.addScheduledTask(task, 32, 36);
            task = new Task("BUSY3", 36,39,3);
-        task.addUser(UiUser.find("prof. Rossi"));
+        task.addUser(UiUser.find("prof.Rossi"));
         task.setDescription("Very important");
         tg.addScheduledTask(task, 36,39);
          task = new Task("BUSY4", 41,43,2);
-        task.addUser(UiUser.find("prof. Rossi"));
+        task.addUser(UiUser.find("prof.Rossi"));
         task.setDescription("Do not disturb!");
         tg.addScheduledTask(task, 41,43);
 

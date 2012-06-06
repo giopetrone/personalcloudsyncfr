@@ -4,6 +4,7 @@
  */
 package org.unito.client;
 
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.IsSerializable;
 import java.util.ArrayList;
 
@@ -59,6 +60,7 @@ public class UiUser implements IsSerializable {
                 return u;
             }
         }
+        Window.alert("User not found: "+us);
         return null;
     }
 
@@ -67,7 +69,7 @@ public class UiUser implements IsSerializable {
         new UiUser("giovanna");
         new UiUser("gianluca");
         new UiUser("marino");
-        new UiUser("prof. Rossi", 10.0);
+        new UiUser("prof.Rossi", 10.0);
     }
 
     public static ArrayList<String> getUserIds() {

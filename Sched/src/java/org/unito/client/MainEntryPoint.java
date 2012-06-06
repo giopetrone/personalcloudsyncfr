@@ -18,6 +18,7 @@ import com.google.gwt.event.dom.client.MouseOutHandler;
 import com.google.gwt.event.dom.client.MouseOverEvent;
 import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.user.client.Timer;
+
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -61,12 +62,14 @@ public class MainEntryPoint implements EntryPoint {
     TextBox tUsers = new TextBox();
     TextArea tDescription = new TextArea();
     TextBox userName = new TextBox();
+    Label dateLabel = new Label("Today");
     CheckBox cOverlap = new CheckBox("Can overlap other tasks ");
     private String multiUser = "";
     int partenza = 8;
     int fine = 20;
     int orario = fine - partenza;
     ArrayList<String> usersToShow = new ArrayList();
+    String modalita = "normale"; // se no test1 test2 etc
 
     /**
      * Creates a new instance of MainEntryPoint
@@ -78,20 +81,52 @@ public class MainEntryPoint implements EntryPoint {
      * The entry point method, called automatically by loading a module
      * that declares an implementing class as an entry-point
      */
+    private void setTimers() {
+        /* Timer msgTimer = new Timer() {
+
+        public void run() {
+        refreshMsgList();
+
+        }
+        };
+        msgTimer.scheduleRepeating(MSG_INTERVAL);
+         */
+        Timer singleTimer = new Timer() {
+
+            public void run() {
+                getService().stringaData("data", callbackData);
+            }
+        };
+        singleTimer.schedule(1000);
+    }
+
     public void onModuleLoad() {
+        //   setTimers();
         RootPanel.get().addStyleName("gwt-root");
         // content creation
         HorizontalPanel uroz = new HorizontalPanel();
-       // uroz.addStyleName("paddedHorizontalPanel");
-        //  uroz.setSpacing(10);
-        Label ll1 = new Label("Week from March 7 to March 13");
-        ll1.addStyleName("labella");
-        uroz.add(ll1);
+        dateLabel.addStyleName("labella");
+        uroz.add(dateLabel);
         Label spazio = new Label("         ");
         spazio.setWidth("100px");
         uroz.add(spazio);
         uroz.add(new Label(" You are logged as:"));
         uroz.add(userName);
+        final Button but = new Button("Modalita' Test");
+        but.addClickHandler(new ClickHandler() {
+
+            public void onClick(ClickEvent event) {
+                if (modalita.equals("normale")) {
+                    modalita = "test";
+                    but.setText("Modalita' normale");
+                } else {
+                    modalita = "normale";
+                    but.setText("Modalita' test");
+                }
+            }
+        });
+        uroz.add(spazio);
+        uroz.add(but);
         RootPanel.get().add(uroz);
         TaskGroup.addTaskGroup();
         TaskGroup.esempioTest();
@@ -119,7 +154,6 @@ public class MainEntryPoint implements EntryPoint {
         RootPanel.get().add(taskSched);
         RootPanel.get().add(buttonPanel);
         RootPanel.get().add(lblServerReply);
-
     }
 
     private VerticalPanel pannelloScheduler() {
@@ -134,7 +168,7 @@ public class MainEntryPoint implements EntryPoint {
             public void onClick(ClickEvent event) {
                 // Window.alert("bottonr cliccato size " + TaskGroup.current().getTasks().size());
 
-                getService().schedule(new ViaVai(TaskGroup.current()), "start", "new", callbackTask);
+                getService().schedule(new ViaVai(TaskGroup.current()), "start", "new", modalita, callbackTask);
                 // getService().schedule(new TaskGroup(), "start", callbackTask);
                 //   getService().myMethod("mar", prova);
 
@@ -145,7 +179,7 @@ public class MainEntryPoint implements EntryPoint {
         schedule2Button.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-                getService().schedule(new ViaVai(TaskGroup.current()), "end", "new", callbackTask);
+                getService().schedule(new ViaVai(TaskGroup.current()), "end", "new", modalita, callbackTask);
 
             }
         });
@@ -218,6 +252,7 @@ public class MainEntryPoint implements EntryPoint {
         label8.setWidth("100px");
         h.add(label8);
         h.add(tUsers);
+        h.add(iniziaPartecipanti());
         retPanel.add(h);
         h = new HorizontalPanel();
         cOverlap.setWidth("100px");
@@ -256,10 +291,7 @@ public class MainEntryPoint implements EntryPoint {
                 }
                 int sch = TaskGroup.addScheduleTask(tName.getText(), vStart, vEnd, tDuration.getText(), tBefore.getText(), tAfter.getText(), vSched, tUsers.getText(), cOverlap.getValue(), tDescription.getText());
                 if (sch == -1) {
-                    boolean callScheduler = Window.confirm("task has not been scheduled, do you want to change something?");
-                    if (callScheduler) {
-                        Window.alert("still to be done");
-                    }
+                    Window.alert("Task " + tName.getText() + " cannot be scheduled. Press button \"Show full task list\" to view the complete set of tasks and ask for help in rescheduling problematic ones");
                     return;
                 }
                 riempi(taskTable, false, TaskGroup.current());
@@ -312,7 +344,7 @@ public class MainEntryPoint implements EntryPoint {
                 //  if (selectedUser() != null) {
                 String tName = MainEntryPoint.this.tName.getText();
                 if (TaskGroup.exists(tName)) {
-                    getService().scheduleRequest(new ViaVai(TaskGroup.current()), tName, "startintervals", "mu/", "move", selectedUser(), callbackTaskSuggest);
+                    getService().scheduleRequest(new ViaVai(TaskGroup.current()), tName, "startintervals", "mu/", "move", selectedUser(), modalita, callbackTaskSuggest);
 
                     //   getService().scheduleRequest(new ViaVai(TaskGroup.current()), tName, "startintervals", multiUser, "move", "" /* RIMOSSO: selectedUser()*/, callbackTaskSuggest);
                 } else {
@@ -328,7 +360,7 @@ public class MainEntryPoint implements EntryPoint {
             public void onClick(ClickEvent event) {
                 final String tName = MainEntryPoint.this.tName.getText();
                 if (TaskGroup.exists(tName) && selectedUser() != null) {
-                    getService().scheduleRequest(new ViaVai(TaskGroup.current()), tName, "startintervals", multiUser, "insert", selectedUser(), callbackTaskSuggest);
+                    getService().scheduleRequest(new ViaVai(TaskGroup.current()), tName, "startintervals", multiUser, "insert", selectedUser(), modalita, callbackTaskSuggest);
                 } else {
                     Window.alert("task=NOT found:" + tName);
                 }
@@ -343,7 +375,7 @@ public class MainEntryPoint implements EntryPoint {
                 final String tName = MainEntryPoint.this.tName.getText();
                 if (TaskGroup.exists(tName) && selectedUser() != null) {
                     TaskGroup.current().setChoiceForTask(tName);
-                    getService().scheduleRequest(new ViaVai(TaskGroup.current()), tName, "tasknet", multiUser, "move", selectedUser(), callbackTaskSuggest);
+                    getService().scheduleRequest(new ViaVai(TaskGroup.current()), tName, "tasknet", multiUser, "move", selectedUser(), modalita, callbackTaskSuggest);
                 } else {
                     Window.alert("task=NOT found:" + tName);
                 }
@@ -358,7 +390,7 @@ public class MainEntryPoint implements EntryPoint {
                 final String tName = MainEntryPoint.this.tName.getText();
                 if (TaskGroup.exists(tName) && selectedUser() != null) {
                     TaskGroup.current().setChoiceForTask(tName);
-                    getService().scheduleRequest(new ViaVai(TaskGroup.current()), tName, "tasknet", multiUser, "insert", selectedUser(), callbackTaskSuggest);
+                    getService().scheduleRequest(new ViaVai(TaskGroup.current()), tName, "tasknet", multiUser, "insert", selectedUser(), modalita, callbackTaskSuggest);
                 } else {
                     Window.alert("task=NOT found:" + tName);
                 }
@@ -373,7 +405,7 @@ public class MainEntryPoint implements EntryPoint {
                     final String tName = MainEntryPoint.this.tName.getText();
                     if (TaskGroup.exists(tName)) {
                         // INUTILE??     TaskGroup.current().setChoiceForTask(tName);
-                        getService().scheduleRequest(new ViaVai(TaskGroup.current()), tName, "startintervals", "mu/", "move", selectedUser(), callbackTaskSuggest);
+                        getService().scheduleRequest(new ViaVai(TaskGroup.current()), tName, "startintervals", "mu/", "move", selectedUser(), modalita, callbackTaskSuggest);
                     } else {
                         Window.alert("task NOT found:" + tName);
                     }
@@ -748,6 +780,17 @@ public class MainEntryPoint implements EntryPoint {
             Window.alert("Communication failed");
         }
     };
+    final AsyncCallback<String> callbackData = new AsyncCallback<String>() {
+
+        public void onSuccess(String result) {
+            lblServerReply.setText("successo");
+            dateLabel.setText(result);
+        }
+
+        public void onFailure(Throwable caught) {
+            Window.alert("Communication failed");
+        }
+    };
 
     public static TaskAllocationAsync getService() {
         // Create the client proxy. Note that although you are creating the
@@ -761,7 +804,6 @@ public class MainEntryPoint implements EntryPoint {
     }
 
     private String stringVal(ListBox day, ListBox time, int subtract) {
-
         return "" + (day.getSelectedIndex() * 12 + time.getSelectedIndex() - subtract);
     }
 
@@ -948,24 +990,23 @@ public class MainEntryPoint implements EntryPoint {
 
     }
 
-    private ListBox iniziaUtentiOld() {
-        final ListBox ret = new ListBox(true);
+    private ListBox iniziaPartecipanti() {
+        ListBox ret = new ListBox(true);
         ArrayList<String> ids = UiUser.getUserIds();
+        //    Window.alert("ids=" + ids.size());
         for (String s : ids) {
             ret.addItem(s);
         }
-        ret.addItem("*");
-        ret.setVisibleItemCount(ids.size());
+        //ret.setVisibleItemCount(1);
         ret.addChangeHandler(new ChangeHandler() {
 
             public void onChange(ChangeEvent event) {
-                usersToShow.clear();
-                for (int i = 0; i < ret.getItemCount(); i++) {
-                    if (ret.isItemSelected(i)) {
-                        usersToShow.add(ret.getItemText(i));
+                ListBox li = (ListBox) event.getSource();
+                for (int i = 0; i < li.getItemCount(); i++) {
+                    if (li.isItemSelected(i)) {
+                        tUsers.setText(tUsers.getText() + " " + li.getItemText(i));
                     }
                 }
-                riempi(taskTable, false, TaskGroup.current());
             }
         });
         return ret;

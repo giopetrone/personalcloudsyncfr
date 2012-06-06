@@ -13,8 +13,8 @@ import java.util.ArrayList;
  * @author marino
  */
 public interface TaskAllocationAsync { 
-    public void myMethod(String s, AsyncCallback<String> callback);
+    public void stringaData(String s, AsyncCallback<String> callback);
     public void removeTask(String s, AsyncCallback<String> callback);
-    public void  schedule(ViaVai daFare, String mode, String old,  AsyncCallback<ViaVai> callback);
-    public void  scheduleRequest(ViaVai daFare, String taskName, String taskNet, String mu, String mode, String user,  AsyncCallback<ViaVai> callback);
+    public void  schedule(ViaVai daFare, String mode, String old, String modalita,  AsyncCallback<ViaVai> callback);
+    public void  scheduleRequest(ViaVai daFare, String taskName, String taskNet, String mu, String mode, String user, String modalita,  AsyncCallback<ViaVai> callback);
 }

@@ -28,7 +28,7 @@ public class TaskCall {
 
     static TaskStore ts = new TaskStore();
 
-    public TaskGroup doRequest(TaskGroup iTask, String taskName, String taskNet, String mu, String mode, String user) {
+    public TaskGroup doRequest(TaskGroup iTask, String taskName, String taskNet, String mu, String mode, String user,  String modalita) {
 
         // 2 modes:
         // "startintervals" to request places where a task can be placed
@@ -67,7 +67,7 @@ public class TaskCall {
             httpClient.getConnectionManager().shutdown();
             if (taskNet.equals("tasknet")) {
                 // call Scheduler with result from constraint solver
-                TaskGroup ret1 = new TaskCall().doIt(ret, "start", "new");
+                TaskGroup ret1 = new TaskCall().doIt(ret, "start", "new", modalita);
                 return ret1;
             } else {  // taskNet.equals("tasknet")
                 return ret;
@@ -90,7 +90,7 @@ public class TaskCall {
         }
     }
 
-    public TaskGroup doIt(TaskGroup taskGroup, String mode, String old) {
+    public TaskGroup doIt(TaskGroup taskGroup, String mode, String old, String modalita) {
         // create store of tasks
         if (!old.equals("old")) {   //riparti da 0
             ts = new TaskStore();
