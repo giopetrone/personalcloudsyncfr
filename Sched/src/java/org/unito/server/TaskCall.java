@@ -28,7 +28,7 @@ public class TaskCall {
 
     static TaskStore ts = new TaskStore();
 
-    public TaskGroup doRequest(TaskGroup iTask, String taskName, String taskNet, String mu, String mode, String user,  String modalita) {
+    public TaskGroup doRequest(TaskGroup iTask, String taskName, String taskNet, String mu, String mode, String user, String modalita) {
 
         // 2 modes:
         // "startintervals" to request places where a task can be placed
@@ -37,15 +37,15 @@ public class TaskCall {
         // have to be moved to make room for it in the specified interval;
         // the resulting net is then passes to jacop for generating a schedule
 
-        System.err.println("in dorequest task="+taskName+"\n"+"tasknet="+taskNet+"\n"+"mu="+mu+"\n"+"mode="+mode+"\n"+"user="+user+"\n");
+        System.err.println("in dorequest task=" + taskName + "\n" + "tasknet=" + taskNet + "\n" + "mu=" + mu + "\n" + "mode=" + mode + "\n" + "user=" + user + "\n");
         String pr = new Request(iTask, taskName, taskNet, mu, mode, user).toServerString();
         System.err.println("in dorequest request=\n" + pr);
         try {
             DefaultHttpClient httpClient = new DefaultHttpClient();
             String req = "http://localhost:3000/modstn/" + mu + taskNet;
-            System.err.println("in dorequest url=" + req +"\n");
+            System.err.println("in dorequest url=" + req + "\n");
             HttpPost postRequest = new HttpPost(req);
-                    
+
             //   "http://localhost:3000/modstn/startintervals");   oppure "tasknet"
             StringEntity input = new StringEntity(pr);
             input.setContentType("text/xml");
@@ -67,7 +67,7 @@ public class TaskCall {
             httpClient.getConnectionManager().shutdown();
             if (taskNet.equals("tasknet")) {
                 // call Scheduler with result from constraint solver
-                TaskGroup ret1 = new TaskCall().doIt(ret, "start", "new", modalita);
+                TaskGroup ret1 = new TaskCall().doConstraints(ret, "start", "new", modalita);
                 return ret1;
             } else {  // taskNet.equals("tasknet")
                 return ret;
@@ -90,150 +90,90 @@ public class TaskCall {
         }
     }
 
-    public TaskGroup doIt(TaskGroup taskGroup, String mode, String old, String modalita) {
+    private void timeAndOverlap(TaskGroup taskGroup, TaskStore tas) {
+        for (Task t1 : taskGroup.getTasks()) {  // avoid overlap bteween disjoint task couples
+            for (Task t2 : taskGroup.getTasks()) {
+                if (t1 != t2
+                        && !t1.isOverlap()
+                        && !t2.isOverlap()
+                        && !t1.disJoint(t2) /* && !taskNames.contains(t1.getName())
+                        && !taskNames.contains(t2.getName())*/) {
+                    tas.imposeNonOverlap(t1.getName(), t2.getName());
+                }
+            }
+        }
+        for (Task t : taskGroup.getTasks()) {
+            ArrayList<String> bef = t.getBefore();
+            for (String se : bef) {
+                tas.imposeBefore(t.getName(), se);
+                System.out.println("inpomgo " + t.getName() + "before " + se);
+            }
+            ArrayList<String> aft = t.getAfter();
+            for (String se : aft) {
+                tas.imposeAfter(t.getName(), se);
+                System.out.println("inpomgo " + t.getName() + "after " + se);
+            }
+        }
+    }
+
+    private TaskGroup schedule(TaskGroup taskGroup, TaskStore tas, String mode) {
+        boolean result = tas.genSchedule(mode);
+        if (result) {
+            System.out.println("\nProposed schedule for mode:" + mode);
+        } else {
+            System.out.println("*** No solution!");
+        }
+        tas.printTasks();
+        System.out.println();
+        if (result) {
+            ArrayList<MyTask> tasks = tas.getTasks();
+            TaskGroup ret = new TaskGroup(taskGroup);
+            ret.getCurrSchedule().clear();
+            for (int k = 0; k < tasks.size(); k++) {
+                MyTask st = tasks.get(k);
+                int start = st.getStart().dom().min();
+                int end = st.getEnd().dom().min();
+                int dura = st.getDuration().dom().min();
+                ret.setSchedule(st.getName(), start, end);
+                System.out.println("Miotask=" + st.getName() + " " + start + " " + end + " " + dura);
+            }
+            return ret;
+        } else {
+            return null;
+        }
+    }
+
+    public TaskGroup doConstraints(TaskGroup taskGroup, String mode, String old, String modalita) {
         // create store of tasks
         if (!old.equals("old")) {   //riparti da 0
             ts = new TaskStore();
             User.clear();
         }
         ArrayList<String> taskNames = new ArrayList<String>();
-        System.err.println("in doit taskssize=" + taskGroup.getTasks().size());
+        System.err.println("in doit tasks size=" + taskGroup.getTasks().size());
+        // forse fuori dal loop? mettere qui? createUsers(taskGroup);
         for (Task t : taskGroup.getTasks()) {
             ts.addTask(t.getName(), t.getMinStartHour(), t.getMaxEndHour(), t.getMinStartHour(), t.getMaxEndHour(), t.getDuration());
-            createUsers(taskGroup);
+            createUsers(taskGroup); // forse fuori dal loop?
             for (UiUser u : t.getUsers()) {
                 ts.addActorToTask(t.getName(), User.find(u.getId()));
             }
-            /*  if (!t.getOverlap()) {
-            taskNames.add(t.getName());
-            }*/
         }
-        for (Task t1 : taskGroup.getTasks()) {  // avoid overlap bteween disjoint task couples
-            for (Task t2 : taskGroup.getTasks()) {
-                if (t1 != t2
-                        && !t1.isOverlap()
-                        && !t2.isOverlap()
-                        && !t1.disJoint(t2) /* && !taskNames.contains(t1.getName())
-                        && !taskNames.contains(t2.getName())*/) {
-                    ts.imposeNonOverlap(t1.getName(), t2.getName());
-                }
-            }
-        }
-        //   ts.imposeNonOverlap(taskNames);
-        for (Task t : taskGroup.getTasks()) {
-            ArrayList<String> bef = t.getBefore();
-            for (String se : bef) {
-                ts.imposeBefore(t.getName(), se);
-                System.out.println("inpomgo " + t.getName() + "before " + se);
-            }
-            ArrayList<String> aft = t.getAfter();
-            for (String se : aft) {
-                ts.imposeAfter(t.getName(), se);
-                System.out.println("inpomgo " + t.getName() + "after " + se);
-            }
-        }
+        timeAndOverlap(taskGroup, ts);
         // creo il clone e reimpongo i constraint di base
         TaskStore cts = ts.clone();
-        //   cts.imposeNonOverlap(taskNames);
-        for (Task t1 : taskGroup.getTasks()) {  // avoid overlap bteween disjoint task couples
-            for (Task t2 : taskGroup.getTasks()) {
-                if (t1 != t2
-                        && !t1.isOverlap()
-                        && !t2.isOverlap()
-                        && !t1.disJoint(t2) /* && !taskNames.contains(t1.getName())
-                        && !taskNames.contains(t2.getName())*/) {
-                    cts.imposeNonOverlap(t1.getName(), t2.getName());
-                }
-            }
-        }
-        //cts.imposeBefore("T1", "T2");
-        for (Task t : taskGroup.getTasks()) {
-            ArrayList<String> bef = t.getBefore();
-            for (String se : bef) {
-                cts.imposeBefore(t.getName(), se);
-                System.out.println("inpomgo " + t.getName() + "before " + se);
-            }
-            ArrayList<String> aft = t.getAfter();
-            for (String se : aft) {
-                cts.imposeAfter(t.getName(), se);
-                System.out.println("inpomgo " + t.getName() + "after " + se);
-            }
-        }
+        timeAndOverlap(taskGroup, cts);
         System.out.println("Tasks before constraint propagation:");
         ts.printTasks();
         boolean consistent = ts.checkConsistency();
         System.out.println("\nThe set of constraints is consistent? "
                 + consistent + "\n");
-        if (!consistent) {
+        if (consistent) {
+            return schedule(taskGroup, mode.equals("start")? ts:cts, mode);
+        }else{
             return null;
         }
-        if (mode.equals("start")) {
-            boolean result = ts.genSchedule("start");
-            if (result) {
-                System.out.println("\nProposed schedule (start tasks as soon as possible):");
-            } else {
-                System.out.println("*** No solution!");
-            }
-            ts.printTasks();
-            System.out.println();
-            if (result) {
-                ArrayList<MyTask> tasks = ts.getTasks();
-                TaskGroup ret = new TaskGroup(taskGroup);
-                ret.getCurrSchedule().clear();
-                for (int k = 0; k < tasks.size(); k++) {
-                    MyTask st = tasks.get(k);
-                    //    System.out.println("miotaskstartinput=" + st.getName() + ";"+ st.getStart() +";min="+
-                    //          st.getStart().dom().min()  );
-                /*    String[] arra = ("" + st.getStart()).split(" ", -1);
-                    int start = Integer.parseInt(arra[arra.length -1]);
-                    arra = ("" + st.getEnd()).split(" ", -1);
-                    int end = Integer.parseInt(arra[arra.length -1]);
-                    arra = ("" + st.getDuration()).split(" ", -1);
-                    int dura = Integer.parseInt(arra[arra.length -1]);
-                    ret.addSchedule(new org.unito.client.Interval(st.getName(), start, end)); */
-                    int start = st.getStart().dom().min();
-                    int end = st.getEnd().dom().min();
-                    int dura = st.getDuration().dom().min();
-                    ret.setSchedule(st.getName(), start, end);
-                    //  curr.setDuration(dura);
-                    System.out.println("Miotask=" + st.getName() + " " + start + " " + end + " " + dura);
-                }
-                return ret;
-            } else {
-                return null;
-            }
-        }
-        if (mode.equals("end")) {
-            boolean otherResult = cts.genSchedule("end");
-            if (otherResult) {
-                System.out.println("\nAlternative schedule (schedule tasks with earlier deadlines first):");
-            } else {
-                System.out.println("*** No solution!");
-            }
-            cts.printTasks();
-            if (otherResult) {
-                ArrayList<MyTask> tasks = cts.getTasks();
-                TaskGroup ret = new TaskGroup(taskGroup);
-                for (int k = 0; k < tasks.size(); k++) {
-                    MyTask st = tasks.get(k);
-                    /*   String[] arra = ("" + st.getStart()).split(" ", -1);
-                    int start = Integer.parseInt(arra[2]);
-                    arra = ("" + st.getEnd()).split(" ", -1);
-                    int end = Integer.parseInt(arra[2]);
-                    arra = ("" + st.getDuration()).split(" ", -1);
-                    int dura = Integer.parseInt(arra[2]); */
-                    int start = st.getStart().dom().min();
-                    int end = st.getEnd().dom().min();
-                    int dura = st.getDuration().dom().min();
-                    ret.setSchedule(st.getName(), start, end);
-                    System.out.println("Miotask=" + st.getName() + " " + start + " " + end + " " + dura);
-                }
-                return ret;
-            } else {
-                return null;
-            }
-        }
-        return null;
+      
     }
 
     public String removeTask(String task) {

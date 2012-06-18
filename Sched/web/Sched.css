@@ -52,11 +52,8 @@
     font-size: 12px;
 }
 
-.gwt-ButtonOLD{
-
+.gwt-Button{
     font-weight: bold;
-    font-size: 24px;
-    font-style:italic;
 }
 
 .overlapping{

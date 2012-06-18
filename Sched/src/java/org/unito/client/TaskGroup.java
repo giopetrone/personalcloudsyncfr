@@ -152,14 +152,19 @@ public class TaskGroup implements IsSerializable {
             }
         }
         tmp = users.split(" ", -1);
+        Window.alert("users='" + users + "'" + tmp.length);
         for (int i = 0; i < tmp.length; i++) {
             if (!tmp[i].equals("") && !tmp[i].equals(" ")) {
                 if (UiUser.find(tmp[i]) == null) {
-                    msg += "User not found: " + tmp[i] + "\n";
+                    msg += "User not found: " + tmp[i];
                 }
             }
         }
         return msg;
+    }
+    
+    public static boolean isSingle(String tName){
+        return get(tName).oneUser();
     }
 
     public static void add(Task t) {
@@ -216,7 +221,9 @@ public class TaskGroup implements IsSerializable {
     public void updateWith(ViaVai result) {
         selectedTask = result.getSelectedTask();
         updateTaskSlots(new TaskGroup(result));
-        /* non funziona e non so perche'!!!!  */  //taskSchedule = Interval.sort(result.getTaskSchedule());
+        /*
+         * non funziona e non so perche'!!!!
+         */  //taskSchedule = Interval.sort(result.getTaskSchedule());
     }
 
     public void updateTaskSlots(TaskGroup tg) {
@@ -305,7 +312,9 @@ public class TaskGroup implements IsSerializable {
         return -1;
     }
 
-    public static ArrayList<String>[] nomiCaselle(/*boolean showAlt,*/TaskGroup fonte) {
+    public static ArrayList<String>[] nomiCaselle(/*
+             * boolean showAlt,
+             */TaskGroup fonte) {
         ArrayList<String>[] ret = new ArrayList[oreLavoro];
         for (int i = 0; i < oreLavoro; i++) {
             ret[i] = new ArrayList();
@@ -564,7 +573,7 @@ public class TaskGroup implements IsSerializable {
         task.addUser(UiUser.find("gianluca"));
         task.setDescription("University staff meeting");
         tg.addScheduledTask(task, 15, 17);
-        task = new Task("Pilates", 22, 24, 2);
+        task = new Task("Palestra", 22, 24, 2);
         task.addUser(UiUser.find("gianluca"));
         task.setDescription("Teach Software development");
         tg.addScheduledTask(task, 22, 24);
@@ -610,34 +619,151 @@ public class TaskGroup implements IsSerializable {
 
 
         // ora prof rossi
-         task = new Task("BUSY1", 24,30,6);
+        task = new Task("BUSY1", 24, 30, 6);
         task.addUser(UiUser.find("prof.Rossi"));
         task.setDescription("Very busy");
-        tg.addScheduledTask(task, 24,30);
-          task = new Task("BUSY2", 32,36,4);
+        tg.addScheduledTask(task, 24, 30);
+        task = new Task("BUSY2", 32, 36, 4);
         task.addUser(UiUser.find("prof.Rossi"));
         task.setDescription("critical");
         tg.addScheduledTask(task, 32, 36);
-           task = new Task("BUSY3", 36,39,3);
+        task = new Task("BUSY3", 36, 39, 3);
         task.addUser(UiUser.find("prof.Rossi"));
         task.setDescription("Very important");
-        tg.addScheduledTask(task, 36,39);
-         task = new Task("BUSY4", 41,43,2);
+        tg.addScheduledTask(task, 36, 39);
+        task = new Task("BUSY4", 41, 43, 2);
         task.addUser(UiUser.find("prof.Rossi"));
         task.setDescription("Do not disturb!");
-        tg.addScheduledTask(task, 41,43);
+        tg.addScheduledTask(task, 41, 43);
 
-         // ora marino
-         task = new Task("BUSY5", 12,17,5);
+        // ora marino
+        task = new Task("BUSY5", 12, 17, 5);
         task.addUser(UiUser.find("marino"));
         task.setDescription("busy");
-        tg.addScheduledTask(task, 12,17);
+        tg.addScheduledTask(task, 12, 17);
 
-         // ora giovanna
-         task = new Task("BUSY6", 12,18,6);
+        // ora giovanna
+        task = new Task("BUSY6", 12, 18, 6);
         task.addUser(UiUser.find("giovanna"));
         task.setDescription("busy");
-        tg.addScheduledTask(task, 12,18);
+        tg.addScheduledTask(task, 12, 18);
+
+
+        //   Window.alert("corrente in esempio"+ current().tasks);
+    }
+
+    public static void esempioTestOLD() {
+        UiUser.createUsers();
+        lunch();
+        TaskGroup tg = current();
+
+        // Monday
+        Task task = new Task("Progr I/1", 1, 3, 2);
+        task.addUser(UiUser.find("gianluca"));
+        task.setDescription("Teach Programming");
+        tg.addScheduledTask(task, 1, 3);
+
+        task = new Task("Sviluppo SW/1", 3, 5, 2);
+        task.addUser(UiUser.find("gianluca"));
+        task.setDescription("Teach Software development");
+        tg.addScheduledTask(task, 3, 5);
+        task = new Task("Nuoto", 8, 11, 3);
+        task.addUser(UiUser.find("gianluca"));
+        task.setDescription("daughter attends Saggio nuoto");
+        tg.addScheduledTask(task, 8, 11);
+        // Tuesday
+        task = new Task("Sviluppo SW/2", 13, 15, 2);
+        task.addUser(UiUser.find("gianluca"));
+        task.setDescription("Teach Software development");
+        tg.addScheduledTask(task, 13, 15);
+        task = new Task("CCS", 15, 17, 2);
+        task.addUser(UiUser.find("gianluca"));
+        task.setDescription("University staff meeting");
+        tg.addScheduledTask(task, 15, 17);
+        task = new Task("Pilates", 22, 24, 2);
+        task.addUser(UiUser.find("gianluca"));
+        task.setDescription("Teach Software development");
+        tg.addScheduledTask(task, 22, 24);
+        // Wednesday
+        task = new Task("Progr I/2", 25, 27, 2);
+        task.addUser(UiUser.find("gianluca"));
+        task.setDescription("Teach Programming");
+        tg.addScheduledTask(task, 25, 27);
+        task = new Task("Skype call PRIN", 27, 29, 2);
+        task.addUser(UiUser.find("gianluca"));
+        task.setDescription("Teach Programming");
+        tg.addScheduledTask(task, 27, 29);
+        // NUOVO  
+        task = new Task("Visita dr. Neri", 30, 35, 2);
+        task.addUser(UiUser.find("gianluca"));
+        task.setDescription("See doctor");
+        tg.addScheduledTask(task, 33, 35);
+        task = new Task("Ricevimento st.", 5, 60, 2);
+        task.addUser(UiUser.find("gianluca"));
+        task.setDescription("Teach Programming");
+        tg.addScheduledTask(task, 30, 32);
+        // Thursday
+        // NUOVO  
+        task = new Task("Anagrafe", 36, 40, 1);
+        task.addUser(UiUser.find("gianluca"));
+        task.setDescription("get Dcouments");
+        tg.addScheduledTask(task, 36, 37);
+        task = new Task("Sviluppo SW/3", 37, 39, 2);
+        task.addUser(UiUser.find("gianluca"));
+        task.setDescription("Teach Software development");
+        tg.addScheduledTask(task, 37, 39);
+        task = new Task("Tesista Ugo", 30, 54, 1);
+        task.addUser(UiUser.find("gianluca"));
+        task.setDescription("Thesist meeting");
+        tg.addScheduledTask(task, 39, 40);
+        task = new Task("Tesista Ida", 30, 54, 1);
+        task.addUser(UiUser.find("gianluca"));
+        task.setDescription("Thesist meeting");
+        tg.addScheduledTask(task, 40, 41);
+        task = new Task("Idraulico", 30, 48, 3);
+        task.addUser(UiUser.find("gianluca"));
+        task.setDescription("Plumber");
+        tg.addScheduledTask(task, 43, 46);
+        // Friday
+        task = new Task("Progr I/3", 49, 51, 2);
+        task.addUser(UiUser.find("gianluca"));
+        task.setDescription("Teach Programming");
+        tg.addScheduledTask(task, 49, 51);
+        task = new Task("CDD", 54, 58, 4);
+        task.addUser(UiUser.find("gianluca"));
+        task.setDescription("University staff meeting");
+        tg.addScheduledTask(task, 54, 58);
+
+
+        // ora prof rossi
+        task = new Task("BUSY1", 24, 30, 6);
+        task.addUser(UiUser.find("prof.Rossi"));
+        task.setDescription("Very busy");
+        tg.addScheduledTask(task, 24, 30);
+        task = new Task("BUSY2", 32, 36, 4);
+        task.addUser(UiUser.find("prof.Rossi"));
+        task.setDescription("critical");
+        tg.addScheduledTask(task, 32, 36);
+        task = new Task("BUSY3", 36, 39, 3);
+        task.addUser(UiUser.find("prof.Rossi"));
+        task.setDescription("Very important");
+        tg.addScheduledTask(task, 36, 39);
+        task = new Task("BUSY4", 41, 43, 2);
+        task.addUser(UiUser.find("prof.Rossi"));
+        task.setDescription("Do not disturb!");
+        tg.addScheduledTask(task, 41, 43);
+
+        // ora marino
+        task = new Task("BUSY5", 12, 17, 5);
+        task.addUser(UiUser.find("marino"));
+        task.setDescription("busy");
+        tg.addScheduledTask(task, 12, 17);
+
+        // ora giovanna
+        task = new Task("BUSY6", 12, 18, 6);
+        task.addUser(UiUser.find("giovanna"));
+        task.setDescription("busy");
+        tg.addScheduledTask(task, 12, 18);
 
 
         //   Window.alert("corrente in esempio"+ current().tasks);
@@ -661,20 +787,20 @@ public class TaskGroup implements IsSerializable {
         TaskGroup tg = current();
         if (lunch) {
             Task task = new Task("Lunch1", 5, 6, 1);
-             task.setOverlap(true);
+            task.setOverlap(true);
             tg.addScheduledTask(task, 5, 6);
             task = new Task("Lunch2", 17, 18, 1);
-             task.setOverlap(true);
-            tg.addScheduledTask(task, 17,18);
+            task.setOverlap(true);
+            tg.addScheduledTask(task, 17, 18);
             task = new Task("Lunch3", 29, 30, 1);
-             task.setOverlap(true);
+            task.setOverlap(true);
             tg.addScheduledTask(task, 29, 30);
             task = new Task("Lunch4", 41, 42, 1);
-             task.setOverlap(true);
+            task.setOverlap(true);
             tg.addScheduledTask(task, 41, 42);
-            task = new Task("Lunch5", 53,54, 1);
-             task.setOverlap(true);
-            tg.addScheduledTask(task, 53,54);
+            task = new Task("Lunch5", 53, 54, 1);
+            task.setOverlap(true);
+            tg.addScheduledTask(task, 53, 54);
         } else {
             tg.remove("Lunch1");
             tg.remove("Lunch2");
@@ -697,10 +823,6 @@ public class TaskGroup implements IsSerializable {
      */
     public void setTaskSchedule(ArrayList<Interval> taskSchedule) {
         this.taskSchedule = taskSchedule;
-    }
-
-    public void addTaskSchedule(Interval inte) {
-        taskSchedule.add(inte);
     }
 
     /**

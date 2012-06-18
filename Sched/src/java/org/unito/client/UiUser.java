@@ -55,12 +55,15 @@ public class UiUser implements IsSerializable {
     }
 
     public static UiUser find(String us) {
+        try {
         for (UiUser u : getUsers()) {
             if (u.id.equals(us)) {
                 return u;
             }
         }
-        Window.alert("User not found: "+us);
+        throw new Exception("buu");
+      //  Window.alert("User not found: "+us);
+        } catch (Exception ex){ex.printStackTrace();}
         return null;
     }
 

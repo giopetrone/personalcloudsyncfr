@@ -77,7 +77,11 @@ public class Task implements IsSerializable {
     public ArrayList<UiUser> getUsers() {
         return users;
     }
-
+    
+    public boolean oneUser() {
+        return users.size() <= 1;
+    }
+     
     public int getOfficialSchedule() {
         return TaskGroup.current().getOfficialSchedule(getName());
     }
