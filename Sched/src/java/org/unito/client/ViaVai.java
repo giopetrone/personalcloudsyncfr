@@ -5,6 +5,7 @@
 package org.unito.client;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import java.util.ArrayList;
 
 /**
  *
@@ -25,20 +26,22 @@ public class ViaVai implements IsSerializable {
         this.selectedTask = t.getSelectedTask();
         this.choice = t.getChoice();
         this.tasks = new Task[t.getTasks().size()];
-        this.globalSchedule = new Interval[t.getCurrSchedule().size()];
-        this.taskSchedule = new Interval[t.getTaskSchedule().size()];
         int i = 0;
         for (Task ta : t.getTasks()) {
             tasks[i++] = ta;
         }
+        this.globalSchedule = new Interval[t.getCurrSchedule().size()];
         i = 0;
         for (Interval inte : t.getCurrSchedule()) {
-            // System.out.println("creo viavai sche= "+ inte.getMin());
+            //   System.out.println("creo viavai sche= "+ inte.getMin());
             globalSchedule[i++] = inte;
         }
-        for (Interval inte : t.getTaskSchedule()) {
-            // System.out.println("creo viavai sche user conflicts= "+ inte.getUsers().size());
-            taskSchedule[i++] = inte;
+        // System.out.println("t=null??? " + t);
+        ArrayList<Interval> iopo = t.getTaskSchedule();
+        this.taskSchedule = new Interval[iopo.size()];
+        for (int j = 0; j < iopo.size(); j++) {
+            System.out.println("creo viavai sche user conflicts= " + t.getTaskSchedule().size() + " " + taskSchedule.length);
+            taskSchedule[j] = iopo.get(j);
         }
     }
 
@@ -95,7 +98,7 @@ public class ViaVai implements IsSerializable {
      * @param globalSchedule the globalSchedule to set
      */
     public void setGlobalSchedule(Interval[] globalSchedule) {
-        this.globalSchedule = globalSchedule;
+        this.setGlobalSchedule(globalSchedule);
     }
 
     /**
@@ -125,4 +128,5 @@ public class ViaVai implements IsSerializable {
     public void setSelectedTask(String selectedTask) {
         this.selectedTask = selectedTask;
     }
+    
 }

@@ -26,6 +26,11 @@ public class Interval implements IsSerializable {
         this.max = max;
         this.taskName = taskName;
     }
+    
+    public boolean esterno(Interval i) {
+        return !(i.min >= min && i.min < max ||
+           i.max >= min && i.max < max) ; 
+    }
 
     public String getName() {
         return getTaskName();

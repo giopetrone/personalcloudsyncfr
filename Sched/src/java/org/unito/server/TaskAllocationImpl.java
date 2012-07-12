@@ -29,7 +29,7 @@ public class TaskAllocationImpl extends RemoteServiceServlet implements TaskAllo
         cal.add(Calendar.DAY_OF_WEEK, -day);
         //  String from = "Week from: "+ cal.roll(Calendar.DAY_OF_WEEK, -day);
         ret += df.format(cal.getTime());
-        cal.add(Calendar.DAY_OF_WEEK, 7 - day);
+        cal.add(Calendar.DAY_OF_WEEK, 6 );//- day);
         ret += " To: " + df.format(cal.getTime());
         return ret;
     }
@@ -42,6 +42,7 @@ public class TaskAllocationImpl extends RemoteServiceServlet implements TaskAllo
     public ViaVai schedule(ViaVai daFare, String mode, String old, String modalita) {
         System.err.println("in taskimpl.schedule");
         TaskGroup ret = new TaskCall().doConstraints(new TaskGroup(daFare), mode, old, modalita);
+         System.err.println("in taskimpl.schedule, DOPO jacop ret = "+ret);
         return ret != null ? new ViaVai(ret) : null;
     }
 

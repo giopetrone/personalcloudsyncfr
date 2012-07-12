@@ -61,7 +61,7 @@
 }
 
 .styleAvailable{
-    border:2px solid #50EA00;
+    border:2px solid #228B22;
 
 }
 
@@ -86,11 +86,11 @@
 }
 
 .styleConflict{
-    border:2px solid orange;
+    border:2px solid #9400D3;
 }
 
 .styleSeriousConflict {
-    border:2px solid red;
+    border:2px solid #990000;
 }
 
 .style1{
@@ -135,12 +135,13 @@
 
 
 .styleUser1{
-    background-color: #D0A000;
+   
+    background-color: #EEEE00;
 
 }
 
 .styleUser2{
-    background-color: #C0B000;
+    background-color: #FF00FF;
 
 }
 
@@ -150,16 +151,17 @@
 }
 
 .styleUser4{
-    background-color: #80D000;
+    background-color: #00FFFF;
 
 }
 
 .styleUser5{
-    background-color: #60E000;
+    background-color: #0000FF;
 
 }
 
 .styleUser6{
-    background-color: #40F000;
+    background-color: #00AABB;
 
+    font-family: 'Times New Roman',Times,serif;
 }

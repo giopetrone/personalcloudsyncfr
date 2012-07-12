@@ -6,17 +6,11 @@ package org.unito.client;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.*;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.MouseOutEvent;
-import com.google.gwt.event.dom.client.MouseOutHandler;
-import com.google.gwt.event.dom.client.MouseOverEvent;
-import com.google.gwt.event.dom.client.MouseOverHandler;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Timer;
 
 import com.google.gwt.user.client.Window;
@@ -31,17 +25,18 @@ import java.util.ArrayList;
  */
 public class MainEntryPoint implements EntryPoint {
 
+    Button moveButton;
     final FlexTable taskTable = new FlexTable();
     final FlexTable taskDefTable = new FlexTable();
     FlexTable userTable = new FlexTable();
     FlexTable legendaTable = new FlexTable();
     private Label lblServerReply = new Label();
     DatePicker dayStart = new DatePicker("giorni", 0);
-    DatePicker timeStart = new DatePicker("ore", 0);
-    DatePicker dayEnd = new DatePicker("giorni", 4);
-    DatePicker timeEnd = new DatePicker("ore", 12);
+    DatePicker timeStart = new DatePicker("oreInizio", 0);
+    DatePicker dayEnd = new DatePicker("giorni", 0);
+    DatePicker timeEnd = new DatePicker("oreTermine", 11);
     DatePicker daySchedule = new DatePicker("giorni", 0);
-    DatePicker timeSchedule = new DatePicker("oreCorto", 0);
+    DatePicker timeSchedule = new DatePicker("oreInizio", 0);
     TextBox tName = new TextBox();
     TextBox tDuration = new TextBox();
     TextBox tBefore = new TextBox();
@@ -50,6 +45,7 @@ public class MainEntryPoint implements EntryPoint {
     TextArea tDescription = new TextArea();
     ListBox userName = null;
     Label dateLabel = new Label("Today");
+    Label padder = new Label("");
     CheckBox cOverlap = new CheckBox("Can overlap other tasks ");
     private String multiUser = "";
     int partenza = 8;
@@ -57,6 +53,7 @@ public class MainEntryPoint implements EntryPoint {
     int orario = fine - partenza;
     ArrayList<String> usersToShow = new ArrayList();
     String modalita = "test"; // se no test1 test2 etc
+    ArrayList<DialogBox> dialoghi = new ArrayList();
 
     /**
      * Creates a new instance of MainEntryPoint
@@ -81,10 +78,22 @@ public class MainEntryPoint implements EntryPoint {
 
             public void run() {
                 getService().stringaData("data", callbackData);
+
+                FlexTable.CellFormatter form = taskTable.getCellFormatter();
+                Element el = form.getElement(1, 1);
+                int hh = el.getClientHeight(); //Window.alert("altezza= : "+ hh);
+                form = ore.getCellFormatter();
+                int newH = taskTable.getRowCount() * hh / 13;
+                padder.setHeight("" + (newH / 2 - 3) + "px");
+                for (int i = 0; i < ore.getRowCount(); i++) {
+                    form.setHeight(i, 0, "" + newH + "px");
+                }
+
             }
         };
         singleTimer.schedule(1000);
     }
+    FlexTable ore = new FlexTable();
 
     public void onModuleLoad() {
         setTimers();
@@ -92,10 +101,10 @@ public class MainEntryPoint implements EntryPoint {
         TaskGroup.addTaskGroup();
         TaskGroup.esempioTest();
         // content creation
-      //  Window.alert("pippo");
+        //  Window.alert("pippo");
         RootPanel.get().add(rigaTop());
-    //     Window.alert("pippo1");
-        iniziaTable(taskTable, TaskGroup.current(), false);
+        //     Window.alert("pippo1");
+        iniziaTable(taskTable, TaskGroup.current(), false, false);
         VerticalPanel pannVertTask = pannelloTask();
         HorizontalPanel buttonPanel = pannelloBottoni();
         VerticalPanel pannVertSched = pannelloScheduler();
@@ -109,7 +118,13 @@ public class MainEntryPoint implements EntryPoint {
         utentiLegenda.add(legendaTable);
 
         HorizontalPanel weekUser = new HorizontalPanel();
-        weekUser.add(taskTable);
+
+        weekUser.add(iniziaOre());
+        weekUser.add(taskTable);/*
+         * FlexTable.CellFormatter form = taskTable.getCellFormatter(); Element
+         * el = form.getElement(1,1); int hh = el.getClientHeight();
+         * Window.alert("altezza= : "+ hh);
+         */
         weekUser.add(utentiLegenda);
         RootPanel.get().add(weekUser);
         HorizontalPanel taskSched = new HorizontalPanel();
@@ -118,11 +133,12 @@ public class MainEntryPoint implements EntryPoint {
         taskSched.add(pannVertSched);
         RootPanel.get().add(taskSched);
         RootPanel.get().add(buttonPanel);
-        if (modalita.equals("normale")) {
+        if (true || modalita.equals("normale")) {
             RootPanel.get().add(lblServerReply);
         }
         if (modalita.equals("test")) {
-            selectAllUsers();
+            String[] us = {"marino", "liliana"};
+            selectAllUsers(us);
         }
     }
 
@@ -134,7 +150,7 @@ public class MainEntryPoint implements EntryPoint {
         spazio.setWidth("100px");
         uroz.add(spazio);
         uroz.add(new Label(" You are logged as:"));
-      //  uroz.add(userName);
+        //  uroz.add(userName);
         userName = iniziaPartecipanti(true);
         uroz.add(userName);
         final Button but = new Button(modalita.equals("normale") ? "Cambia a Modalita' Test" : "Cambia a Modalita' normale");
@@ -144,9 +160,11 @@ public class MainEntryPoint implements EntryPoint {
                 if (modalita.equals("normale")) {
                     modalita = "test";
                     but.setText("Cambia a Modalita' normale");
+                    moveButton.setEnabled(true);
                 } else {
                     modalita = "normale";
                     but.setText("Cambia a Modalita' test");
+                    moveButton.setEnabled(false);
                 }
             }
         });
@@ -190,6 +208,7 @@ public class MainEntryPoint implements EntryPoint {
 
 
                 DialogBox dlg = new MyDialog("Specification of all tasks", null, "alltasks");
+                dialoghi.add(dlg);
                 dlg.center();
             }
         });
@@ -200,72 +219,85 @@ public class MainEntryPoint implements EntryPoint {
         VerticalPanel retPanel = new VerticalPanel();
         retPanel.setBorderWidth(1);
         retPanel.setSpacing(1);
+
         HorizontalPanel h = new HorizontalPanel();
         Label label1 = new Label("Task name:");
         label1.setWidth("100px");
         h.add(label1);
         h.add(tName);
         retPanel.add(h);
+
         h = new HorizontalPanel();
         Label label2 = new Label("Duration:");
         label2.setWidth("100px");
         h.add(label2);
         h.add(tDuration);
         retPanel.add(h);
+
         h = new HorizontalPanel();
         Label label3 = new Label("Start:");
-        Label label4 = new Label("End:");
-        Label label5 = new Label("Before:");
         label3.setWidth("100px");
         h.add(label3);
         h.add(dayStart);
         h.add(timeStart);
         retPanel.add(h);
+
         h = new HorizontalPanel();
+        Label label4 = new Label("Deadline:");
         label4.setWidth("100px");
         h.add(label4);
         h.add(dayEnd);
         h.add(timeEnd); //buttonPanel.add(te4);
         retPanel.add(h);
+
         h = new HorizontalPanel();
-        label5.setWidth("100px");
-        h.add(label5);
-        h.add(tBefore);
-        retPanel.add(h);
-        h = new HorizontalPanel();
-        Label label6 = new Label("After:");
         Label label7 = new Label("Schedule:");
-        Label label8 = new Label("Attendees:");
-        Label label9 = new Label("Description:");
-        label6.setWidth("100px");
-        h.add(label6);
-        h.add(tAfter);
-        retPanel.add(h);
-        h = new HorizontalPanel();
         label7.setWidth("100px");
         h.add(label7);
+        dayStart.propagateTo(dayEnd);
         dayStart.propagateTo(daySchedule);
         timeStart.propagateTo(timeSchedule);
         h.add(daySchedule);
         h.add(timeSchedule); // buttonPanel.add(te7);
         retPanel.add(h);
+
         h = new HorizontalPanel();
+        Label label8 = new Label("Attendees:");
         label8.setWidth("100px");
         h.add(label8);
         h.add(tUsers);
         h.add(iniziaPartecipanti(false));
         retPanel.add(h);
+
         h = new HorizontalPanel();
         cOverlap.setWidth("100px");
         cOverlap.addStyleName("overlapping");
         h.add(cOverlap);
         retPanel.add(h);
+
+
         h = new HorizontalPanel();
+        Label label5 = new Label("Before:");
+        label5.setWidth("100px");
+        h.add(label5);
+        h.add(tBefore);
+        retPanel.add(h);
+
+        h = new HorizontalPanel();
+        Label label6 = new Label("After:");
+        label6.setWidth("100px");
+        h.add(label6);
+        h.add(tAfter);
+        retPanel.add(h);
+
+        h = new HorizontalPanel();
+        Label label9 = new Label("Description:");
         label9.setWidth("100px");
         h.add(label9);
         tDescription.setVisibleLines(2);
         h.add(tDescription);
         retPanel.add(h);
+
         return retPanel;
     }
 
@@ -283,7 +315,7 @@ public class MainEntryPoint implements EntryPoint {
                 }
                 //  Window.alert("giornoSelezionato: " + dayStart.getSelectedIndex());
                 String vStart = stringVal(dayStart, timeStart, 0);
-                String vEnd = stringVal(dayEnd, timeEnd, 0);
+                String vEnd = stringVal(dayEnd, timeEnd, -1);
                 String vSched = stringVal(daySchedule, timeSchedule, 0);
                 String msg = TaskGroup.checkTask(tName.getText(), vStart, vEnd, tDuration.getText(), tBefore.getText(), tAfter.getText(), vSched, tUsers.getText(), cOverlap.getValue());
                 if (!msg.equals("")) {
@@ -292,8 +324,12 @@ public class MainEntryPoint implements EntryPoint {
                 }
                 int sch = TaskGroup.addScheduleTask(tName.getText(), vStart, vEnd, tDuration.getText(), tBefore.getText(), tAfter.getText(), vSched, tUsers.getText(), cOverlap.getValue(), tDescription.getText());
                 if (sch == -1) {
-                    Window.alert("Task " + tName.getText() + " cannot be scheduled. Press button \"Show full task list\" to view the complete set of tasks and ask for help in rescheduling problematic ones");
-                    return;
+                    if (modalita.equals("test")) {
+                    Window.alert("Task " + tName.getText() + " cannot be scheduled. You can receive suggestions for scheduling problematic tasks by pressing button \"Where can I place the task?\"");
+                    } else {
+                        Window.alert("Task " + tName.getText() + " cannot be scheduled. You should manually modify your calendar in order to reserve a time slot for this task, if possible"); 
+                    }
+                     return;
                 }
                 riempi(taskTable, false, TaskGroup.current());
                 updateText(tName.getText());
@@ -306,7 +342,7 @@ public class MainEntryPoint implements EntryPoint {
 
             public void onClick(ClickEvent event) {
                 String vStart = stringVal(dayStart, timeStart, 0);
-                String vEnd = stringVal(dayEnd, timeEnd, 0);
+                String vEnd = stringVal(dayEnd, timeEnd, -1);
                 String vSched = stringVal(daySchedule, timeSchedule, 0);
                 String msg = TaskGroup.checkTask(tName.getText(), vStart, vEnd, tDuration.getText(), tBefore.getText(), tAfter.getText(), vSched, tUsers.getText(), cOverlap.getValue());
                 if (!msg.equals("")) {
@@ -336,8 +372,18 @@ public class MainEntryPoint implements EntryPoint {
                 updateTasks(taskDefTable);
             }
         });
-        final Button moveButton = new Button("Where can I place the task? ");
-        //    moveButton.setEnabled(false);
+        final Button clearButton = new Button("Clear");
+        retPanel.add(clearButton);
+        clearButton.addClickHandler(new ClickHandler() {
+
+            public void onClick(ClickEvent event) {
+                updateText("");
+            }
+        });
+        moveButton = new Button("Where can I place the task? ");
+        if (!modalita.equals("test")) {
+            moveButton.setEnabled(false);
+        }
         retPanel.add(moveButton);
         moveButton.addClickHandler(new ClickHandler() {
 
@@ -397,14 +443,6 @@ public class MainEntryPoint implements EntryPoint {
                 }
             }
         });
-        final Button clearButton = new Button("Clear");
-        retPanel.add(clearButton);
-        clearButton.addClickHandler(new ClickHandler() {
-
-            public void onClick(ClickEvent event) {
-                updateText("");
-            }
-        });
         final Button muButton = new Button("mu");
         //   retPanel.add(muButton);
         muButton.addClickHandler(new ClickHandler() {
@@ -427,7 +465,7 @@ public class MainEntryPoint implements EntryPoint {
 
             public void onClick(ClickEvent event) {
 
-                TaskGroup.lunch();
+                TaskGroup.lunch(false);
                 riempi(taskTable, false, TaskGroup.current());
                 updateTasks(taskDefTable);
             }
@@ -447,9 +485,24 @@ public class MainEntryPoint implements EntryPoint {
         return retPanel;
     }
 
-    private void iniziaTable(final FlexTable t, TaskGroup tg, boolean showIntervals) {
+    private VerticalPanel iniziaOre() {
+        VerticalPanel vv = new VerticalPanel();
+
+
+        FlexTable.CellFormatter form = ore.getCellFormatter();
+        for (int i = 0; i <= orario; i++) {
+            ore.setText(i, 0, " " + (partenza + i));
+        }
+        padder.setHeight("8px");
+        vv.add(padder);
+        vv.add(ore);
+        return vv;
+    }
+
+    private void iniziaTable(final FlexTable t, TaskGroup tg, boolean showIntervals, boolean normale) {
         FlexTable.CellFormatter form = t.getCellFormatter();
-        t.setText(0, 0, "Time");
+
+        t.setText(0, 0, normale ? "Time" : "");
         form.addStyleName(0, 0, "style1");
         //   t.addStyleName("MainLabel");
         t.setText(0, 1, "Monday");
@@ -459,8 +512,15 @@ public class MainEntryPoint implements EntryPoint {
         t.setText(0, 5, "Friday");
         t.setText(0, 6, "Saturday");
         t.setText(0, 7, "Sunday");
-        for (int i = 1; i <= orario; i++) {
-            t.setText(i, 0, " " + (partenza + i - 1));
+
+        if (normale) {
+            for (int i = 0; i <= orario; i++) {
+                t.setText(i, 0, " " + (partenza + i - 1));
+            }
+        } else {
+            for (int i = 0; i <= orario; i++) {
+                t.setText(i, 0, " ");
+            }
         }
         riempi(t, showIntervals, tg);
 
@@ -567,7 +627,7 @@ public class MainEntryPoint implements EntryPoint {
             // te4.setText("" + ta.getMaxEndHour());
             dayEnd.setSelectedIndex(Task.dayOf(ta.getMaxEndHour() - 1));
             //    Window.alert("timeof="+);
-            timeEnd.setSelectedIndex(Task.timeOf(ta.getMaxEndHour() - 1) + 1);
+            timeEnd.setSelectedIndex(Task.timeOf(ta.getMaxEndHour() - 1)); // era -1, ora orario giustro
             tBefore.setText(ta.beforeString());
             tAfter.setText(ta.afterString());
 
@@ -624,11 +684,13 @@ public class MainEntryPoint implements EntryPoint {
     }
 
     private void riempi(FlexTable t, boolean showPossibleSchedules, TaskGroup tg) {
-
+        //Window.alert("rimepi00:");
         FlexTable.CellFormatter form = t.getCellFormatter();
         ArrayList<String>[] nomiCaselle = TaskGroup.nomiCaselle(tg);
+        //  Window.alert("rimepi0:");
         ArrayList<String>[] stiliCaselle = TaskGroup.stiliCaselle(showPossibleSchedules, tg);
         int k = 0;
+        //   Window.alert("rimepi1:");
         for (int j = 0; j < 7 + 1; j++) {
             for (int i = 0; i < orario && k < nomiCaselle.length; i++) {
                 ArrayList<String> currTasks = nomiCaselle[k];
@@ -648,6 +710,7 @@ public class MainEntryPoint implements EntryPoint {
                 form.setStyleName(i + 1, j + 1, currStyles.get(0));
                 k++;
             }
+            //    Window.alert("rimepifinefor:");
         }
         for (int j = 5; j < 7 + 1; j++) {
             for (int i = 0; i < orario; i++) {
@@ -668,7 +731,7 @@ public class MainEntryPoint implements EntryPoint {
             final Button bu = new Button(ta);
             Task t = TaskGroup.get(ta);
             bu.addStyleName("gwt-ButtonSmall");
-            if (t.isOverlap()) {
+            if (t.canOverlap()) {
                 bu.addStyleName("overlapping");
             }
 
@@ -727,7 +790,7 @@ public class MainEntryPoint implements EntryPoint {
             final Button bu = new Button(ta);
             Task t = TaskGroup.get(ta);
             bu.addStyleName("gwt-ButtonSmall");
-            if (t.isOverlap()) {
+            if (t.canOverlap()) {
                 bu.addStyleName("overlapping");
             }
 
@@ -787,6 +850,32 @@ public class MainEntryPoint implements EntryPoint {
                 Window.alert("no solutions");
             } else {
                 DialogBox dlg = new MyDialog("New Schedule", new TaskGroup(result), "proposal");
+                dialoghi.add(dlg);
+                dlg.center();
+                /*
+                 * TaskGroup.updateSchedule(new TaskGroup(result));
+                 * riempi(taskTable, false); updateTasks();
+                 * updateText(tName.getText());
+                 *
+                 */
+            }
+        }
+
+        public void onFailure(Throwable caught) {
+            //  lblServerReply.setText("Communication failed");
+            Window.alert("Communication failed");
+        }
+    };
+    // Create an asynchronous callback to handle the result.
+    final AsyncCallback<ViaVai> callbackSposta = new AsyncCallback<ViaVai>() {
+
+        public void onSuccess(ViaVai result) {
+            lblServerReply.setText("successo");
+            if (result == null) {
+                Window.alert("no solutions");
+            } else {
+                DialogBox dlg = new MyDialog("New Schedule", new TaskGroup(result), "proposal");
+                dialoghi.add(dlg);
                 dlg.center();
                 /*
                  * TaskGroup.updateSchedule(new TaskGroup(result));
@@ -809,11 +898,17 @@ public class MainEntryPoint implements EntryPoint {
             if (result == null) {
                 Window.alert("no solutions");
             } else {
+                if (result.getTaskSchedule().length == 0) {
+                    Window.alert("I cannot suggest a suitable reallocation for Task: '" + result.getSelectedTask() + "'\n, you may request a global reschedule using the button \n 'Schedule early tasks first'");
+                    return;
+                }
                 // clone current and add just new schedule
                 TaskGroup tempr = new TaskGroup(TaskGroup.current());
                 tempr.updateWith(result);
                 DialogBox dlg = new MyDialog("Possible Schedules for: " + tempr.getSelectedTask(), tempr, "intervals");
+                dialoghi.add(dlg);
                 dlg.center();
+                dlg.show();
 
 
                 // per ORA settiamo nuovo schedule a corrente e mostriamo all'utente i conflitti
@@ -885,7 +980,6 @@ public class MainEntryPoint implements EntryPoint {
         ;
 
         public MyDialog(String title, TaskGroup tag, String what) {
-
             this.what = what;
             this.tg = tag;
             setText(title);
@@ -893,24 +987,33 @@ public class MainEntryPoint implements EntryPoint {
             if (tg != null) {
                 //  show a new task schedule proposal
                 f = new FlexTable();
-               
-                iniziaTable(f, tg, what.equals("intervals"));
+                iniziaTable(f, tg, what.equals("intervals"), true);
+
                 if (what.equals("intervals")) {
                     f.addClickHandler(new ClickHandler() {
 
                         @Override
                         public void onClick(ClickEvent event) {
+                            // possible problems:
+                            // 1) we do not make sure that the click happens
+                            //    inside "good" cells
+                            // 2) we check if start time cell is empty
+                            //    but not for duration > 1 hour
                             FlexTable ff = (FlexTable) event.getSource();
                             HTMLTable.Cell clickedCell = ff.getCellForEvent(event);
                             int rowIndex = clickedCell.getRowIndex();
                             int colIndex = clickedCell.getCellIndex();
                             String s = ff.getText(rowIndex, colIndex);
+                            time = --rowIndex + --colIndex * 12;
                             //  Window.alert("row col " + rowIndex + " " + colIndex);
+                            if (!tg.okToStart(tg.getSelectedTask(), time)) {
+                                Window.alert("task would end after latest completion time!!");
+                                return;
+                            }
                             if (s.equals("")) {
-                                time = --rowIndex + --colIndex * 12;
                                 tg.setSchedule(tg.getSelectedTask(), time);
                                 riempi(ff, true, tg);
-                                info.setText("");
+                                info.setText("no conflicts");
                                 //  Window.alert("in click: " + s);
                                 // siamo in nuovo schedule, ,ostraimaolo!!
                                 /*
@@ -920,8 +1023,7 @@ public class MainEntryPoint implements EntryPoint {
                                  *
                                  */
                             } else {
-                                //  info.setText("conflicts for time: " + (--rowIndex + --colIndex * 12) + " "+ tg);
-                                ArrayList<String> conflictingUsers = tg.conflictingSchedules(--rowIndex + --colIndex * 12);
+                                ArrayList<String> conflictingUsers = tg.conflictingSchedules(time);//(--rowIndex + --colIndex * 12);
                                 if (!conflictingUsers.isEmpty()) {
                                     String us = "";
                                     for (String u : conflictingUsers) {
@@ -929,6 +1031,12 @@ public class MainEntryPoint implements EntryPoint {
                                     }
                                     info.setText("Change task schedule for: " + us);
                                 }
+                                // metti il task nel posto anche con conflitto
+                                tg.setSchedule(tg.getSelectedTask(), time);
+                                // togli schedule di quelli in conflitto sul posto
+                                TaskGroup tag = TaskGroup.current().fissaUnoPulisci(tg, time);
+                                // richiedi un nuovo schedule
+                                getService().schedule(new ViaVai(tag), "schedule", "new", modalita, callbackSposta);
                             }
                         }
                     });
@@ -939,6 +1047,7 @@ public class MainEntryPoint implements EntryPoint {
                 initDefTable(f);
 
             }
+
             Button okButton = new Button("OK", this);
             Button cancelButton = new Button("Cancel", this);
             VerticalPanel vert = new VerticalPanel();
@@ -947,10 +1056,10 @@ public class MainEntryPoint implements EntryPoint {
 
             DockPanel dock = new DockPanel();
             dock.setSpacing(4);
-            
-            ScrollPanel  panel = new ScrollPanel(f);
+
+            ScrollPanel panel = new ScrollPanel(f);
             panel.setHeight("500px");
-            
+
             dock.add(panel, DockPanel.CENTER);
             //  dock.add(oriz, DockPanel.SOUTH);
             oriz.add(okButton);
@@ -991,6 +1100,11 @@ public class MainEntryPoint implements EntryPoint {
                     riempi(taskTable, false, TaskGroup.current());
                     updateTasks(taskDefTable);
                     updateText(tName.getText());
+                    // CANCELLA TUTTI i dialoghi aperti
+                    for (DialogBox dl : dialoghi) {
+                        dl.hide();
+                    }
+                    dialoghi.clear();
                 }
             }
             hide();
@@ -1063,11 +1177,20 @@ public class MainEntryPoint implements EntryPoint {
         });
     }
 
-    private void selectAllUsers() {
+    private void selectAllUsers(String[] us) {
+        // add all users except those contained in the input parameter
+        // si poteva far di meglio ma fa lo stesso
         for (int i = 1; i < userTable.getRowCount(); i++) {
-            usersToShow.add(userTable.getText(i, 0));
-            CheckBox ch = (CheckBox) userTable.getWidget(i, 1);
-            ch.setValue(true);
+            String currUser = userTable.getText(i, 0);
+            boolean found = false;
+            for (int j = 0; j < us.length && !found; j++) {
+                found = currUser.equals(us[j]);
+            }
+            if (!found) {
+                usersToShow.add(currUser);
+                CheckBox ch = (CheckBox) userTable.getWidget(i, 1);
+                ch.setValue(true);
+            }
         }
         riempi(taskTable, false, TaskGroup.current());
     }
@@ -1127,17 +1250,14 @@ public class MainEntryPoint implements EntryPoint {
                 addItem("Wednesday");
                 addItem("Thursday");
                 addItem("Friday");
-                setSelectedIndex(index);
-            } else if (what.equals("ore")) {
-                for (int i = 8; i <= 20; i++) {
+            } else if (what.equals("oreTermine")) {
+                for (int i = 9; i <= 20; i++) {
                     addItem("" + i);
                 }
-                setSelectedIndex(index);
-            } else if (what.equals("oreCorto")) {
+            } else if (what.equals("oreInizio")) {
                 for (int i = 8; i <= 19; i++) {
                     addItem("" + i);
                 }
-                setSelectedIndex(index);
             } else {
                 Window.alert("DatePicker, unknown option: " + what);
                 setVisibleItemCount(1);
@@ -1148,6 +1268,7 @@ public class MainEntryPoint implements EntryPoint {
                     }
                 });
             }
+            setSelectedIndex(index);
         }
 
         public void propagateTo(final DatePicker target) {
@@ -1157,6 +1278,13 @@ public class MainEntryPoint implements EntryPoint {
                     target.setSelectedIndex(getSelectedIndex());
                 }
             });
+            /*
+             * addMouseUpHandler(new MouseUpHandler() {
+             *
+             * public void onMouseUp(MouseUpEvent event) { Window.alert(""
+             * +getSelectedIndex());
+             * target.setSelectedIndex(getSelectedIndex()); } });
+             */
         }
     }
 

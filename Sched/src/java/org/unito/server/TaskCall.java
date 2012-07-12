@@ -12,6 +12,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.unito.client.Interval;
 
 import org.unito.client.Task;
 import org.unito.client.TaskGroup;
@@ -58,16 +59,19 @@ public class TaskCall {
             //  System.out.println("risposta=\n");
             //  response.getEntity().writeTo(System.out);
             InputStream is = response.getEntity().getContent();
-            /* OLD:  ArrayList<org.unito.client.Interval> arra = MyDOMParserBean.getIntervals(is);
-            TaskGroup ret = new TaskGroup();
-            ret.setTaskSchedule(arra);
-             * */
+            /*
+             * OLD: ArrayList<org.unito.client.Interval> arra =
+             * MyDOMParserBean.getIntervals(is); TaskGroup ret = new
+             * TaskGroup(); ret.setTaskSchedule(arra);
+             *
+             */
             TaskGroup ret = MyDOMParserBean.fillReply(is);
             ret.setSelectedTask(taskName);
             httpClient.getConnectionManager().shutdown();
             if (taskNet.equals("tasknet")) {
                 // call Scheduler with result from constraint solver
                 TaskGroup ret1 = new TaskCall().doConstraints(ret, "start", "new", modalita);
+                System.out.println("dopo gianluca e doConstraints");
                 return ret1;
             } else {  // taskNet.equals("tasknet")
                 return ret;
@@ -94,10 +98,12 @@ public class TaskCall {
         for (Task t1 : taskGroup.getTasks()) {  // avoid overlap bteween disjoint task couples
             for (Task t2 : taskGroup.getTasks()) {
                 if (t1 != t2
-                        && !t1.isOverlap()
-                        && !t2.isOverlap()
-                        && !t1.disJoint(t2) /* && !taskNames.contains(t1.getName())
-                        && !taskNames.contains(t2.getName())*/) {
+                        && !t1.canOverlap()
+                        && !t2.canOverlap()
+                        && !t1.disJoint(t2) /*
+                         * && !taskNames.contains(t1.getName()) &&
+                         * !taskNames.contains(t2.getName())
+                         */) {
                     tas.imposeNonOverlap(t1.getName(), t2.getName());
                 }
             }
@@ -151,12 +157,37 @@ public class TaskCall {
         }
         ArrayList<String> taskNames = new ArrayList<String>();
         System.err.println("in doit tasks size=" + taskGroup.getTasks().size());
-        // forse fuori dal loop? mettere qui? createUsers(taskGroup);
-        for (Task t : taskGroup.getTasks()) {
-            ts.addTask(t.getName(), t.getMinStartHour(), t.getMaxEndHour(), t.getMinStartHour(), t.getMaxEndHour(), t.getDuration());
-            createUsers(taskGroup); // forse fuori dal loop?
-            for (UiUser u : t.getUsers()) {
-                ts.addActorToTask(t.getName(), User.find(u.getId()));
+        // messo ora fuori dal loop
+         createUsers(taskGroup);
+        if (mode.equals("schedule")) {
+  //          ArrayList<Interval> scheds = taskGroup.getCurrSchedule();
+            int scheU = taskGroup.getOfficialSchedule("Tesista Ugo");
+            System.err.println("in doit sche dfor ugo:"+scheU);
+            for (Task t : taskGroup.getTasks()) {
+                int sche = taskGroup.getOfficialSchedule(t.getName());
+                System.err.println("task, sched "+ t.getName() + " "+ sche);
+                if (sche == -1){
+                    System.out.println("uso vincoli per task: "+t.getName());
+                }
+                if (sche == -1) {
+                    // usa limiti originali
+                    ts.addTask(t.getName(), t.getMinStartHour(), t.getMaxEndHour(), t.getMinStartHour(), t.getMaxEndHour(), t.getDuration());
+                } else {
+                    // posto fisso dettao dallo schedule
+                    ts.addTask(t.getName(), sche, sche + t.getDuration(), sche, sche + t.getDuration(), t.getDuration());
+                }
+                // era qui: createUsers(taskGroup); // forse fuori dal loop?
+                for (UiUser u : t.getUsers()) {
+                    ts.addActorToTask(t.getName(), User.find(u.getId()));
+                }
+            }
+        } else {
+            for (Task t : taskGroup.getTasks()) {
+                ts.addTask(t.getName(), t.getMinStartHour(), t.getMaxEndHour(), t.getMinStartHour(), t.getMaxEndHour(), t.getDuration());
+            //    createUsers(taskGroup); // forse fuori dal loop?
+                for (UiUser u : t.getUsers()) {
+                    ts.addActorToTask(t.getName(), User.find(u.getId()));
+                }
             }
         }
         timeAndOverlap(taskGroup, ts);
@@ -168,12 +199,15 @@ public class TaskCall {
         boolean consistent = ts.checkConsistency();
         System.out.println("\nThe set of constraints is consistent? "
                 + consistent + "\n");
+        if (mode.equals("schedule")) {
+            mode = "start";
+        }
         if (consistent) {
-            return schedule(taskGroup, mode.equals("start")? ts:cts, mode);
-        }else{
+            return schedule(taskGroup, mode.equals("start") ? ts : cts, mode);
+        } else {
             return null;
         }
-      
+
     }
 
     public String removeTask(String task) {
