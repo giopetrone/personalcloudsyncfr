@@ -1,0 +1,5 @@
+package com.unito.tableplus.shared.model;
+
+public enum ChannelMessageType {
+	CHAT, NEWCONNECTION, DISCONNECTION, USERSTATUS, USERONLINE, USERBUSY, USERAWAY, NEWTABLERESOURCE, NEWTABLEMEMBER
+}

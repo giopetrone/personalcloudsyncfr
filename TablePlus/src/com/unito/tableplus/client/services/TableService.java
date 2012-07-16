@@ -4,9 +4,9 @@ import java.util.List;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
-import com.unito.tableplus.shared.model.Document;
+import com.unito.tableplus.shared.model.DriveFile;
 import com.unito.tableplus.shared.model.Table;
-import com.unito.tableplus.shared.model.Message;
+import com.unito.tableplus.shared.model.BlackBoardMessage;
 import com.unito.tableplus.shared.model.User;
 
 @RemoteServiceRelativePath("table-service")
@@ -20,25 +20,19 @@ public interface TableService extends RemoteService {
 
 	void deleteTable(Long key);
 
-	boolean addMessage(Long key, Message message);
-
+	boolean addBlackBoardMessage(Long tableKey, BlackBoardMessage bbMessage);
+	
+	List<BlackBoardMessage> getTableMessages(Long tableKey);
+	
 	boolean clearMessages(Long key);
 
 	boolean addDocumentToTable(String DocId, User user, Long tableKey);
 
-	boolean docAccessToNewMember(User newMember, Table table);
+	void docAccessToNewMember(User newMember, Table table);
 
-	List<Document> getTableDocuments(Table table);
+	List<DriveFile> getTableDriveFiles(Table table);
 
-	boolean addMemberToTable(Long userKey, Long tableKey);
-
-	boolean addHiddenMemberToTable(Long userKey, Long tableKey);
-
-	boolean removeHiddenMemberFromTable(Long userKey, Long tableKey);
-
-	boolean addSelectivePresenceMemberToTable(Long userKey, Long tableKey);
-
-	boolean removeSelectivePresenceMemberFromTable(Long userKey, Long tableKey);
+	void addMember(Long userKey, Long tableKey);
 
 	void removeMessage(String messageKey);
 }

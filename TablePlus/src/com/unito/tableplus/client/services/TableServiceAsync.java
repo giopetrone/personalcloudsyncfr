@@ -3,9 +3,9 @@ package com.unito.tableplus.client.services;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.unito.tableplus.shared.model.Document;
+import com.unito.tableplus.shared.model.DriveFile;
 import com.unito.tableplus.shared.model.Table;
-import com.unito.tableplus.shared.model.Message;
+import com.unito.tableplus.shared.model.BlackBoardMessage;
 import com.unito.tableplus.shared.model.User;
 
 public interface TableServiceAsync {
@@ -18,7 +18,7 @@ public interface TableServiceAsync {
 
 	void deleteTable(Long key, AsyncCallback<Void> callback);
 
-	void addMessage(Long key, Message message, AsyncCallback<Boolean> callback);
+	void addBlackBoardMessage(Long key, BlackBoardMessage bbMessage, AsyncCallback<Boolean> callback);
 
 	void clearMessages(Long key, AsyncCallback<Boolean> callback);
 
@@ -26,25 +26,15 @@ public interface TableServiceAsync {
 			AsyncCallback<Boolean> callback);
 
 	void docAccessToNewMember(User newMember, Table table,
-			AsyncCallback<Boolean> callback);
+			AsyncCallback<Void> callback);
 
-	void getTableDocuments(Table table, AsyncCallback<List<Document>> callback);
+	void getTableDriveFiles(Table table, AsyncCallback<List<DriveFile>> callback);
 
-	void addMemberToTable(Long userKey, Long tableKey,
-			AsyncCallback<Boolean> callback);
-
-	void addHiddenMemberToTable(Long userKey, Long tableKey,
-			AsyncCallback<Boolean> callback);
-
-	void removeHiddenMemberFromTable(Long userK, Long tableKey,
-			AsyncCallback<Boolean> callback);
-
-	void addSelectivePresenceMemberToTable(Long userKey, Long tableKey,
-			AsyncCallback<Boolean> callback);
-
-	void removeSelectivePresenceMemberFromTable(Long userKey, Long tableKey,
-			AsyncCallback<Boolean> callback);
+	void addMember(Long userKey, Long tableKey, AsyncCallback<Void> callback);
 
 	void removeMessage(String messageKey, AsyncCallback<Void> callback);
+
+	void getTableMessages(Long tableKey,
+			AsyncCallback<List<BlackBoardMessage>> callback);
 
 }

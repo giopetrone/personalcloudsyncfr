@@ -1,6 +1,5 @@
 package com.unito.tableplus.client.gui.quickviewpanels;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.extjs.gxt.ui.client.Style.Orientation;
@@ -14,7 +13,6 @@ import com.extjs.gxt.ui.client.event.MessageBoxEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.store.TreeStore;
 import com.extjs.gxt.ui.client.util.IconHelper;
-import com.extjs.gxt.ui.client.util.Params;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.Info;
@@ -30,38 +28,30 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.unito.tableplus.client.TablePlus;
 import com.unito.tableplus.client.gui.RightPanel;
-import com.unito.tableplus.client.services.TableService;
+import com.unito.tableplus.client.services.MessagingServiceAsync;
+import com.unito.tableplus.client.services.ServiceFactory;
 import com.unito.tableplus.client.services.TableServiceAsync;
-import com.unito.tableplus.client.services.NotificationService;
-import com.unito.tableplus.client.services.NotificationServiceAsync;
-import com.unito.tableplus.client.services.UserService;
 import com.unito.tableplus.client.services.UserServiceAsync;
-import com.unito.tableplus.shared.model.Notification;
+import com.unito.tableplus.shared.model.ChannelMessageType;
 import com.unito.tableplus.shared.model.User;
 
 public class MembersPanel extends ContentPanel {
 
-	public RightPanel rightPanel;
+	// servizi
+	public final UserServiceAsync userService = ServiceFactory
+			.getUserServiceInstance();
+	public final TableServiceAsync tableService = ServiceFactory
+			.getTableServiceInstance();
+	protected final MessagingServiceAsync messagingService = ServiceFactory
+			.getChatServiceInstance();
 
 	// componenti
-	public LayoutContainer leftLayoutContainer = new LayoutContainer();
-	public LayoutContainer rightLayoutContainer = new LayoutContainer();
+	public RightPanel rightPanel;
+	public LayoutContainer leftLayoutContainer;
+	public LayoutContainer rightLayoutContainer;
 	public TreePanel<ModelData> treePanel;
-	public TreeStore<ModelData> treeStore = new TreeStore<ModelData>();
-	// public BaseTreeModel onlineMembersRoot;
-	// public BaseTreeModel offlineMembersRoot;
+	public TreeStore<ModelData> treeStore;
 	public ToggleButton setHidden;
-
-	// servizi
-	public final UserServiceAsync userService = GWT.create(UserService.class);
-	public final TableServiceAsync tableService = GWT
-			.create(TableService.class);
-	public final NotificationServiceAsync notificationService = GWT
-			.create(NotificationService.class);
-
-	// altro
-	public User tmpNewUser;
-	public String toBeInvited;
 
 	/**
 	 * Costruttore
@@ -69,9 +59,12 @@ public class MembersPanel extends ContentPanel {
 	 * @return void
 	 */
 
-	public MembersPanel(RightPanel rightPanel_) {
-		this.rightPanel = rightPanel_;
-
+	public MembersPanel(RightPanel rightPanel) {
+		this.rightPanel = rightPanel;
+		leftLayoutContainer = new LayoutContainer();
+		rightLayoutContainer = new LayoutContainer();
+		treeStore = new TreeStore<ModelData>();
+		treeStore.setMonitorChanges(true);
 		setHeading("Members");
 		setCollapsible(true);
 		setTitleCollapse(true);
@@ -80,15 +73,9 @@ public class MembersPanel extends ContentPanel {
 
 		populateLeftLayoutContainer();
 		populateRightLayoutContainer();
+		loadUsers();
 
 	}
-
-	// @Override
-	// protected void onRender(Element parent, int pos) {
-	// super.onRender(parent, pos);
-	// treePanel.setExpanded(onlineMembersRoot, true);
-	// treePanel.setExpanded(offlineMembersRoot, true);
-	// }
 
 	/**
 	 * Popola l'area di sinistra, quella con i pulsanti in verticale
@@ -113,93 +100,7 @@ public class MembersPanel extends ContentPanel {
 				box.addCallback(new Listener<MessageBoxEvent>() {
 					@Override
 					public void handleEvent(MessageBoxEvent be) {
-						// List<String>recipientList=new ArrayList<String>();
-						// recipientList.add("luigi.cortese00@gmail.it");
-						// notificationService.sendEmail(recipientList,
-						// "subject",
-						// "body",
-						// new AsyncCallback<Boolean>(){
-						// @Override
-						// public void onFailure(Throwable caught) {
-						// }
-						// @Override
-						// public void onSuccess(Boolean result) {
-						// System.out.println("EMAIL INVIATA: "+result);
-						// }
-						// });
-
-						if (be.getButtonClicked().getItemId().equals(Dialog.OK)) {
-							// Info.display("MessageBox",
-							// "You entered OK: '{0}'", new
-							// Params(be.getValue()));
-
-							// (10)controlla se all'email corrisponde un utente
-							// iscritto
-							toBeInvited = be.getValue();
-							userService.queryUser("email", be.getValue(),
-									new AsyncCallback<User>() {
-										@Override
-										public void onFailure(Throwable caught) {
-										}
-
-										@Override
-										public void onSuccess(User result) {
-											// (20)se l'utente inserito è null
-											if (result == null)
-												MessageBox
-														.confirm(
-																"Confirm",
-																"This address is not in our database, do you want to sent an invitation by eMail?",
-																new Listener<MessageBoxEvent>() {
-																	public void handleEvent(
-																			MessageBoxEvent ce) {
-																		Button btn = ce
-																				.getButtonClicked();
-																		if (btn.getText()
-																				.equals("Yes")) {
-																			Info.display(
-																					"MessageBox",
-																					"The 'Yes' button was pressed");
-																			sendInvitationByMail();
-																		} else
-																			Info.display(
-																					"MessageBox",
-																					"The 'No' button was pressed");
-																	}
-																});
-											// (23)se l'utente inserito non è
-											// null
-											else {
-												tmpNewUser = result;
-												MessageBox
-														.confirm(
-																"Confirm",
-																"This address is in our database, the corrisponding user will gain access to every document shared by this table. Do you wish to continue?",
-																new Listener<MessageBoxEvent>() {
-																	public void handleEvent(
-																			MessageBoxEvent ce) {
-																		Button btn = ce
-																				.getButtonClicked();
-																		if (btn.getText()
-																				.equals("Yes")) {
-																			Info.display(
-																					"MessageBox",
-																					"The 'Yes' button was pressed");
-																			addExistingUserToTable();
-
-																		} else
-																			Info.display(
-																					"MessageBox",
-																					"The 'No' button was pressed");
-																	}
-																});
-											}
-										}
-									});
-						} else
-							Info.display("MessageBox",
-									"You entered CANCEL: '{0}'",
-									new Params(be.getValue()));
+						inviteUser(be);
 					}
 				});
 			}
@@ -214,11 +115,12 @@ public class MembersPanel extends ContentPanel {
 		setHidden.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
-				if (setHidden.isPressed()) {
-					makeMeHidden();
-				} else {
-					makeMeVisible();
-				}
+				if (setHidden.isPressed())
+					GWT.log("");
+				// makeMeHidden();
+				else
+					GWT.log("");
+				// makeMeVisible();
 			}
 		});
 
@@ -235,41 +137,18 @@ public class MembersPanel extends ContentPanel {
 		Button deleteButton = new Button();
 		deleteButton.setToolTip(new ToolTipConfig("Delete member"));
 		deleteButton.setIcon(IconHelper.createStyle("delete-user"));
-//		deleteButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-//
-//			@Override
-//			public void componentSelected(ButtonEvent ce) {
-//				treeStore = new TreeStore<ModelData>();
-//				rightLayoutContainer.removeFromParent();
-//				rightLayoutContainer = new LayoutContainer();
-//				populateRightLayoutContainer();
-//				addData();
-//				((ContentPanel) rightLayoutContainer.getParent()).layout();
-//			}
-//
-//		});
+
+		deleteButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				Info.display("Delete member", "Not implemented yet");
+			}
+
+		});
+
 		leftLayoutContainer.add(deleteButton);
 
-	}
-
-	/**
-	 * Refreshes members list
-	 * 
-	 */
-
-	public void refresh() {
-		// System.out.println(Thread.currentThread().getName());
-		remove(leftLayoutContainer);
-		populateLeftLayoutContainer();
-		remove(rightLayoutContainer);
-		treeStore = new TreeStore<ModelData>();
-
-		// rightLayoutContainer.removeFromParent();
-		rightLayoutContainer = new LayoutContainer();
-		populateRightLayoutContainer();
-		addData();
-		layout();
-		((ContentPanel) rightLayoutContainer.getParent()).layout();
 	}
 
 	/**
@@ -288,6 +167,7 @@ public class MembersPanel extends ContentPanel {
 
 		treePanel.setIconProvider(new ModelIconProvider<ModelData>() {
 
+			@Override
 			public AbstractImagePrototype getIcon(ModelData model) {
 				if (model.get("icon") != null) {
 					return IconHelper.createStyle((String) model.get("icon"));
@@ -299,369 +179,199 @@ public class MembersPanel extends ContentPanel {
 		});
 		treePanel.setDisplayProperty("name");
 
-		// onlineMembersRoot = new BaseTreeModel();
-		// onlineMembersRoot.set("name", "Online Users");
-		// onlineMembersRoot.set("icon", "lightbulb");
-		// treeStore.add(onlineMembersRoot, false);
-
-		// offlineMembersRoot = new BaseTreeModel();
-		// offlineMembersRoot.set("name", "Offline Users");
-		// offlineMembersRoot.set("icon", "lightbulb_off");
-		// treeStore.add(offlineMembersRoot, false);
-
-		// qui aggiungevo i membri
-
-		// treePanel.setExpanded(onlineMembersRoot, true);
-		// treePanel.setExpanded(offlineMembersRoot, true);
 		rightLayoutContainer.add(treePanel);
 		rightLayoutContainer.setHeight("100%");
 		rightLayoutContainer.setWidth(322);
 		add(rightLayoutContainer);
 
-		// rightLayoutContainer.layout();
-		// members.layout();
 	}
 
-	boolean firsttime = true;
+	public void loadUsers() {
+		userService.queryUsers(rightPanel.getTableUI().getTableMembers(),
+				new AsyncCallback<List<User>>() {
 
-	/**
-	 * Aggiunge i "dati" a questo panel, cioè la lista di membri online e
-	 * offline. Li recupera da "table.onlineMembersEmail" e
-	 * "table.offlineMembersEmail", quindi questo metodo va chiamato solo dopo
-	 * aver inizializzato queste due liste
-	 * 
-	 * @return void
-	 */
+					@Override
+					public void onFailure(Throwable caught) {
+						GWT.log("Failed querying users", caught);
+					}
 
-	public void addData() {
-		ModelData m_son;
-		for (String userEmail : rightPanel.tableUI.onlineMembersEmail) {
-			m_son = new BaseModelData();
-			m_son.set("name", userEmail);
-
-			m_son.set("icon", "user-green");
-			treeStore.add(m_son, false);
-
-		}
-
-		for (String userEmail : rightPanel.tableUI.offlineMembersEmail) {
-			m_son = new BaseModelData();
-			m_son.set("name", userEmail);
-
-			m_son.set("icon", "user-silhouette");
-			try {
-				treeStore.add(m_son, false);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-		}
-		setHidden.toggle(rightPanel.tableUI.hiddenUser);
+					@Override
+					public void onSuccess(List<User> result) {
+						ModelData data;
+						for (User user : result) {
+							data = new BaseModelData();
+							data.set("name", user.getEmail());
+							data.set("icon", "user-offline");
+							treeStore.add(data, false);
+						}
+					}
+				});
 		layout();
 	}
 
-	/**
-	 * Aggiunge l'utente tmpNewUser al tavolo corrente
-	 * 
-	 * @return void
-	 */
+	private void inviteUser(MessageBoxEvent be) {
+		if (be.getButtonClicked().getItemId().equals(Dialog.OK)) {
 
-	public void addExistingUserToTable() {
-
-		tableService.addMemberToTable(tmpNewUser.getKey(),
-				rightPanel.tableUI.tableKey, new AsyncCallback<Boolean>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						// Auto-generated method stub
-
-					}
-
-					@Override
-					public void onSuccess(Boolean result) {
-
-						// crea una notifica
-						Notification n = new Notification();
-						n.setSenderEmail(TablePlus.user.getEmail());
-						n.setSenderKey(TablePlus.user.getKey());
-						n.setEventKind("MEMBERTABLEADD");
-						n.setMemberEmail(tmpNewUser.getEmail());
-						n.setTableKey(rightPanel.tableUI.tableKey);
-						n.setStatus(tmpNewUser.isOnline() ? "ONLINE"
-								: "OFFLINE");
-
-						// la spedisce
-						throwNotification(n);
-
-					}
-
-				});
-		// // (10) aggiungo all'utente il tavolo corrente
-		// this.tmpNewUser.addTable(table.getKey());
-		// System.out.println(tmpNewUser.getTables().get(
-		// tmpNewUser.getTables().size() - 1));
-		//
-		// // (15) dovrei recuperare la versione aggiornata del tavolo...
-		// // Ha senso??? Tutte queste richieste al DB...
-		//
-		// // (20) aggiungo al tavolo il nuovo utente
-		// table.addMember(this.tmpNewUser.getKey());
-		//
-		// // (30) fornisco all'utente gli accessi in scrittura a tutti i doc
-		// del
-		// // tavolo
-		// tableService.docAccessToNewMember(tmpNewUser, table,
-		// new AsyncCallback<Boolean>() {
-		// @Override
-		// public void onFailure(Throwable caught) {
-		// }
-		//
-		// @Override
-		// public void onSuccess(Boolean result) {
-		// // (60) aggiorno il member panel
-		// }
-		// });
-	}
-
-	/**
-	 * Lancia una notifica
-	 * 
-	 * @return void
-	 */
-
-	public void throwNotification(Notification notification) {
-		notificationService.sendNotification(notification,
-				new AsyncCallback<Boolean>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						// Auto-generated method stub
-
-					}
-
-					@Override
-					public void onSuccess(Boolean result) {
-						// Auto-generated method stub
-
-					}
-
-				});
-	}
-
-	/**
-	 * Sulla base della notifica ricevuta aggiorna la lista dei membri.
-	 * 
-	 * @return void
-	 */
-
-	public void print(Notification n) {
-		System.out.println(TablePlus.user.getEmail() + " in "
-				+ rightPanel.tableUI.tableName + " (" + n.getEventKind()
-				+ "):\n ------ onlineMembersEmail["
-				+ rightPanel.tableUI.onlineMembersEmail.size() + "] = "
-				+ rightPanel.tableUI.onlineMembersEmail
-				+ "\n ------ offlineMembersEmail["
-				+ rightPanel.tableUI.offlineMembersEmail.size() + "] = "
-				+ rightPanel.tableUI.offlineMembersEmail
-				+ "\n ------ hiddenMembersEmail["
-				+ rightPanel.tableUI.hiddenMembersEmail.size() + "] = "
-				+ rightPanel.tableUI.hiddenMembersEmail
-				+ "\n ------ selectivePresenceMembers["
-				+ rightPanel.tableUI.selectivePresenceMembers.size() + "] = "
-				+ rightPanel.tableUI.selectivePresenceMembers + "\n ------ ");
-	}
-
-	public void refreshMembersTree(Notification n) {
-
-		List<String> off = rightPanel.tableUI.offlineMembersEmail;
-		List<String> on = rightPanel.tableUI.onlineMembersEmail;
-		List<String> hid = rightPanel.tableUI.hiddenMembersEmail;
-		List<String> sel = rightPanel.tableUI.selectivePresenceMembers;
-		String em = n.getMemberEmail();
-
-		// (10) MEMBERONLINE
-
-		if ((n.getEventKind().equals("MEMBERONLINE"))) {
-			if (!hid.contains(em))
-				if (sel.contains(em)) {
-					if (off.contains(em))
-						off.remove(em);
-					if (!on.contains(em))
-						on.add(em);
-				}
-		}
-
-		// (20) MEMBEROFFLINE
-
-		if (n.getEventKind().equals("MEMBEROFFLINE")) {
-			if (!hid.contains(em))
-				if (sel.contains(em)) {
-					if (!off.contains(em))
-						off.add(em);
-					if (on.contains(em))
-						on.remove(em);
-				}
-		}
-
-		// (30) MEMBERVISIBLE
-
-		if (n.getEventKind().equals("MEMBERVISIBLE")) {
-			if (hid.contains(em))
-				hid.remove(em);
-			if (sel.contains(em)) {
-				if (off.contains(em))
-					off.remove(em);
-				if (!on.contains(em))
-					on.add(em);
-			}
-		}
-
-		// (40) MEMBERHIDDEN
-
-		if (n.getEventKind().equals("MEMBERHIDDEN")) {
-			if (!hid.contains(em))
-				hid.add(em);
-			if (sel.contains(em)) {
-				if (!off.contains(em))
-					off.add(em);
-				if (on.contains(em))
-					on.remove(em);
-			}
-		}
-
-		// (50) MEMBERTABLEADD
-
-		if (n.getEventKind().equals("MEMBERTABLEADD")) {
-			if (!off.contains(em))
-				off.add(em);
-		}
-
-		// (60) SELECTIVEPRESENCEON
-
-		if (n.getEventKind().equals("SELECTIVEPRESENCEON")) {
-			if (!sel.contains(em))
-				sel.add(em);
-			if (!hid.contains(em)) {
-				if (off.contains(em))
-					off.remove(em);
-				if (!on.contains(em))
-					on.add(em);
-			}
-		}
-
-		// (70) SELECTIVEPRESENCEOFF
-
-		if (n.getEventKind().equals("SELECTIVEPRESENCEOFF")) {
-			if (sel.contains(em))
-				sel.remove(em);
-			if (!hid.contains(em)) {
-				if (!off.contains(em))
-					off.add(em);
-				if (on.contains(em))
-					on.remove(em);
-			}
-		}
-
-		refresh();
-		print(n);
-
-		// System.out.println();
-		// for (ModelData m : treeStore.getAllItems())
-		// System.out.print(m.get("name") + ", ");
-		// System.out.println("\n");
-		layout();
-
-	}
-
-	/**
-	 * Rende invisibile l'utente corrente per il tavolo corrente
-	 * 
-	 * @return void
-	 */
-
-	public void makeMeHidden() {
-		rightPanel.tableUI.hiddenUser = true;
-		// (10) mi sposto localmente nella lista di utenti offline
-		// String toRemove=null;
-		// for(String s:rightPanel.table.onlineMembersEmail)
-		// if(s.equals(TablePlus.user.getEmail()))
-		// toRemove=s;
-		// if(toRemove!=null){
-		// rightPanel.table.onlineMembersEmail.remove(toRemove);
-		// rightPanel.table.offlineMembersEmail.add(toRemove);
-		// }
-
-		// (20) aggiorno l'oggetto Table nel DB
-		tableService.addHiddenMemberToTable(TablePlus.user.getKey(),
-				rightPanel.tableUI.tableKey, new AsyncCallback<Boolean>() {
-					@Override
-					public void onFailure(Throwable caught) {
-					}
-
-					@Override
-					public void onSuccess(Boolean result) {
-					}
-				});
-
-		// (30) lancio una notifica (aggiornerò la mia vista quando riceverò la
-		// notifica, come tutti gli altri)
-		Notification n = new Notification();
-		n.setEventKind("MEMBERHIDDEN");
-		n.setSenderEmail(TablePlus.user.getEmail());
-		n.setMemberEmail(TablePlus.user.getEmail());
-		n.setSenderKey(TablePlus.user.getKey());
-		n.setTableKey(rightPanel.tableUI.tableKey);
-		throwNotification(n);
-	}
-
-	/**
-	 * Rende invisibile l'utente corrente per il tavolo corrente
-	 * 
-	 * @return void
-	 */
-
-	public void makeMeVisible() {
-		rightPanel.tableUI.hiddenUser = false;
-		// (20) aggiorno l'oggetto Table nel DB
-		tableService.removeHiddenMemberFromTable(TablePlus.user.getKey(),
-				rightPanel.tableUI.tableKey, new AsyncCallback<Boolean>() {
-					@Override
-					public void onFailure(Throwable caught) {
-					}
-
-					@Override
-					public void onSuccess(Boolean result) {
-					}
-				});
-
-		// (30) lancio una notifica (aggiornerò la mia vista quando riceverò la
-		// notifica, come tutti gli altri)
-		Notification n = new Notification();
-		n.setEventKind("MEMBERVISIBLE");
-		n.setSenderEmail(TablePlus.user.getEmail());
-		n.setMemberEmail(TablePlus.user.getEmail());
-		n.setSenderKey(TablePlus.user.getKey());
-		n.setTableKey(rightPanel.tableUI.tableKey);
-		throwNotification(n);
-	}
-
-	public void sendInvitationByMail() {
-		if (toBeInvited != null) {
-			List<String> recipientList = new ArrayList<String>();
-			recipientList.add(toBeInvited);
-			notificationService.sendEmail(TablePlus.user.getEmail(),
-					toBeInvited,
-					"",
-					"",
-					this.rightPanel.tableUI.tableKey,
-					new AsyncCallback<Boolean>() {
+			// checks if user exists in database
+			final String toBeInvited = be.getValue();
+			userService.queryUser("email", toBeInvited,
+					new AsyncCallback<User>() {
 						@Override
 						public void onFailure(Throwable caught) {
+							GWT.log("Failed querying user", caught);
+						}
+
+						@Override
+						public void onSuccess(final User result) {
+							// if user does not exist
+							if (result == null)
+								MessageBox
+										.confirm(
+												"Confirm",
+												"This address is not in our database, do you want to sent an invitation by email?",
+												new Listener<MessageBoxEvent>() {
+													@Override
+													public void handleEvent(
+															MessageBoxEvent ce) {
+														Button btn = ce
+																.getButtonClicked();
+														if (btn.getText()
+																.equals("Yes"))
+														sendInvitationByMail(toBeInvited);
+													}
+												});
+							// if user exist
+							else if (!result.getTables().contains(
+									rightPanel.getTableUI().getTableKey())) {
+								MessageBox
+										.confirm(
+												"Confirm",
+												"This address is in our database, "
+														+ "the corrisponding user will gain access to "
+														+ "every document shared by this table. Do you wish to continue?",
+												new Listener<MessageBoxEvent>() {
+													@Override
+													public void handleEvent(
+															MessageBoxEvent ce) {
+														Button btn = ce
+																.getButtonClicked();
+														if (btn.getText()
+																.equals("Yes"))
+															addMember(result);
+													}
+												});
+							}
+
+						}
+					});
+		}
+	}
+
+	/**
+	 * Adds a user to current table
+	 * 
+	 * @return void
+	 */
+
+	public void addMember(final User newUser) {
+		tableService.addMember(newUser.getKey(), rightPanel.getTableUI()
+				.getTableKey(), new AsyncCallback<Void>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				GWT.log("Failed adding user", caught);
+			}
+
+			@Override
+			public void onSuccess(Void v) {
+				List<Long> recipients = rightPanel.getTableUI()
+						.getTableMembers();
+				recipients.add(newUser.getKey());
+				messagingService.sendMessage(TablePlus.getUser().getKey(),
+						newUser.getEmail(), ChannelMessageType.NEWTABLEMEMBER,
+						recipients, rightPanel.getTableUI().getTableKey(),
+						new AsyncCallback<String>() {
+
+							@Override
+							public void onFailure(Throwable caught) {
+								GWT.log("Failed to notify other users", caught);
+							}
+
+							@Override
+							public void onSuccess(String result) {
+								Info.display("Result",
+										"User has been successfully added to table.");
+							}
+
+						});
+			}
+
+		});
+	}
+
+	public void refreshMembersTree(ChannelMessageType event, Long userKey,
+			String userEmail) {
+		if (event.equals(ChannelMessageType.NEWCONNECTION)
+				&& !userEmail.equals(TablePlus.getUser().getEmail())) {
+			ModelData model;
+			model = treeStore.findModel("name", userEmail);
+			model.set("icon", "user-away");
+			treeStore.update(model);
+
+			messagingService.sendMessage(TablePlus.getUser().getKey(), "",
+					ChannelMessageType.USERSTATUS, userKey, TablePlus
+							.getDesktop().getActiveTableKey(),
+					new AsyncCallback<String>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GWT.log("Failed to send user status", caught);
+						}
+
+						@Override
+						public void onSuccess(String result) {
+						}
+
+					});
+		} else if (event.equals(ChannelMessageType.DISCONNECTION)) {
+			ModelData model;
+			model = treeStore.findModel("name", userEmail);
+			model.set("icon", "user-offline");
+			treeStore.update(model);
+		} else if (event.equals(ChannelMessageType.NEWTABLEMEMBER)) {
+			ModelData m = new BaseModelData();
+			m.set("name", userEmail);
+			m.set("icon", "user-offline");
+			treeStore.add(m, false);
+		} else if (event.equals(ChannelMessageType.USERONLINE)) {
+			ModelData model = treeStore.findModel("name", userEmail);
+			model.set("icon", "user-online");
+			treeStore.update(model);
+			Info.display("User status", "User " + userEmail + " is now online");
+		} else if (event.equals(ChannelMessageType.USERAWAY)) {
+			ModelData model = treeStore.findModel("name", userEmail);
+			model.set("icon", "user-away");
+			treeStore.update(model);
+			Info.display("User status", "User " + userEmail + " went away.");
+		} else if (event.equals(ChannelMessageType.USERBUSY)) {
+
+		}
+	}
+
+	public void sendInvitationByMail(String toBeInvited) {
+		//TODO: parse email address
+		if (toBeInvited != null) {
+			messagingService.sendInvitationEmail(TablePlus.getUser().getEmail(),
+					toBeInvited,this.rightPanel.getTableUI().getTableKey(),
+					new AsyncCallback<Boolean>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+							GWT.log("Unable to send invitation email");
 						}
 
 						@Override
 						public void onSuccess(Boolean result) {
-							System.out.println("EMAIL INVIATA: " + result);
+							Info.display("Invitation","Email sent successfully");
 						}
 					});
 		}

@@ -1,2 +1,0 @@
-serviceClass: com.unito.tableplus.client.services.TokenService
-path: 7EEE3AA4559D74A94EA982C776A4F605.gwt.rpc

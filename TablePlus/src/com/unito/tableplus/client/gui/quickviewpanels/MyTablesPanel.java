@@ -1,5 +1,7 @@
 package com.unito.tableplus.client.gui.quickviewpanels;
 
+import java.util.List;
+
 import com.extjs.gxt.ui.client.Style.Orientation;
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.data.BaseModelData;
@@ -30,13 +32,9 @@ import com.unito.tableplus.client.gui.RightPanel;
 import com.unito.tableplus.client.gui.TableUI;
 import com.unito.tableplus.client.services.TableService;
 import com.unito.tableplus.client.services.TableServiceAsync;
-import com.unito.tableplus.client.services.NotificationService;
-import com.unito.tableplus.client.services.NotificationServiceAsync;
 import com.unito.tableplus.client.services.UserService;
 import com.unito.tableplus.client.services.UserServiceAsync;
 import com.unito.tableplus.shared.model.Table;
-import com.unito.tableplus.shared.model.Notification;
-import com.unito.tableplus.shared.model.User;
 
 public class MyTablesPanel extends ContentPanel {
 
@@ -53,24 +51,16 @@ public class MyTablesPanel extends ContentPanel {
 			.create(TableService.class);
 	protected final UserServiceAsync userService = GWT
 			.create(UserService.class);
-	protected final NotificationServiceAsync notificationService = GWT
-			.create(NotificationService.class);
 
-	/**
-	 * Costruttore
-	 * 
-	 * @return void
-	 */
-
-	public MyTablesPanel(RightPanel rightPanel_) {
-		this.rightPanel = rightPanel_;
+	public MyTablesPanel(RightPanel rightPanel) {
+		this.rightPanel = rightPanel;
 
 		setHeading("My Tables");
 		setCollapsible(true);
 		setTitleCollapse(true);
 		setBodyStyle("backgroundColor: white;");
 		setLayout(new RowLayout(Orientation.HORIZONTAL));
-
+		mask("Loading...");
 		populateLeftLayoutContainer();
 		populateRightLayoutContainer();
 	}
@@ -122,6 +112,7 @@ public class MyTablesPanel extends ContentPanel {
 
 		treePanel.setIconProvider(new ModelIconProvider<ModelData>() {
 
+			@Override
 			public AbstractImagePrototype getIcon(ModelData model) {
 				if (model.get("icon") != null) {
 					return IconHelper.createStyle((String) model.get("icon"));
@@ -134,12 +125,12 @@ public class MyTablesPanel extends ContentPanel {
 		treePanel.setDisplayProperty("name");
 		treePanel.addListener(Events.OnDoubleClick,
 				new Listener<TreePanelEvent<ModelData>>() {
+					@Override
 					public void handleEvent(TreePanelEvent<ModelData> be) {
-						
-						
-						
-						TablePlus.desktop.switchToTable(((TableUI) be.getItem()
-								.get("table")).tableName);
+
+						TablePlus.getDesktop().switchToTable(
+								((TableUI) be.getItem().get("table"))
+										.getTableName());
 					};
 				});
 
@@ -147,177 +138,103 @@ public class MyTablesPanel extends ContentPanel {
 		rightLayoutContainer.setHeight("100%");
 		rightLayoutContainer.setWidth(300);
 		add(rightLayoutContainer);
-
+		
+		loadTablesList();
 		// myTables.layout();
 	}
 
 	/**
-	 * Crea un nuovo tavolo: (1) crea l'oggetto Table; (2) lo memorizza nel DB
+	 * Creates a new table and stores table data. Updates user. If everything
+	 * goes fine corresponding TableUI will be created.
 	 * 
-	 * @return void
 	 */
-
-	private Table newTable = null;
 
 	public void createNewTable(String tableName) {
 
 		// (10)crea un nuovo tavolo
-		newTable = new Table(TablePlus.user.getKey());
+		final Table newTable = new Table(TablePlus.getUser().getKey());
 		newTable.setName(tableName);
 
 		// (20)aggiunge il nuovo tavolo al db
 		tableService.storeTable(newTable, new AsyncCallback<Long>() {
 			@Override
 			public void onFailure(Throwable caught) {
+				GWT.log("Failed storing new table", caught);
 			}
 
 			@Override
-			public void onSuccess(Long result) {
+			public void onSuccess(final Long newTableKey) {
 
-				createNewTable_20(result);
+				TablePlus.getUser().addTable(newTableKey);
+				newTable.setKey(newTableKey);
+				// aggiorna l'utente nel db
+				userService.storeUser(TablePlus.getUser(),
+						new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GWT.log("Failed storing new table", caught);
+							}
+
+							@Override
+							public void onSuccess(Void v) {
+								TableUI table = new TableUI(newTable);
+								TablePlus.getDesktop().addTable(table);
+								Info.display("New Table created",
+										table.getTableName()
+												+ " is ready to join!");
+								addNewTableToTree(table);
+							}
+						});
 			}
 		});
 
 	}
 
 	/**
-	 * Crea un nuovo tavolo -2-: (1) aggiorna l'utente corrente in locale; (2)
-	 * aggiunge all'utente il tavolo; (3) aggiorna l'utente corrente nel db.
+	 * Fills the tables list
 	 * 
 	 * @return void
 	 */
 
-	private Long newTableKey;
-
-	public void createNewTable_20(Long newTableKey_) {
-		this.newTableKey = newTableKey_;
-		// (24)aggiorna l'utente corrente
-		userService.queryUser(TablePlus.user.getKey(),
-				new AsyncCallback<User>() {
+	public void loadTablesList() {
+		tableService.queryTables(TablePlus.getUser().getTables(),
+				new AsyncCallback<List<Table>>() {
 					@Override
 					public void onFailure(Throwable caught) {
+						GWT.log("Failure querying tables in loadTablesList");
+						unmask();
 					}
 
 					@Override
-					public void onSuccess(User result_) {
-						//TablePlus.user = result_;
-
-						// (25)aggiunge all'utente il tavolo appena creato
-						TablePlus.user.addTable(newTableKey);
-
-						// (27)aggiorna l'utente nel db
-						userService.storeUser(TablePlus.user,
-								new AsyncCallback<Void>() {
-									@Override
-									public void onFailure(Throwable caught) {
-									}
-
-									@Override
-									public void onSuccess(Void result) {
-										tableService.queryTable(newTableKey,
-												new AsyncCallback<Table>() {
-													@Override
-													public void onFailure(
-															Throwable caught) {
-													}
-
-													@Override
-													public void onSuccess(
-															Table result) {
-														createNewTable(result);
-													}
-												});
-									}
-								});
-
+					public void onSuccess(List<Table> result) {
+						for (Table table : result) {
+							TableUI t = new TableUI(table);
+							TablePlus.getDesktop().addTable(t);
+							addTable(t);
+						}
+						unmask();
 					}
-				});
-
-	}
-
-	/**
-	 * Crea un tavolo sulla base di un tavolo, aggiorna la vista corrente
-	 * 
-	 * @return void
-	 */
-
-	public void createNewTable(Table t) {
-
-		// (30)crea il tavolo corrispondente Table table1 = new
-		TableUI table1 = new TableUI(t);
-
-		// (40)aggiunge il nuovo tavolo al desktop
-		TablePlus.desktop.addTable(table1);
-
-		// (50)carica il nuovo table
-		Info.display("Table added: " + table1.tableName, "Ready to join!");
-		// desktop.switchToTable(table1.getTable().getName());
-
-		// (60)aggiunge il nuovo table alla lista del personalpanel
-		addNewTableToTree(table1);
-
-		// (70)lancia una notifica di creazione nuovo tavolo
-		Notification n = new Notification();
-		n.setSenderEmail(TablePlus.user.getEmail());
-		n.setSenderKey(TablePlus.user.getKey());
-		n.setEventKind("NEWTABLE");
-		n.setTableKey(t.getKey());
-
-		this.throwNotification(n);
-
-	}
-
-	/**
-	 * Lancia una notifica
-	 * 
-	 * @return void
-	 */
-
-	public void throwNotification(Notification notification) {
-		notificationService.sendNotification(notification,
-				new AsyncCallback<Boolean>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						// Auto-generated method stub
-
-					}
-
-					@Override
-					public void onSuccess(Boolean result) {
-						// Auto-generated method stub
-
-					}
-
 				});
 	}
 
-	/**
-	 * Aggiunge l'elenco dei miei gruppi
-	 * 
-	 * @return void
-	 */
-
-	public void addData() {
-		ModelData m;
-		for (TableUI t : TablePlus.desktop.getTables()) {
-			m = new BaseModelData();
-			m.set("name", t.tableName);
-			m.set("icon", "monitor");
-			m.set("table", t);
-			treeStore.add(m, false);
-		}
+	public void addTable(TableUI table) {
+		ModelData m = new BaseModelData();
+		m.set("key", table.getTableKey());
+		m.set("name", table.getTableName());
+		m.set("icon", "monitor");
+		m.set("table", table);
+		treeStore.add(m, false);
 	}
 
 	/**
-	 * Aggiunge un tavolo all'elenco
+	 * Adds a table to tables list
 	 * 
 	 * @return void
 	 */
 
 	public void addNewTableToTree(TableUI t) {
 		ModelData m = new BaseModelData();
-		m.set("name", t.tableName);
+		m.set("name", t.getTableName());
 		m.set("icon", "monitor");
 		m.set("table", t);
 		treeStore.add(m, false);

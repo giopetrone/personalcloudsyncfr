@@ -2,75 +2,49 @@ package com.unito.tableplus.client.gui;
 
 import com.extjs.gxt.ui.client.Style.Orientation;
 import com.extjs.gxt.ui.client.data.ModelData;
-import com.extjs.gxt.ui.client.dnd.DragSource;
+import com.extjs.gxt.ui.client.dnd.DND.Operation;
 import com.extjs.gxt.ui.client.dnd.DropTarget;
 import com.extjs.gxt.ui.client.dnd.TreePanelDragSource;
 import com.extjs.gxt.ui.client.dnd.TreePanelDropTarget;
-import com.extjs.gxt.ui.client.dnd.DND.Operation;
 import com.extjs.gxt.ui.client.event.DNDEvent;
 import com.extjs.gxt.ui.client.event.DNDListener;
-import com.extjs.gxt.ui.client.event.MenuEvent;
-import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
-import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.layout.AccordionLayout;
 import com.extjs.gxt.ui.client.widget.layout.FillLayout;
-import com.extjs.gxt.ui.client.widget.menu.Menu;
-import com.extjs.gxt.ui.client.widget.menu.MenuItem;
-import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanel;
-
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.unito.tableplus.client.TablePlus;
-import com.unito.tableplus.client.gui.quickviewpanels.TableResourcesPanel;
 import com.unito.tableplus.client.gui.quickviewpanels.MembersPanel;
-import com.unito.tableplus.client.gui.quickviewpanels.MyTablesPanel;
 import com.unito.tableplus.client.gui.quickviewpanels.MyResourcesPanel;
-import com.unito.tableplus.client.gui.quickviewpanels.WalletPanel;
-import com.unito.tableplus.client.services.TableService;
+import com.unito.tableplus.client.gui.quickviewpanels.MyTablesPanel;
+import com.unito.tableplus.client.gui.quickviewpanels.TableResourcesPanel;
+import com.unito.tableplus.client.services.ServiceFactory;
 import com.unito.tableplus.client.services.TableServiceAsync;
-import com.unito.tableplus.client.services.NotificationService;
-import com.unito.tableplus.client.services.NotificationServiceAsync;
-import com.unito.tableplus.shared.model.Notification;
 
 public class RightPanel extends ContentPanel {
 
 	// servizi
-	public final TableServiceAsync tableService = GWT
-			.create(TableService.class);
-	public final NotificationServiceAsync notificationService = GWT
-			.create(NotificationService.class);
+	private final TableServiceAsync tableService = ServiceFactory
+			.getTableServiceInstance();
 
 	// componenti
-	private ToolBar toolBar = null;
-	public TableUI tableUI;
-	public WalletPanel walletPanel;
-	public MyResourcesPanel myResourcesPanel;
-	public MembersPanel membersPanel;
-	public MyTablesPanel myTablesPanel;
-	public TableResourcesPanel tableResourcesPanel;
+	private TableUI tableUI;
+	private MyResourcesPanel myResourcesPanel;
+	private MembersPanel membersPanel;
+	private MyTablesPanel myTablesPanel;
+	private TableResourcesPanel tableResourcesPanel;
 
 	// altro
-	public boolean isTable = true;
+	private boolean isTable = true;
 
-	/**
-	 * Costruttore
-	 * 
-	 * @return void
-	 */
-
-	public RightPanel(TableUI tableUI_, boolean isTable_) {
-		this.tableUI = tableUI_;
-		this.isTable = isTable_;
+	public RightPanel(TableUI tableUI, boolean isTable) {
+		this.tableUI = tableUI;
+		this.setTable(isTable);
 
 		setLayout(new FillLayout(Orientation.VERTICAL));
 		setCollapsible(true);
 		setTitleCollapse(true);
 		setBodyStyle("backgroundColor: lightgray;");
 		setFrame(true);
-
-		addToolBar();
 
 		if (isTable)
 			tablePanel();
@@ -88,9 +62,6 @@ public class RightPanel extends ContentPanel {
 
 		setHeading("Quick View - <b><u>Personal Table</u></b>");
 
-		walletPanel = new WalletPanel(this);
-		add(walletPanel);
-
 		myResourcesPanel = new MyResourcesPanel(this);
 		add(myResourcesPanel);
 
@@ -106,7 +77,7 @@ public class RightPanel extends ContentPanel {
 
 	public void tablePanel() {
 
-		setHeading("Quick View - " + tableUI.tableName);
+		setHeading("Quick View - " + tableUI.getTableName());
 
 		membersPanel = new MembersPanel(this);
 		add(membersPanel);
@@ -118,66 +89,6 @@ public class RightPanel extends ContentPanel {
 		add(tableResourcesPanel);
 
 		addDnd();
-	}
-
-	/**
-	 * Lancia una notifica
-	 * 
-	 * @return void
-	 */
-
-	public void throwNotification(Notification notification) {
-		notificationService.sendNotification(notification,
-				new AsyncCallback<Boolean>() {
-					@Override
-					public void onFailure(Throwable caught) {
-					}
-
-					@Override
-					public void onSuccess(Boolean result) {
-					}
-				});
-	}
-
-	/**
-	 * Aggiunge la toolbar
-	 * 
-	 * @return void
-	 */
-
-	public void addToolBar() {
-		toolBar = new ToolBar();
-		Button styleButton = new Button("Style");
-
-		MenuItem accordionItem = new MenuItem("Accordion Layout",
-				new SelectionListener<MenuEvent>() {
-					@Override
-					public void componentSelected(MenuEvent ce) {
-						setLayout(new AccordionLayout());
-						layout();
-					}
-				});
-
-		MenuItem fillItem = new MenuItem("Fill Layout",
-				new SelectionListener<MenuEvent>() {
-					@Override
-					public void componentSelected(MenuEvent ce) {
-						setLayout(new FillLayout(Orientation.VERTICAL));
-						layout();
-					}
-				});
-
-		Menu menu = new Menu();
-		menu.add(accordionItem);
-		menu.add(fillItem);
-
-		styleButton.setMenu(menu);
-
-		Button button2 = new Button("Menu2");
-		toolBar.add(styleButton);
-		toolBar.add(button2);
-		setTopComponent(toolBar);
-
 	}
 
 	/**
@@ -207,8 +118,9 @@ public class RightPanel extends ContentPanel {
 
 			@Override
 			public void dragDrop(DNDEvent e) {
-				System.out.println("ID ---> "+e.getTarget().getId());
-				//se il rilascio dell'oggetto avviene nella lista dei Table objects...
+				System.out.println("ID ---> " + e.getTarget().getId());
+				// se il rilascio dell'oggetto avviene nella lista dei Table
+				// objects...
 				if (e.getDropTarget().getClass().toString()
 						.contains("TreePanelDropTarget")) {
 					@SuppressWarnings("rawtypes")
@@ -216,7 +128,7 @@ public class RightPanel extends ContentPanel {
 					ModelData sel = tree.getSelectionModel().getSelectedItem();
 
 					tableService.addDocumentToTable((String) sel.get("docId"),
-							TablePlus.user, tableUI.tableKey,
+							TablePlus.getUser(), tableUI.getTableKey(),
 							new AsyncCallback<Boolean>() {
 								@Override
 								public void onFailure(Throwable caught) {
@@ -233,34 +145,36 @@ public class RightPanel extends ContentPanel {
 							});
 					super.dragDrop(e);
 				}
-				
+
 				// se il rilascio dell'oggetto avviene sul desktop
-				else if (e.getTarget().getId().equals("x-desktop")||e.getTarget().getId().equals("x-auto-2")){
-					
-					//recupero l'oggetto
+				else if (e.getTarget().getId().equals("x-desktop")
+						|| e.getTarget().getId().equals("x-auto-2")) {
+
+					// recupero l'oggetto
 					@SuppressWarnings("rawtypes")
 					TreePanel tree = ((TreePanel) e.getComponent());
 					ModelData sel = tree.getSelectionModel().getSelectedItem();
-					
-					//chiamo il metodo di tableUI che si occupa di aggiungere
-					//lo shortcut
-					tableUI.addGdocShortcut((String) sel.get("name"),(String) sel.get("link"),(String) sel.get("docId"));
-					
+
+					// chiamo il metodo di tableUI che si occupa di aggiungere
+					// lo shortcut
+					tableUI.addDriveShortcut((String) sel.get("name"),
+							(String) sel.get("link"), (String) sel.get("docId"));
+
 					super.dragDrop(e);
 				}
-				
+
 			}
 		};
 
 		TreePanelDragSource source = new TreePanelDragSource(
-				myResourcesPanel.treePanel);
+				myResourcesPanel.getTreePanel());
 		source.addDNDListener(listener);
 
 		TreePanelDropTarget target = new TreePanelDropTarget(
 				tableResourcesPanel.treePanel);
 		target.setOperation(Operation.COPY);
 
-		DropTarget dropTarget = new DropTarget(TablePlus.desktop.getDesktop());
+		DropTarget dropTarget = new DropTarget(TablePlus.getDesktop().getDesktop());
 		dropTarget.setOperation(Operation.COPY);
 
 		// target.setFeedback(Feedback.BOTH);
@@ -268,6 +182,44 @@ public class RightPanel extends ContentPanel {
 
 	public void addDndFromQuickviewToDesktop() {
 		// DragSource source=new dragSource();
+	}
+
+	/**
+	 * @return the isTable
+	 */
+	public boolean isTable() {
+		return isTable;
+	}
+
+	/**
+	 * @param isTable the isTable to set
+	 */
+	public void setTable(boolean isTable) {
+		this.isTable = isTable;
+	}
+
+	public MyTablesPanel getMyTablesPanel() {
+		return myTablesPanel;
+	}
+
+	public void setMyTablesPanel(MyTablesPanel myTablesPanel) {
+		this.myTablesPanel = myTablesPanel;
+	}
+
+	public MembersPanel getMembersPanel() {
+		return membersPanel;
+	}
+
+	public void setMembersPanel(MembersPanel membersPanel) {
+		this.membersPanel = membersPanel;
+	}
+
+	public TableUI getTableUI() {
+		return tableUI;
+	}
+
+	public void setTableUI(TableUI tableUI) {
+		this.tableUI = tableUI;
 	}
 
 }

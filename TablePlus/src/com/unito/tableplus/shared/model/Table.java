@@ -1,11 +1,11 @@
 package com.unito.tableplus.shared.model;
    
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import javax.jdo.annotations.IdGeneratorStrategy;
+import javax.jdo.annotations.NotPersistent;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
@@ -19,17 +19,18 @@ public class Table implements Serializable {
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
 	private Long key;
 
+	public void setKey(Long key) {
+		this.key = key;
+	}
+
 	@Persistent
 	private String name = null;
 
 	@Persistent
 	private List<Long> members = null;
-
-	@Persistent
-	private List<Long> hiddenMembers;
-
-	@Persistent
-	private List<Long> selectivePresenceMembers;
+	
+	@NotPersistent
+	private List<String> membersEmail =  null;
 
 	@Persistent
 	private Long creator = null;
@@ -38,7 +39,7 @@ public class Table implements Serializable {
 	private Long owner = null;
 
 	@Persistent(mappedBy = "table")
-	private List<Message> blackboard;
+	private List<BlackBoardMessage> blackboard;
 
 	@Persistent
 	private List<String> documents;
@@ -46,11 +47,9 @@ public class Table implements Serializable {
 	public Table(Long creator) {
 		this.creator = creator;
 		this.owner = creator;
-		this.blackboard = new LinkedList<Message>();
+		this.blackboard = new LinkedList<BlackBoardMessage>();
 		this.setDocuments(new LinkedList<String>());
 		this.members = new LinkedList<Long>();
-		this.setHiddenMembers(new ArrayList<Long>());
-		this.setSelectivePresenceMembers(new ArrayList<Long>());
 		this.members.add(creator);
 	}
 
@@ -58,7 +57,7 @@ public class Table implements Serializable {
 
 	}
 
-	public List<Message> getBlackBoard() {
+	public List<BlackBoardMessage> getBlackBoard() {
 		return this.blackboard;
 	}
 
@@ -111,6 +110,7 @@ public class Table implements Serializable {
 		members.add(owner);
 	}
 
+	@Override
 	public String toString() {
 		return "Table Name:" + this.name + " - Creator: " + this.creator
 				+ " - Owner: " + this.owner + " - " + this.members.size()
@@ -125,45 +125,6 @@ public class Table implements Serializable {
 		this.members = members;
 	}
 
-	public void addHiddenMember(Long hmKey) {
-		hiddenMembers.add(hmKey);
-	}
-
-	public boolean removeHiddenMember(Long hmKey) {
-		Long toRemove = null;
-		for (Long l : hiddenMembers) {
-			if (l.compareTo(hmKey) == 0) {
-				toRemove = l;
-			}
-		}
-		if (toRemove != null) {
-			hiddenMembers.remove(toRemove);
-			return true;
-		} else {
-			return false;
-		}
-
-	}
-
-	public void addSelectivePresenceMember(Long hmKey) {
-		selectivePresenceMembers.add(hmKey);
-	}
-
-	public boolean removeSelectivePresenceMember(Long hmKey) {
-		Long toRemove = null;
-		for (Long l : selectivePresenceMembers) {
-			if (l.compareTo(hmKey) == 0) {
-				toRemove = l;
-			}
-		}
-		if (toRemove != null) {
-			selectivePresenceMembers.remove(toRemove);
-			return true;
-		} else {
-			return false;
-		}
-
-	}
 
 	public List<String> getDocuments() {
 		return documents;
@@ -177,20 +138,18 @@ public class Table implements Serializable {
 		documents.add(document);
 	}
 
-	public List<Long> getHiddenMembers() {
-		return hiddenMembers;
+	/**
+	 * @return the membersEmail
+	 */
+	public List<String> getMembersEmail() {
+		return membersEmail;
 	}
 
-	public void setHiddenMembers(List<Long> hiddenMembers) {
-		this.hiddenMembers = hiddenMembers;
-	}
-
-	public List<Long> getSelectivePresenceMembers() {
-		return selectivePresenceMembers;
-	}
-
-	public void setSelectivePresenceMembers(List<Long> selectivePresenceMembers) {
-		this.selectivePresenceMembers = selectivePresenceMembers;
+	/**
+	 * @param membersEmail the membersEmail to set
+	 */
+	public void setMembersEmail(List<String> membersEmail) {
+		this.membersEmail = membersEmail;
 	}
 
 }

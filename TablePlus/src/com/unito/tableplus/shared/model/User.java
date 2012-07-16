@@ -1,15 +1,16 @@
 package com.unito.tableplus.shared.model;
-   
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.NotPersistent;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
-@PersistenceCapable
+@PersistenceCapable(detachable = "true")
 public class User implements Serializable {
 
 	private static final long serialVersionUID = -7305579743183016832L;
@@ -31,19 +32,10 @@ public class User implements Serializable {
 	private String email;
 
 	@Persistent
-	private List<Long> tables=new ArrayList<Long>();
-
-	@Persistent
-	private String token;
-
-	@Persistent
-	private String loginProvider;
+	private List<Long> tables = new ArrayList<Long>();
 
 	@NotPersistent
-	private List<Document> documents;
-
-	@Persistent
-	private boolean online;
+	private UserStatus status;
 
 	public Long getKey() {
 		return key;
@@ -81,38 +73,6 @@ public class User implements Serializable {
 		this.email = email;
 	}
 
-	public boolean isOnline() {
-		return online;
-	}
-
-	public void setOnline(boolean online) {
-		this.online = online;
-	}
-
-	public List<Document> getDocuments() {
-		return documents;
-	}
-
-	public void setDocuments(List<Document> documents) {
-		this.documents = documents;
-	}
-
-	public String getToken() {
-		return token;
-	}
-
-	public void setToken(String token) {
-		this.token = token;
-	}
-
-	public String getLoginProvider() {
-		return loginProvider;
-	}
-
-	public void setLoginProvider(String loginProvider) {
-		this.loginProvider = loginProvider;
-	}
-
 	public List<Long> getTables() {
 		return tables;
 	}
@@ -120,9 +80,22 @@ public class User implements Serializable {
 	public void setTables(List<Long> tables) {
 		this.tables = tables;
 	}
-	
-	public void addTable(Long table){
+
+	public void addTable(Long table) {
 		this.tables.add(table);
 	}
 
+	/**
+	 * @return the status
+	 */
+	public UserStatus getStatus() {
+		return status;
+	}
+
+	/**
+	 * @param status the status to set
+	 */
+	public void setStatus(UserStatus status) {
+		this.status = status;
+	}
 }

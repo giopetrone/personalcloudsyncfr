@@ -8,13 +8,9 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 @PersistenceCapable
-
 public class Invitation implements Serializable{
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -7604076012205785560L;
 
 	@PrimaryKey
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
@@ -25,6 +21,12 @@ public class Invitation implements Serializable{
 	
 	@Persistent
 	private Long tableKey;
+	
+	@Persistent
+	private Long author;
+
+	@Persistent
+	private String invitedUser;
 
 	public Long getKey() {
 		return key;
@@ -50,5 +52,20 @@ public class Invitation implements Serializable{
 		this.tableKey = tableKey;
 	}
 	
+	public Long getAuthor() {
+		return author;
+	}
+
+	public void setAuthor(Long author) {
+		this.author = author;
+	}
+	
+	public String getInvitedUser() {
+		return invitedUser;
+	}
+
+	public void setInvitedUser(String invitedUser) {
+		this.invitedUser = invitedUser;
+	}
 	
 }

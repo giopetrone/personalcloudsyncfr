@@ -67,12 +67,18 @@
 		!important;
 }
 
-.user-green {
+.user-online {
 	background-image: url(../images/status_online.png) !important;
 }
 
-.user-silhouette {
+.user-offline {
 	background-image: url(../images/status_offline.png) !important;
+}
+.user-away {
+	background-image: url(../images/status_away.png) !important;
+}
+.user-busy {
+	background-image: url(../images/status_busy.png) !important;
 }
 
 .document_font {
@@ -98,65 +104,36 @@
 .set-hidden {
 	background-image: url(../images/user_silhouette.png) !important;
 }
-.sort_ascending{
+
+.sort_ascending {
 	background-image: url(../images/sort_ascending.png) !important;
 }
 
-.arrow_refresh{
+.arrow_refresh {
 	background-image: url(../images/arrow_refresh.png) !important;
 }
 
-.folder_16{
+.folder_16 {
 	background-image: url(../images/folder.png) !important;
 }
 
-.monitor{
+.monitor {
 	background-image: url(../images/monitor.png) !important;
 }
 
-.monitor_add{
+.monitor_add {
 	background-image: url(../images/monitor_add.png) !important;
 }
 
-.monitor_go{
+.monitor_go {
 	background-image: url(../images/monitor_go.png) !important;
 }
 
 /* shortcuts */
-#grid-win-shortcut img {
-	width: 48px;
-	height: 48px;
-	background: url(../images/grid48x48.png);
-}
-
-#acc-win-shortcut img {
-	width: 48px;
-	height: 48px;
-	background-image: url(../images/im48x48.png);
-}
-
 #wallet-win-shortcut img {
 	width: 64px;
 	height: 64px;
-	background-image: url(../images/Briefcase.png);
-}
-
-#calendar-win-shortcut img {
-	width: 64px;
-	height: 64px;
-	background-image: url(../images/Address_Book.png);
-}
-
-#tablesmanager-win-shortcut img {
-	width: 64px;
-	height: 64px;
-	background-image: url(../images/User.png);
-}
-
-#pesmanager-win-shortcut img {
-	width: 64px;
-	height: 64px;
-	background-image: url(../images/E-Mail.png);
+	background-image: url(../images/wallet.png);
 }
 
 #myresources-win-shortcut img {
@@ -174,7 +151,13 @@
 #chat-win-shortcut img {
 	width: 64px;
 	height: 64px;
-	background-image: url(../images/Application.png);
+	background-image: url(../images/group_chat.png);
+}
+
+#blackboard-win-shortcut img {
+	width: 64px;
+	height: 64px;
+	background-image: url(../images/blackboard.png);
 }
 
 #doc-win-shortcut img {

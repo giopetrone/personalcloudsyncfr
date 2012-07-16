@@ -19,41 +19,56 @@ import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanel;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.unito.tableplus.client.TablePlus;
 import com.unito.tableplus.client.gui.RightPanel;
-import com.unito.tableplus.shared.model.Document;
+import com.unito.tableplus.client.services.ServiceFactory;
+import com.unito.tableplus.client.services.UserServiceAsync;
+import com.unito.tableplus.shared.model.DriveFile;
+import com.unito.tableplus.shared.model.Provider;
+
+import java.util.List;
+import com.unito.tableplus.shared.model.Resource;
 
 public class MyResourcesPanel extends ContentPanel {
 
-	public RightPanel rightPanel;
-	
-	//componenti
-	public LayoutContainer leftLayoutContainer = new LayoutContainer();
-	public LayoutContainer rightLayoutContainer = new LayoutContainer();
-	public TreePanel<ModelData> treePanel;
-	public TreeStore<ModelData> treeStore = new TreeStore<ModelData>();
-	public BaseTreeModel googleDocsRoot = new BaseTreeModel();
-	
+	private static final UserServiceAsync userService = ServiceFactory
+			.getUserServiceInstance();
+
+	private RightPanel rightPanel;
+
+	// componenti
+	private LayoutContainer leftLayoutContainer;
+	private LayoutContainer rightLayoutContainer;
+	private TreePanel<ModelData> treePanel;
+	private TreeStore<ModelData> treeStore;
+	private BaseTreeModel resourcesRoot;
+
 	/**
 	 * Costruttore
 	 * 
 	 * @return void
 	 */
-	
-	public MyResourcesPanel(RightPanel rightPanel_) {
-		this.rightPanel = rightPanel_;
-		
-		setHeading("My Objects");
+
+	public MyResourcesPanel(RightPanel rightPanel) {
+		this.setRightPanel(rightPanel);
+
+		setHeading("My Resources");
 		setCollapsible(true);
 		setTitleCollapse(true);
 		setBodyStyle("backgroundColor: white;");
 		setLayout(new RowLayout(Orientation.HORIZONTAL));
-		
+		mask("Loading...");
+		leftLayoutContainer = new LayoutContainer();
+		rightLayoutContainer = new LayoutContainer();
+		treeStore = new TreeStore<ModelData>();
+		resourcesRoot = new BaseTreeModel();
 		populateLeftLayoutContainer();
 		populateRightLayoutContainer();
 	}
-	
+
 	/**
 	 * Popola l'area di sinistra, quella con i pulsanti in verticale
 	 * 
@@ -63,20 +78,21 @@ public class MyResourcesPanel extends ContentPanel {
 	public void populateLeftLayoutContainer() {
 		// button per il refresh dei miei documenti
 		Button refreshMyResources = new Button();
-		refreshMyResources
-				.setToolTip(new ToolTipConfig("Refresh objects list"));
+		refreshMyResources.setToolTip(new ToolTipConfig(
+				"Refresh resources list"));
 		refreshMyResources.setIcon(IconHelper.createStyle("arrow_refresh"));
 		refreshMyResources
 				.addSelectionListener(new SelectionListener<ButtonEvent>() {
 					@Override
 					public void componentSelected(ButtonEvent ce) {
+						// TODO: implement this method
 						// refreshMyResourcesTree();
 					}
 				});
 		leftLayoutContainer.add(refreshMyResources);
 		add(leftLayoutContainer);
 	}
-	
+
 	/**
 	 * Popola l'area di destra, quella con le informazioni
 	 * 
@@ -84,13 +100,12 @@ public class MyResourcesPanel extends ContentPanel {
 	 */
 
 	public void populateRightLayoutContainer() {
-
 		rightLayoutContainer.setScrollMode(Scroll.AUTO);
 
 		treePanel = new TreePanel<ModelData>(treeStore) {
 			@Override
 			protected boolean hasChildren(ModelData m) {
-				if ("MyGoogleDocs".equals(m.get("name"))) {
+				if ("Resources".equals(m.get("name"))) {
 					return true;
 				}
 				return super.hasChildren(m);
@@ -99,6 +114,7 @@ public class MyResourcesPanel extends ContentPanel {
 
 		treePanel.setIconProvider(new ModelIconProvider<ModelData>() {
 
+			@Override
 			public AbstractImagePrototype getIcon(ModelData model) {
 				if (model.get("icon") != null) {
 					return IconHelper.createStyle((String) model.get("icon"));
@@ -113,40 +129,110 @@ public class MyResourcesPanel extends ContentPanel {
 
 		treePanel.addListener(Events.OnDoubleClick,
 				new Listener<TreePanelEvent<ModelData>>() {
+					@Override
 					public void handleEvent(TreePanelEvent<ModelData> be) {
-						// System.out.println("CIAO " +
-						// be.getItem().get("name"));
 						if (be.getItem().get("link") != null)
 							com.google.gwt.user.client.Window.open((String) be
 									.getItem().get("link"), "_blank", "");
 					};
 				});
 
-		
-		googleDocsRoot.set("name", "MyGoogleDocs");
-		treeStore.add(googleDocsRoot, false);
+		resourcesRoot.set("name", "Resources");
+		treeStore.add(resourcesRoot, false);
 
-		ModelData m_son;
-		
-		if (TablePlus.user.getDocuments() != null)
-			for (Document document : TablePlus.user.getDocuments()) {
-				m_son = new BaseModelData();
-				m_son.set("name", document.getTitle());
-				m_son.set("icon", "document_font");
-				m_son.set("link", document.getLink());
-				m_son.set("docId", document.getDocId());
-				// System.out.println("LINK = "+document.getLink());
-				treeStore.add(googleDocsRoot, m_son, false);
-			}
-		
-		treePanel.setExpanded(googleDocsRoot, true);
+		treePanel.setExpanded(resourcesRoot, true);
 
 		rightLayoutContainer.add(treePanel);
 		rightLayoutContainer.setHeight("100%");
 		rightLayoutContainer.setWidth(300);
 		add(rightLayoutContainer);
-//		rightLayoutContainer.layout();
-//		myResources.layout();
+		userService.loadResources(TablePlus.getUser(),
+				new AsyncCallback<List<Resource>>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						GWT.log("Error loading user Drive files.");
+						unmask();
+					}
+
+					@Override
+					public void onSuccess(List<Resource> result) {
+						if (result != null) {
+							ModelData model;
+							for (Resource r : result) {
+								if (r.getProvider().equals(Provider.DRIVE)) {
+									DriveFile driveFile = (DriveFile) r;
+									model = new BaseModelData();
+									model.set("name", driveFile.getTitle());
+									model.set("icon", "document_font");
+									model.set("link", driveFile.getLink());
+									model.set("docId", driveFile.getDocId());
+									treeStore.add(resourcesRoot, model, false);
+								}
+
+							}
+						}
+						unmask();
+					}
+				});
+
+	}
+	
+	//TODO: load all resources types
+	public void loadResources() {
+		treeStore.removeAll();
+		userService.loadResources(TablePlus.getUser(),
+				new AsyncCallback<List<Resource>>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						GWT.log("Error loading user Drive files.");
+						unmask();
+					}
+
+					@Override
+					public void onSuccess(List<Resource> result) {
+						if (result != null) {
+							ModelData model;
+							for (Resource r : result) {
+								if (r.getProvider().equals(Provider.DRIVE)) {
+									DriveFile driveFile = (DriveFile) r;
+									model = new BaseModelData();
+									model.set("name", driveFile.getTitle());
+									model.set("icon", "document_font");
+									model.set("link", driveFile.getLink());
+									model.set("docId", driveFile.getDocId());
+									treeStore.add(resourcesRoot, model, false);
+								}
+
+							}
+						}
+						unmask();
+					}
+				});
+
 	}
 
+	/**
+	 * @return the rightPanel
+	 */
+	public RightPanel getRightPanel() {
+		return rightPanel;
+	}
+
+	/**
+	 * @param rightPanel
+	 *            the rightPanel to set
+	 */
+	public void setRightPanel(RightPanel rightPanel) {
+		this.rightPanel = rightPanel;
+	}
+
+	public TreePanel<ModelData> getTreePanel() {
+		return treePanel;
+	}
+
+	public void setTreePanel(TreePanel<ModelData> treePanel) {
+		this.treePanel = treePanel;
+	}
 }

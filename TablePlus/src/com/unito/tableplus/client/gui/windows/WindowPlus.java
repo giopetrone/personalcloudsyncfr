@@ -16,6 +16,7 @@ public class WindowPlus extends Window {
 		setSize(400, 300);
 
 		this.addListener(Events.Hide, new Listener<WindowEvent>(){
+			@Override
 			public void handleEvent(WindowEvent be) {
 				if(!closedBySwitch){
 					setPreviousPosition(getPosition(false));
@@ -28,10 +29,6 @@ public class WindowPlus extends Window {
 		
 	}
 	
-	public void _hide(){
-		super.hide();
-	}
-
 	boolean closedBySwitch=false;
 	boolean wasOpen = false;
 	private Point previousPosition;
@@ -45,8 +42,6 @@ public class WindowPlus extends Window {
 	public void setWasOpen(boolean wasOpen) {
 		this.wasOpen = wasOpen;
 	}
-
-	
 
 	public int getPreviousWidth() {
 		return previousWidth;
@@ -79,7 +74,5 @@ public class WindowPlus extends Window {
 	public void setPreviousPosition(Point previousPosition) {
 		this.previousPosition = previousPosition;
 	}
-	
-	
 
 }

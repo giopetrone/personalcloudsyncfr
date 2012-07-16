@@ -1,5 +1,7 @@
 package com.unito.tableplus.client.gui.quickviewpanels;
 
+import java.util.List;
+
 import com.extjs.gxt.ui.client.Style.Orientation;
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.data.BaseModelData;
@@ -19,12 +21,19 @@ import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanel;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.unito.tableplus.client.TablePlus;
 import com.unito.tableplus.client.gui.RightPanel;
-import com.unito.tableplus.shared.model.Document;
+import com.unito.tableplus.client.services.ServiceFactory;
+import com.unito.tableplus.client.services.TableServiceAsync;
+import com.unito.tableplus.shared.model.DriveFile;
+import com.unito.tableplus.shared.model.Table;
 
 public class TableResourcesPanel extends ContentPanel {
+	
+	public final TableServiceAsync tableService = ServiceFactory
+			.getTableServiceInstance();
 
 	public RightPanel rightPanel;
 
@@ -41,15 +50,17 @@ public class TableResourcesPanel extends ContentPanel {
 	 * @return void
 	 */
 
-	public TableResourcesPanel(RightPanel rightPanel_) {
-		this.rightPanel = rightPanel_;
+	public TableResourcesPanel(RightPanel rightPanel) {
+		this.rightPanel = rightPanel;
 
-		setHeading("Table Objects");
+		setHeading("Table Resources");
 		setCollapsible(true);
 		setTitleCollapse(true);
 		setBodyStyle("backgroundColor: white;");
 		setLayout(new RowLayout(Orientation.HORIZONTAL));
-
+		
+		mask("Loading...");
+		
 		populateLeftLayoutContainer();
 		populateRightLayoutContainer();
 	}
@@ -84,7 +95,7 @@ public class TableResourcesPanel extends ContentPanel {
 				.addSelectionListener(new SelectionListener<ButtonEvent>() {
 					@Override
 					public void componentSelected(ButtonEvent ce) {
-						TablePlus.desktop.switchToTable("Personal Table");
+						TablePlus.getDesktop().switchToTable("Personal Table");
 					}
 				});
 		leftLayoutContainer.add(backToPersonalTable);
@@ -104,7 +115,7 @@ public class TableResourcesPanel extends ContentPanel {
 		treePanel = new TreePanel<ModelData>(treeStore) {
 			@Override
 			protected boolean hasChildren(ModelData m) {
-				if ("TableGoogleDocs".equals(m.get("name"))) {
+				if ("Resources".equals(m.get("name"))) {
 					return true;
 				}
 				return super.hasChildren(m);
@@ -113,6 +124,7 @@ public class TableResourcesPanel extends ContentPanel {
 
 		treePanel.setIconProvider(new ModelIconProvider<ModelData>() {
 
+			@Override
 			public AbstractImagePrototype getIcon(ModelData model) {
 				if (model.get("icon") != null) {
 					return IconHelper.createStyle((String) model.get("icon"));
@@ -127,30 +139,17 @@ public class TableResourcesPanel extends ContentPanel {
 
 		treePanel.addListener(Events.OnDoubleClick,
 				new Listener<TreePanelEvent<ModelData>>() {
+					@Override
 					public void handleEvent(TreePanelEvent<ModelData> be) {
-						// System.out.println("CIAO " +
-						// be.getItem().get("name"));
 						if (be.getItem().get("link") != null)
 							com.google.gwt.user.client.Window.open((String) be
 									.getItem().get("link"), "_blank", "");
 					};
 				});
 
-		googleDocsRoot.set("name", "TableGoogleDocs");
+		googleDocsRoot.set("name", "Resources");
 		treeStore.add(googleDocsRoot, false);
 
-		// ModelData m_son;
-		//
-		// if (table.googleDocuments != null)
-		// for (Document document : table.googleDocuments) {
-		// m_son = new BaseModelData();
-		// m_son.set("name", document.getTitle());
-		// m_son.set("icon", "document_font");
-		// m_son.set("link", document.getLink());
-		// m_son.set("docId", document.getDocId());
-		// // System.out.println("LINK = "+document.getLink());
-		// store.add(root, m_son, false);
-		// }
 
 		treePanel.setExpanded(googleDocsRoot, true);
 
@@ -158,22 +157,42 @@ public class TableResourcesPanel extends ContentPanel {
 		rightLayoutContainer.setHeight("100%");
 		rightLayoutContainer.setWidth(300);
 		add(rightLayoutContainer);
-		// tableObjectTreeLc.layout();
-		// tableResources.layout();
+		
+		loadResources(rightPanel.getTableUI().getTable());
+	}
+	
+	/**
+	 * Crea la lista dei google documents del tavolo
+	 * 
+	 * @return void
+	 */
+
+	public void loadResources(Table table) {
+		tableService.getTableDriveFiles(table,
+				new AsyncCallback<List<DriveFile>>() {
+					@Override
+					public void onFailure(Throwable caught) {
+					}
+
+					@Override
+					public void onSuccess(List<DriveFile> result) {
+						addData(result);
+						unmask();
+					}
+				});
 	}
 
-	public void addData() {
-		ModelData m_son;
+	public void addData(List<DriveFile> files) {
+		ModelData model;
 
-		if (rightPanel.tableUI.googleDocuments != null)
-			for (Document document : rightPanel.tableUI.googleDocuments) {
-				m_son = new BaseModelData();
-				m_son.set("name", document.getTitle());
-				m_son.set("icon", "document_font");
-				m_son.set("link", document.getLink());
-				m_son.set("docId", document.getDocId());
-				// System.out.println("LINK = "+document.getLink());
-				treeStore.add(googleDocsRoot, m_son, false);
+		if (files != null)
+			for (DriveFile driveFile : files) {
+				model = new BaseModelData();
+				model.set("name", driveFile.getTitle());
+				model.set("icon", "document_font");
+				model.set("link", driveFile.getLink());
+				model.set("docId", driveFile.getDocId());
+				treeStore.add(googleDocsRoot, model, false);
 			}
 	}
 }

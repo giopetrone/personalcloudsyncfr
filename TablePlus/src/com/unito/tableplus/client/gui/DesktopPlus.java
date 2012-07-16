@@ -22,63 +22,56 @@ import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.unito.tableplus.client.TablePlus;
-import com.unito.tableplus.client.gui.windows.*;
-import com.unito.tableplus.client.services.NotificationService;
-import com.unito.tableplus.client.services.NotificationServiceAsync;
-import com.unito.tableplus.client.services.UserService;
+import com.unito.tableplus.client.gui.windows.MyResourcesWindow;
+import com.unito.tableplus.client.gui.windows.WalletWindow;
+import com.unito.tableplus.client.gui.windows.WindowPlus;
+import com.unito.tableplus.client.services.MessagingServiceAsync;
+import com.unito.tableplus.client.services.ServiceFactory;
 import com.unito.tableplus.client.services.UserServiceAsync;
-import com.unito.tableplus.shared.model.Notification;
-import com.unito.tableplus.shared.model.User;
+import com.unito.tableplus.shared.model.ChannelMessageType;
 
 public class DesktopPlus extends Desktop {
 
-	private List<TableUI> tables = new ArrayList<TableUI>();
-	private TableUI currentTable;
-	private RightPanel currentRightPanel;
+	private List<TableUI> tables;
+	private TableUI activeTable;
+	private RightPanel activeRightPanel;
+
 	// listener dedicato al menu
 	private SelectionListener<MenuEvent> menuListener;
 	private SelectionListener<MenuEvent> tableMenuListener;
+
 	// listener dedicato agli shortcut
-	public SelectionListener<ComponentEvent> shortcutListener;
+	private SelectionListener<ComponentEvent> shortcutListener;
 	protected StartMenu startMenu;
 	private List<MenuItem> menuItems = new ArrayList<MenuItem>();
-	public Menu tablesSubMenu = new Menu();
-	String logoutUrl;
-	// crea il servizio per l'utente
-	private final UserServiceAsync userService = GWT.create(UserService.class);
+	private Menu tablesSubMenu = new Menu();
 
-	// crea il servizio per il notification
-	protected final NotificationServiceAsync notificationService = GWT
-			.create(NotificationService.class);
+	private final UserServiceAsync userService = ServiceFactory
+			.getUserServiceInstance();
+	protected final MessagingServiceAsync messagingService = ServiceFactory
+			.getChatServiceInstance();
 
-	protected User user;
-
-	public DesktopPlus(User user_, String logoutUrl_) {
-		// (1)costruttore di Desktop
+	public DesktopPlus() {
 		super();
-		this.user = user_;
-		this.logoutUrl = logoutUrl_;
-
-		// (2)setta il listener del menu
+		tables = new ArrayList<TableUI>();
+		// setta il listener del menu
 		setMenuListener(new SelectionListener<MenuEvent>() {
 			@Override
 			public void componentSelected(MenuEvent me) {
 				String s = ((MenuItem) me.getItem()).getText();
-
 				if (s.contains("Table") || s.contains("Personal Table")) {
 					switchToTable(s);
 				} else if (s.equals("Add Table")) {
-					createTable();
+					// TODO: do something
 				} else {
 					itemSelected(me);
 				}
 			}
 		});
 
-		// (3)setta il listener per il cambio dei tavoli
+		// setta il listener per il cambio dei tavoli
 		tableMenuListener = new SelectionListener<MenuEvent>() {
 			@Override
 			public void componentSelected(MenuEvent me) {
@@ -111,36 +104,6 @@ public class DesktopPlus extends Desktop {
 		s.addSelectionListener(shortcutListener);
 		this.addShortcut(s);
 
-		// calendar
-		WindowPlus calendarWindow = new CalendarWindow();
-		addWindow(calendarWindow);
-		s = new Shortcut();
-		s.setText("Calendar");
-		s.setId("calendar-win-shortcut");
-		s.setData("window", calendarWindow);
-		s.addSelectionListener(shortcutListener);
-		this.addShortcut(s);
-
-		// tables manager
-		WindowPlus tablesManagerWindow = new TablesManagerWindow();
-		addWindow(tablesManagerWindow);
-		s = new Shortcut();
-		s.setText("Tables Manager");
-		s.setId("tablesmanager-win-shortcut");
-		s.setData("window", tablesManagerWindow);
-		s.addSelectionListener(shortcutListener);
-		this.addShortcut(s);
-
-		// p&S manager
-		WindowPlus pesManagerWindow = new PesManagerWindow();
-		addWindow(pesManagerWindow);
-		s = new Shortcut();
-		s.setText("P&S Manager");
-		s.setId("pesmanager-win-shortcut");
-		s.setData("window", pesManagerWindow);
-		s.addSelectionListener(shortcutListener);
-		this.addShortcut(s);
-
 		// my resources
 		WindowPlus myResourcesWindow = new MyResourcesWindow();
 		addWindow(myResourcesWindow);
@@ -155,8 +118,9 @@ public class DesktopPlus extends Desktop {
 	public void setStartMenu() {
 		startMenu = taskBar.getStartMenu();
 
-		// -(5)- popola lo StartMenu(D)
-		startMenu.setHeading(user.getEmail());
+		// popola lo StartMenu
+		if (TablePlus.getUser() != null)
+			startMenu.setHeading(TablePlus.getUser().getEmail());
 		startMenu.setIconStyle("user");
 
 		MenuItem menuItem = new MenuItem("Add Table");
@@ -210,84 +174,27 @@ public class DesktopPlus extends Desktop {
 		tool.addSelectionListener(new SelectionListener<MenuEvent>() {
 			@Override
 			public void componentSelected(MenuEvent ce) {
-				// Info.display("Event", "The 'Logout' tool was clicked");
-				logoutUser();
+				// TODO: send message
+				redirect(TablePlus.getLogoutUrl());
 			}
 		});
 		startMenu.addTool(tool);
 	}
 
-	public void throwNotification(Notification notification) {
-		notificationService.sendNotification(notification,
-				new AsyncCallback<Boolean>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						// Auto-generated method stub
-
-					}
-
-					@Override
-					public void onSuccess(Boolean result) {
-						// Auto-generated method stub
-						//logoutUser();
-					}
-
-				});
-	}
-
-	public void logoutUser() {
-		userService.queryUser(user.getKey(), new AsyncCallback<User>() {
-			@Override
-			public void onFailure(Throwable caught) {
-			}
-
-			@Override
-			public void onSuccess(User result) {
-				user = result;
-				user.setOnline(false);
-
-				// notifica di un utente offline
-				Notification n = new Notification();
-				n.setSenderEmail(user.getEmail());
-				n.setSenderKey(user.getKey());
-				n.setEventKind("MEMBEROFFLINE");
-				n.setOwningTables(user.getTables());
-				n.setMemberEmail(user.getEmail());
-				throwNotification(n);
-
-				userService.storeUser(user, new AsyncCallback<Void>() {
-					@Override
-					public void onFailure(Throwable caught) {
-					}
-
-					@Override
-					public void onSuccess(Void result) {
-					}
-				});
-				redirect(logoutUrl);
-			}
-		});
-	}
-
 	public void setTableSubMenu() {
-		MenuItem item_ = new MenuItem("Personal Table");
-		item_.addSelectionListener(tableMenuListener);
-		menuItems.add(item_);
-		tablesSubMenu.add(item_);
+		MenuItem item = new MenuItem("Personal Table");
+		item.addSelectionListener(tableMenuListener);
+		menuItems.add(item);
+		tablesSubMenu.add(item);
 	}
 
-	public void createTable() {
+	public void loadPersonalTable(TableUI personalTable) {
 
-	}
-
-	public void loadPersonalTable(TableUI personalTable_) {
-
-		currentTable = TablePlus.personalTable;
-		currentRightPanel = currentTable.getRightPanel();
+		activeTable = TablePlus.getPersonalTable();
+		activeRightPanel = activeTable.getRightPanel();
 		createRightPanel();
 
-		for (Shortcut s : currentTable.getShortcuts()) {
+		for (Shortcut s : activeTable.getShortcuts()) {
 			this.addShortcut(s);
 			s.addSelectionListener(shortcutListener);
 		}
@@ -299,87 +206,60 @@ public class DesktopPlus extends Desktop {
 	public void switchToTable(String s) {
 		unloadCurrentTable();
 
-		if (s.equals("Personal Table"))
-			loadTable(TablePlus.personalTable);
-		else
+		if (s.equals("Personal Table")) {
+			loadTable(TablePlus.getPersonalTable());
+		} else
 			for (TableUI t : tables) {
-				if (t.tableName.equals(s))
+				if (t.getTableName().equals(s)) {
 					loadTable(t);
+				}
 			}
 
 	}
 
-	public TableUI tableToLeave;
+	private void unloadCurrentTable() {
 
-	public void unloadCurrentTable() {
+		// if the active table is not the Personal Table
+		if (!activeTable.getTableKey().equals(0L)) {
+			for (Shortcut s : activeTable.getShortcuts()) {
+				s.setVisible(false);
+			}
+			messagingService.sendMessage(TablePlus.getUser().getKey(), "",
+					ChannelMessageType.USERAWAY, activeTable.getTableMembers(),
+					activeTable.getTableKey(), new AsyncCallback<String>() {
 
-		// parte il timer della presence selettiva (a meno che non sia il
-		// personal table)
+						@Override
+						public void onFailure(Throwable caught) {
+							GWT.log("Unable to send AWAY message");
+						}
 
-		if (currentTable.tableKey != null) {
-			tableToLeave = currentTable;
-			tableToLeave.timer = new Timer() {
-				@Override
-				public void run() {
-					tableToLeave.selectivePresenceOff();
-				}
-			};
-			tableToLeave.timer.schedule(5000);
+						@Override
+						public void onSuccess(String result) {
+						}
+
+					});
 		}
 
-		// operazioni per l'unload del tavolo
-		for (Shortcut s : currentTable.getShortcuts()) {
-			s.setVisible(false);
-		}
-
-		for (WindowPlus w : currentTable.getWindows()) {
+		for (WindowPlus w : activeTable.getWindows()) {
 			if (w.isVisible()) {
 				w.setClosedBySwitch(true);
 				w.setWasOpen(true);
-
 				w.hide();
 			}
 		}
 
-		currentRightPanel.removeFromParent();
+		activeRightPanel.removeFromParent();
 	}
 
-	public TableUI tableToJoin;
-
 	public void loadTable(TableUI table) {
-		this.currentTable = table;
-
-		// ferma il timer della presence selettiva (a meno che non sia il
-		// personal table)
-
-		if (currentTable.tableName != null) {
-			tableToJoin = currentTable;
-			// System.out.println("AAA");
-			// se il timer è attivo (ma non ho un modo per controllare)
-			// significa che risulto presenceSelective=true, ma il timer è
-			// già partito
-			if (tableToJoin.timer != null) {
-				// System.out.println("BBB");
-
-				tableToJoin.timer.cancel();
-			}// altrimenti, se il timer non è attivo significa (a meno di
-				// situazioni particolari che al momento possiamo non
-				// considerare) che siamo presenceSelective=false
-			if (tableToJoin.selectivePresence == false) {
-				// System.out.println("CCC");
-
-				tableToJoin.selectivePresenceOn();
-			}
-		}
-
-		// operazioni per l'unload del tavolo...
+		this.activeTable = table;
 
 		// carica gli shortcuts e i rispettivi listener
-		for (Shortcut s : currentTable.getShortcuts()) {
+		for (Shortcut s : activeTable.getShortcuts()) {
 			s.setVisible(true);
 		}
 
-		for (WindowPlus w : currentTable.getWindows()) {
+		for (WindowPlus w : activeTable.getWindows()) {
 			if (w.getWasOpen()) {
 				// w.setPagePosition(w.getPreviousPosition());
 				w.show();
@@ -388,11 +268,27 @@ public class DesktopPlus extends Desktop {
 		}
 
 		// carica il pannello di destra
-		currentRightPanel = table.getRightPanel();
-		// System.out.println("CRP is "+((currentRightPanel==null)?"null":"not null"));
-		desktop.add(currentRightPanel, new RowData(350, 1, new Margins(8)));
+		activeRightPanel = table.getRightPanel();
+		desktop.add(activeRightPanel, new RowData(350, 1, new Margins(8)));
 		desktop.layout();
 
+		if (!activeTable.getTableKey().equals(0L))
+			messagingService.sendMessage(TablePlus.getUser().getKey(), "",
+					ChannelMessageType.USERONLINE,
+					activeTable.getTableMembers(), activeTable.getTableKey(),
+					new AsyncCallback<String>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+							GWT.log("Unable to send ONLINE message");
+						}
+
+						@Override
+						public void onSuccess(String result) {
+
+						}
+
+					});
 	}
 
 	public void createRightPanel() {
@@ -406,7 +302,7 @@ public class DesktopPlus extends Desktop {
 		leftCP.setVisible(false);
 
 		desktop.add(leftCP, new RowData(1, 100));
-		desktop.add(currentRightPanel, new RowData(350, 1, new Margins(8)));
+		desktop.add(activeRightPanel, new RowData(350, 1, new Margins(8)));
 		desktop.layout();
 	}
 
@@ -429,39 +325,6 @@ public class DesktopPlus extends Desktop {
 		}
 	}
 
-	public SelectionListener<MenuEvent> getMenuListener() {
-		return menuListener;
-	}
-
-	public void setMenuListener(SelectionListener<MenuEvent> menuListener) {
-		this.menuListener = menuListener;
-	}
-
-	public SelectionListener<ComponentEvent> getShortcutListener() {
-		return shortcutListener;
-	}
-
-	public void setShortcutListener(
-			SelectionListener<ComponentEvent> shortcutListener) {
-		this.shortcutListener = shortcutListener;
-	}
-
-	public RightPanel getCurrentRightPanel() {
-		return currentRightPanel;
-	}
-
-	public void setCurrentRightPanel(RightPanel rightPanel) {
-		this.currentRightPanel = rightPanel;
-	}
-
-	public List<TableUI> getTables() {
-		return tables;
-	}
-
-	public void setTables(List<TableUI> tables) {
-		this.tables = tables;
-	}
-
 	public void addTable(TableUI t) {
 		this.tables.add(t);
 		for (Shortcut s : t.getShortcuts()) {
@@ -473,10 +336,10 @@ public class DesktopPlus extends Desktop {
 	}
 
 	public void updateTablesList(TableUI t) {
-		MenuItem item_ = new MenuItem(t.tableName);
-		item_.addSelectionListener(tableMenuListener);
-		menuItems.add(item_);
-		tablesSubMenu.add(item_);
+		MenuItem item = new MenuItem(t.getTableName());
+		item.addSelectionListener(tableMenuListener);
+		menuItems.add(item);
+		tablesSubMenu.add(item);
 		taskBar.layout();
 	}
 
@@ -510,6 +373,43 @@ public class DesktopPlus extends Desktop {
 		w.setHeading("Bogus Window " + ++index);
 		w.setSize(400, 300);
 		return w;
+	}
+
+	public SelectionListener<MenuEvent> getMenuListener() {
+		return menuListener;
+	}
+
+	public void setMenuListener(SelectionListener<MenuEvent> menuListener) {
+		this.menuListener = menuListener;
+	}
+
+	public SelectionListener<ComponentEvent> getShortcutListener() {
+		return shortcutListener;
+	}
+
+	public void setShortcutListener(
+			SelectionListener<ComponentEvent> shortcutListener) {
+		this.shortcutListener = shortcutListener;
+	}
+
+	public RightPanel getCurrentRightPanel() {
+		return activeRightPanel;
+	}
+
+	public void setCurrentRightPanel(RightPanel rightPanel) {
+		this.activeRightPanel = rightPanel;
+	}
+
+	public List<TableUI> getTables() {
+		return tables;
+	}
+
+	public void setTables(List<TableUI> tables) {
+		this.tables = tables;
+	}
+
+	public Long getActiveTableKey() {
+		return activeTable.getTableKey();
 	}
 
 	public static native void redirect(String url)

@@ -4,14 +4,14 @@ import java.util.List;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
+import com.unito.tableplus.shared.model.LoginInfo;
+import com.unito.tableplus.shared.model.Resource;
 import com.unito.tableplus.shared.model.User;
 
 @RemoteServiceRelativePath("user-service")
 public interface UserService extends RemoteService {
 
 	List<User> queryUsers(List<Long> keys);
-	
-	User getCurrentUser();
 	
 	void storeUser(User user);
 
@@ -21,5 +21,7 @@ public interface UserService extends RemoteService {
 
 	void deleteUser(Long key);
 
-	public String isLoggedIn(String requestUri);
+	List<Resource> loadResources(User user);
+
+	User loadUser(LoginInfo info);
 }

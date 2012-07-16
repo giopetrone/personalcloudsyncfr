@@ -1,2 +1,0 @@
-serviceClass: com.unito.tableplus.client.services.LoginService
-path: 01616BFC3200C1A12A417E83312CA9EC.gwt.rpc
