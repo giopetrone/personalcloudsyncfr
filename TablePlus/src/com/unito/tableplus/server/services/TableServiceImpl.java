@@ -5,13 +5,13 @@ import java.util.List;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.unito.tableplus.client.services.TableService;
 import com.unito.tableplus.server.TableQueries;
+import com.unito.tableplus.shared.model.Bookmark;
 import com.unito.tableplus.shared.model.DriveFile;
 import com.unito.tableplus.shared.model.BlackBoardMessage;
 import com.unito.tableplus.shared.model.Table;
 import com.unito.tableplus.shared.model.User;
 
-public class TableServiceImpl extends RemoteServiceServlet implements
-		TableService {
+public class TableServiceImpl extends RemoteServiceServlet implements TableService {
 
 	private static final long serialVersionUID = -3403034728905706407L;
 
@@ -39,7 +39,7 @@ public class TableServiceImpl extends RemoteServiceServlet implements
 	public boolean addBlackBoardMessage(Long key, BlackBoardMessage bbMessage) {
 		return TableQueries.addBlackBoardMessage(key, bbMessage);
 	}
-	
+
 	@Override
 	public void removeMessage(String messageKey) {
 		TableQueries.removeMessage(messageKey);
@@ -74,4 +74,21 @@ public class TableServiceImpl extends RemoteServiceServlet implements
 	public List<BlackBoardMessage> getTableMessages(Long tableKey) {
 		return TableQueries.getBlackBoardMessages(tableKey);
 	}
+
+	@Override
+	public List<Bookmark> getTableBookmark(Long tableKey) {
+		return TableQueries.getBookmark(tableKey);
+	}
+
+	@Override
+	public boolean addBookmark(Long key, Bookmark bookmark) {
+		return TableQueries.addBookmark(key, bookmark);
+	}
+
+	@Override
+	public void removeBookmark(String key) {
+		TableQueries.removeBookmark(key);
+		
+	}
+
 }
