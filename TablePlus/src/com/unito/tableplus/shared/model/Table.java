@@ -1,5 +1,5 @@
 package com.unito.tableplus.shared.model;
-   
+
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -12,7 +12,7 @@ import javax.jdo.annotations.PrimaryKey;
 
 @PersistenceCapable(detachable = "true")
 public class Table implements Serializable {
-	
+
 	private static final long serialVersionUID = -4489608881786573961L;
 
 	@PrimaryKey
@@ -28,7 +28,7 @@ public class Table implements Serializable {
 
 	@Persistent
 	private List<Long> members = null;
-	
+
 	@NotPersistent
 	private List<String> membersEmail =  null;
 
@@ -44,6 +44,9 @@ public class Table implements Serializable {
 	@Persistent
 	private List<String> documents;
 
+	@Persistent(mappedBy = "table")
+	private List<Bookmark> bookmark=new LinkedList<Bookmark>();
+
 	public Table(Long creator) {
 		this.creator = creator;
 		this.owner = creator;
@@ -51,11 +54,10 @@ public class Table implements Serializable {
 		this.setDocuments(new LinkedList<String>());
 		this.members = new LinkedList<Long>();
 		this.members.add(creator);
+		this.setBookmarks(new LinkedList<Bookmark>());
 	}
 
-	public Table() {
-
-	}
+	public Table() {}
 
 	public List<BlackBoardMessage> getBlackBoard() {
 		return this.blackboard;
@@ -152,4 +154,17 @@ public class Table implements Serializable {
 		this.membersEmail = membersEmail;
 	}
 
+	//gestione segnalibri relativi ad un tavolo
+
+	private void setBookmarks(LinkedList<Bookmark> bookmark) {
+		this.bookmark=bookmark;
+	}
+
+	public List<Bookmark> getBookmark() {
+		return bookmark;
+	}
+
+	public void addBookmark(Bookmark b) {
+		getBookmark().add(b);
+	}
 }
