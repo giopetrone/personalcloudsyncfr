@@ -3,6 +3,7 @@ package com.unito.tableplus.client.services;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.unito.tableplus.shared.model.Bookmark;
 import com.unito.tableplus.shared.model.DriveFile;
 import com.unito.tableplus.shared.model.Table;
 import com.unito.tableplus.shared.model.BlackBoardMessage;
@@ -22,8 +23,7 @@ public interface TableServiceAsync {
 
 	void clearMessages(Long key, AsyncCallback<Boolean> callback);
 
-	void addDocumentToTable(String DocId, User user, Long tableKey,
-			AsyncCallback<Boolean> callback);
+	void addDocumentToTable(String DocId, User user, Long tableKey,AsyncCallback<Boolean> callback);
 
 	void docAccessToNewMember(User newMember, Table table,
 			AsyncCallback<Void> callback);
@@ -36,5 +36,12 @@ public interface TableServiceAsync {
 
 	void getTableMessages(Long tableKey,
 			AsyncCallback<List<BlackBoardMessage>> callback);
+
+	void getTableBookmark(Long tableKey, AsyncCallback<List<Bookmark>> callback);
+
+	void addBookmark(Long key, Bookmark bookmark, AsyncCallback<Boolean> asyncCallback);
+
+	void removeBookmark(String key, AsyncCallback<Void> asyncCallback);
+
 
 }
