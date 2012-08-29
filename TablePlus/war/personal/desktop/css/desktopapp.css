@@ -165,3 +165,46 @@
 	height: 64px;
 	background-image: url(../images/Doc.png);
 }
+
+#mybookmark-win-shortcut img {
+	width: 64px;
+	height: 64px;
+	background-image: url(../images/bookmark.png);
+}
+.popup
+{
+    background-color       :    LightSteelBlue;
+    border-style           :	groove;
+    margin                 :    5px 5px 5px 5px;
+    text-align             :    center;
+}
+.popup-panel{
+
+    text-align             :    center;
+	padding				   :	15px;
+}
+.popup-title{
+    text-align             :    center;
+	padding				   :	15px;
+}
+.popup-footer{
+	style				   :    float;
+    text-align             :    center;
+	padding				   :	15px;
+}
+.popup-float{
+	style				   :    float;
+
+}
+.edit {
+	background-image: url(../images/edit.png) !important;
+}
+.addTag {
+	background-image: url(../images/addTag.png) !important;
+}
+.go {
+	background-image: url(../images/go.png) !important;
+}
+.comment{
+	background-image: url(../images/comment.png)  !important;
+}
