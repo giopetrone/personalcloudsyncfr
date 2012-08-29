@@ -2,27 +2,31 @@ package com.unito.tableplus.client.gui;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import com.extjs.gxt.desktop.client.Shortcut;
 import com.unito.tableplus.client.TablePlus;
 import com.unito.tableplus.client.gui.windows.BlackBoardWindow;
+import com.unito.tableplus.client.gui.windows.BookmarkWindow;
+import com.unito.tableplus.client.gui.windows.BookmarkWindowList;
 import com.unito.tableplus.client.gui.windows.ChatWindow;
 import com.unito.tableplus.client.gui.windows.DocWindow;
 import com.unito.tableplus.client.gui.windows.TableResourcesWindow;
 import com.unito.tableplus.client.gui.windows.WindowPlus;
+import com.unito.tableplus.shared.model.Bookmark;
 import com.unito.tableplus.shared.model.Table;
 
 public class TableUI {
-
 	private RightPanel rightPanel;
 	private List<WindowPlus> windows = new ArrayList<WindowPlus>();
 	private List<Shortcut> shortcuts = new ArrayList<Shortcut>();
 	private Shortcut s1;
 	private Shortcut s2;
 	private Shortcut s3;
+	private Shortcut s;
 	private WindowPlus chatWindow;
 	private WindowPlus blackboardWindow;
 	private WindowPlus tableResourcesWindow;
+	private WindowPlus bookmarkWindowList;
+	private WindowPlus bookmarkWindow;
 	private Table table;
 	private String tableName;
 	private Long tableKey;
@@ -30,7 +34,7 @@ public class TableUI {
 
 	/**
 	 * Costruttore per personal table
-	 * 
+	 *
 	 * @return void
 	 */
 
@@ -51,11 +55,22 @@ public class TableUI {
 		tableResourcesWindow = new TableResourcesWindow();
 		chatWindow = new ChatWindow(this);
 		blackboardWindow = new BlackBoardWindow(getTable());
-
+		bookmarkWindowList = new BookmarkWindowList(getTable());
+		
+		//provvisorio
+		Bookmark b= new Bookmark();
+		b.setTitle("Gwt");
+		b.setUrl("http://www.vogella.com/articles/GWT/article.html#resources_gwt");
+		bookmarkWindow = new BookmarkWindow(getTable());
+		
 		addWindow(tableResourcesWindow);
 		addWindow(chatWindow);
 		addWindow(blackboardWindow);
-
+		addWindow(bookmarkWindowList);
+		
+		//provvisorio
+		addWindow(bookmarkWindow);
+		
 		// table resources
 		s1 = new Shortcut();
 		s1.setText("Table Resources");
@@ -77,23 +92,28 @@ public class TableUI {
 		s3.setData("window", blackboardWindow);
 		this.addShortcut(s3);
 
-//		s3.addListener(Events.OnClick, new Listener<BaseEvent>() {
-//			@Override
-//			public void handleEvent(BaseEvent be) {
-//				GWT.log("You clicked on blackboard shortcut");
-//				blackboardWindow = new BlackBoardWindow(getTable());
-//				s3.setData("window", blackboardWindow);
-//				addWindow(blackboardWindow);
-//			}
-//
-//		});
+		// my bookmark list
+
+		s = new Shortcut();
+		s.setText("My Bookmark List");
+		s.setId("mybookmark-win-shortcut");
+		s.setData("window", bookmarkWindowList);
+		this.addShortcut(s);
+		
+		// bookmark (provvisorio)
+
+		s = new Shortcut();
+		s.setText("Bookmark");
+		s.setId("mybookmark-win-shortcut");
+		s.setData("window", bookmarkWindow);
+		this.addShortcut(s);
 	}
 
 	/**
 	 * Questo metodo viene invocato come conseguenza di un drag n drop che
 	 * termina sul desktop, quindi qui viene creato lo shortcut corrispondente
 	 * al documento che è stato trascinato e rilasciato.
-	 * 
+	 *
 	 * @param docName
 	 *            il titolo del documento
 	 * @param docLink
@@ -105,17 +125,14 @@ public class TableUI {
 	public void addDriveShortcut(String docName, String docLink, String docId) {
 		DocWindow docWindow = new DocWindow(docLink);
 		addWindow(docWindow);
-
 		Shortcut s = new Shortcut();
 		s.setText(docName);
 		s.setId("doc-win-shortcut");
 		s.setData("window", docWindow);
 		this.addShortcut(s);
-
 		TablePlus.getDesktop().addShortcut(s);
 		s.setVisible(true);
 		s.addSelectionListener(TablePlus.getDesktop().getShortcutListener());
-
 		TablePlus.getDesktop().getDesktop().layout();
 	}
 
@@ -218,4 +235,6 @@ public class TableUI {
 	public void setTable(Table table) {
 		this.table = table;
 	}
+
+
 }
