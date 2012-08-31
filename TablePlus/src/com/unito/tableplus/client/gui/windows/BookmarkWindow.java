@@ -70,7 +70,9 @@ public class BookmarkWindow extends WindowPlus {
 				b=result.get(0);
 				System.out.println(b.toString());
 				b.addTagCategory("IT");
+				
 //----fine parte provvisoria	
+				
 				setHeading("Bookmark: "+b.getTitle());
 				setLayout(new RowLayout(Orientation.VERTICAL));
 				
@@ -173,20 +175,6 @@ public class BookmarkWindow extends WindowPlus {
 		            	loadComments();	
 					}
 				});	
-//input area			    
-				inputArea = new TextArea();
-				inputArea.setEmptyText("Leave a comment");
-				inputArea.setHeight(40);
-				inputArea.setWidth(width);
-				add(inputArea, new RowData(1, -1, new Margins(4)));
-				inputArea.addKeyListener(new KeyListener() {
-					@Override
-					public void componentKeyPress(ComponentEvent event) {
-						if (event.getKeyCode() == 13) {
-							addComment();
-						}
-					}
-				});	
 //radio button
 				HorizontalPanel hpv= new HorizontalPanel();
 				radio.setSize(55, 5);
@@ -201,6 +189,25 @@ public class BookmarkWindow extends WindowPlus {
 				radioGroup.add(radio);  
 				radioGroup.add(radio2);  
 				hpv.add(radioGroup);
+				radioGroup.setIntStyleAttribute("font-size", 6);
+				radioGroup.setStyleName("html");
+				radioGroup.setStyleAttribute("font-size", "6px");
+				add(hpv, new RowData(1, -1, new Margins(10)));
+//input area			    
+				inputArea = new TextArea();
+				inputArea.setEmptyText("Leave a comment");
+				inputArea.setHeight(40);
+				inputArea.setWidth(width);
+				add(inputArea, new RowData(1, -1, new Margins(4)));
+				inputArea.addKeyListener(new KeyListener() {
+					@Override
+					public void componentKeyPress(ComponentEvent event) {
+						if (event.getKeyCode() == 13) {
+							addComment();
+						}
+					}
+				});	
+
 
 //pannello bottoni				
 				HorizontalPanel hpButton= new HorizontalPanel();
@@ -208,7 +215,7 @@ public class BookmarkWindow extends WindowPlus {
 				hpButton.add(refreshButton);
 				hpButton.add(goButton);
 				hpButton.add(closeButton);	
-				hpButton.add(hpv);
+
 				add(hpButton);
 				
 				unmask();
@@ -253,7 +260,7 @@ public class BookmarkWindow extends WindowPlus {
 			}
 			@Override
 			public void onSuccess(List<Comment> result) {
-				
+				if (result.size()>0) {
 				for(Comment c: result){
 					if(c.isPrivate()){
 						//se i commenti sono stati fatti dallo stesso utente
@@ -270,8 +277,13 @@ public class BookmarkWindow extends WindowPlus {
 							+c.getComment()+"</div>";	
 				}
 				historyContainer.add(new Label(message+"<br>"), "");
-				if (result.size()>0) message="<div align=\"left\"><br><b>Comments:<br><br></b></div>";	
-				else message="<div align=\"left\"><b>There are no comments for the bookmark!</b><br></div>";	
+				message="<div align=\"left\"><br><b>Comments:<br><br></b></div>";	
+				}
+				else {
+					message="<div align=\"left\"><br><b>There are no comments for the bookmark!</b><br></div>";
+					historyContainer.add(new Label(message+"<br>"), "");
+				}
+				
 				unmask();
 			}
 		});					
