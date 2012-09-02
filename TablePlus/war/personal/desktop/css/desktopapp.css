@@ -208,3 +208,12 @@
 .comment{
 	background-image: url(../images/comment.png)  !important;
 }
+.FlexTable-button {
+  	color:			black;
+  	text-align: 	right;
+  	vertical-align: top;
+  	padding-right:	0px;
+  	margin-right:	0px;
+  	padding-left:	50px;
+  	margin-left:	50px;
+}
