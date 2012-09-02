@@ -26,6 +26,7 @@ import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.unito.tableplus.client.TablePlus;
 import com.unito.tableplus.client.services.BookmarkService;
@@ -54,7 +55,7 @@ public class BookmarkWindow extends WindowPlus {
 	public BookmarkWindow(final Table table){
 		super();
 		this.table = table;
-		setSize(500,500);
+		setSize(550,500);
 		
 		//provvisorio: prendo il primo segnalibro salvato, nella futura implementazione 
 		//verra preso come parametro al doppio click sull'elemento della BookmarkWindowsList
@@ -87,9 +88,41 @@ public class BookmarkWindow extends WindowPlus {
 				LayoutContainer preview=  new LayoutContainer();
 				HorizontalPanel hpp= new HorizontalPanel();
 				preview.add(hpp);
-				hpp.add( new Html("<iframe src='"+b.getUrl()+" width='200'; height='200'<p><a href='"+b.getUrl()+"'>"+b.getTitle()+"</a></p></iframe>"));
+				hpp.add( new Html("<iframe src='"+b.getUrl()+" width='300'; height='200'<p><a href='"+b.getUrl()+"'>"+b.getTitle()+"</a></p></iframe>"));
 				mainContainer.add(preview);
-//legend				
+				
+				FlexTable ftable = new FlexTable();
+				ftable.getRowFormatter().addStyleName(0,"FlexTable");
+				ftable.setCellSpacing(10);
+				ftable.insertRow(0);
+				ftable.insertRow(1);
+				ftable.addCell(0);
+				ftable.addCell(0);
+				ftable.addCell(1);
+				ftable.addCell(1);
+				hpp.add(ftable);
+				
+				ftable.getCellFormatter().addStyleName(0, 1,"FlexTable-button");
+				ftable.getCellFormatter().addStyleName(1, 1,"FlexTable-button");
+				
+				ftable.setWidget(0, 0, new Html("<div style=\"padding-left:10px;\"><b>Legend:</b>" +
+						"<div style=\"padding-top:5px;padding-bottom:5px\">"+b.getLegend()+"</div></div>"));
+				
+				Button editLegendButton=new Button("Edit");
+				editLegendButton.setToolTip(new ToolTipConfig("Edit the bookmark's legend"));
+				editLegendButton.setIcon(IconHelper.createStyle("edit"));			
+				ftable.setWidget(0, 1, editLegendButton);
+				
+				
+				ftable.setWidget(1, 0,new Html("<div style=\"padding-left:10px;padding-top:15px;\"><b>Tag:</b>" +
+						"<div style=\"padding-top:5px;\">"+b.getTag()+"</div></div>"));
+//add tag			
+				Button addTag=new Button("Add");
+				addTag.setToolTip(new ToolTipConfig("Add a new tag to bookmark"));
+				addTag.setIcon(IconHelper.createStyle("addTag"));			
+				ftable.setWidget(1, 1,addTag);	
+				ftable.getFlexCellFormatter().setStyleName(1, 1, "table-cell");
+/*legend				
 				VerticalPanel vpp= new VerticalPanel();
 				hpp.add(vpp);
 				vpp.add(new Html("<div style=\"padding-left:10px;\"><b>Legend:</b>" +
@@ -100,7 +133,7 @@ public class BookmarkWindow extends WindowPlus {
 				editLegendButton.setIcon(IconHelper.createStyle("edit"));			
 				vpp.add(editLegendButton);
 //tooltip edit legend	 
-				ToolTipConfig config = new ToolTipConfig();  
+	*/			ToolTipConfig config = new ToolTipConfig();  
 			  
 				config.setText("Edit the bookmark's legend");  
 				config.setTitle("Edit legend");  
@@ -110,7 +143,7 @@ public class BookmarkWindow extends WindowPlus {
 				config.setCloseable(true);  
 				config.setMaxWidth(415);  
 				editLegendButton.setToolTip(config);  
-			    
+/*			    
 //tag
 				vpp.add(new Html("<div style=\"padding-left:10px;padding-top:15px;\"><b>Tag:</b>" +
 						"<div style=\"padding-top:5px;\">"+b.getTag()+"</div></div>"));
@@ -118,7 +151,9 @@ public class BookmarkWindow extends WindowPlus {
 				Button addTag=new Button("Add");
 				addTag.setToolTip(new ToolTipConfig("Add a new tag to bookmark"));
 				addTag.setIcon(IconHelper.createStyle("addTag"));			
-				vpp.add(addTag);				
+				vpp.add(addTag);	
+				
+*/
 //commenti				
 				LayoutContainer commentPanel= new LayoutContainer();
 				commentPanel.setScrollMode(Scroll.AUTO);	
@@ -262,8 +297,10 @@ public class BookmarkWindow extends WindowPlus {
 			public void onSuccess(List<Comment> result) {
 				if (result.size()>0) {
 				for(Comment c: result){
+					System.out.println(c.toString());
+					//se i commenti sono privati
 					if(c.isPrivate()){
-						//se i commenti sono stati fatti dallo stesso utente
+						//se i commenti sono stati fatti dallo stesso utente sono visualizzati e sottolineati
 						if (c.getAuthor().equals(TablePlus.getUser().getEmail())){
 							message+="<div><div style=\"color: #191970;float:left;\">&lt<u>"+c.getAuthor()
 									+"</u>&gt </div><div style=\"color:	#3D3D4C;float:left;\">"+c.getDateString()+"</div> - "
@@ -272,9 +309,19 @@ public class BookmarkWindow extends WindowPlus {
 						else 	message+="<div><div style=\"color: #191970;float:left;\">&lt"+c.getAuthor()
 								+"&gt Commento Privato</div>";	
 					}
-					else message+="<div><div style=\"color: #191970;float:left;\">&lt"+c.getAuthor()
+					//se sono pubblici
+					else {
+						//se i commenti sono stati fatti dallo stesso utente sono visualizzati e sottolineati
+						if (c.getAuthor().equals(TablePlus.getUser().getEmail())){
+							message+="<div><div style=\"color: #191970;float:left;\">&lt<u>"+c.getAuthor()
+									+"</u>&gt </div><div style=\"color:	#3D3D4C;float:left;\">"+c.getDateString()+"</div> - "
+									+c.getComment()+"</div>";	
+						}
+						else
+						message+="<div><div style=\"color: #191970;float:left;\">&lt"+c.getAuthor()
 							+"&gt </div><div style=\"color:	#3D3D4C;float:left;\">"+c.getDateString()+"</div> - "
 							+c.getComment()+"</div>";	
+						}
 				}
 				historyContainer.add(new Label(message+"<br>"), "");
 				message="<div align=\"left\"><br><b>Comments:<br><br></b></div>";	
