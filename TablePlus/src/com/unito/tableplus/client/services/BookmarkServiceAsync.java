@@ -8,8 +8,6 @@ import com.unito.tableplus.shared.model.Comment;
 
 public interface BookmarkServiceAsync {
 
-	void storeBookmark(Bookmark bookmark, AsyncCallback<Void> asyncCallback);
-
 	void queryBookmark(String key, AsyncCallback<Bookmark> callback);
 
 	void deleteBookmark(String key, AsyncCallback<Void> callback);
@@ -21,6 +19,10 @@ public interface BookmarkServiceAsync {
 	void deleteComment(String key, AsyncCallback<Void> asyncCallback);
 
 	void editComment(Bookmark b, String key, AsyncCallback<String> asyncCallback);
+
+	void editLegend(String key, String newLegend, AsyncCallback<Boolean> asyncCallback);
+
+	void storeBookmark(Bookmark bookmark, AsyncCallback<Void> callback);
 
 }
 
