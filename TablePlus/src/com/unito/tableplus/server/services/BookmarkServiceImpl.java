@@ -11,12 +11,12 @@ import com.unito.tableplus.shared.model.Comment;
 public class BookmarkServiceImpl extends RemoteServiceServlet implements BookmarkService {
 
 	private static final long serialVersionUID = 2345237647330858842L;
-
+	
 	@Override
 	public void storeBookmark(Bookmark bookmark) {
 		BookmarkQueries.storeBookmark(bookmark);
 	}
-
+	
 	@Override
 	public Bookmark queryBookmark(String key) {
 		return BookmarkQueries.queryBookmark(key);
@@ -44,6 +44,12 @@ public class BookmarkServiceImpl extends RemoteServiceServlet implements Bookmar
 	public String editComment(Bookmark b, String key) {
 		return BookmarkQueries.editComment(b, key);
 		
+	}
+
+	@Override
+	public boolean editLegend(String key, String newLegend) {
+		System.out.println("*********BookmarkServiceImpl editLegend(String key, String newLegend):"+ key+", "+ newLegend+ "**********");
+		return BookmarkQueries.editLegend(key, newLegend);
 	}
 
 }
