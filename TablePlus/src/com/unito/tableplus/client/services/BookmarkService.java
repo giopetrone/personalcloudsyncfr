@@ -9,8 +9,6 @@ import com.unito.tableplus.shared.model.Comment;
 @RemoteServiceRelativePath("bookmark-service")
 public interface BookmarkService extends RemoteService {
 	
-	void storeBookmark(Bookmark bookmark);
-
 	Bookmark queryBookmark(String key);
 
 	void deleteBookmark(String key);
@@ -22,5 +20,9 @@ public interface BookmarkService extends RemoteService {
 	void deleteComment(String key);
 
 	String editComment(Bookmark b, String key);
+
+	boolean editLegend(String key, String newLegend);
+
+	void storeBookmark(Bookmark bookmark);
 
 }
