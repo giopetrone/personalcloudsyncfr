@@ -3,31 +3,25 @@ package com.unito.tableplus.server;
 import java.util.List;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Transaction;
-
-import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.event.MessageBoxEvent;
-import com.extjs.gxt.ui.client.widget.Dialog;
-import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.unito.tableplus.shared.model.Bookmark;
 import com.unito.tableplus.shared.model.Comment;
 
 public class BookmarkQueries {
+	
+	public static void storeBookmark(Bookmark bookmark) {
 
-	public static String storeBookmark(Bookmark bookmark) {
-		String key = null;
 		PersistenceManager pm = ServiceFactory.getPmfInstance().getPersistenceManager();
 		try {
 			pm.makePersistent(bookmark);
-			key = bookmark.getKey();
+
 		} catch (Exception e) {
 			System.err.println("Something gone wrong storing the bookmark: " + e);
 			e.printStackTrace();
 		} finally {
 			pm.close();
 		}
-		return key;
 	}
-
+	
 	public static Bookmark queryBookmark(String key) {
 		PersistenceManager pm = ServiceFactory.getPmfInstance().getPersistenceManager();
 		Bookmark bookmark = null;
@@ -117,6 +111,26 @@ public class BookmarkQueries {
 		}	
 		return editable;
 		
+	}
+
+	public static boolean editLegend(String key, String newLegend) {
+		System.out.println("*********BookmarkQueries editLegend(String key, String newLegend):"+ key+", "+ newLegend+ "**********");
+
+		PersistenceManager pm = ServiceFactory.getPmfInstance().getPersistenceManager();
+		Bookmark bookmark = null;
+		Boolean result=false;
+		try {
+			Object object = pm.getObjectById(Bookmark.class, key);
+			bookmark = (Bookmark) pm.detachCopy(object);
+			bookmark.setLegend(newLegend);
+			result=true;
+		} catch (Exception e) {
+			System.err.println("There has been editing bookmark's legend: " + e);
+			
+		} finally {
+			pm.close();
+		}
+		return result;
 	}
 
 }
