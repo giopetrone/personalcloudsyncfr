@@ -54,7 +54,9 @@ public class Bookmark implements Serializable {
 	}	
 	
 	public void setLegend(String legend) {
+		System.out.println("*********Bookmark setLegend(String legend):"+ key+", "+ legend+ "**********");
 		this.legend = legend;
+		System.out.println("*********aggiornata legenda: "+ this.getLegend()+ "**********");
 	}
 	
 	public void setTable(Table table) {
