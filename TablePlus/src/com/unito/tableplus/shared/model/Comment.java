@@ -96,7 +96,7 @@ public class Comment implements Serializable {
 	//others 
 	
 	public String toString(){
-		return "<"+author+"> "+comment+" Writed on: "+getDateString();		
+		return "<"+author+"> "+comment+" Writed on: "+getDateString()+" ["+visibility+"]";		
 	}
 
 	public boolean isPrivate() {
