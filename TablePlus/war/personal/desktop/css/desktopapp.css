@@ -208,12 +208,41 @@
 .comment{
 	background-image: url(../images/comment.png)  !important;
 }
-.FlexTable-button {
-  	color:			black;
-  	text-align: 	right;
-  	vertical-align: top;
-  	padding-right:	0px;
-  	margin-right:	0px;
-  	padding-left:	50px;
-  	margin-left:	50px;
+
+
+.FlexTable-button0 {
+  	color:				black;
+  	text-align: 		right;
+  	vertical-align: 	top;
+  	horizontal-align: 	right;
+  	width: 				50px;
+  	margin-top:			0;
+  	height: 			150px;
+  	
+}
+.FlexTable-button1 {
+  	color:				black;
+  	text-align: 		right;
+  	vertical-align: 	top;
+  	horizontal-align: 	right;
+  	width: 				50px;
+  	margin-top:			0;
+  	height: 			50px;
+  	
+}
+.FlexTable-text1 {
+  	color:				black;
+  	vertical-align: 	top;
+  	horizontal-align: 	right;
+  	width: 				150px;
+  	margin-top:			0;
+  	height: 			50px;
+}
+.FlexTable-text0 {
+  	color:				black;
+  	vertical-align: 	top;
+  	horizontal-align: 	right;
+  	width: 				150px;
+  	margin-top:			0;
+  	height: 			150px;
 }
