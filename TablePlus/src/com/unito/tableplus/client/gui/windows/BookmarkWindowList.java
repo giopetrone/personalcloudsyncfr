@@ -2,6 +2,8 @@ package com.unito.tableplus.client.gui.windows;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.extjs.gxt.desktop.client.Shortcut;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.Orientation;
 import com.extjs.gxt.ui.client.Style.Scroll;
@@ -34,6 +36,7 @@ import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.PopupPanel;
+import com.unito.tableplus.client.TablePlus;
 import com.unito.tableplus.client.services.BookmarkService;
 import com.unito.tableplus.client.services.BookmarkServiceAsync;
 import com.unito.tableplus.client.services.ServiceFactory;
@@ -45,7 +48,9 @@ public class BookmarkWindowList extends WindowPlus {
 	
 	private final TableServiceAsync tableService = ServiceFactory.getTableServiceInstance();
 	private final BookmarkServiceAsync bookmarkService = GWT.create(BookmarkService.class);
-
+	
+	private WindowPlus bookmarkWindowList=this;
+	
 	private Table table;
 	private LayoutContainer mainContainer;
 	private Grid<BaseModel> grid;
@@ -58,7 +63,7 @@ public class BookmarkWindowList extends WindowPlus {
 	private Menu contextMenu;
 	private MenuItem deleteItem;
 	
-	public BookmarkWindowList(Table table) {
+	public BookmarkWindowList(final Table table) {
 		super();
 		setSize(530, 300);
 		this.table = table;
@@ -119,23 +124,25 @@ public class BookmarkWindowList extends WindowPlus {
                 if (rowIndex != -1) {               	
                 	final BaseModel selected = grid.getSelectionModel().getSelectedItem();
     				String key = selected.get("key").toString();
-    				getBookmarkPreview(key);
+    				//getBookmarkPreview(key);
+    				getBookmarkWindow(table, key);
+    				setPosition(600,200);
                 }
             }
         });
-		CellDoubleClick(this);
+		//CellDoubleClick();
 
 		loadBookmark();
 	}
 	
-	private void CellDoubleClick(final BookmarkWindowList bookmarkWindowList) {
+	private void CellDoubleClick() {
 		grid.addListener(Events.CellDoubleClick, new Listener<GridEvent<BaseModel>>() {
             public void handleEvent(GridEvent<BaseModel> ge) {
                 int rowIndex = ge.getRowIndex();
                 if (rowIndex != -1) {               	
                 	final BaseModel selected = grid.getSelectionModel().getSelectedItem();
     				String key = selected.get("key").toString();
-    				getBookmarkWindow(key, bookmarkWindowList);
+    				getBookmarkWindow(table, key);
                 }
             }
         });
@@ -165,8 +172,8 @@ public class BookmarkWindowList extends WindowPlus {
 		});
 	}
 	
-	public void getBookmarkWindow(String key, WindowPlus bookmarkWindowList) {
-		final WindowPlus bwl=bookmarkWindowList;
+	public void getBookmarkWindow(final Table table, String key) {
+		System.out.println("***** doppio click entra in getBookmarkWindow(final Table table, String key)");
 		bookmarkService.queryBookmark(key,new AsyncCallback<Bookmark>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -176,8 +183,17 @@ public class BookmarkWindowList extends WindowPlus {
 			}
 			@Override
 			public void onSuccess(Bookmark b) {
-				//attaccare finestra tavolo...................
-				 bwl.add(new BookmarkWindow(table));
+				System.out.println("***** Recuperato segnalibro creo finestra per :"+b.toString());
+				final BookmarkPopup bookmarkPopup= new BookmarkPopup(table, b);
+				
+				bookmarkPopup.setPopupPositionAndShow(new PopupPanel.PositionCallback() {
+                	public void setPosition(int offsetWidth, int offsetHeight) {
+	                	int left = 10;
+	                	int top = 10;
+	                	bookmarkPopup.setPopupPosition(left, top);
+                	}
+            	});
+				
 			}
 		});
 	}
