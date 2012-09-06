@@ -1,0 +1,2 @@
+serviceClass: dida.spikes3.client.GreetingService
+path: 158F797513CBBDAA6A9352BFDD4FC926.gwt.rpc
