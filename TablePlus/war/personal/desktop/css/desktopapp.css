@@ -175,8 +175,6 @@
 {
     background-color       :    LightSteelBlue;
     border-style           :	groove;
-    margin                 :    5px 5px 5px 5px;
-    text-align             :    center;
 }
 .popup-panel{
 
@@ -210,6 +208,15 @@
 }
 
 
+.FlexTable-text0 {
+  	color:				black;
+  	vertical-align: 	top;
+  	horizontal-align: 	right;
+  	width: 				150px;
+  	margin-top:			0;
+  	height: 			120px;
+}
+
 .FlexTable-button0 {
   	color:				black;
   	text-align: 		right;
@@ -217,9 +224,10 @@
   	horizontal-align: 	right;
   	width: 				50px;
   	margin-top:			0;
-  	height: 			150px;
+  	height: 			120px;
   	
 }
+
 .FlexTable-button1 {
   	color:				black;
   	text-align: 		right;
@@ -227,7 +235,7 @@
   	horizontal-align: 	right;
   	width: 				50px;
   	margin-top:			0;
-  	height: 			50px;
+  	height: 			80px;
   	
 }
 .FlexTable-text1 {
@@ -236,13 +244,5 @@
   	horizontal-align: 	right;
   	width: 				150px;
   	margin-top:			0;
-  	height: 			50px;
-}
-.FlexTable-text0 {
-  	color:				black;
-  	vertical-align: 	top;
-  	horizontal-align: 	right;
-  	width: 				150px;
-  	margin-top:			0;
-  	height: 			150px;
+  	height: 			80px;
 }
