@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.io.InputStream;
+import android.util.Log;
 
 public class ProxyUtils {
 
@@ -38,28 +39,44 @@ public class ProxyUtils {
 
     //create the JSON Object for different request and then make connection with server and put response into another JSON Object (send at the activity)
     public static JSONObject proxyCall(String operation, Object param)
-                    throws Exception {
-            JSONObject jsRequest = new JSONObject();
-            if (operation.equals("firstTest")) {
-                    jsRequest.put("request", "firstTest");
-                    jsRequest.put("parameter", param);
-            } else
-                    System.out.println("ProxyCall, operazione non riconosciuta");
-            
-            HttpEntity entity = new StringEntity(jsRequest.toString());
-            post.setEntity(entity);
-            HttpResponse response = client.execute(post);
-            entity = response.getEntity();
-            InputStream is = entity.getContent();
-            JSONTokener jt;
-            jt = new JSONTokener(is);
-            JSONObject jsResp = new JSONObject(jt);
-            // use response so i can do more request
-            if (response.getEntity() != null) {
-                    response.getEntity().consumeContent();
-            }
-            is.close();
-            return jsResp;
-    }
-}
+            throws Exception {
+    JSONObject jsRequest = new JSONObject();
+ 	Log.i("proxyCall ", "I" );
     
+  
+    operation = "firstTest";
+    if (operation.equals("firstTest")) {
+            jsRequest.put("request", "firstTest");
+          //  jsRequest.put("parameter", param);
+    } else
+            System.out.println("ProxyCall, operazione non riconosciuta");
+   //TMP
+	Log.i("proxyCall ", "II" );
+    JSONObject jsResp = new JSONObject();    
+    
+    HttpEntity entity = new StringEntity(jsRequest.toString());
+    Log.i("proxyCall ", "III" );
+       post.setEntity(entity);     
+       Log.i("proxyCall ", "IV" );
+       if (client == null)
+       	Log.i("proxyCall ", "client NULL" );
+       Log.i("proxyCall ", " V" );       
+    HttpResponse response = client.execute(post);
+    Log.i("proxyCall ", " VI" );       
+    /* entity = response.getEntity();
+    InputStream is = entity.getContent();
+    JSONTokener jt;
+    jt = new JSONTokener(is);
+   // JSONObject jsResp = new JSONObject(jt);
+    // use response so i can do more request
+  //  if (response.getEntity() != null) {
+  //          response.getEntity().consumeContent();
+  //  } 
+    
+    is.close();
+    Log.i("proxyCall : jsResp ",jsResp.toString() );
+    */
+    return jsResp;
+}
+}
+ 

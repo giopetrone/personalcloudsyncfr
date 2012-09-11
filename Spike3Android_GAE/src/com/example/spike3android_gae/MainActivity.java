@@ -25,8 +25,10 @@ public class MainActivity extends ListActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-      //  setContentView(R.layout.activity_main);
-     //   ProxyUtils.init();
+       // setContentView(R.layout.activity_main);
+        Log.i("sono in onCreate", "ciao");
+        ProxyUtils.init();
+        Log.i("sono in onCreate", "ciao dopo init");
     }
     
     public void onResume(){
@@ -42,6 +44,8 @@ public class MainActivity extends ListActivity {
         getMenuInflater().inflate(R.menu.activity_main, menu);
         return true;
     }
+    
+    /*
     public void serverCall(){
         try{
                 key=getIntent().getStringExtra("key");
@@ -52,28 +56,35 @@ public class MainActivity extends ListActivity {
                         
            } catch (Exception e) { Log.i("Eccezione", e.toString());}
         }
-    
+    */
     public void loadData(){
     	
     	try {
     		Log.i("sono in loadData", "ciao");
     	//  key=getIntent().getStringExtra("key");
-    		key = "9";
+    		key = "ANnaGio";
     		List<ViewDoc> members=new LinkedList<ViewDoc>();
-   /*       JSONObject request = ProxyUtils.proxyCall("queryUsersStatus",key);
-          JSONObject rispo = request.getJSONObject("results");
-          JSONArray online= rispo.getJSONArray("online");
+    		
+    		 Log.i("loadData", key);
+    		 String fromServlet =   "statusFROMSERVLET" ;
+             JSONObject request = ProxyUtils.proxyCall("firstTest",key);
+        //  String fromServlet = request.getString("status");
+     
           
-          List<Long> usersKeys=new LinkedList<Long>();  
+          
+          //    JSONObject rispo = request.getJSONObject("results");
+      //    JSONArray online= rispo.getJSONArray("online");
+          
+       //   List<Long> usersKeys=new LinkedList<Long>();  
           //load members status
-          for(int i=0;i<online.length();i++){
-                  long onlineMemberKey = (long) online.getInt(i);
-                  members.add(new ViewMembers(onlineMemberKey,"online"));
+      //    for(int i=0;i<online.length();i++){
+       //           long onlineMemberKey = (long) online.getInt(i);
+        //          members.add(new ViewDoc(onlineMemberKey,"online"));
                  
-          }
-          */
+        //  }
+           
         //  members.add( new ViewMembers((long)1,"online"));
-    		members.add( new ViewDoc( "ii","online", "dd"));
+    		members.add( new ViewDoc( "id",fromServlet, "dd"));
           //load data on adapter
           array=new MyAdapter(this,members);
           setListAdapter(array);        
