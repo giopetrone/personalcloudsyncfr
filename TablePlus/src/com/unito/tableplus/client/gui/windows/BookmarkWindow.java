@@ -59,11 +59,13 @@ public class BookmarkWindow extends WindowPlus {
 	private FlexTable ftable = new FlexTable();
 	private HorizontalPanel hpp= new HorizontalPanel();
 	
-	public BookmarkWindow(final Table table, Bookmark b){
+	public BookmarkWindow(final Table table){
+	
+//	public BookmarkWindow(final Table table, Bookmark b){
 		super();
 		this.table = table;
-		this.b=b;
-		setSize(550,500);
+//		this.b=b;
+		setSize(570,500);
 		
 		setLayout(new RowLayout(Orientation.VERTICAL));
 				
@@ -71,11 +73,147 @@ public class BookmarkWindow extends WindowPlus {
 		mainContainer.setScrollMode(Scroll.AUTO);			
 
 		getObject();
-				
-
 
 	}
 	
+	private void getObject() {
+		//provvisorio: prendo il primo segnalibro salvato, nella futura implementazione 
+		//verra preso come parametro al doppio click sull'elemento della BookmarkWindowsList
+		tableService.getTableBookmark(table.getKey(),new AsyncCallback<List<Bookmark>>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				GWT.log("Unable to load the bookmark! ", caught);
+				Info.display("Error", "Unable to load the bookmarks.");
+				unmask();
+			}
+			@Override
+			public void onSuccess(List<Bookmark> result) {			
+				b=result.get(0);
+				System.out.println(b.toString());
+				b.addTag("IT");
+		//fine parte provvisoria		
+				
+				setTitle();
+				setFrame();
+				createFlexTable();
+				createCommentPanel();
+				radioButton();
+				createInputArea();
+				createButtonPanel();
+			}
+		});
+	}
+	
+	private void setTitle() {
+		//title	
+		setHeading("Bookmark: "+b.getTitle());
+		Html title= new Html("<div align=\"center\"><b>\nThe bookmak <u>"+b.getTitle()+"</u> has been shared on this table\n\n</b></div> ");
+		title.setHeight(30);
+		mainContainer.add(title);
+	}
+	
+	private void setFrame() {
+		//frame anteprima				
+		LayoutContainer preview=  new LayoutContainer();
+		preview.add(hpp);
+		hpp.add( new Html("<iframe src='"+b.getUrl()+" width='300'; height='200'<p><a href='"+b.getUrl()+"'>"+b.getTitle()+"</a></p></iframe>"));
+		mainContainer.add(preview);
+	}
+	
+	private void createFlexTable() {
+		ftable.insertRow(0);
+		ftable.insertRow(1);
+		ftable.addCell(0);
+		ftable.addCell(0);
+		ftable.addCell(1);
+		ftable.addCell(1);
+
+		hpp.add(ftable);
+		
+		ftable.setBorderWidth(2);
+		
+		ftable.getCellFormatter().addStyleName(0, 0,"FlexTable-text0");		
+		ftable.getCellFormatter().addStyleName(0, 1,"FlexTable-button0");
+		
+		ftable.getCellFormatter().addStyleName(1, 0,"FlexTable-text1");
+		ftable.getCellFormatter().addStyleName(1, 1,"FlexTable-button1");
+//legend				
+		ftable.setWidget(0, 0, getHtmlLegend());
+//edit legend				
+		Button editLegendButton=new Button("Edit");
+		editLegendButton.setToolTip(new ToolTipConfig("Edit the bookmark's legend"));
+		editLegendButton.setIcon(IconHelper.createStyle("edit"));			
+		ftable.setWidget(0, 1, editLegendButton);
+				
+		editLegendButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			public void componentSelected(ButtonEvent ce) {
+				ftable.setWidget(0, 0, setFormLegend());
+			}
+		});					
+//tag				
+		ftable.setWidget(1, 0, getTag());
+//add tag			
+		Button addTag=new Button("Add");
+		addTag.setToolTip(new ToolTipConfig("Add a new tag to bookmark"));
+		addTag.setIcon(IconHelper.createStyle("addTag"));			
+		ftable.setWidget(1, 1,addTag);	
+		addTag.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			public void componentSelected(ButtonEvent ce) {
+				ftable.setWidget(1, 0, setFormTag());
+			}
+		});		
+	}
+
+	private void createCommentPanel() {
+		//commenti				
+		LayoutContainer commentPanel= new LayoutContainer();
+		commentPanel.setScrollMode(Scroll.AUTO);	
+		historyContainer = new HtmlContainer(message);
+		commentPanel.add(historyContainer);
+		mainContainer.add(commentPanel);	
+		historyContainer.scrollIntoView(commentPanel);
+		add(mainContainer, new RowData(1, 1, new Margins(4)));
+		HorizontalPanel hp= new HorizontalPanel();
+		mainContainer.add(hp);
+		loadComments();	
+	}
+	
+	private void radioButton() {
+		//radio button
+		HorizontalPanel hpv= new HorizontalPanel();
+		radio.setSize(55, 5);
+		radio.setBoxLabel("Public");  
+		radio.setValue(true);  
+
+		radio2.setBoxLabel("Private");  
+		radio2.setSize(55, 5);
+		RadioGroup radioGroup = new RadioGroup();  
+		radioGroup.setFieldLabel("Comment Visibility: ");  
+		radioGroup.add(radio);  
+		radioGroup.add(radio2);  
+		hpv.add(radioGroup);
+		radioGroup.setIntStyleAttribute("font-size", 6);
+		radioGroup.setStyleName("html");
+		radioGroup.setStyleAttribute("font-size", "6px");
+		add(hpv, new RowData(1, -1, new Margins(10)));
+	}
+
+	private void createInputArea() {
+		//input area			    
+		inputArea = new TextArea();
+		inputArea.setEmptyText("Leave a comment");
+		inputArea.setHeight(40);
+		inputArea.setWidth(width);
+		add(inputArea, new RowData(1, -1, new Margins(4)));
+		inputArea.addKeyListener(new KeyListener() {
+			@Override
+			public void componentKeyPress(ComponentEvent event) {
+				if (event.getKeyCode() == 13) {
+					addComment();
+				}
+			}
+		});	
+	}
 
 	private void createButtonPanel() {
 		//close button				
@@ -133,129 +271,6 @@ public class BookmarkWindow extends WindowPlus {
 		
 	}
 
-
-	private void createInputArea() {
-		//input area			    
-		inputArea = new TextArea();
-		inputArea.setEmptyText("Leave a comment");
-		inputArea.setHeight(40);
-		inputArea.setWidth(width);
-		add(inputArea, new RowData(1, -1, new Margins(4)));
-		inputArea.addKeyListener(new KeyListener() {
-			@Override
-			public void componentKeyPress(ComponentEvent event) {
-				if (event.getKeyCode() == 13) {
-					addComment();
-				}
-			}
-		});	
-	}
-
-	private void radioButton() {
-		//radio button
-		HorizontalPanel hpv= new HorizontalPanel();
-		radio.setSize(55, 5);
-		radio.setBoxLabel("Public");  
-		radio.setValue(true);  
-
-		radio2.setBoxLabel("Private");  
-		radio2.setSize(55, 5);
-		RadioGroup radioGroup = new RadioGroup();  
-		radioGroup.setFieldLabel("Comment Visibility: ");  
-		radioGroup.add(radio);  
-		radioGroup.add(radio2);  
-		hpv.add(radioGroup);
-		radioGroup.setIntStyleAttribute("font-size", 6);
-		radioGroup.setStyleName("html");
-		radioGroup.setStyleAttribute("font-size", "6px");
-		add(hpv, new RowData(1, -1, new Margins(10)));
-	}
-
-	private void createCommentPanel() {
-		//commenti				
-		LayoutContainer commentPanel= new LayoutContainer();
-		commentPanel.setScrollMode(Scroll.AUTO);	
-		historyContainer = new HtmlContainer(message);
-		commentPanel.add(historyContainer);
-		mainContainer.add(commentPanel);	
-		historyContainer.scrollIntoView(commentPanel);
-		add(mainContainer, new RowData(1, 1, new Margins(4)));
-		HorizontalPanel hp= new HorizontalPanel();
-		mainContainer.add(hp);
-		loadComments();	
-	}
-
-	private void createFlexTable() {
-		ftable.insertRow(0);
-		ftable.insertRow(1);
-		ftable.addCell(0);
-		ftable.addCell(0);
-		ftable.addCell(1);
-		ftable.addCell(1);
-
-		hpp.add(ftable);
-				
-		ftable.getCellFormatter().addStyleName(0, 1,"FlexTable-button0");
-		ftable.getCellFormatter().addStyleName(0, 0,"FlexTable-text0");
-		ftable.getCellFormatter().addStyleName(1, 0,"FlexTable-text1");
-		ftable.getCellFormatter().addStyleName(1, 1,"FlexTable-button1");
-//legend				
-		ftable.setWidget(0, 0, getHtmlLegend());
-//edit legend				
-		Button editLegendButton=new Button("Edit");
-		editLegendButton.setToolTip(new ToolTipConfig("Edit the bookmark's legend"));
-		editLegendButton.setIcon(IconHelper.createStyle("edit"));			
-		ftable.setWidget(0, 1, editLegendButton);
-				
-		editLegendButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-			public void componentSelected(ButtonEvent ce) {
-				ftable.setWidget(0, 0, setFormLegend());
-			}
-		});					
-//tag				
-		ftable.setWidget(1, 0,new Html("<div style=\"padding-left:10px;\"><b>Tag:</b>" +
-				"<div style=\"padding-top:5px;\">"+b.getTag()+"</div></div>"));
-//add tag			
-		Button addTag=new Button("Add");
-		addTag.setToolTip(new ToolTipConfig("Add a new tag to bookmark"));
-		addTag.setIcon(IconHelper.createStyle("addTag"));			
-		ftable.setWidget(1, 1,addTag);	
-		addTag.addSelectionListener(new SelectionListener<ButtonEvent>() {
-			public void componentSelected(ButtonEvent ce) {
-				ftable.setWidget(1, 0, setFormTag());
-			}
-
-		});		
-	}
-
-	private void getObject() {
-		/*provvisorio: prendo il primo segnalibro salvato, nella futura implementazione 
-		//verra preso come parametro al doppio click sull'elemento della BookmarkWindowsList
-		tableService.getTableBookmark(table.getKey(),new AsyncCallback<List<Bookmark>>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GWT.log("Unable to load the bookmark! ", caught);
-				Info.display("Error", "Unable to load the bookmarks.");
-				unmask();
-			}
-			@Override
-			public void onSuccess(List<Bookmark> result) {			
-				b=result.get(0);
-				System.out.println(b.toString());
-				b.addTagCategory("IT");
-		//fine parte provvisoria		
-		*/		
-				setTitle();
-				setFrame();
-				createFlexTable();
-				createCommentPanel();
-				radioButton();
-				createInputArea();
-				createButtonPanel();
-		/*	}
-		});*/
-	}
-	
 	private Widget getHtmlLegend() {
 		return new Html("<div style=\"padding-left:10px;\"><b>Legend:</b>" +
 				"<div style=\"padding-top:5px;padding-bottom:5px\">"+b.getLegend()+"</div></div>");
@@ -343,7 +358,7 @@ public class BookmarkWindow extends WindowPlus {
 		panel.setStyleAttribute("padding-left", "10px");
 		
 		Label label=new Label("Insert the new legend:");
-		panel.setSize(160, 150);
+		//panel.setSize(160, 120);
 		
 		label.setStyleAttribute("padding-bottom", "10px");
 		panel.add(label);	
@@ -359,7 +374,7 @@ public class BookmarkWindow extends WindowPlus {
 		panel.add(legend);	
 		
 	    HorizontalPanel hp= new HorizontalPanel();  
-	    hp.setWidth(160);
+	   // hp.setWidth(160);
 	    hp.setStyleAttribute("padding-top", "17px");
 	    hp.setHorizontalAlign(HorizontalAlignment.LEFT);
 		Button saveButton = new Button("Save");
@@ -385,14 +400,31 @@ public class BookmarkWindow extends WindowPlus {
 		return panel;
 	}
 	
-
 	public LayoutContainer setFormTag(){
 		final LayoutContainer panel = new LayoutContainer();
 		panel.setStyleAttribute("padding-left", "10px");
-		
+		//panel.setSize(160, 80);
 		Label label=new Label("Add a tag to bookmark:");		
 		label.setStyleAttribute("padding-bottom", "10px");
 		panel.add(label);	
+		
+	    HorizontalPanel hp1= new HorizontalPanel();  
+	    panel.add(hp1);
+	    hp1.setStyleAttribute("padding-top", "5px");
+
+		final TextArea inputTag = new TextArea();
+		inputTag.setHeight(20);
+		inputTag.setWidth(60);
+		inputTag.setPreventScrollbars(true);
+		inputTag.setAllowBlank(false);
+
+		hp1.add(inputTag);	
+		Button choose = new Button("Choose");
+		
+		choose.setStyleAttribute("padding-left", "5px");
+		choose.setHeight(20);
+		hp1.add(choose);
+		/*
 		ListStore<BaseModel> tagStore = new ListStore<BaseModel>();
 		BaseModel tagModel;
 		for (String tag : b.getTag()) {
@@ -411,39 +443,63 @@ public class BookmarkWindow extends WindowPlus {
 		combo.setWidth(120);
 		combo.setStyleAttribute("padding-top", "10px");
 		panel.add(combo);	
+		String newTag= combo.getValue().toString();
+		*/
 		
 	    HorizontalPanel hp= new HorizontalPanel();  
-	    hp.setWidth(160);
-	    hp.setStyleAttribute("padding-top", "17px");
+	   // hp.setWidth(160);
+	    hp.setStyleAttribute("padding-top", "7px");
 	    hp.setHorizontalAlign(HorizontalAlignment.LEFT);
 		Button saveButton = new Button("Save");
 		hp.add(saveButton);
 		saveButton.setStyleAttribute("padding-right", "10px");
 		
 		Button cancelButton = new Button("Cancel");
-		ftable.setWidget(1, 0, viewTag());
+		
 		hp.add(cancelButton);
 		cancelButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
-				
+				ftable.setWidget(1, 0, getTag());
 			}
 		});
 		saveButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
-				
+				addTag(inputTag.getValue());
+				ftable.setWidget(1, 0, getTag());
 			}
 		});
 		panel.add(hp);
 		return panel;
 	}
 	
-	public Widget viewTag() {
-		// TODO Auto-generated method stub
-		return null;
+	public Widget getTag() {
+		return new Html("<div style=\"padding-left:10px;\"><b>Tag:</b>" +
+				"<div style=\"padding-top:5px;\">"+b.getTag()+"</div></div>");
 	}
 
+	public void addTag(final String tag) {
+		bookmarkService.addTag(b.getKey(),tag, new AsyncCallback<Boolean>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				GWT.log("Unable to add tag! ", caught);
+				Info.display("Error", "Unable to add the tag.");
+				unmask();
+			}
+			@Override
+			public void onSuccess(Boolean result) {
+				GWT.log("Successfully edited bookmark's legend! ");
+				Info.display("Succes", "Successfully added bookmark's tag.");
+				b.addTag(tag);
+				System.out.println("New Legend: "+b.getLegend());
+				ftable.setWidget(0, 0, getHtmlLegend());
+				unmask();
+					
+			}
+			
+		});		
+	}
 
 	public void editLegend(final String value) {
 		bookmarkService.editLegend(b.getKey(),value, new AsyncCallback<Boolean>() {
@@ -461,26 +517,8 @@ public class BookmarkWindow extends WindowPlus {
 				System.out.println("New Legend: "+b.getLegend());
 				ftable.setWidget(0, 0, getHtmlLegend());
 				unmask();
-					
 			}
-			
 		});			
-	}
-
-	private void setTitle() {
-		//title	
-		setHeading("Bookmark: "+b.getTitle());
-		Html title= new Html("<div align=\"center\"><b>\nThe bookmak <u>"+b.getTitle()+"</u> has been shared on this table\n\n</b></div> ");
-		title.setHeight(30);
-		mainContainer.add(title);
-	}
-	
-	private void setFrame() {
-		//frame anteprima				
-		LayoutContainer preview=  new LayoutContainer();
-		preview.add(hpp);
-		hpp.add( new Html("<iframe src='"+b.getUrl()+" width='300'; height='200'<p><a href='"+b.getUrl()+"'>"+b.getTitle()+"</a></p></iframe>"));
-		mainContainer.add(preview);
 	}
 }
 
