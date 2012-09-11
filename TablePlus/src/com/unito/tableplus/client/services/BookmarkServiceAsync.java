@@ -24,5 +24,7 @@ public interface BookmarkServiceAsync {
 
 	void storeBookmark(Bookmark bookmark, AsyncCallback<Void> callback);
 
+	void addTag(String key, String tag, AsyncCallback<Boolean> asyncCallback);
+
 }
 
