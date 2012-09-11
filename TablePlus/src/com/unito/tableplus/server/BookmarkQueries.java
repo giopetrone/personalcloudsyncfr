@@ -9,11 +9,9 @@ import com.unito.tableplus.shared.model.Comment;
 public class BookmarkQueries {
 	
 	public static void storeBookmark(Bookmark bookmark) {
-
 		PersistenceManager pm = ServiceFactory.getPmfInstance().getPersistenceManager();
 		try {
 			pm.makePersistent(bookmark);
-
 		} catch (Exception e) {
 			System.err.println("Something gone wrong storing the bookmark: " + e);
 			e.printStackTrace();
@@ -114,8 +112,7 @@ public class BookmarkQueries {
 	}
 
 	public static boolean editLegend(String key, String newLegend) {
-		System.out.println("*********BookmarkQueries editLegend(String key, String newLegend):"+ key+", "+ newLegend+ "**********");
-
+		//System.out.println("<>>>>>>>>> bookmarkQueries editLegend("+key+", "+newLegend+ ")");
 		PersistenceManager pm = ServiceFactory.getPmfInstance().getPersistenceManager();
 		Bookmark bookmark = null;
 		Boolean result=false;
@@ -123,9 +120,30 @@ public class BookmarkQueries {
 			Object object = pm.getObjectById(Bookmark.class, key);
 			bookmark = (Bookmark) pm.detachCopy(object);
 			bookmark.setLegend(newLegend);
+			pm.makePersistent(bookmark);
+			//System.out.println("<>>>>>>>>> pm.makePersistent(bookmark);");
 			result=true;
 		} catch (Exception e) {
-			System.err.println("There has been editing bookmark's legend: " + e);
+			System.err.println("There has been an error editing bookmark's legend: " + e);
+			
+		} finally {
+			pm.close();
+		}
+		return result;
+	}
+
+	public static boolean addTag(String key, String tag) {
+		PersistenceManager pm = ServiceFactory.getPmfInstance().getPersistenceManager();
+		Bookmark bookmark = null;
+		Boolean result=false;
+		try {
+			Object object = pm.getObjectById(Bookmark.class, key);
+			bookmark = (Bookmark) pm.detachCopy(object);
+			bookmark.addTag(tag);
+			pm.makePersistent(bookmark);
+			result=true;
+		} catch (Exception e) {
+			System.err.println("There has been an error adding tag: " + e);
 			
 		} finally {
 			pm.close();
