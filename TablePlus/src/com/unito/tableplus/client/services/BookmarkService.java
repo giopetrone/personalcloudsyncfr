@@ -25,4 +25,6 @@ public interface BookmarkService extends RemoteService {
 
 	void storeBookmark(Bookmark bookmark);
 
+	boolean addTag(String key, String tag);
+
 }
