@@ -54,9 +54,11 @@ public class Bookmark implements Serializable {
 	}	
 	
 	public void setLegend(String legend) {
-		System.out.println("*********Bookmark setLegend(String legend):"+ key+", "+ legend+ "**********");
+		System.out.println("<>>>>>>>>>1) bookmark setLegend("+this.getLegend()+ ")");
+
 		this.legend = legend;
-		System.out.println("*********aggiornata legenda: "+ this.getLegend()+ "**********");
+		System.out.println("<>>>>>>>>>2) bookmark setLegend("+this.getLegend()+ ")");
+
 	}
 	
 	public void setTable(Table table) {
@@ -69,6 +71,7 @@ public class Bookmark implements Serializable {
 	
 	public void setTagCategory (LinkedList<String> tag) {
 		this.tag=tag;		
+		
 	}
 
 	//getters
@@ -132,7 +135,10 @@ public class Bookmark implements Serializable {
 		getComments().add(comment);	
 	}
 
-	public void addTagCategory(String string) {
+	public void addTag(String string) {
 		this.tag.add(string);	
 	}
+
+
+	
 }
