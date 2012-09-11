@@ -48,8 +48,12 @@ public class BookmarkServiceImpl extends RemoteServiceServlet implements Bookmar
 
 	@Override
 	public boolean editLegend(String key, String newLegend) {
-		System.out.println("*********BookmarkServiceImpl editLegend(String key, String newLegend):"+ key+", "+ newLegend+ "**********");
 		return BookmarkQueries.editLegend(key, newLegend);
+	}
+
+	@Override
+	public boolean addTag(String key, String tag) {
+		return BookmarkQueries.addTag(key, tag);
 	}
 
 }
