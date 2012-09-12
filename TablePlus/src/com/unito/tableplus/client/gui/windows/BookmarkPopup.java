@@ -115,9 +115,10 @@ public class BookmarkPopup extends PopupPanel {
 		ftable.addCell(1);
 
 		hpp.add(ftable);
-				
+		
+		ftable.getCellFormatter().addStyleName(0, 0,"FlexTable-text0");		
 		ftable.getCellFormatter().addStyleName(0, 1,"FlexTable-button0");
-		ftable.getCellFormatter().addStyleName(0, 0,"FlexTable-text0");
+		
 		ftable.getCellFormatter().addStyleName(1, 0,"FlexTable-text1");
 		ftable.getCellFormatter().addStyleName(1, 1,"FlexTable-button1");
 //legend				
@@ -257,8 +258,6 @@ public class BookmarkPopup extends PopupPanel {
 		});	
 	}
 
-
-
 	public Widget getHtmlLegend() {
 		return new Html("<div style=\"padding-left:10px;\"><b>Legend:</b>" +
 				"<div style=\"padding-top:5px;padding-bottom:5px\">"+b.getLegend()+"</div></div>");
@@ -343,7 +342,7 @@ public class BookmarkPopup extends PopupPanel {
 		panel.setStyleAttribute("padding-left", "10px");
 		
 		Label label=new Label("Insert the new legend:");
-		panel.setSize(160, 150);
+		//panel.setSize(160, 150);
 		
 		label.setStyleAttribute("padding-bottom", "10px");
 		panel.add(label);	
@@ -388,10 +387,28 @@ public class BookmarkPopup extends PopupPanel {
 	public LayoutContainer setFormTag(){
 		final LayoutContainer panel = new LayoutContainer();
 		panel.setStyleAttribute("padding-left", "10px");
-		
+		//panel.setSize(160, 80);
 		Label label=new Label("Add a tag to bookmark:");		
 		label.setStyleAttribute("padding-bottom", "10px");
 		panel.add(label);	
+		
+	    HorizontalPanel hp1= new HorizontalPanel();  
+	    panel.add(hp1);
+	    hp1.setStyleAttribute("padding-top", "5px");
+
+		final TextArea inputTag = new TextArea();
+		inputTag.setHeight(20);
+		inputTag.setWidth(60);
+		inputTag.setPreventScrollbars(true);
+		inputTag.setAllowBlank(false);
+
+		hp1.add(inputTag);	
+		Button choose = new Button("Choose");
+		
+		choose.setStyleAttribute("padding-left", "5px");
+		choose.setHeight(20);
+		hp1.add(choose);
+		/*
 		ListStore<BaseModel> tagStore = new ListStore<BaseModel>();
 		BaseModel tagModel;
 		for (String tag : b.getTag()) {
@@ -410,39 +427,61 @@ public class BookmarkPopup extends PopupPanel {
 		combo.setWidth(120);
 		combo.setStyleAttribute("padding-top", "10px");
 		panel.add(combo);	
+		String newTag= combo.getValue().toString();
+		*/
 		
 	    HorizontalPanel hp= new HorizontalPanel();  
-	    hp.setWidth(160);
-	    hp.setStyleAttribute("padding-top", "17px");
+	   // hp.setWidth(160);
+	    hp.setStyleAttribute("padding-top", "7px");
 	    hp.setHorizontalAlign(HorizontalAlignment.LEFT);
 		Button saveButton = new Button("Save");
 		hp.add(saveButton);
 		saveButton.setStyleAttribute("padding-right", "10px");
 		
 		Button cancelButton = new Button("Cancel");
-		ftable.setWidget(1, 0, viewTag());
+		
 		hp.add(cancelButton);
 		cancelButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
-				
+				ftable.setWidget(1, 0, getTag());
 			}
 		});
 		saveButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
-				
+				addTag(inputTag.getValue());
+				ftable.setWidget(1, 0, getTag());
 			}
 		});
 		panel.add(hp);
 		return panel;
 	}
 	
-	public Widget viewTag() {
-		// TODO Auto-generated method stub
-		return null;
+	public Widget getTag() {
+		return new Html("<div style=\"padding-left:10px;\"><b>Tag:</b>" +
+				"<div style=\"padding-top:5px;\">"+b.getTagString()+"</div></div>");
 	}
 
+
+	public void addTag(final String tag) {
+		bookmarkService.addTag(b.getKey(),tag, new AsyncCallback<Boolean>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				GWT.log("Unable to add tag! ", caught);
+				Info.display("Error", "Unable to add the tag.");
+			}
+			@Override
+			public void onSuccess(Boolean result) {
+				GWT.log("Successfully edited bookmark's legend! ");
+				Info.display("Succes", "Successfully added bookmark's tag.");
+				b.addTag(tag);
+				ftable.setWidget(0, 0, getTag());					
+			}
+		});		
+	}
+
+	
 	public void editLegend(final String value) {
 		bookmarkService.editLegend(b.getKey(),value, new AsyncCallback<Boolean>() {
 			@Override
