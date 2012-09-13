@@ -68,12 +68,13 @@ public class MainActivity extends ListActivity {
     		 Log.i("loadData", key);
     		 String fromServlet =   "statusFROMSERVLET" ;
              JSONObject request = ProxyUtils.proxyCall("firstTest",key);
-        //  String fromServlet = request.getString("status");
+            //  fromServlet = request.getString("status");
      
           
           
-          //    JSONObject rispo = request.getJSONObject("results");
-      //    JSONArray online= rispo.getJSONArray("online");
+             JSONObject rispo = request.getJSONObject("status");
+             Log.i("loadData", rispo.toString());
+        //  JSONArray online= rispo.getJSONArray("online");
           
        //   List<Long> usersKeys=new LinkedList<Long>();  
           //load members status
