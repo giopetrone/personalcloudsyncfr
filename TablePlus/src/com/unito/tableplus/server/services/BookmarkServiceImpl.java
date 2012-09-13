@@ -1,5 +1,6 @@
 package com.unito.tableplus.server.services;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -55,5 +56,11 @@ public class BookmarkServiceImpl extends RemoteServiceServlet implements Bookmar
 	public boolean addTag(String key, String tag) {
 		return BookmarkQueries.addTag(key, tag);
 	}
+
+	@Override
+	public boolean removeTag(String key, String tag) {
+		return BookmarkQueries.removeTag(key, tag);
+	}
+
 
 }
