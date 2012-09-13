@@ -1,5 +1,6 @@
 package com.unito.tableplus.client.services;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -25,6 +26,9 @@ public interface BookmarkServiceAsync {
 	void storeBookmark(Bookmark bookmark, AsyncCallback<Void> callback);
 
 	void addTag(String key, String tag, AsyncCallback<Boolean> asyncCallback);
+
+	void removeTag(String key, String tag, AsyncCallback<Boolean> asyncCallback);
+
 
 }
 
