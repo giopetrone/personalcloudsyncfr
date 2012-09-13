@@ -2,8 +2,6 @@ package com.unito.tableplus.client.gui.windows;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import com.extjs.gxt.desktop.client.Shortcut;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.Orientation;
 import com.extjs.gxt.ui.client.Style.Scroll;
@@ -36,7 +34,6 @@ import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.PopupPanel;
-import com.unito.tableplus.client.TablePlus;
 import com.unito.tableplus.client.services.BookmarkService;
 import com.unito.tableplus.client.services.BookmarkServiceAsync;
 import com.unito.tableplus.client.services.ServiceFactory;
@@ -48,9 +45,7 @@ public class BookmarkWindowList extends WindowPlus {
 	
 	private final TableServiceAsync tableService = ServiceFactory.getTableServiceInstance();
 	private final BookmarkServiceAsync bookmarkService = GWT.create(BookmarkService.class);
-	
-	private WindowPlus bookmarkWindowList=this;
-	
+		
 	private Table table;
 	private LayoutContainer mainContainer;
 	private Grid<BaseModel> grid;
