@@ -27,4 +27,7 @@ public interface BookmarkService extends RemoteService {
 
 	boolean addTag(String key, String tag);
 
+	boolean removeTag(String key, String tag);
+
+
 }
