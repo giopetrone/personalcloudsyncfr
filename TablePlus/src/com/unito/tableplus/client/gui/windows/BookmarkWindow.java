@@ -1,16 +1,13 @@
 package com.unito.tableplus.client.gui.windows;
 
-import java.util.LinkedList;
 import java.util.List;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.Orientation;
 import com.extjs.gxt.ui.client.Style.Scroll;
-import com.extjs.gxt.ui.client.data.BaseModel;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.KeyListener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.util.IconHelper;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
@@ -20,18 +17,19 @@ import com.extjs.gxt.ui.client.widget.Info;
 import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.form.ComboBox;
 import com.extjs.gxt.ui.client.widget.form.Radio;
 import com.extjs.gxt.ui.client.widget.form.RadioGroup;
 import com.extjs.gxt.ui.client.widget.form.TextArea;
-import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
 import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlexTable;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.unito.tableplus.client.TablePlus;
@@ -39,7 +37,6 @@ import com.unito.tableplus.client.services.BookmarkService;
 import com.unito.tableplus.client.services.BookmarkServiceAsync;
 import com.unito.tableplus.client.services.ServiceFactory;
 import com.unito.tableplus.client.services.TableServiceAsync;
-import com.unito.tableplus.shared.model.BlackBoardMessageType;
 import com.unito.tableplus.shared.model.Bookmark;
 import com.unito.tableplus.shared.model.Comment;
 import com.unito.tableplus.shared.model.Table;
@@ -49,6 +46,7 @@ public class BookmarkWindow extends WindowPlus {
 	
 	private final BookmarkServiceAsync bookmarkService = GWT.create(BookmarkService.class);
 	private final TableServiceAsync tableService = ServiceFactory.getTableServiceInstance();
+	
 	private Table table;
 	private LayoutContainer mainContainer;
 	private HtmlContainer historyContainer;
@@ -59,6 +57,10 @@ public class BookmarkWindow extends WindowPlus {
 	private Radio radio2 = new Radio();
 	private FlexTable ftable = new FlexTable();
 	private HorizontalPanel hpp= new HorizontalPanel();
+	private HorizontalPanel hpTag= new HorizontalPanel();  
+	private Button saveButton = new Button("Save");
+	private Button cancelButton = new Button("Cancel");
+	private ListBox listTag = new ListBox();
 	
 	public BookmarkWindow(final Table table){
 	
@@ -131,7 +133,6 @@ public class BookmarkWindow extends WindowPlus {
 
 		hpp.add(ftable);
 		ftable.setHeight("200px");
-		ftable.setBorderWidth(1);
 		
 		ftable.getCellFormatter().addStyleName(0, 0,"FlexTable-text0");		
 		ftable.getCellFormatter().addStyleName(0, 1,"FlexTable-button0");
@@ -163,8 +164,19 @@ public class BookmarkWindow extends WindowPlus {
 				ftable.setWidget(1, 0, setFormTag());
 			}
 		});		
+	
+//remove tag			
+		Button removeTag=new Button("Remove");
+		addTag.setToolTip(new ToolTipConfig("Remove a tag to bookmark"));
+		addTag.setIcon(IconHelper.createStyle("removeTag"));			
+		ftable.setWidget(1, 1,removeTag);	
+		removeTag.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			public void componentSelected(ButtonEvent ce) {
+				ftable.setWidget(1, 0, setFormRemoveTag());
+			}
+		});		
 	}
-
+		
 	private void createCommentPanel() {
 		//commenti				
 		LayoutContainer commentPanel= new LayoutContainer();
@@ -279,7 +291,6 @@ public class BookmarkWindow extends WindowPlus {
 
 	private void addComment() {
 		if (inputArea.getValue() != null){
-			
 			Comment c;
 			if (radio.getValue()){
 				c = new Comment(inputArea.getValue(), TablePlus.getUser().getEmail());		
@@ -416,53 +427,42 @@ public class BookmarkWindow extends WindowPlus {
 	    hp1.setStyleAttribute("padding-top", "5px");
 
 		final TextArea inputTag = new TextArea();
+		
+		if(b.getTag().size()>0) {
+			for (String tag : b.getTag()) {
+				listTag.addItem(tag);
+			}
+			listTag.setHeight("20px");
+			
+			listTag.addChangeHandler(new ChangeHandler(){
+			   
+				@Override
+				public void onChange(ChangeEvent event) {
+					inputTag.setValue(listTag.getItemText(listTag.getSelectedIndex()));
+					
+				}
+			 });
+		}	
 		inputTag.setHeight(20);
 		inputTag.setWidth(60);
 		inputTag.setPreventScrollbars(true);
 		inputTag.setAllowBlank(false);
+		inputTag.setStyleAttribute("padding-rigth", "10px");
+		inputTag.setEmptyText(listTag.getItemText(listTag.getSelectedIndex()));
+		inputTag.setValue(listTag.getItemText(listTag.getSelectedIndex()));
 
 		hp1.add(inputTag);	
-		Button choose = new Button("Choose");
+		hp1.add(listTag);
+				
+	    hpTag.setStyleAttribute("padding-top", "7px");
+	    hpTag.setHorizontalAlign(HorizontalAlignment.LEFT);
 		
-		choose.setStyleAttribute("padding-left", "5px");
-		choose.setHeight(20);
-		hp1.add(choose);
-		
-	    HorizontalPanel hp= new HorizontalPanel();  
-	    hp.setStyleAttribute("padding-top", "7px");
-	    hp.setHorizontalAlign(HorizontalAlignment.LEFT);
-		Button saveButton = new Button("Save");
-		hp.add(saveButton);
+		hpTag.add(saveButton);
 		saveButton.setStyleAttribute("padding-right", "10px");
 		saveButton.setHeight(20);
-		Button cancelButton = new Button("Cancel");
-		cancelButton.setHeight(20);
-		hp.add(cancelButton);
 		
-		if(b.getTag().size()>0){
-			hp.removeAll();	
-			ListStore<BaseModel> tagStore = new ListStore<BaseModel>();
-			BaseModel tagModel;
-			for (String tag : b.getTag()) {
-				tagModel = new BaseModel();
-				tagModel.set("type", tag);
-				tagStore.add(tagModel);
-			}
-	
-			final ComboBox<BaseModel> combo = new ComboBox<BaseModel>();
-			combo.setFieldLabel("Tag");
-			combo.setDisplayField("tag");
-			combo.setTriggerAction(TriggerAction.ALL);
-			combo.setStore(tagStore);
-			combo.setAllowBlank(false);
-			combo.setEditable(false);
-			combo.setWidth(120);
-			combo.setStyleAttribute("padding-top", "10px");
-			hp.add(combo);	
-			//String newTag= combo.getValue().toString();
-			
-		}
-		else choose.disable();
+		cancelButton.setHeight(20);
+		hpTag.add(cancelButton);
 
 		cancelButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
@@ -478,10 +478,57 @@ public class BookmarkWindow extends WindowPlus {
 				ftable.setWidget(1, 0, getTag());
 			}
 		});
-		panel.add(hp);
+		panel.add(hpTag);
 		return panel;
 	}
+	
+	public LayoutContainer setFormRemoveTag(){
+		final LayoutContainer panel = new LayoutContainer();
+		panel.setStyleAttribute("padding-left", "10px");
+		panel.setHeight(80);
+		Label label=new Label("Remove a tag to bookmark:");		
+		label.setStyleAttribute("padding-bottom", "10px");
+		panel.add(label);	
+		
+	    HorizontalPanel hp1= new HorizontalPanel();  
+	    panel.add(hp1);
+	    hp1.setStyleAttribute("padding-top", "5px");
+		
+		for (String tag : b.getTag()) {
+			listTag.addItem(tag);
+		}
+		listTag.setHeight("20px");
+		hp1.add(listTag);
+				
+	    hpTag.setStyleAttribute("padding-top", "7px");
+	    hpTag.setHorizontalAlign(HorizontalAlignment.LEFT);
+		Button removeButton= new Button("Remove");
+		hpTag.add(removeButton);
+		
+		removeButton.setStyleAttribute("padding-right", "10px");
+		removeButton.setHeight(20);
+		
+		cancelButton.setHeight(20);
+		hpTag.add(cancelButton);
 
+		cancelButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				ftable.setWidget(1, 0, getTag());
+			}
+		});
+		removeButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				removeTag(listTag.getItemText(listTag.getSelectedIndex()));
+				refresh();
+				ftable.setWidget(1, 0, getTag());
+			}
+		});
+		panel.add(hpTag);
+		return panel;
+	}
+	
 	public Widget getTag() {
 		return new Html("<div style=\"padding-left:10px;\"><b>Tag:</b>" +
 				"<div style=\"padding-top:5px;\">"+b.getTagString()+"</div></div>");
@@ -497,18 +544,34 @@ public class BookmarkWindow extends WindowPlus {
 			}
 			@Override
 			public void onSuccess(Boolean result) {
-				GWT.log("Successfully edited bookmark's legend! ");
+				GWT.log("Successfully added bookmark's tag! ");
 				Info.display("Succes", "Successfully added bookmark's tag.");
 				b.addTag(tag);
-				System.out.println("New Legend: "+b.getLegend());
-				ftable.setWidget(0, 0, getHtmlLegend());
+				ftable.setWidget(1, 0, getTag());
 				unmask();
-					
 			}
-			
 		});		
 	}
 
+	public void removeTag(final String tag) {
+		bookmarkService.removeTag(b.getKey(),tag, new AsyncCallback<Boolean>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				GWT.log("Unable to remove tag! ", caught);
+				Info.display("Error", "Unable to remove the tag.");
+				unmask();
+			}
+			@Override
+			public void onSuccess(Boolean result) {
+				GWT.log("Successfully removed bookmark's tag! ");
+				Info.display("Succes", "Successfully removed bookmark's tag.");
+				b.removeTag(tag);
+				ftable.setWidget(1, 0, getTag());
+				unmask();
+			}
+		});		
+	}
+	
 	public void editLegend(final String value) {
 		bookmarkService.editLegend(b.getKey(),value, new AsyncCallback<Boolean>() {
 			@Override
@@ -539,7 +602,8 @@ public class BookmarkWindow extends WindowPlus {
 			@Override
 			public void onSuccess(Bookmark result) {			
 				b=result;
-				System.out.println("refresh "+b.toString());
+				ftable.setWidget(0, 0, getHtmlLegend());
+				ftable.setWidget(1, 0, getTag());
 			}
 		});
 	}
