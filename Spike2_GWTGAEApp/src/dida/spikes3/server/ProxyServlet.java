@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -17,32 +18,56 @@ public class ProxyServlet extends HttpServlet {
 	 private static final long serialVersionUID = -6455653509373554816L;
 	 
 	 @Override
+     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                     throws ServletException, IOException {
+		    InputStream is = req.getInputStream();
+		    PrintWriter pw = resp.getWriter();
+		    pw.print("ciao da anna");
+		    pw.flush();
+            pw.close();
+	 }
+	 
+	 @Override
      protected void doPost(HttpServletRequest req, HttpServletResponse resp)
                      throws ServletException, IOException {
 
-             InputStream is = req.getInputStream();
-             try {
+             InputStream is = req.getInputStream();             
+             PrintWriter pw = resp.getWriter();
+            try {
                      JSONTokener jt = new JSONTokener(is);
                      JSONObject jo = new JSONObject(jt);
-
-                     String request = jo.getString("request");
-                     PrintWriter pw = resp.getWriter();
-
+                     JSONObject rj = new JSONObject();    
+                   //temp anangio
+                     rj.put("status", "OK");                     
+                     String request = jo.getString("request");                
+                      
                      if (request.equals("firstTest"))
-                             createResult(jo, pw);
-                     else {
-                             JSONObject rj = new JSONObject();
-                             rj.put("status", "ERROR");
-                             rj.put("error", "Request unkown.");
-                             pw.print(rj);
-                             pw.flush();
-                             pw.close();
+                    	                 
+                         rj.put("status", "OK");
+                     else {                             
+                             rj.put("status", "ERROR");                              
+                           
                      }
+                     rj.put("status", "OK");
+                     
+                     String json = "{"
+                	         + "  \"query\": \"Pizza\", "
+                	         + "  \"locations\": [ 94043, 90210 ] "
+                	         + "}";
 
+                	 JSONObject object = (JSONObject) new JSONTokener(json).nextValue();
+                	 String query = object.getString("query");
+                	 JSONArray locations = object.getJSONArray("locations");
+                     
+                     pw.print(object);
+                     pw.flush();
+                    
+ 
              } catch (Exception e) {
                      System.err.println("Error while processing post request.");
                      System.err.println(e);
              }
+	  finally  { pw.close();}
 
 	 }
 	 
