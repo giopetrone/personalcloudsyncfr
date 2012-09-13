@@ -19,7 +19,7 @@ public class ProxyUtils {
     private static HttpClient client;
     private static HttpPost post;
     //private static final String PROXY_SERVLET_URL = "http://tableplusplus.appspot.com/tableplus/proxy";
-    private static final String PROXY_SERVLET_URL ="http://127.0.0.1:8888/spike2_gwtgaeapp/proxyServlet";
+    private static final String PROXY_SERVLET_URL ="http://10.0.2.2:8888/spike2_gwtgaeapp/proxyServlet";
 
     /**
      * Method: first time only create object
@@ -39,8 +39,12 @@ public class ProxyUtils {
 
     //create the JSON Object for different request and then make connection with server and put response into another JSON Object (send at the activity)
     public static JSONObject proxyCall(String operation, Object param)
-            throws Exception {
-    JSONObject jsRequest = new JSONObject();
+            throws Exception {  
+    	
+    	
+    	
+    	
+    	JSONObject jsRequest = new JSONObject();
  	Log.i("proxyCall ", "I" );
     
   
@@ -55,19 +59,27 @@ public class ProxyUtils {
     JSONObject jsResp = new JSONObject();    
     
     HttpEntity entity = new StringEntity(jsRequest.toString());
-    Log.i("proxyCall ", "III" );
+    
        post.setEntity(entity);     
-       Log.i("proxyCall ", "IV" );
+     
        if (client == null)
        	Log.i("proxyCall ", "client NULL" );
-       Log.i("proxyCall ", " V" );       
-    HttpResponse response = client.execute(post);
-    Log.i("proxyCall ", " VI" );       
-    /* entity = response.getEntity();
-    InputStream is = entity.getContent();
-    JSONTokener jt;
-    jt = new JSONTokener(is);
-   // JSONObject jsResp = new JSONObject(jt);
+         
+    HttpResponse response = client.execute(post);         
+      entity = response.getEntity();
+      if (entity == null) 
+    	  Log.i("proxyCall", "null");
+      else
+       Log.i("proxyCall", entity.toString());
+     InputStream is = entity.getContent();
+ 
+     if (is == null) 
+   	  Log.i("proxyCall", "null");
+     else 
+        Log.i("proxyCall", is.toString());
+     JSONTokener jt;
+     jt = new JSONTokener(is);
+      jsResp = new JSONObject(jt);
     // use response so i can do more request
   //  if (response.getEntity() != null) {
   //          response.getEntity().consumeContent();
@@ -75,8 +87,9 @@ public class ProxyUtils {
     
     is.close();
     Log.i("proxyCall : jsResp ",jsResp.toString() );
-    */
-    return jsResp;
+     
+     return jsResp;
+     
 }
 }
  
