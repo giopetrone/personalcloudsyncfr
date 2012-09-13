@@ -16,6 +16,7 @@ import com.extjs.gxt.ui.client.widget.HtmlContainer;
 import com.extjs.gxt.ui.client.widget.Info;
 import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.VerticalPanel;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.Radio;
 import com.extjs.gxt.ui.client.widget.form.RadioGroup;
@@ -154,11 +155,12 @@ public class BookmarkWindow extends WindowPlus {
 		});					
 //tag				
 		ftable.setWidget(1, 0, getTag());
-//add tag			
+//add tag		
+		VerticalPanel vp= new VerticalPanel();
 		Button addTag=new Button("Add");
 		addTag.setToolTip(new ToolTipConfig("Add a new tag to bookmark"));
 		addTag.setIcon(IconHelper.createStyle("addTag"));			
-		ftable.setWidget(1, 1,addTag);	
+		vp.add(addTag);
 		addTag.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			public void componentSelected(ButtonEvent ce) {
 				ftable.setWidget(1, 0, setFormTag());
@@ -168,8 +170,9 @@ public class BookmarkWindow extends WindowPlus {
 //remove tag			
 		Button removeTag=new Button("Remove");
 		addTag.setToolTip(new ToolTipConfig("Remove a tag to bookmark"));
-		addTag.setIcon(IconHelper.createStyle("removeTag"));			
-		ftable.setWidget(1, 1,removeTag);	
+		addTag.setIcon(IconHelper.createStyle("removeTag"));		
+		vp.add(removeTag);
+		ftable.setWidget(1, 1,vp);	
 		removeTag.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			public void componentSelected(ButtonEvent ce) {
 				ftable.setWidget(1, 0, setFormRemoveTag());
