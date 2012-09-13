@@ -112,7 +112,6 @@ public class BookmarkQueries {
 	}
 
 	public static boolean editLegend(String key, String newLegend) {
-		//System.out.println("<>>>>>>>>> bookmarkQueries editLegend("+key+", "+newLegend+ ")");
 		PersistenceManager pm = ServiceFactory.getPmfInstance().getPersistenceManager();
 		Bookmark bookmark = null;
 		Boolean result=false;
@@ -121,7 +120,6 @@ public class BookmarkQueries {
 			bookmark = (Bookmark) pm.detachCopy(object);
 			bookmark.setLegend(newLegend);
 			pm.makePersistent(bookmark);
-			//System.out.println("<>>>>>>>>> pm.makePersistent(bookmark);");
 			result=true;
 		} catch (Exception e) {
 			System.err.println("There has been an error editing bookmark's legend: " + e);
@@ -150,5 +148,26 @@ public class BookmarkQueries {
 		}
 		return result;
 	}
+
+	public static boolean removeTag(String key, String tag) {
+		PersistenceManager pm = ServiceFactory.getPmfInstance().getPersistenceManager();
+		Bookmark bookmark = null;
+		Boolean result=false;
+		try {
+			Object object = pm.getObjectById(Bookmark.class, key);
+			bookmark = (Bookmark) pm.detachCopy(object);
+			bookmark.removeTag(tag);
+			pm.makePersistent(bookmark);
+			result=true;
+		} catch (Exception e) {
+			System.err.println("There has been an error deleting tag: " + e);
+			
+		} finally {
+			pm.close();
+		}
+		return result;
+	}
+
+
 
 }
