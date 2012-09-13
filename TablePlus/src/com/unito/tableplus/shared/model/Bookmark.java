@@ -106,7 +106,11 @@ public class Bookmark implements Serializable {
 	public LinkedList<String> getTag() {	
 		return tag;
 	}
-	
+	public String getTagString() {	
+		String listTag="";
+		for(String t: tag) listTag+=t+", ";
+		return listTag.substring(0, listTag.length()-2);
+	}	
 	public LinkedList<Comment> getComments(){		
 		return commentList;
 	}		
@@ -136,7 +140,20 @@ public class Bookmark implements Serializable {
 	}
 
 	public void addTag(String string) {
-		this.tag.add(string);	
+		boolean existing=false;
+		for (String s: tag){
+			if (s.equalsIgnoreCase(string)) existing=true;
+		}
+		if(!existing) this.tag.add(string);	
+	}
+	
+	public void removeTag(String string) {
+		int i=0;
+		for (String s: tag){
+			
+			if (s.equals(string)) tag.remove(i);
+			i++;
+		}
 	}
 
 
