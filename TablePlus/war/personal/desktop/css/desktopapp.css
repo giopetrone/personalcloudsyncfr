@@ -200,6 +200,9 @@
 .addTag {
 	background-image: url(../images/addTag.png) !important;
 }
+.removeTag {
+	background-image: url(../images/delete.png) !important;
+}
 .go {
 	background-image: url(../images/go.png) !important;
 }
@@ -213,7 +216,6 @@
   	vertical-align: 	top;
   	horizontal-align: 	right;
   	width: 				150px;
-  	margin-top:			0;
   	height: 			120px;
 }
 
@@ -223,7 +225,6 @@
   	vertical-align: 	top;
   	horizontal-align: 	right;
   	width: 				50px;
-  	margin-top:			0;
   	height: 			120px;
   	
 }
