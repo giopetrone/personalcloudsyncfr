@@ -58,7 +58,7 @@ public class BookmarkServiceImpl extends RemoteServiceServlet implements Bookmar
 	}
 
 	@Override
-	public boolean removeTag(String key, String tag) {
+	public boolean removeTag(String key, int tag) {
 		return BookmarkQueries.removeTag(key, tag);
 	}
 
