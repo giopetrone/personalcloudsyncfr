@@ -54,11 +54,7 @@ public class Bookmark implements Serializable {
 	}	
 	
 	public void setLegend(String legend) {
-		System.out.println("<>>>>>>>>>1) bookmark setLegend("+this.getLegend()+ ")");
-
 		this.legend = legend;
-		System.out.println("<>>>>>>>>>2) bookmark setLegend("+this.getLegend()+ ")");
-
 	}
 	
 	public void setTable(Table table) {
@@ -70,8 +66,7 @@ public class Bookmark implements Serializable {
 	}
 	
 	public void setTagCategory (LinkedList<String> tag) {
-		this.tag=tag;		
-		
+		this.tag=tag;			
 	}
 
 	//getters
@@ -102,15 +97,18 @@ public class Bookmark implements Serializable {
 	
 	public List<String> getAnnotation() {	
 		return annotation;
-	}	
+	}
+	
 	public LinkedList<String> getTag() {	
 		return tag;
 	}
+	
 	public String getTagString() {	
 		String listTag="";
 		for(String t: tag) listTag+=t+", ";
 		return listTag.substring(0, listTag.length()-2);
 	}	
+	
 	public LinkedList<Comment> getComments(){		
 		return commentList;
 	}		
@@ -131,7 +129,7 @@ public class Bookmark implements Serializable {
 	@Override
 	public String toString() {
 		return "Title: "+this.getTitle() + ", Url: " + this.getUrl() + ", Legend: "+ this.getLegend()
-				+"\nComments: "+this.getComments().size()+" Tag: "+this.getTag()
+				+"\nComments: "+this.getComments().size()+" Tag: "+this.getTagString()
 				+ ", Annotations: "+this.getAnnotation().size();
 	}
 
@@ -141,21 +139,15 @@ public class Bookmark implements Serializable {
 
 	public void addTag(String string) {
 		boolean existing=false;
-		for (String s: tag){
+		for (String s: this.getTag()){
 			if (s.equalsIgnoreCase(string)) existing=true;
 		}
 		if(!existing) this.tag.add(string);	
 	}
 	
-	public void removeTag(String string) {
-		int i=0;
-		for (String s: tag){
-			
-			if (s.equals(string)) tag.remove(i);
-			i++;
-		}
+	public void removeTag(int tag) {
+		this.getTag().remove(tag);
+		
 	}
 
-
-	
 }
