@@ -149,7 +149,7 @@ public class BookmarkQueries {
 		return result;
 	}
 
-	public static boolean removeTag(String key, String tag) {
+	public static boolean removeTag(String key, int tag) {
 		PersistenceManager pm = ServiceFactory.getPmfInstance().getPersistenceManager();
 		Bookmark bookmark = null;
 		Boolean result=false;
