@@ -59,9 +59,14 @@ public class BookmarkWindow extends WindowPlus {
 	private FlexTable ftable = new FlexTable();
 	private HorizontalPanel hpp= new HorizontalPanel();
 	private HorizontalPanel hpTag= new HorizontalPanel();  
+	private HorizontalPanel hpTag2;  
 	private Button saveButton = new Button("Save");
 	private Button cancelButton = new Button("Cancel");
-	private ListBox listTag = new ListBox();
+	private ListBox listTag;
+	private TextArea inputTag;
+	private Button editLegendButton=new Button("Edit");
+	private Button removeTag=new Button("Remove");
+	private Button addTag=new Button("Add");
 	
 	public BookmarkWindow(final Table table){
 	
@@ -69,7 +74,7 @@ public class BookmarkWindow extends WindowPlus {
 		super();
 		this.table = table;
 //		this.b=b;
-		setSize(550,500);
+		setSize(570,500);
 		
 		setLayout(new RowLayout(Orientation.VERTICAL));
 				
@@ -93,8 +98,6 @@ public class BookmarkWindow extends WindowPlus {
 			@Override
 			public void onSuccess(List<Bookmark> result) {			
 				b=result.get(0);
-				System.out.println(b.toString());
-				b.addTag("IT");
 		//fine parte provvisoria		
 				
 				setTitle();
@@ -143,7 +146,8 @@ public class BookmarkWindow extends WindowPlus {
 //legend				
 		ftable.setWidget(0, 0, getHtmlLegend());
 //edit legend				
-		Button editLegendButton=new Button("Edit");
+		
+		editLegendButton.setWidth(65);
 		editLegendButton.setToolTip(new ToolTipConfig("Edit the bookmark's legend"));
 		editLegendButton.setIcon(IconHelper.createStyle("edit"));			
 		ftable.setWidget(0, 1, editLegendButton);
@@ -157,7 +161,9 @@ public class BookmarkWindow extends WindowPlus {
 		ftable.setWidget(1, 0, getTag());
 //add tag		
 		VerticalPanel vp= new VerticalPanel();
-		Button addTag=new Button("Add");
+		vp.setSpacing(6);
+		
+		addTag.setWidth(65);
 		addTag.setToolTip(new ToolTipConfig("Add a new tag to bookmark"));
 		addTag.setIcon(IconHelper.createStyle("addTag"));			
 		vp.add(addTag);
@@ -168,9 +174,11 @@ public class BookmarkWindow extends WindowPlus {
 		});		
 	
 //remove tag			
-		Button removeTag=new Button("Remove");
-		addTag.setToolTip(new ToolTipConfig("Remove a tag to bookmark"));
-		addTag.setIcon(IconHelper.createStyle("removeTag"));		
+		
+		removeTag.setWidth(65);
+
+		removeTag.setToolTip(new ToolTipConfig("Remove a tag to bookmark"));
+		removeTag.setIcon(IconHelper.createStyle("removeTag"));		
 		vp.add(removeTag);
 		ftable.setWidget(1, 1,vp);	
 		removeTag.addSelectionListener(new SelectionListener<ButtonEvent>() {
@@ -329,7 +337,6 @@ public class BookmarkWindow extends WindowPlus {
 			public void onSuccess(List<Comment> result) {
 				if (result.size()>0) {
 				for(Comment c: result){
-					System.out.println(c.toString());
 					//se i commenti sono privati
 					if(c.isPrivate()){
 						//se i commenti sono stati fatti dallo stesso utente sono visualizzati e sottolineati
@@ -369,6 +376,7 @@ public class BookmarkWindow extends WindowPlus {
 	}	
 	
 	public LayoutContainer setFormLegend(){
+		editLegendButton.disable();
 		final LayoutContainer panel = new LayoutContainer();
 		panel.setStyleAttribute("padding-left", "10px");
 		
@@ -409,8 +417,6 @@ public class BookmarkWindow extends WindowPlus {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
 				editLegend(legend.getValue());
-				refresh();
-				ftable.setWidget(0, 0, getHtmlLegend());
 			}
 		});
 		panel.add(hp);
@@ -418,6 +424,8 @@ public class BookmarkWindow extends WindowPlus {
 	}
 	
 	public LayoutContainer setFormTag(){
+		addTag.disable();
+		removeTag.disable();
 		final LayoutContainer panel = new LayoutContainer();
 		panel.setStyleAttribute("padding-left", "10px");
 		panel.setHeight(80);
@@ -429,31 +437,28 @@ public class BookmarkWindow extends WindowPlus {
 	    panel.add(hp1);
 	    hp1.setStyleAttribute("padding-top", "5px");
 
-		final TextArea inputTag = new TextArea();
-		
-		if(b.getTag().size()>0) {
-			for (String tag : b.getTag()) {
-				listTag.addItem(tag);
-			}
-			listTag.setHeight("20px");
-			
-			listTag.addChangeHandler(new ChangeHandler(){
-			   
-				@Override
-				public void onChange(ChangeEvent event) {
-					inputTag.setValue(listTag.getItemText(listTag.getSelectedIndex()));
-					
-				}
-			 });
-		}	
+		inputTag = new TextArea();
 		inputTag.setHeight(20);
 		inputTag.setWidth(60);
 		inputTag.setPreventScrollbars(true);
 		inputTag.setAllowBlank(false);
 		inputTag.setStyleAttribute("padding-rigth", "10px");
-		inputTag.setEmptyText(listTag.getItemText(listTag.getSelectedIndex()));
-		inputTag.setValue(listTag.getItemText(listTag.getSelectedIndex()));
-
+		inputTag.setValue(b.getTag().get(0));
+		
+		listTag = new ListBox();
+		if(b.getTag().size()>0) {
+			for (String tag : b.getTag()) {
+				listTag.addItem(tag);
+			}
+			listTag.setHeight("20px");
+			listTag.addChangeHandler(new ChangeHandler(){
+				@Override
+				public void onChange(ChangeEvent event) {
+					inputTag.setValue(listTag.getItemText(listTag.getSelectedIndex()));
+				}
+			 });
+		}	
+		
 		hp1.add(inputTag);	
 		hp1.add(listTag);
 				
@@ -476,9 +481,7 @@ public class BookmarkWindow extends WindowPlus {
 		saveButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
-				addTag(inputTag.getValue());
-				refresh();
-				ftable.setWidget(1, 0, getTag());
+				addTag(inputTag.getValue().toUpperCase());
 			}
 		});
 		panel.add(hpTag);
@@ -496,23 +499,24 @@ public class BookmarkWindow extends WindowPlus {
 	    HorizontalPanel hp1= new HorizontalPanel();  
 	    panel.add(hp1);
 	    hp1.setStyleAttribute("padding-top", "5px");
-		
+	    
+	    listTag = new ListBox();
 		for (String tag : b.getTag()) {
 			listTag.addItem(tag);
 		}
 		listTag.setHeight("20px");
 		hp1.add(listTag);
-				
-	    hpTag.setStyleAttribute("padding-top", "7px");
-	    hpTag.setHorizontalAlign(HorizontalAlignment.LEFT);
+		hpTag2= new HorizontalPanel();	
+	    hpTag2.setStyleAttribute("padding-top", "7px");
+	    hpTag2.setHorizontalAlign(HorizontalAlignment.LEFT);
 		Button removeButton= new Button("Remove");
-		hpTag.add(removeButton);
+		hpTag2.add(removeButton);
 		
 		removeButton.setStyleAttribute("padding-right", "10px");
 		removeButton.setHeight(20);
 		
 		cancelButton.setHeight(20);
-		hpTag.add(cancelButton);
+		hpTag2.add(cancelButton);
 
 		cancelButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
@@ -523,12 +527,10 @@ public class BookmarkWindow extends WindowPlus {
 		removeButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
-				removeTag(listTag.getItemText(listTag.getSelectedIndex()));
-				refresh();
-				ftable.setWidget(1, 0, getTag());
+				removeTag(listTag.getSelectedIndex());
 			}
 		});
-		panel.add(hpTag);
+		panel.add(hpTag2);
 		return panel;
 	}
 	
@@ -547,16 +549,16 @@ public class BookmarkWindow extends WindowPlus {
 			}
 			@Override
 			public void onSuccess(Boolean result) {
-				GWT.log("Successfully added bookmark's tag! ");
-				Info.display("Succes", "Successfully added bookmark's tag.");
+				GWT.log("Successfully added tag! ");
+				Info.display("Success", "Successfully added tag");
 				b.addTag(tag);
 				ftable.setWidget(1, 0, getTag());
-				unmask();
 			}
 		});		
+		
 	}
 
-	public void removeTag(final String tag) {
+	public void removeTag(final int tag) {
 		bookmarkService.removeTag(b.getKey(),tag, new AsyncCallback<Boolean>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -566,13 +568,13 @@ public class BookmarkWindow extends WindowPlus {
 			}
 			@Override
 			public void onSuccess(Boolean result) {
-				GWT.log("Successfully removed bookmark's tag! ");
-				Info.display("Succes", "Successfully removed bookmark's tag.");
+				GWT.log("Successfully removed tag! ");
+				Info.display("Success", "Successfully removed tag");
 				b.removeTag(tag);
 				ftable.setWidget(1, 0, getTag());
-				unmask();
 			}
 		});		
+		refresh();
 	}
 	
 	public void editLegend(final String value) {
@@ -588,9 +590,7 @@ public class BookmarkWindow extends WindowPlus {
 				GWT.log("Successfully edited bookmark's legend! ");
 				Info.display("Succes", "Successfully edited bookmark's legend.");
 				b.setLegend(value);
-				System.out.println("New Legend: "+b.getLegend());
 				ftable.setWidget(0, 0, getHtmlLegend());
-				unmask();
 			}
 		});			
 	}
