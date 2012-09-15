@@ -178,16 +178,9 @@ public class BookmarkWindowList extends WindowPlus {
 			}
 			@Override
 			public void onSuccess(Bookmark b) {
-				System.out.println("***** Recuperato segnalibro creo finestra per :"+b.toString());
-				final BookmarkPopup bookmarkPopup= new BookmarkPopup(table, b);
+				//BookmarkWindow bookmarkPopup= new BookmarkWindow(table, b);
 				
-				bookmarkPopup.setPopupPositionAndShow(new PopupPanel.PositionCallback() {
-                	public void setPosition(int offsetWidth, int offsetHeight) {
-	                	int left = 10;
-	                	int top = 10;
-	                	bookmarkPopup.setPopupPosition(left, top);
-                	}
-            	});
+				BookmarkWindow bookmarkPopup= new BookmarkWindow(table);
 				
 			}
 		});
