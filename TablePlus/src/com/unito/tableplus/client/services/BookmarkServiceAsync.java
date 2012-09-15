@@ -27,7 +27,7 @@ public interface BookmarkServiceAsync {
 
 	void addTag(String key, String tag, AsyncCallback<Boolean> asyncCallback);
 
-	void removeTag(String key, String tag, AsyncCallback<Boolean> asyncCallback);
+	void removeTag(String key, int tag, AsyncCallback<Boolean> asyncCallback);
 
 
 }
