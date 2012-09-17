@@ -34,20 +34,22 @@ public class BookmarkQueries {
 		return bookmark;
 	}
 
-	public static void deleteBookmark(String key) {
+	public static boolean deleteBookmark(String key) {
 		PersistenceManager pm = ServiceFactory.getPmfInstance().getPersistenceManager();
+		boolean result=false;
 		try {
 			Object object = pm.getObjectById(Bookmark.class, key);
 			pm.deletePersistent(object);
+			result=true;
 		} catch (Exception e) {
 			System.err.println("Something gone wrong deleting the bookmark: " + e);
 		} finally {
 			pm.close();
 		}
+		return result;
 	}
 
 	public static boolean addComment(String key, Comment comment) {
-		System.out.println("Bookmark queries add comment" );
 		PersistenceManager pm = ServiceFactory.getPmfInstance().getPersistenceManager();
 		Transaction tx = pm.currentTransaction();
 		try {
@@ -81,18 +83,19 @@ public class BookmarkQueries {
 		return detached.getComments();
 	}
 
-	public static void deleteComment(String key) {
-		System.out.println("Bookmark queries delete comment" );
-
+	public static boolean deleteComment(String key) {
+		boolean result=false;
 		PersistenceManager pm = ServiceFactory.getPmfInstance().getPersistenceManager();
 		try {
 			Comment c = pm.getObjectById(Comment.class, key);
 			pm.deletePersistentAll(c);
+			result=true;
 		} catch (Exception e) {
 			System.err.println("There has been an error deleting comment: " + e);
 		} finally {
 			pm.close();
 		}	
+		return result;
 		
 	}
 
@@ -167,7 +170,5 @@ public class BookmarkQueries {
 		}
 		return result;
 	}
-
-
 
 }
