@@ -1,8 +1,6 @@
 package com.unito.tableplus.server.services;
 
-import java.util.LinkedList;
 import java.util.List;
-
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.unito.tableplus.client.services.BookmarkService;
 import com.unito.tableplus.server.BookmarkQueries;
@@ -24,8 +22,8 @@ public class BookmarkServiceImpl extends RemoteServiceServlet implements Bookmar
 	}
 
 	@Override
-	public void deleteBookmark(String key) {
-		BookmarkQueries.deleteBookmark(key);
+	public boolean deleteBookmark(String key) {
+		return BookmarkQueries.deleteBookmark(key);
 	}
 
 	public boolean addComment(String key, Comment comment) {
@@ -37,8 +35,8 @@ public class BookmarkServiceImpl extends RemoteServiceServlet implements Bookmar
 	}
 
 	@Override
-	public void deleteComment(String key) {
-		BookmarkQueries.deleteComment(key);
+	public boolean deleteComment(String key) {
+		return BookmarkQueries.deleteComment(key);
 	}
 
 	@Override
