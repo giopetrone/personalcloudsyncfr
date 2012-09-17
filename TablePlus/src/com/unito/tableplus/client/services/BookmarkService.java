@@ -11,13 +11,13 @@ public interface BookmarkService extends RemoteService {
 	
 	Bookmark queryBookmark(String key);
 
-	void deleteBookmark(String key);
+	boolean deleteBookmark(String key);
 
 	boolean addComment(String string, Comment comment);
 	
 	List<Comment> getComments(String key);
 
-	void deleteComment(String key);
+	boolean deleteComment(String key);
 
 	String editComment(Bookmark b, String key);
 
