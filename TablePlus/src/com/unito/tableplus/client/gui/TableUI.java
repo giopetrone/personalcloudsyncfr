@@ -8,25 +8,29 @@ import com.unito.tableplus.client.gui.windows.BlackBoardWindow;
 import com.unito.tableplus.client.gui.windows.BookmarkWindow;
 import com.unito.tableplus.client.gui.windows.BookmarkWindowList;
 import com.unito.tableplus.client.gui.windows.ChatWindow;
+import com.unito.tableplus.client.gui.windows.CommentWindow;
 import com.unito.tableplus.client.gui.windows.DocWindow;
 import com.unito.tableplus.client.gui.windows.TableResourcesWindow;
 import com.unito.tableplus.client.gui.windows.WindowPlus;
-import com.unito.tableplus.shared.model.Bookmark;
 import com.unito.tableplus.shared.model.Table;
 
 public class TableUI {
+	
 	private RightPanel rightPanel;
 	private List<WindowPlus> windows = new ArrayList<WindowPlus>();
 	private List<Shortcut> shortcuts = new ArrayList<Shortcut>();
 	private Shortcut s1;
 	private Shortcut s2;
 	private Shortcut s3;
-	private Shortcut s;
+	private Shortcut s4;
+	private Shortcut s5;
+	private Shortcut s6;
 	private WindowPlus chatWindow;
 	private WindowPlus blackboardWindow;
 	private WindowPlus tableResourcesWindow;
 	private WindowPlus bookmarkWindowList;
 	private WindowPlus bookmarkWindow;
+	private WindowPlus commentWindow;
 	private Table table;
 	private String tableName;
 	private Long tableKey;
@@ -43,7 +47,6 @@ public class TableUI {
 		this.setTableKey(0L);
 	}
 
-	// TODO: windows should be created and added to links only when links are
 	// clicked except for chatwindow, look at commented code below
 	public TableUI(Table table) {
 		this.setTable(table);
@@ -57,11 +60,10 @@ public class TableUI {
 		blackboardWindow = new BlackBoardWindow(getTable());
 		bookmarkWindowList = new BookmarkWindowList(getTable());
 		
-		//provvisorio
-		Bookmark b= new Bookmark();
-		b.setTitle("Gwt");
-		b.setUrl("http://www.vogella.com/articles/GWT/article.html#resources_gwt");
+		//provvisorio		
 		bookmarkWindow = new BookmarkWindow(getTable());
+		//provvisorio		
+		commentWindow = new CommentWindow(getTable());
 		
 		addWindow(tableResourcesWindow);
 		addWindow(chatWindow);
@@ -70,6 +72,7 @@ public class TableUI {
 		
 		//provvisorio
 		addWindow(bookmarkWindow);
+		addWindow(commentWindow);
 		
 		// table resources
 		s1 = new Shortcut();
@@ -94,19 +97,27 @@ public class TableUI {
 
 		// my bookmark list
 
-		s = new Shortcut();
-		s.setText("My Bookmark List");
-		s.setId("mybookmark-win-shortcut");
-		s.setData("window", bookmarkWindowList);
-		this.addShortcut(s);
+		s4 = new Shortcut();
+		s4.setText("My Bookmark List");
+		s4.setId("mybookmark-win-shortcut");
+		s4.setData("window", bookmarkWindowList);
+		this.addShortcut(s4);
 		
 		// bookmark (provvisorio)
 
-		s = new Shortcut();
-		s.setText("Bookmark");
-		s.setId("mybookmark-win-shortcut");
-		s.setData("window", bookmarkWindow);
-		this.addShortcut(s);
+		s5 = new Shortcut();
+		s5.setText("Bookmark");
+		s5.setId("mybookmark-win-shortcut");
+		s5.setData("window", bookmarkWindow);
+		this.addShortcut(s5);
+		
+		// bookmark comment (provvisorio)
+
+		s6 = new Shortcut();
+		s6.setText("Bookmark's Comment");
+		s6.setId("mybookmarkcomment-win-shortcut");
+		s6.setData("window", commentWindow);
+		this.addShortcut(s6);
 	}
 
 	/**
