@@ -76,14 +76,14 @@ public class CommentsPopup extends PopupPanel {
 			public void componentSelected(MenuEvent ce) {
 				final BaseModel selected = grid.getSelectionModel().getSelectedItem();
 				String key = selected.get("key").toString();
-				bookmarkService.deleteComment(key, new AsyncCallback<Void>() {
+				bookmarkService.deleteComment(key, new AsyncCallback<Boolean>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GWT.log("Unable to delete comment", caught);
 						Info.display("Error", "Unable to delete comment.");
 					}
 					@Override
-					public void onSuccess(Void result) {
+					public void onSuccess(Boolean result) {
 						commentStore.remove(selected);
 						contextMenu.setEnabled(commentStore.getCount() > 0);
 					}
@@ -185,15 +185,15 @@ public class CommentsPopup extends PopupPanel {
 				Comment c = new Comment(comment.getValue(),TablePlus.getUser().getEmail());
 				addComment(c);
 				comment.clear();
-				bookmarkService.deleteComment(key, new AsyncCallback<Void>() {
+				bookmarkService.deleteComment(key, new AsyncCallback<Boolean>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GWT.log("Unable to delete comment", caught);
 						Info.display("Error", "Unable to delete comment.");
 					}
 					@Override
-					public void onSuccess(Void result) {
-						edit=true;
+					public void onSuccess(Boolean result) {
+						edit=result;
 					}
 				});
 				inputPanel.hide();
