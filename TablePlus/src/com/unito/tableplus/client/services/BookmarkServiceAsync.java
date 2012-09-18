@@ -27,6 +27,5 @@ public interface BookmarkServiceAsync {
 
 	void removeTag(String key, int tag, AsyncCallback<Boolean> asyncCallback);
 
-
 }
 
