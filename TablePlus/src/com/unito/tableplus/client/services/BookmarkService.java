@@ -29,5 +29,4 @@ public interface BookmarkService extends RemoteService {
 
 	boolean removeTag(String key, int tag);
 
-
 }
