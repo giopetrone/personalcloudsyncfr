@@ -19,6 +19,8 @@ import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.FormButtonBinding;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
+import com.extjs.gxt.ui.client.widget.form.Radio;
+import com.extjs.gxt.ui.client.widget.form.RadioGroup;
 import com.extjs.gxt.ui.client.widget.form.TextArea;
 import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
 import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
@@ -41,6 +43,7 @@ import com.unito.tableplus.client.services.TableServiceAsync;
 import com.unito.tableplus.shared.model.Bookmark;
 import com.unito.tableplus.shared.model.Comment;
 import com.unito.tableplus.shared.model.Table;
+import com.unito.tableplus.shared.model.VisibilityType;
 
 public class CommentWindow extends WindowPlus {
 	
@@ -62,10 +65,11 @@ public class CommentWindow extends WindowPlus {
 	private boolean edit=false;	
 	private	Bookmark b;
 	private	Table table;
-	private int maxWidthComment=128;
-	private int maxWidthAuthor=136;
+	private int maxWidthComment=120;
+	private int maxWidthAuthor=130;
+	private Radio radio1;
 
-//	public CommentWindow(final Bookmark b, final Table table) {
+	//	public CommentWindow(final Bookmark b, final Table table) {
 	public CommentWindow(final Table table) {
 		super();
 		this.table=table;
@@ -93,7 +97,7 @@ public class CommentWindow extends WindowPlus {
 
 	protected void createWindow() {
 	    getPixelWidth();
-	    setSize(maxWidthAuthor+220+maxWidthComment, 290);
+	    setSize(maxWidthAuthor+309+maxWidthComment, 250);
 	    
 		setHeading("Bookmark's "+b.getTitle()+" comments");
 		setLayout(new RowLayout(Orientation.VERTICAL));
@@ -182,10 +186,25 @@ public class CommentWindow extends WindowPlus {
 	private FormPanel newComment() {
 		final FormPanel panel = new FormPanel();
 		FormData formData = new FormData("-20");
-		panel.setHeading("New Comment");
+		panel.setHeading("New Comment from "+TablePlus.getUser().getEmail());
 		panel.setFrame(true);
-		panel.setWidth(350);
-		panel.add(new Label("Sender's e-mail: "+TablePlus.getUser().getEmail()));
+		panel.setWidth(385);
+		
+	    panel.setLabelWidth(110);
+	    
+		radio1 = new Radio();  
+	    radio1.setBoxLabel("Public");  
+	    radio1.setValue(true);  
+	  
+	    Radio radio2 = new Radio();  
+	    radio2.setBoxLabel("Private");  
+	  
+	    RadioGroup radioGroup = new RadioGroup();  
+	    radioGroup.setFieldLabel("Comment Visibility");  
+	    radioGroup.add(radio1);  
+	    radioGroup.add(radio2); 
+	    panel.add(radioGroup);
+	    
 		final TextArea comment = new TextArea();
 		comment.setHeight(35);
 		comment.setPreventScrollbars(true);
@@ -197,6 +216,7 @@ public class CommentWindow extends WindowPlus {
 		panel.addButton(saveButton);
 		Button cancelButton = new Button("Cancel");
 		panel.addButton(cancelButton);
+		saveButton.setStyleAttribute("padding-left", "35px");
 		panel.setButtonAlign(HorizontalAlignment.CENTER);
 		FormButtonBinding binding = new FormButtonBinding(panel);
 		binding.addButton(saveButton);
@@ -209,7 +229,9 @@ public class CommentWindow extends WindowPlus {
 		saveButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
-				Comment c = new Comment(comment.getValue(),TablePlus.getUser().getEmail());
+				Comment c;
+				if (radio1.getValue()) c = new Comment(comment.getValue(),TablePlus.getUser().getEmail());
+				else c = new Comment(comment.getValue(),TablePlus.getUser().getEmail(), VisibilityType.PRIVATE);
 				addComment(c);
 				comment.clear();
 				rebuild();
@@ -263,7 +285,20 @@ public class CommentWindow extends WindowPlus {
 		panel.setHeading("Edit Comment");
 		panel.setFrame(true);
 		panel.setWidth(350);
-		
+	    panel.setLabelWidth(110);
+	    
+		radio1 = new Radio();  
+	    radio1.setBoxLabel("Public");  
+	    radio1.setValue(true);  
+	  
+	    Radio radio2 = new Radio();  
+	    radio2.setBoxLabel("Private");  
+	  
+	    RadioGroup radioGroup = new RadioGroup();  
+	    radioGroup.setFieldLabel("Comment Visibility");  
+	    radioGroup.add(radio1);  
+	    radioGroup.add(radio2); 
+	    panel.add(radioGroup);
 		final TextArea comment = new TextArea();
 		comment.setHeight(35);
 		comment.setPreventScrollbars(true);
@@ -276,6 +311,7 @@ public class CommentWindow extends WindowPlus {
 		panel.addButton(saveButton);
 		Button cancelButton = new Button("Cancel");
 		panel.addButton(cancelButton);
+		saveButton.setStyleAttribute("padding-left", "70px");
 		panel.setButtonAlign(HorizontalAlignment.CENTER);
 		FormButtonBinding binding = new FormButtonBinding(panel);
 		binding.addButton(saveButton);
@@ -288,7 +324,9 @@ public class CommentWindow extends WindowPlus {
 		saveButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
-				Comment c = new Comment(comment.getValue(),TablePlus.getUser().getEmail());
+				Comment c;
+				if (radio1.getValue()) c = new Comment(comment.getValue(),TablePlus.getUser().getEmail());
+				else c = new Comment(comment.getValue(),TablePlus.getUser().getEmail(), VisibilityType.PRIVATE);
 				editComment(c, key);
 				comment.clear();
 				rebuild();
@@ -347,6 +385,7 @@ public class CommentWindow extends WindowPlus {
 			model.set("author", c.getAuthor());
 			model.set("comment", c.getComment());
 			model.set("date", c.getDate());
+			model.set("visibility", c.getVisibilty());
 			commentStore.add(model);
 		}
 		contextMenu.setEnabled(commentStore.getCount() > 0);
@@ -355,11 +394,13 @@ public class CommentWindow extends WindowPlus {
 	private ColumnModel getColumnModel() {
 		ColumnConfig author = new ColumnConfig("author", "Author", maxWidthAuthor);
 		ColumnConfig comment = new ColumnConfig("comment", "Comment", maxWidthComment);
-		ColumnConfig date = new ColumnConfig("date", "Date", 220);
+		ColumnConfig date = new ColumnConfig("date", "Date", 200);
+		ColumnConfig visibility = new ColumnConfig("visibility", "Visibility", 60);
 		List<ColumnConfig> config = new ArrayList<ColumnConfig>();
 		config.add(author);
 		config.add(comment);
 		config.add(date);
+		config.add(visibility);
 		return new ColumnModel(config);
 	}
 
