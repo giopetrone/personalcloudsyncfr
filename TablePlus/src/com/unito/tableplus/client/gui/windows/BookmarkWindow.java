@@ -51,9 +51,9 @@ public class BookmarkWindow extends WindowPlus {
 	private Table table;
 	private LayoutContainer mainContainer;
 	private HtmlContainer historyContainer;
-	private TextArea inputArea;
+	private TextArea inputArea;	
 	private  Bookmark b;
-	private String message ="<div align=\"left\"><br><b>Comments:<br><br></b></div>";	
+	private String message ="<div align=\"left\"><br><b>Comments :<br><br></b></div>";	
 	private Radio radio = new Radio();  
 	private Radio radio2 = new Radio();
 	private FlexTable ftable = new FlexTable();
@@ -67,6 +67,7 @@ public class BookmarkWindow extends WindowPlus {
 	private Button editLegendButton=new Button("Edit");
 	private Button removeTag=new Button("Remove");
 	private Button addTag=new Button("Add");
+
 	
 	public BookmarkWindow(final Table table){
 	
@@ -99,7 +100,6 @@ public class BookmarkWindow extends WindowPlus {
 			public void onSuccess(List<Bookmark> result) {			
 				b=result.get(0);
 		//fine parte provvisoria		
-				
 				setTitle();
 				setFrame();
 				createFlexTable();
@@ -116,7 +116,7 @@ public class BookmarkWindow extends WindowPlus {
 		setHeading("Bookmark: "+b.getTitle());
 		Html title= new Html("<div align=\"center\"><b>\nThe bookmak <u>"+b.getTitle()+"</u> has been shared on this table\n\n</b></div> ");
 		title.setHeight(30);
-		mainContainer.add(title);
+		add(title);
 	}
 	
 	private void setFrame() {
@@ -124,7 +124,7 @@ public class BookmarkWindow extends WindowPlus {
 		LayoutContainer preview=  new LayoutContainer();
 		preview.add(hpp);
 		hpp.add( new Html("<iframe src='"+b.getUrl()+" width='300'; height='200'<p><a href='"+b.getUrl()+"'>"+b.getTitle()+"</a></p></iframe>"));
-		mainContainer.add(preview);
+		add(preview);
 	}
 	
 	private void createFlexTable() {
@@ -154,6 +154,7 @@ public class BookmarkWindow extends WindowPlus {
 				
 		editLegendButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			public void componentSelected(ButtonEvent ce) {
+				editLegendButton.disable();
 				ftable.setWidget(0, 0, setFormLegend());
 			}
 		});					
@@ -169,6 +170,8 @@ public class BookmarkWindow extends WindowPlus {
 		vp.add(addTag);
 		addTag.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			public void componentSelected(ButtonEvent ce) {
+				addTag.disable();
+				removeTag.disable();
 				ftable.setWidget(1, 0, setFormTag());
 			}
 		});		
@@ -183,13 +186,15 @@ public class BookmarkWindow extends WindowPlus {
 		ftable.setWidget(1, 1,vp);	
 		removeTag.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			public void componentSelected(ButtonEvent ce) {
+				addTag.disable();
+				removeTag.disable();
 				ftable.setWidget(1, 0, setFormRemoveTag());
 			}
 		});		
 	}
 		
 	private void createCommentPanel() {
-		//commenti				
+		//commenti		
 		LayoutContainer commentPanel= new LayoutContainer();
 		commentPanel.setScrollMode(Scroll.AUTO);	
 		historyContainer = new HtmlContainer(message);
@@ -204,7 +209,8 @@ public class BookmarkWindow extends WindowPlus {
 	
 	private void radioButton() {
 		//radio button
-		HorizontalPanel hpv= new HorizontalPanel();
+		HorizontalPanel fp= new HorizontalPanel();
+		
 		radio.setSize(55, 5);
 		radio.setBoxLabel("Public");  
 		radio.setValue(true);  
@@ -212,14 +218,18 @@ public class BookmarkWindow extends WindowPlus {
 		radio2.setBoxLabel("Private");  
 		radio2.setSize(55, 5);
 		RadioGroup radioGroup = new RadioGroup();  
-		radioGroup.setFieldLabel("Comment Visibility: ");  
+		Label label=new Label("New Comment Visibility: ");  
+		label.setStyleAttribute("font-size", "10pt");
+		label.setStyleAttribute("padding-right", "10pt");
+		
+		radioGroup.setStyleAttribute("padding-top", "4pt");
+		
 		radioGroup.add(radio);  
-		radioGroup.add(radio2);  
-		hpv.add(radioGroup);
-		radioGroup.setIntStyleAttribute("font-size", 6);
-		radioGroup.setStyleName("html");
-		radioGroup.setStyleAttribute("font-size", "6px");
-		add(hpv, new RowData(1, -1, new Margins(10)));
+		radioGroup.add(radio2);
+		fp.add(label);
+		fp.add(radioGroup);
+		
+		add(fp, new RowData(1, -1, new Margins(10)));
 	}
 
 	private void createInputArea() {
@@ -327,6 +337,7 @@ public class BookmarkWindow extends WindowPlus {
 	
 	public void loadComments() {
 		bookmarkService.getComments(b.getKey(),new AsyncCallback<List<Comment>>() {
+			
 			@Override
 			public void onFailure(Throwable caught) {
 				GWT.log("Unable to load comments of bookmarks: "+ b.getTitle(), caught);
@@ -363,20 +374,19 @@ public class BookmarkWindow extends WindowPlus {
 						}
 				}
 				historyContainer.add(new Label(message+"<br>"), "");
-				message="<div align=\"left\"><br><b>Comments:<br><br></b></div>";	
+				message ="<div align=\"left\"><br><b>Comments ("+(result.size()+1)+") :<br><br></b></div>";
 				}
 				else {
 					message="<div align=\"left\"><br><b>There are no comments for the bookmark!</b><br></div>";
 					historyContainer.add(new Label(message+"<br>"), "");
 				}
-				
 				unmask();
 			}
 		});					
 	}	
 	
 	public LayoutContainer setFormLegend(){
-		editLegendButton.disable();
+		
 		final LayoutContainer panel = new LayoutContainer();
 		panel.setStyleAttribute("padding-left", "10px");
 		
@@ -411,12 +421,14 @@ public class BookmarkWindow extends WindowPlus {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
 				ftable.setWidget(0, 0, getHtmlLegend());
+				editLegendButton.enable();
 			}
 		});
 		saveButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
 				editLegend(legend.getValue());
+				editLegendButton.enable();
 			}
 		});
 		panel.add(hp);
@@ -424,8 +436,7 @@ public class BookmarkWindow extends WindowPlus {
 	}
 	
 	public LayoutContainer setFormTag(){
-		addTag.disable();
-		removeTag.disable();
+
 		final LayoutContainer panel = new LayoutContainer();
 		panel.setStyleAttribute("padding-left", "10px");
 		panel.setHeight(80);
@@ -476,12 +487,16 @@ public class BookmarkWindow extends WindowPlus {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
 				ftable.setWidget(1, 0, getTag());
+				addTag.enable();
+				removeTag.enable();
 			}
 		});
 		saveButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
 				addTag(inputTag.getValue().toUpperCase());
+				addTag.enable();
+				removeTag.enable();
 			}
 		});
 		panel.add(hpTag);
@@ -521,12 +536,16 @@ public class BookmarkWindow extends WindowPlus {
 		cancelButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
+				addTag.enable();
+				removeTag.enable();
 				ftable.setWidget(1, 0, getTag());
 			}
 		});
 		removeButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
+				addTag.enable();
+				removeTag.enable();
 				removeTag(listTag.getSelectedIndex());
 			}
 		});
