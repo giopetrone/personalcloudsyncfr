@@ -60,5 +60,4 @@ public class BookmarkServiceImpl extends RemoteServiceServlet implements Bookmar
 		return BookmarkQueries.removeTag(key, tag);
 	}
 
-
 }
