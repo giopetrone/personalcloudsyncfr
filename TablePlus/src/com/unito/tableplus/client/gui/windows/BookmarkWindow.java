@@ -99,7 +99,8 @@ public class BookmarkWindow extends WindowPlus {
 			@Override
 			public void onSuccess(List<Bookmark> result) {			
 				b=result.get(0);
-		//fine parte provvisoria		
+		//fine parte provvisoria	
+				refresh();
 				setTitle();
 				setFrame();
 				createFlexTable();
@@ -220,9 +221,9 @@ public class BookmarkWindow extends WindowPlus {
 		RadioGroup radioGroup = new RadioGroup();  
 		Label label=new Label("New Comment Visibility: ");  
 		label.setStyleAttribute("font-size", "10pt");
-		label.setStyleAttribute("padding-right", "10pt");
+		label.setStyleAttribute("padding-right", "10px");
 		
-		radioGroup.setStyleAttribute("padding-top", "4pt");
+		radioGroup.setStyleAttribute("padding-top", "5px");
 		
 		radioGroup.add(radio);  
 		radioGroup.add(radio2);
@@ -374,7 +375,7 @@ public class BookmarkWindow extends WindowPlus {
 						}
 				}
 				historyContainer.add(new Label(message+"<br>"), "");
-				message ="<div align=\"left\"><br><b>Comments ("+(result.size()+1)+") :<br><br></b></div>";
+				message ="<div align=\"left\"><br><b>Comments :<br><br></b></div>";
 				}
 				else {
 					message="<div align=\"left\"><br><b>There are no comments for the bookmark!</b><br></div>";
