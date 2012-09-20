@@ -627,6 +627,8 @@ public class BookmarkWindow extends WindowPlus {
 				b=result;
 				ftable.setWidget(0, 0, getHtmlLegend());
 				ftable.setWidget(1, 0, getTag());
+				loadComments();	
+
 			}
 		});
 	}
