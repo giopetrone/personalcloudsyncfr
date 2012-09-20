@@ -13,7 +13,6 @@ import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.util.IconHelper;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.Info;
-import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.Layout;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
@@ -56,6 +55,7 @@ public class CommentWindow extends WindowPlus {
 	private Grid<BaseModel> grid;
 	private Button loadButton;
 	private Button addButton;
+	private Button deleteButton;
 	private Layout fitLayout = new FitLayout();
 	private Layout centerLayout = new CenterLayout();
 	private FormPanel inputPanel;
@@ -171,13 +171,45 @@ public class CommentWindow extends WindowPlus {
 		});
 		addButton.setToolTip(new ToolTipConfig("Add comment"));
 		addButton.setIcon(IconHelper.createStyle("add"));		
+//delete	
+		deleteButton = new Button("Delete All", new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				System.out.println("deleteComment");
+
+				deleteComment();
+			}
+		});
+		deleteButton.setToolTip(new ToolTipConfig("Delete All"));
+		deleteButton.setIcon(IconHelper.createStyle("deleteAll"));		
 		
 		addButton(loadButton);
 		addButton(addButton);
+		addButton(deleteButton);
 
 		loadComments();
     }
-    
+	private void deleteComment() {
+		for (final BaseModel bm : commentStore.getModels()){
+			if (bm.get("author").equals(TablePlus.getUser().getEmail())){
+				System.out.println("deleteComment: "+bm.get("comment"));
+
+				bookmarkService.deleteComment(bm.get("key").toString(), new AsyncCallback<Boolean>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GWT.log("Unable to delete comment", caught);
+						Info.display("Error", "Unable to delete comment.");
+					}
+					@Override
+					public void onSuccess(Boolean result) {
+						System.out.println("cancellato commento");
+						commentStore.remove(bm);
+						loadComments();
+					}
+				});
+			}
+		}
+	}
 	protected void addComment() {
 		inputPanel = newComment();
 		showForm();
