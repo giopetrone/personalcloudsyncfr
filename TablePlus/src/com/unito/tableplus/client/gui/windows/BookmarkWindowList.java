@@ -1,6 +1,7 @@
 package com.unito.tableplus.client.gui.windows;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.Orientation;
@@ -13,11 +14,14 @@ import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MenuEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.store.ListStore;
+import com.extjs.gxt.ui.client.util.IconHelper;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.Info;
 import com.extjs.gxt.ui.client.widget.Layout;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.form.ComboBox;
+import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
 import com.extjs.gxt.ui.client.widget.form.FormButtonBinding;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.extjs.gxt.ui.client.widget.form.TextArea;
@@ -31,6 +35,7 @@ import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
+import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.PopupPanel;
@@ -39,6 +44,7 @@ import com.unito.tableplus.client.services.BookmarkServiceAsync;
 import com.unito.tableplus.client.services.ServiceFactory;
 import com.unito.tableplus.client.services.TableServiceAsync;
 import com.unito.tableplus.shared.model.Bookmark;
+import com.unito.tableplus.shared.model.Comment;
 import com.unito.tableplus.shared.model.Table;
 
 public class BookmarkWindowList extends WindowPlus {
@@ -51,16 +57,18 @@ public class BookmarkWindowList extends WindowPlus {
 	private Grid<BaseModel> grid;
 	private ListStore<BaseModel> bookmarksStore;
 	private Button loadButton;
-	private Button bookmarkButton;
+	private Button addButton;
 	private Layout fitLayout = new FitLayout();
 	private Layout centerLayout = new CenterLayout();
 	private FormPanel inputPanel;
 	private Menu contextMenu;
 	private MenuItem deleteItem;
+	private List<String> allTags= new LinkedList<String>();
+	private ComboBox<BaseModel> combo = new ComboBox<BaseModel>();  
 	
 	public BookmarkWindowList(final Table table) {
 		super();
-		setSize(530, 300);
+		setSize(650, 350);
 		this.table = table;
 		setHeading("Bookmark");
 		
@@ -99,20 +107,24 @@ public class BookmarkWindowList extends WindowPlus {
 		mainContainer.add(grid);
 
 		add(mainContainer, new RowData(1, 1, new Margins(4)));
-		loadButton = new Button("Load Bookmark", new SelectionListener<ButtonEvent>() {
+		loadButton = new Button("Refresh", new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
 				loadBookmark();
 			}
 		});
-		bookmarkButton = new Button("Add Bookmark",new SelectionListener<ButtonEvent>() {
+		loadButton.setToolTip(new ToolTipConfig("Refresh objects"));
+		loadButton.setIcon(IconHelper.createStyle("arrow_refresh"));
+		addButton = new Button("Add",new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
 				showInputPanel();
 			}
 		});
+		addButton.setToolTip(new ToolTipConfig("Add Object"));
+		addButton.setIcon(IconHelper.createStyle("add"));		
 		addButton(loadButton);
-		addButton(bookmarkButton);
+		addButton(addButton);
 		grid.addListener(Events.CellMouseUp, new Listener<GridEvent<BaseModel>>() {
             public void handleEvent(GridEvent<BaseModel> ge) {
                 int rowIndex = ge.getRowIndex();
@@ -121,7 +133,7 @@ public class BookmarkWindowList extends WindowPlus {
     				String key = selected.get("key").toString();
     				//getBookmarkPreview(key);
     				getBookmarkWindow(table, key);
-    				setPosition(600,200);
+    				//setPosition(600,200);
                 }
             }
         });
@@ -209,7 +221,7 @@ public class BookmarkWindowList extends WindowPlus {
 		if (inputPanel == null) inputPanel = buildPanel();
 		mainContainer.remove(grid);
 		loadButton.disable();
-		bookmarkButton.disable();
+		addButton.disable();
 		mainContainer.setLayout(centerLayout);
 		mainContainer.add(inputPanel);
 		mainContainer.layout();
@@ -228,7 +240,7 @@ public class BookmarkWindowList extends WindowPlus {
 				mainContainer.setLayout(fitLayout);
 				mainContainer.add(grid);
 				loadButton.enable();
-				bookmarkButton.enable();
+				addButton.enable();
 				mainContainer.layout();
 				loadBookmark();
 			}
@@ -236,32 +248,53 @@ public class BookmarkWindowList extends WindowPlus {
 	}
 
 	private void fillGrid(List<Bookmark> bookmarks) {
-		BaseModel model;
-
+		
 		for (final Bookmark bookmark : bookmarks) {
-			model = new BaseModel();
+			allTags.addAll(bookmark.getTag());
+			final BaseModel model = new BaseModel();
 			model.set("key", bookmark.getKey());
 			model.set("title", bookmark.getTitle());
 			model.set("url", bookmark.getUrl());
 			model.set("legend", bookmark.getLegend());
+			bookmarkService.getComments(bookmark.getKey(),new AsyncCallback<List<Comment>>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					GWT.log("Unable to load the comment's number", caught);
+					Info.display("Error", "Unable to load the comment's number.");
+					unmask();
+				}
+				@Override
+				public void onSuccess(List<Comment> result) {
+					model.set("comment",  result.size());
+				}				
+			});
+			model.set("tag", bookmark.getTagString());
+			model.set("annotation", bookmark.getAnnotationNumber());
 			bookmarksStore.add(model);
 		}
 		contextMenu.setEnabled(bookmarksStore.getCount() > 0);
 	}
 
 	private ColumnModel getColumnModel() {
-		ColumnConfig title = new ColumnConfig("title", "Title", 100);
-		ColumnConfig url = new ColumnConfig("url", "Url", 150);
-		ColumnConfig legend = new ColumnConfig("legend", "Legend", 250);
+		ColumnConfig title = new ColumnConfig("title", "Title", 80);
+		ColumnConfig url = new ColumnConfig("url", "Url", 170);
+		ColumnConfig legend = new ColumnConfig("legend", "Legend", 145);
+		ColumnConfig comment = new ColumnConfig("comment", "Comment", 60);
+		ColumnConfig tag = new ColumnConfig("tag", "Tag", 100);
+		ColumnConfig annotation = new ColumnConfig("annotation", "Annotation", 60);
 		List<ColumnConfig> config = new ArrayList<ColumnConfig>();
 		config.add(title);
 		config.add(url);
 		config.add(legend);
+		config.add(comment);
+		config.add(tag);
+		config.add(annotation);
 		return new ColumnModel(config);
 	}
 
 	private FormPanel buildPanel() {
 		final FormPanel panel = new FormPanel();
+		panel.setLayoutData(Orientation.HORIZONTAL);
 		FormData formData = new FormData("-20");
 		panel.setHeading("New Bookmark");
 		panel.setFrame(true);
@@ -293,8 +326,31 @@ public class BookmarkWindowList extends WindowPlus {
 		comment.setPreventScrollbars(true);
 		comment.setFieldLabel("Comment");
 		comment.setAllowBlank(true);
-		panel.add(comment, formData);	
-	      
+		panel.add(comment, formData);
+		
+		final TextArea annotation = new TextArea();
+		annotation.setHeight(20);
+		annotation.setPreventScrollbars(true);
+		annotation.setFieldLabel("Annotation");
+		annotation.setAllowBlank(true);
+		panel.add(annotation, formData);	
+		
+
+	    ListStore<BaseModel> store = new ListStore<BaseModel>();  
+	    for (String s: allTags){
+	    	BaseModel bm= new BaseModel();
+	    	bm.set("value", s);
+	    	store.add(bm);  
+	    }
+	    
+	    combo.setFieldLabel("Tag");  
+	    combo.setDisplayField("value");  
+	    combo.setTriggerAction(TriggerAction.ALL);  
+	    combo.setStore(store);  
+	    panel.add(combo, formData);  		
+
+	
+		
 		Button saveButton = new Button("Save");
 		panel.addButton(saveButton);
 		Button cancelButton = new Button("Cancel");
@@ -309,7 +365,7 @@ public class BookmarkWindowList extends WindowPlus {
 				mainContainer.setLayout(fitLayout);
 				mainContainer.add(grid);
 				loadButton.enable();
-				bookmarkButton.enable();
+				addButton.enable();
 				mainContainer.layout();
 			}
 		});
@@ -320,12 +376,16 @@ public class BookmarkWindowList extends WindowPlus {
 				bookmark.setTitle(title.getValue());
 				bookmark.setUrl(url.getValue());
 				bookmark.setLegend(legend.getValue());
-				
-				System.out.println(bookmark.toString());
+				if (annotation.getValue()!=null)
+					bookmark.addAnnotation(annotation.getValue());
+				if (combo.getValue().get("value", null)!=null)
+					bookmark.addTag(combo.getValue().get("value", null).toString());
 				title.clear();
 				url.clear();
 				legend.clear();
 				comment.clear();
+				annotation.clear();
+				combo.clear();
 				shareBookmark(bookmark);
 			}
 		});
