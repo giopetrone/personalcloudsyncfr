@@ -98,6 +98,9 @@ public class Bookmark implements Serializable {
 	public List<String> getAnnotation() {	
 		return annotation;
 	}
+	public int getAnnotationNumber() {	
+		return getAnnotation().size();
+	}
 	
 	public LinkedList<String> getTag() {	
 		return tag;
@@ -106,7 +109,9 @@ public class Bookmark implements Serializable {
 	public String getTagString() {	
 		String listTag="";
 		for(String t: tag) listTag+=t+", ";
-		return listTag.substring(0, listTag.length()-2);
+		if (listTag.length()>0)
+			return listTag.substring(0, listTag.length()-2);
+		else return "No Tag";
 	}	
 	
 	public LinkedList<Comment> getComments(){		
@@ -148,6 +153,22 @@ public class Bookmark implements Serializable {
 	public void removeTag(int tag) {
 		this.getTag().remove(tag);
 		
+	}
+
+	public void addAnnotation(String value) {
+		this.getAnnotation().add(value);
+	}
+
+	public String getAnnotationString() {
+		String listAnnotation="";
+		for(String a: getAnnotation()) listAnnotation+=a+", ";
+		if (listAnnotation.length()>0)
+			return listAnnotation.substring(0, listAnnotation.length()-2);
+		else return "No Annotation";
+	}
+
+	public void removeAnnotation(int annotation) {
+		this.getAnnotation().remove(annotation);
 	}
 
 }
