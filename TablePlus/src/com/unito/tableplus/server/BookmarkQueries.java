@@ -171,4 +171,42 @@ public class BookmarkQueries {
 		return result;
 	}
 
+	public static boolean addAnnotation(String key, String annotation) {
+		PersistenceManager pm = ServiceFactory.getPmfInstance().getPersistenceManager();
+		Bookmark bookmark = null;
+		Boolean result=false;
+		try {
+			Object object = pm.getObjectById(Bookmark.class, key);
+			bookmark = (Bookmark) pm.detachCopy(object);
+			bookmark.addAnnotation(annotation);
+			pm.makePersistent(bookmark);
+			result=true;
+		} catch (Exception e) {
+			System.err.println("There has been an error adding annotation: " + e);
+			
+		} finally {
+			pm.close();
+		}
+		return result;
+	}
+
+	public static boolean removeAnnotation(String key, int annotation) {
+		PersistenceManager pm = ServiceFactory.getPmfInstance().getPersistenceManager();
+		Bookmark bookmark = null;
+		Boolean result=false;
+		try {
+			Object object = pm.getObjectById(Bookmark.class, key);
+			bookmark = (Bookmark) pm.detachCopy(object);
+			bookmark.removeAnnotation(annotation);
+			pm.makePersistent(bookmark);
+			result=true;
+		} catch (Exception e) {
+			System.err.println("There has been an error deleting annotation: " + e);
+			
+		} finally {
+			pm.close();
+		}
+		return result;
+	}
+
 }
