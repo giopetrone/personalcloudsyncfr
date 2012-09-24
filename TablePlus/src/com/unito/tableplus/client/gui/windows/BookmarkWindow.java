@@ -52,30 +52,39 @@ public class BookmarkWindow extends WindowPlus {
 	private LayoutContainer mainContainer;
 	private HtmlContainer historyContainer;
 	private TextArea inputArea;	
-	private  Bookmark b;
+	private Bookmark resource;
 	private String message ="<div align=\"left\"><br><b>Comments :<br><br></b></div>";	
 	private Radio radio = new Radio();  
 	private Radio radio2 = new Radio();
 	private FlexTable ftable = new FlexTable();
 	private HorizontalPanel hpp= new HorizontalPanel();
 	private HorizontalPanel hpTag= new HorizontalPanel();  
+	private HorizontalPanel hpAnnotation= new HorizontalPanel();  
 	private HorizontalPanel hpTag2;  
-	private Button saveButton = new Button("Save");
-	private Button cancelButton = new Button("Cancel");
+	private HorizontalPanel hpAnnotation2;  
+	private Button saveTag = new Button("Save");
+	private Button cancelTag = new Button("Cancel");
+	private Button saveLegend = new Button("Save");
+	private Button cancelLegend = new Button("Cancel");
+	private Button saveAnnotation = new Button("Save");
+	private Button cancelAnnotation = new Button("Cancel");
 	private ListBox listTag;
-	private TextArea inputTag;
+	private ListBox listAnnotation;
+	private TextArea inputAnnotation;
 	private Button editLegendButton=new Button("Edit");
 	private Button removeTag=new Button("Remove");
 	private Button addTag=new Button("Add");
-
+	private Button removeAnnotation=new Button("Remove");
+	private Button addAnnotation=new Button("Add");
+	private TextArea inputTag = new TextArea();
 	
 	public BookmarkWindow(final Table table){
 	
-//	public BookmarkWindow(final Table table, Bookmark b){
+	//public BookmarkWindow(final Table table, Bookmark resource){
 		super();
 		this.table = table;
-//		this.b=b;
-		setSize(570,500);
+		//this.resource=resource;
+		setSize(590,500);
 		
 		setLayout(new RowLayout(Orientation.VERTICAL));
 				
@@ -83,6 +92,7 @@ public class BookmarkWindow extends WindowPlus {
 		mainContainer.setScrollMode(Scroll.AUTO);			
 
 		getObject();
+		//System.out.println("creata finestra!!!"+resource.toString());
 
 	}
 	
@@ -98,7 +108,7 @@ public class BookmarkWindow extends WindowPlus {
 			}
 			@Override
 			public void onSuccess(List<Bookmark> result) {			
-				b=result.get(0);
+				resource=result.get(0);
 		//fine parte provvisoria	
 				refresh();
 				setTitle();
@@ -114,41 +124,52 @@ public class BookmarkWindow extends WindowPlus {
 	
 	private void setTitle() {
 		//title	
-		setHeading("Bookmark: "+b.getTitle());
-		Html title= new Html("<div align=\"center\"><b>\nThe bookmak <u>"+b.getTitle()+"</u> has been shared on this table\n\n</b></div> ");
+		String objectName=resource.getClass().getName().substring(33);
+		setHeading(objectName+": "+resource.getTitle());
+		Html title= new Html("<div align=\"center\"><b>\nThe "+objectName
+				+" <u>"+resource.getTitle() +"</u> has been shared on this table\n\n</b></div> ");
 		title.setHeight(30);
+		title.setStyleAttribute("padding-top", "7px");
 		add(title);
-	}
+	} 
 	
 	private void setFrame() {
 		//frame anteprima				
 		LayoutContainer preview=  new LayoutContainer();
 		preview.add(hpp);
-		hpp.add( new Html("<iframe src='"+b.getUrl()+" width='300'; height='200'<p><a href='"+b.getUrl()+"'>"+b.getTitle()+"</a></p></iframe>"));
+		hpp.setStyleAttribute("padding-left", "7px");
+		hpp.add( new Html("<iframe src='"+resource.getUrl()+" width='300'; height='223'<p><a href='"+resource.getUrl()+"'>"+resource.getTitle()+"</a></p></iframe>"));
 		add(preview);
 	}
 	
 	private void createFlexTable() {
 		ftable.insertRow(0);
 		ftable.insertRow(1);
+		ftable.insertRow(2);
 		ftable.addCell(0);
 		ftable.addCell(0);
 		ftable.addCell(1);
 		ftable.addCell(1);
-
+		ftable.addCell(2);
+		ftable.addCell(2);
+		
 		hpp.add(ftable);
-		ftable.setHeight("200px");
+		ftable.setHeight("223px");
 		
 		ftable.getCellFormatter().addStyleName(0, 0,"FlexTable-text0");		
 		ftable.getCellFormatter().addStyleName(0, 1,"FlexTable-button0");
 		
 		ftable.getCellFormatter().addStyleName(1, 0,"FlexTable-text1");
 		ftable.getCellFormatter().addStyleName(1, 1,"FlexTable-button1");
+		
+		ftable.getCellFormatter().addStyleName(2, 0,"FlexTable-text2");
+		ftable.getCellFormatter().addStyleName(2, 1,"FlexTable-button2");
 //legend				
 		ftable.setWidget(0, 0, getHtmlLegend());
 //edit legend				
 		
 		editLegendButton.setWidth(65);
+		editLegendButton.setStyleAttribute("padding-left", "10px");
 		editLegendButton.setToolTip(new ToolTipConfig("Edit the bookmark's legend"));
 		editLegendButton.setIcon(IconHelper.createStyle("edit"));			
 		ftable.setWidget(0, 1, editLegendButton);
@@ -163,12 +184,13 @@ public class BookmarkWindow extends WindowPlus {
 		ftable.setWidget(1, 0, getTag());
 //add tag		
 		VerticalPanel vp= new VerticalPanel();
-		vp.setSpacing(6);
-		
 		addTag.setWidth(65);
 		addTag.setToolTip(new ToolTipConfig("Add a new tag to bookmark"));
-		addTag.setIcon(IconHelper.createStyle("addTag"));			
+		addTag.setIcon(IconHelper.createStyle("addTag"));		
+		vp.setStyleAttribute("padding-left", "10px");
+
 		vp.add(addTag);
+		addTag.setStyleAttribute("padding-bottom", "5px");
 		addTag.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			public void componentSelected(ButtonEvent ce) {
 				addTag.disable();
@@ -177,21 +199,55 @@ public class BookmarkWindow extends WindowPlus {
 			}
 		});		
 	
-//remove tag			
-		
+//remove tag				
 		removeTag.setWidth(65);
-
-		removeTag.setToolTip(new ToolTipConfig("Remove a tag to bookmark"));
+		removeTag.setToolTip(new ToolTipConfig("Remove a tag from bookmark"));
 		removeTag.setIcon(IconHelper.createStyle("removeTag"));		
 		vp.add(removeTag);
 		ftable.setWidget(1, 1,vp);	
+		if(resource.getTag().size()==0) removeTag.disable();
 		removeTag.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			public void componentSelected(ButtonEvent ce) {
 				addTag.disable();
 				removeTag.disable();
 				ftable.setWidget(1, 0, setFormRemoveTag());
 			}
+		});	
+//annotation				
+		ftable.setWidget(2, 0, getAnnotation());
+//add annotation		
+		VerticalPanel vp2= new VerticalPanel();
+		vp2.setStyleAttribute("padding-left", "10px");
+
+		addAnnotation.setWidth(65);
+		addAnnotation.setToolTip(new ToolTipConfig("Add annotation to bookmark"));
+		addAnnotation.setIcon(IconHelper.createStyle("addTag"));	
+		addAnnotation.setStyleAttribute("padding-bottom", "5px");
+
+		vp2.add(addAnnotation);
+		addAnnotation.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			public void componentSelected(ButtonEvent ce) {
+				addAnnotation.disable();
+				removeAnnotation.disable();
+				ftable.setWidget(2, 0, setFormAnnotation());
+			}
 		});		
+			
+//remove annotation			
+		removeAnnotation.setWidth(65);
+		if(resource.getAnnotation().size()==0) removeAnnotation.disable();
+		removeAnnotation.setToolTip(new ToolTipConfig("Remove annotation's bookmark"));
+		removeAnnotation.setIcon(IconHelper.createStyle("removeTag"));		
+		vp2.add(removeAnnotation);
+		ftable.setWidget(2, 1,vp2);	
+		removeAnnotation.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			public void componentSelected(ButtonEvent ce) {
+				addAnnotation.disable();
+				removeAnnotation.disable();
+				ftable.setWidget(2, 0, setFormRemoveAnnotation());
+			}
+		});			
+	
 	}
 		
 	private void createCommentPanel() {
@@ -264,7 +320,7 @@ public class BookmarkWindow extends WindowPlus {
 		goButton.setIcon(IconHelper.createStyle("go"));
 		goButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			public void componentSelected(ButtonEvent ce) {
-				Window.open(b.getUrl(), "", "left=100,top=100,width=600,height=400,menubar,toolbar,resizable");
+				Window.open(resource.getUrl(), "", "left=100,top=100,width=600,height=400,menubar,toolbar,resizable");
 			}
 		});	
 		//bottone commento
@@ -274,7 +330,7 @@ public class BookmarkWindow extends WindowPlus {
 							    
 		commentButton.addSelectionListener(new SelectionListener<ButtonEvent>(){
 			public void componentSelected(ButtonEvent ce) {
-		   	  	final CommentsPopup popup = new CommentsPopup(b, table);
+		   	  	final CommentsPopup popup = new CommentsPopup(resource, table);
 		   	   	popup.setStyleName("popup");
 		       	popup.setPopupPositionAndShow(new PopupPanel.PositionCallback() {
 		           	public void setPosition(int offsetWidth, int offsetHeight) {
@@ -308,7 +364,7 @@ public class BookmarkWindow extends WindowPlus {
 
 	private Widget getHtmlLegend() {
 		return new Html("<div style=\"padding-left:10px;\"><b>Legend:</b>" +
-				"<div style=\"padding-top:5px;padding-bottom:5px\">"+b.getLegend()+"</div></div>");
+				"<div style=\"padding-top:5px;padding-bottom:5px\">"+resource.getLegend()+"</div></div>");
 	}
 
 	private void addComment() {
@@ -320,7 +376,7 @@ public class BookmarkWindow extends WindowPlus {
 			else {
 				c = new Comment(inputArea.getValue(), TablePlus.getUser().getEmail(), VisibilityType.PRIVATE);	
 			}
-			bookmarkService.addComment(b.getKey(), c,new AsyncCallback<Boolean>() {
+			bookmarkService.addComment(resource.getKey(), c,new AsyncCallback<Boolean>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GWT.log("Failed to add comment to bookmark: ", caught);
@@ -337,11 +393,11 @@ public class BookmarkWindow extends WindowPlus {
 	}
 	
 	public void loadComments() {
-		bookmarkService.getComments(b.getKey(),new AsyncCallback<List<Comment>>() {
+		bookmarkService.getComments(resource.getKey(),new AsyncCallback<List<Comment>>() {
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				GWT.log("Unable to load comments of bookmarks: "+ b.getTitle(), caught);
+				GWT.log("Unable to load comments of bookmarks: "+ resource.getTitle(), caught);
 				Info.display("Error", "Unable to load comments.");
 				unmask();
 			}
@@ -387,45 +443,38 @@ public class BookmarkWindow extends WindowPlus {
 	}	
 	
 	public LayoutContainer setFormLegend(){
-		
 		final LayoutContainer panel = new LayoutContainer();
 		panel.setStyleAttribute("padding-left", "10px");
-		
 		Label label=new Label("Insert the new legend:");
-		panel.setHeight(120);
-		
-		label.setStyleAttribute("padding-bottom", "10px");
+		label.setStyleAttribute("padding-bottom", "5px");
 		panel.add(label);	
-		
 		final TextArea legend = new TextArea();
-		legend.setHeight(50);
-		legend.setWidth(120);
-		legend.setValue(b.getLegend());
+		legend.setHeight(35);
+		legend.setWidth(150);
+		legend.setValue(resource.getLegend());
 		legend.setPreventScrollbars(true);
 		legend.setAllowBlank(false);
-		legend.setStyleAttribute("padding-top", "10px");
-		legend.setStyleAttribute("padding-bottom", "10px");
+		legend.setStyleAttribute("padding-top", "5px");
+		legend.setStyleAttribute("padding-bottom", "5px");
 		panel.add(legend);	
 		
 	    HorizontalPanel hp= new HorizontalPanel();  
-	    hp.setStyleAttribute("padding-top", "17px");
+	    hp.setStyleAttribute("padding-top", "10px");
 	    hp.setHorizontalAlign(HorizontalAlignment.LEFT);
-		Button saveButton = new Button("Save");
-		saveButton.setHeight(20);
-		hp.add(saveButton);
-		saveButton.setStyleAttribute("padding-right", "10px");
+		saveLegend.setHeight(20);
+		hp.add(saveLegend);
+		saveLegend.setStyleAttribute("padding-right", "10px");
 		
-		Button cancelButton = new Button("Cancel");
-		cancelButton.setHeight(20);
-		hp.add(cancelButton);
-		cancelButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+		cancelLegend.setHeight(20);
+		hp.add(cancelLegend);
+		cancelLegend.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
 				ftable.setWidget(0, 0, getHtmlLegend());
 				editLegendButton.enable();
 			}
 		});
-		saveButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+		saveLegend.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
 				editLegend(legend.getValue());
@@ -437,10 +486,8 @@ public class BookmarkWindow extends WindowPlus {
 	}
 	
 	public LayoutContainer setFormTag(){
-
 		final LayoutContainer panel = new LayoutContainer();
 		panel.setStyleAttribute("padding-left", "10px");
-		panel.setHeight(80);
 		Label label=new Label("Add a tag to bookmark:");		
 		label.setStyleAttribute("padding-bottom", "10px");
 		panel.add(label);	
@@ -451,40 +498,44 @@ public class BookmarkWindow extends WindowPlus {
 
 		inputTag = new TextArea();
 		inputTag.setHeight(20);
-		inputTag.setWidth(60);
+		
 		inputTag.setPreventScrollbars(true);
 		inputTag.setAllowBlank(false);
 		inputTag.setStyleAttribute("padding-rigth", "10px");
-		inputTag.setValue(b.getTag().get(0));
 		
-		listTag = new ListBox();
-		if(b.getTag().size()>0) {
-			for (String tag : b.getTag()) {
+		
+		if(resource.getTag().size()>0) {
+			inputTag.setValue(resource.getTag().get(0));
+			listTag = new ListBox();
+			inputTag.setWidth(60);
+			for (String tag : resource.getTag()) {
 				listTag.addItem(tag);
 			}
 			listTag.setHeight("20px");
+			listTag.setWidth("80px");
 			listTag.addChangeHandler(new ChangeHandler(){
 				@Override
 				public void onChange(ChangeEvent event) {
 					inputTag.setValue(listTag.getItemText(listTag.getSelectedIndex()));
 				}
 			 });
+			hp1.add(listTag);
 		}	
-		
+		else inputTag.setWidth(140);
 		hp1.add(inputTag);	
-		hp1.add(listTag);
+		
 				
 	    hpTag.setStyleAttribute("padding-top", "7px");
 	    hpTag.setHorizontalAlign(HorizontalAlignment.LEFT);
 		
-		hpTag.add(saveButton);
-		saveButton.setStyleAttribute("padding-right", "10px");
-		saveButton.setHeight(20);
+		hpTag.add(saveTag);
+		saveTag.setStyleAttribute("padding-right", "10px");
+		saveTag.setHeight(20);
 		
-		cancelButton.setHeight(20);
-		hpTag.add(cancelButton);
+		cancelTag.setHeight(20);
+		hpTag.add(cancelTag);
 
-		cancelButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+		cancelTag.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
 				ftable.setWidget(1, 0, getTag());
@@ -492,7 +543,7 @@ public class BookmarkWindow extends WindowPlus {
 				removeTag.enable();
 			}
 		});
-		saveButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+		saveTag.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
 				addTag(inputTag.getValue().toUpperCase());
@@ -503,13 +554,11 @@ public class BookmarkWindow extends WindowPlus {
 		panel.add(hpTag);
 		return panel;
 	}
-	
 	public LayoutContainer setFormRemoveTag(){
 		final LayoutContainer panel = new LayoutContainer();
 		panel.setStyleAttribute("padding-left", "10px");
-		panel.setHeight(80);
 		Label label=new Label("Remove a tag to bookmark:");		
-		label.setStyleAttribute("padding-bottom", "10px");
+		label.setStyleAttribute("padding-bottom", "5px");
 		panel.add(label);	
 		
 	    HorizontalPanel hp1= new HorizontalPanel();  
@@ -517,36 +566,39 @@ public class BookmarkWindow extends WindowPlus {
 	    hp1.setStyleAttribute("padding-top", "5px");
 	    
 	    listTag = new ListBox();
-		for (String tag : b.getTag()) {
+		for (String tag : resource.getTag()) {
 			listTag.addItem(tag);
 		}
+		
 		listTag.setHeight("20px");
+		listTag.setWidth("120px");
+
 		hp1.add(listTag);
 		hpTag2= new HorizontalPanel();	
-	    hpTag2.setStyleAttribute("padding-top", "7px");
+	    hpTag2.setStyleAttribute("padding-top", "5px");
 	    hpTag2.setHorizontalAlign(HorizontalAlignment.LEFT);
-		Button removeButton= new Button("Remove");
-		hpTag2.add(removeButton);
 		
-		removeButton.setStyleAttribute("padding-right", "10px");
-		removeButton.setHeight(20);
+		Button remove=new Button("Remove");
+		remove.setStyleAttribute("padding-right", "10px");
+		remove.setHeight(20);
+		hpTag2.add(remove);
 		
-		cancelButton.setHeight(20);
-		hpTag2.add(cancelButton);
+		cancelTag.setHeight(20);
+		hpTag2.add(cancelTag);
 
-		cancelButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+		cancelTag.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
 				addTag.enable();
-				removeTag.enable();
+				if(resource.getTag().size()>0) removeTag.enable();
 				ftable.setWidget(1, 0, getTag());
 			}
 		});
-		removeButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+		remove.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
 				addTag.enable();
-				removeTag.enable();
+				if(resource.getTag().size()>0)  removeTag.enable();
 				removeTag(listTag.getSelectedIndex());
 			}
 		});
@@ -556,11 +608,11 @@ public class BookmarkWindow extends WindowPlus {
 	
 	public Widget getTag() {
 		return new Html("<div style=\"padding-left:10px;\"><b>Tag:</b>" +
-				"<div style=\"padding-top:5px;\">"+b.getTagString()+"</div></div>");
+				"<div style=\"padding-top:5px;\">"+resource.getTagString()+"</div></div>");
 	}
 
 	public void addTag(final String tag) {
-		bookmarkService.addTag(b.getKey(),tag, new AsyncCallback<Boolean>() {
+		bookmarkService.addTag(resource.getKey(),tag, new AsyncCallback<Boolean>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GWT.log("Unable to add tag! ", caught);
@@ -571,15 +623,15 @@ public class BookmarkWindow extends WindowPlus {
 			public void onSuccess(Boolean result) {
 				GWT.log("Successfully added tag! ");
 				Info.display("Success", "Successfully added tag");
-				b.addTag(tag);
+				resource.addTag(tag);
 				ftable.setWidget(1, 0, getTag());
 			}
 		});		
-		
+		removeTag.enable();
 	}
 
 	public void removeTag(final int tag) {
-		bookmarkService.removeTag(b.getKey(),tag, new AsyncCallback<Boolean>() {
+		bookmarkService.removeTag(resource.getKey(),tag, new AsyncCallback<Boolean>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GWT.log("Unable to remove tag! ", caught);
@@ -590,7 +642,7 @@ public class BookmarkWindow extends WindowPlus {
 			public void onSuccess(Boolean result) {
 				GWT.log("Successfully removed tag! ");
 				Info.display("Success", "Successfully removed tag");
-				b.removeTag(tag);
+				resource.removeTag(tag);
 				ftable.setWidget(1, 0, getTag());
 			}
 		});		
@@ -598,7 +650,7 @@ public class BookmarkWindow extends WindowPlus {
 	}
 	
 	public void editLegend(final String value) {
-		bookmarkService.editLegend(b.getKey(),value, new AsyncCallback<Boolean>() {
+		bookmarkService.editLegend(resource.getKey(),value, new AsyncCallback<Boolean>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GWT.log("Unable to edit the bookmark's legend! ", caught);
@@ -609,14 +661,14 @@ public class BookmarkWindow extends WindowPlus {
 			public void onSuccess(Boolean result) {
 				GWT.log("Successfully edited bookmark's legend! ");
 				Info.display("Succes", "Successfully edited bookmark's legend.");
-				b.setLegend(value);
+				resource.setLegend(value);
 				ftable.setWidget(0, 0, getHtmlLegend());
 			}
 		});			
 	}
 
 	public void refresh() {
-		bookmarkService.queryBookmark(b.getKey(),new AsyncCallback<Bookmark>() {
+		bookmarkService.queryBookmark(resource.getKey(),new AsyncCallback<Bookmark>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GWT.log("Unable to load the bookmark! ", caught);
@@ -624,15 +676,153 @@ public class BookmarkWindow extends WindowPlus {
 			}
 			@Override
 			public void onSuccess(Bookmark result) {			
-				b=result;
+				resource=result;
 				ftable.setWidget(0, 0, getHtmlLegend());
 				ftable.setWidget(1, 0, getTag());
 				loadComments();	
-
 			}
 		});
 	}
+	
+	public Widget getAnnotation() {
+		return new Html("<div style=\"padding-left:10px;\"><b>Annotation:</b>" +
+				"<div style=\"padding-top:5px;\">"+resource.getAnnotationString()+"</div></div>");
+	}
+	
+	public LayoutContainer setFormAnnotation(){
+		final LayoutContainer panel = new LayoutContainer();
+		panel.setStyleAttribute("padding-left", "10px");
+		Label label=new Label("Add annotation to bookmark:");		
+		label.setStyleAttribute("padding-bottom", "5px");
+		panel.add(label);	
+		
+		inputAnnotation = new TextArea();
+		inputAnnotation.setHeight(20);
+		inputAnnotation.setWidth(150);
+		inputAnnotation.setPreventScrollbars(true);
+		inputAnnotation.setAllowBlank(false);
+		inputAnnotation.setStyleAttribute("padding-rigth", "10px");
+		inputAnnotation.setStyleAttribute("padding-top", "5px");
+		panel.add(inputAnnotation);
+				
+	    hpAnnotation.setHorizontalAlign(HorizontalAlignment.LEFT);
+		
+	    hpAnnotation.add(saveAnnotation);
+	    hpAnnotation.setStyleAttribute("padding-top", "10px");
+		saveAnnotation.setStyleAttribute("padding-right", "10px");
+		saveAnnotation.setHeight(20);
+		
+		cancelAnnotation.setHeight(20);
+		hpAnnotation.add(cancelAnnotation);
 
+		cancelAnnotation.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				ftable.setWidget(2, 0, getAnnotation());
+				addAnnotation.enable();
+				if(resource.getAnnotation().size()>0) removeAnnotation.enable();
+			}
+		});
+		saveAnnotation.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				addAnnotation(inputAnnotation.getValue());
+				addAnnotation.enable();
+				if(resource.getAnnotation().size()>0)  removeAnnotation.enable();
+			}
+		});
+		panel.add(hpAnnotation);
+		return panel;
+	}
+
+	public void addAnnotation(final String annotation) {
+		bookmarkService.addAnnotation(resource.getKey(),annotation, new AsyncCallback<Boolean>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				GWT.log("Unable to add annotation! ", caught);
+				Info.display("Error", "Unable to add annotation.");
+				unmask();
+			}
+			@Override
+			public void onSuccess(Boolean result) {
+				GWT.log("Successfully added tag! ");
+				Info.display("Success", "Successfully added annotation");
+				resource.addAnnotation(annotation);
+				ftable.setWidget(2, 0, getAnnotation());
+			}
+		});		
+		removeAnnotation.enable();
+	}
+
+	public LayoutContainer setFormRemoveAnnotation(){
+		final LayoutContainer panel = new LayoutContainer();
+		panel.setStyleAttribute("padding-left", "10px");
+		Label label=new Label("Remove annotation:");		
+		label.setStyleAttribute("padding-bottom", "5px");
+		panel.add(label);	
+		
+	    HorizontalPanel hp1= new HorizontalPanel();  
+	    panel.add(hp1);
+	    hp1.setStyleAttribute("padding-top", "5px");
+	    
+	    listAnnotation = new ListBox();
+		for (String annotation : resource.getAnnotation()) {
+			listAnnotation.addItem(annotation);
+		}
+		listAnnotation.setHeight("20px");
+		listAnnotation.setWidth("120px");
+		hp1.add(listAnnotation);
+		hpAnnotation2= new HorizontalPanel();	
+	    hpAnnotation2.setStyleAttribute("padding-top", "5px");
+	    hpAnnotation2.setHorizontalAlign(HorizontalAlignment.LEFT);
+		Button removeButton= new Button("Remove");
+		hpAnnotation2.add(removeButton);
+		
+		removeButton.setStyleAttribute("padding-right", "10px");
+		removeButton.setHeight(20);
+		
+		cancelAnnotation.setHeight(20);
+		hpAnnotation2.add(cancelAnnotation);
+
+		cancelAnnotation.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				addAnnotation.enable();
+				if(resource.getAnnotation().size()>0) removeAnnotation.enable();
+				ftable.setWidget(2, 0, getAnnotation());
+			}
+		});
+		removeButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				addAnnotation.enable();
+				if(resource.getAnnotation().size()>0) removeAnnotation.enable();
+				removeAnnotation(listAnnotation.getSelectedIndex());
+			}
+		});
+		panel.add(hpAnnotation2);
+		return panel;
+	}
+
+	public void removeAnnotation(final int annotation) {
+		bookmarkService.removeAnnotation(resource.getKey(),annotation, new AsyncCallback<Boolean>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				GWT.log("Unable to remove annotation! ", caught);
+				Info.display("Error", "Unable to remove annotation.");
+				unmask();
+			}
+			@Override
+			public void onSuccess(Boolean result) {
+				GWT.log("Successfully removed tag! ");
+				Info.display("Success", "Successfully removed annotation");
+				resource.removeAnnotation(annotation);
+				ftable.setWidget(2, 0, getAnnotation());
+			}
+		});		
+		if (resource.getAnnotation().size()==0) removeAnnotation.disable();
+	}
+	
 }
 
 
