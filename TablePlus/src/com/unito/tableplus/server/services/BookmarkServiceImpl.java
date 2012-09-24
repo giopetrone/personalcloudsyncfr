@@ -60,4 +60,13 @@ public class BookmarkServiceImpl extends RemoteServiceServlet implements Bookmar
 		return BookmarkQueries.removeTag(key, tag);
 	}
 
+	@Override
+	public boolean addAnnotation(String key, String annotation) {
+		return BookmarkQueries.addAnnotation(key, annotation);
+	}
+	
+	@Override
+	public boolean removeAnnotation(String key, int annotation) {
+		return BookmarkQueries.removeAnnotation(key, annotation);
+	}
 }
