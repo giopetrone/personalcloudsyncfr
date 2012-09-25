@@ -12,11 +12,15 @@ import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.GridEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MenuEvent;
+import com.extjs.gxt.ui.client.event.SelectionChangedEvent;
+import com.extjs.gxt.ui.client.event.SelectionChangedListener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.util.IconHelper;
 import com.extjs.gxt.ui.client.util.Margins;
+import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.Info;
+import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.Layout;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
@@ -37,7 +41,10 @@ import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.unito.tableplus.client.services.BookmarkService;
 import com.unito.tableplus.client.services.BookmarkServiceAsync;
@@ -64,7 +71,7 @@ public class BookmarkWindowList extends WindowPlus {
 	private Menu contextMenu;
 	private MenuItem deleteItem;
 	private List<String> allTags= new LinkedList<String>();
-	private ComboBox<BaseModel> combo = new ComboBox<BaseModel>();  
+
 	
 	public BookmarkWindowList(final Table table) {
 		super();
@@ -295,7 +302,7 @@ public class BookmarkWindowList extends WindowPlus {
 	private FormPanel buildPanel() {
 		final FormPanel panel = new FormPanel();
 		panel.setLayoutData(Orientation.HORIZONTAL);
-		FormData formData = new FormData("-20");
+		final FormData formData = new FormData("-20");
 		panel.setHeading("New Bookmark");
 		panel.setFrame(true);
 		panel.setWidth(350);
@@ -333,23 +340,15 @@ public class BookmarkWindowList extends WindowPlus {
 		annotation.setPreventScrollbars(true);
 		annotation.setFieldLabel("Annotation");
 		annotation.setAllowBlank(true);
-		panel.add(annotation, formData);	
-		
+		panel.add(annotation, formData);
 
-	    ListStore<BaseModel> store = new ListStore<BaseModel>();  
-	    for (String s: allTags){
-	    	BaseModel bm= new BaseModel();
-	    	bm.set("value", s);
-	    	store.add(bm);  
-	    }
-	    
-	    combo.setFieldLabel("Tag");  
-	    combo.setDisplayField("value");  
-	    combo.setTriggerAction(TriggerAction.ALL);  
-	    combo.setStore(store);  
-	    panel.add(combo, formData);  		
-
-	
+		final TextArea tag = new TextArea();
+		tag.setHeight(20);
+		tag.setPreventScrollbars(true);
+		tag.setFieldLabel("Tag");
+		tag.setAllowBlank(true);
+		panel.add(tag, formData);
+		tag.setToolTip("All existing tags: \n"+allTags.toString());
 		
 		Button saveButton = new Button("Save");
 		panel.addButton(saveButton);
@@ -378,14 +377,14 @@ public class BookmarkWindowList extends WindowPlus {
 				bookmark.setLegend(legend.getValue());
 				if (annotation.getValue()!=null)
 					bookmark.addAnnotation(annotation.getValue());
-				if (combo.getValue().get("value", null)!=null)
-					bookmark.addTag(combo.getValue().get("value", null).toString());
+				if (tag.getValue()!=null)
+					bookmark.addTag(tag.getValue().toUpperCase());
 				title.clear();
 				url.clear();
 				legend.clear();
 				comment.clear();
 				annotation.clear();
-				combo.clear();
+				tag.clear();
 				shareBookmark(bookmark);
 			}
 		});
