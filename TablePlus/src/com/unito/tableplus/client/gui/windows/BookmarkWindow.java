@@ -353,6 +353,7 @@ public class BookmarkWindow extends WindowPlus {
 		});	
 		//pannello bottoni				
 		HorizontalPanel hpButton= new HorizontalPanel();
+		hpButton.setSpacing(6);
 		hpButton.add(commentButton);
 		hpButton.add(refreshButton);
 		hpButton.add(goButton);
