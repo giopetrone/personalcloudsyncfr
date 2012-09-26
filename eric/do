@@ -1,8 +1,0 @@
-svn delete -m " " https://personalcloudsyncfr.googlecode.com/svn/.eric4project
-svn delete -m " " https://personalcloudsyncfr.googlecode.com/svn/__init__.py
-svn delete -m " " https://personalcloudsyncfr.googlecode.com/svn/build.xml
-svn delete -m " " https://personalcloudsyncfr.googlecode.com/svn/main.py
-svn delete -m " " https://personalcloudsyncfr.googlecode.com/svn/minibrowser.py
-svn delete -m " " https://personalcloudsyncfr.googlecode.com/svn/primo.e4p
-svn delete -m " " https://personalcloudsyncfr.googlecode.com/svn/script.py
-
