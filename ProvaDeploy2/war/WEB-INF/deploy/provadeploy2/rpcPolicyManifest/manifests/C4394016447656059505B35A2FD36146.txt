@@ -1,2 +1,0 @@
-serviceClass: mui.client.services.TokenService
-path: 1FC554CCBB0DE4D253CB8B9790EE5863.gwt.rpc
