@@ -1,2 +1,0 @@
-serviceClass: pckdiprova.client.GreetingService
-path: B16B19EBA1B774A0ADE7580C8EC398F4.gwt.rpc
