@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -32,6 +33,24 @@ import com.unito.tableplus.shared.model.Wallet;
 public class Proxy extends HttpServlet {
 
 	private static final long serialVersionUID = -6455653509373554816L;
+
+	@Override
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException {
+		JSONObject jo = new JSONObject();
+		JSONArray ja = new JSONArray();
+		PrintWriter pw = resp.getWriter();
+		try {
+			ja.put(1);
+			ja.put(4);
+			jo.put("userKeysList", ja);
+			
+			queryUsers(jo, pw);
+
+		} catch (JSONException e) {
+			System.err.println(e);
+		}
+	}
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -61,8 +80,6 @@ public class Proxy extends HttpServlet {
 				writeMessage(jo, pw);
 			else if (request.equals("deleteMessage"))
 				deleteMessage(jo, pw);
-			else if (request.equals("toggleHide"))
-				toggleHide(jo, pw);
 			else if (request.equals("toggleStatus"))
 				toggleStatus(jo, pw);
 			else if (request.equals("setPresence"))
@@ -374,33 +391,6 @@ public class Proxy extends HttpServlet {
 
 		} catch (Exception e) {
 			System.err.println("Error while querying users status.");
-			System.err.println(e);
-		} finally {
-			pw.close();
-		}
-	}
-
-	private void toggleHide(JSONObject jo, PrintWriter pw) {
-		try {
-			Long user = jo.getLong("userKey");
-			Long tableKey = jo.getLong("tableKey");
-			Table table = TableQueries.queryTable(tableKey);
-			// FIXME: getHiddenMembers
-			List<Long> hiddenMembers = table.getMembers();
-
-			if (hiddenMembers.contains(user))
-				hiddenMembers.remove(user);
-			else
-				hiddenMembers.add(user);
-			TableQueries.storeTable(table);
-
-			JSONObject rj = new JSONObject();
-			rj.put("status", "OK");
-			pw.print(rj);
-			pw.flush();
-
-		} catch (Exception e) {
-			System.err.println("Error while toggling hide.");
 			System.err.println(e);
 		} finally {
 			pw.close();
