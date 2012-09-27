@@ -1,8 +1,10 @@
 package com.unito.tableplus.server;
 
 import java.util.List;
+
 import javax.jdo.PersistenceManager;
 import javax.jdo.Transaction;
+
 import com.unito.tableplus.shared.model.Bookmark;
 import com.unito.tableplus.shared.model.Comment;
 

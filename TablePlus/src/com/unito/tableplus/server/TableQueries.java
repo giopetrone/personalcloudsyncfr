@@ -6,8 +6,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+
 import javax.jdo.PersistenceManager;
 import javax.jdo.Transaction;
+
 import com.google.gdata.client.docs.DocsService;
 import com.google.gdata.data.acl.AclEntry;
 import com.google.gdata.data.acl.AclFeed;
@@ -17,9 +19,9 @@ import com.google.gdata.data.docs.DocumentListEntry;
 import com.google.gdata.data.docs.DocumentListFeed;
 import com.google.gdata.util.ServiceException;
 import com.unito.tableplus.server.services.DriveServiceImpl;
+import com.unito.tableplus.shared.model.BlackBoardMessage;
 import com.unito.tableplus.shared.model.Bookmark;
 import com.unito.tableplus.shared.model.DriveFile;
-import com.unito.tableplus.shared.model.BlackBoardMessage;
 import com.unito.tableplus.shared.model.Table;
 import com.unito.tableplus.shared.model.User;
 import com.unito.tableplus.shared.model.Wallet;
@@ -32,6 +34,7 @@ public class TableQueries {
 		try {
 			for (Long key : keys) {
 				Table t = pm.getObjectById(Table.class, key);
+				t.getBlackBoard(); //this is needed because of the lazy behavior
 				tables.add(pm.detachCopy(t));
 			}
 		} catch (Exception e) {
@@ -63,6 +66,7 @@ public class TableQueries {
 		try {
 			Table table = pm.getObjectById(Table.class, key);
 			if (table == null) return table;
+			table.getBlackBoard(); //this is needed because of the lazy behavior
 			detached = pm.detachCopy(table);
 		} catch (Exception e) {
 			System.err.println("There has been an error querying tables: " + e);

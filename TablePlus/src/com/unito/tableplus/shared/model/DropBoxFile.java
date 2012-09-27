@@ -1,14 +1,14 @@
 package com.unito.tableplus.shared.model;
 
+import com.extjs.gxt.ui.client.data.BaseModel;
+
 /**
  * This is the class for DropBox objects descriptor.
  * 
  */
-public class DropBoxFile extends Resource{
+public class DropBoxFile implements Resource{
 	 
-	public DropBoxFile() {
-		super(Provider.DROPBOX);
-	}
+	
 
 	private static final long serialVersionUID = -1506954532942923572L;
 	private String size;
@@ -115,5 +115,29 @@ public class DropBoxFile extends Resource{
 	public String toString() {
 		return "Path: " + this.getPath() + " Icon: " + this.getIcon()
 				+ " Is Dir?: " + this.getIsDir();
+	}
+
+	@Override
+	public String getName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getURI() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public BaseModel getModel() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Provider getProvider() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

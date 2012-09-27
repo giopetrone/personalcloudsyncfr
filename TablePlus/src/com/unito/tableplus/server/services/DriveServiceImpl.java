@@ -15,8 +15,8 @@ import com.google.gdata.util.AuthenticationException;
 import com.google.gdata.util.ServiceException;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.unito.tableplus.client.services.DriveService;
-import com.unito.tableplus.shared.model.DriveFile;
 import com.unito.tableplus.server.Utils;
+import com.unito.tableplus.shared.model.DriveFile;
 
 public class DriveServiceImpl extends RemoteServiceServlet implements
 		DriveService {

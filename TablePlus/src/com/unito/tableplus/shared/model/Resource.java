@@ -2,27 +2,16 @@ package com.unito.tableplus.shared.model;
 
 import java.io.Serializable;
 
-public abstract class Resource implements Serializable {
+import com.extjs.gxt.ui.client.data.BaseModel;
+
+public interface Resource extends Serializable {
+	public String getName();
+
+	public String getIcon();
+
+	public String getURI();
+
+	public BaseModel getModel();
 	
-	private static final long serialVersionUID = -2157821573998748181L;
-	private Provider provider;
-	
-	public Resource(Provider provider){
-		this.setProvider(provider);
-	}
-
-	/**
-	 * @return the provider
-	 */
-	public Provider getProvider() {
-		return provider;
-	}
-
-	/**
-	 * @param provider the provider to set
-	 */
-	public void setProvider(Provider provider) {
-		this.provider = provider;
-	}
-
+	public Provider getProvider();
 }
