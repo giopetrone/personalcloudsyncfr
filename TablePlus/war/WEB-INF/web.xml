@@ -41,7 +41,7 @@
 		<servlet-name>userServlet</servlet-name>
 		<url-pattern>/tableplus/user-service</url-pattern>
 	</servlet-mapping>
-	
+
 	<!-- LOGIN SERVLET -->
 
 	<servlet>
@@ -53,9 +53,9 @@
 		<servlet-name>loginService</servlet-name>
 		<url-pattern>/tableplus/login</url-pattern>
 	</servlet-mapping>
-	
+
 	<!-- CHAT SERVLETS -->
-	
+
 	<servlet>
 		<servlet-name>chat_service</servlet-name>
 		<servlet-class>com.unito.tableplus.server.services.MessagingServiceImpl</servlet-class>
@@ -70,22 +70,22 @@
 		<servlet-name>handle_connect</servlet-name>
 		<servlet-class>com.unito.tableplus.server.servlets.ConnectionServlet</servlet-class>
 	</servlet>
-	
+
 	<servlet-mapping>
 		<servlet-name>handle_connect</servlet-name>
 		<url-pattern>/_ah/channel/connected/</url-pattern>
 	</servlet-mapping>
-	
+
 	<servlet>
 		<servlet-name>handle_disconnect</servlet-name>
 		<servlet-class>com.unito.tableplus.server.servlets.DisconnectionServlet</servlet-class>
 	</servlet>
-	
+
 	<servlet-mapping>
 		<servlet-name>handle_disconnect</servlet-name>
 		<url-pattern>/_ah/channel/disconnected/</url-pattern>
 	</servlet-mapping>
-	
+
 	<!-- DropBox SERVLET -->
 
 	<servlet>
@@ -97,43 +97,67 @@
 		<servlet-name>dropboxServlet</servlet-name>
 		<url-pattern>/tableplus/dropbox-service</url-pattern>
 	</servlet-mapping>
-	
+
 	<!-- PROXY SERVLET -->
-	
+
 	<servlet>
 		<servlet-name>proxy</servlet-name>
 		<servlet-class>com.unito.tableplus.server.servlets.Proxy</servlet-class>
 	</servlet>
-	
+
 	<servlet-mapping>
 		<servlet-name>proxy</servlet-name>
 		<url-pattern>/tableplus/proxy</url-pattern>
-	</servlet-mapping>	
-	
+	</servlet-mapping>
+
 	<!-- CALLBACK SERVLET -->
-	
+
 	<servlet>
 		<servlet-name>callback</servlet-name>
 		<servlet-class>com.unito.tableplus.server.servlets.CallbackServlet</servlet-class>
 	</servlet>
-	
+
 	<servlet-mapping>
 		<servlet-name>callback</servlet-name>
 		<url-pattern>/tableplus/callback</url-pattern>
 	</servlet-mapping>
-	
-	<!-- Invitaion SERVLET -->
-	
+
+	<!-- INVITATION SERVLET -->
+
 	<servlet>
 		<servlet-name>invitation</servlet-name>
 		<servlet-class>com.unito.tableplus.server.servlets.InvitationServlet</servlet-class>
 	</servlet>
-	
+
 	<servlet-mapping>
 		<servlet-name>invitation</servlet-name>
 		<url-pattern>/tableplus/invitation</url-pattern>
+	</servlet-mapping>
+	
+	<!-- BOOKMARK SERVLET -->
+	
+	<servlet>
+		<servlet-name>bookmarkServlet</servlet-name>
+		<servlet-class>com.unito.tableplus.server.services.BookmarkServiceImpl</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>bookmarkServlet</servlet-name>
+		<url-pattern>/tableplus/bookmark-service</url-pattern>
 	</servlet-mapping>	
 	
+	<!-- COMMENT SERVLET -->
+	
+	<servlet>
+		<servlet-name>commentServlet</servlet-name>
+		<servlet-class>com.unito.tableplus.server.services.CommentServiceImpl</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>commentServlet</servlet-name>
+		<url-pattern>/tableplus/comment-service</url-pattern>
+	</servlet-mapping>	
+
 	<!-- Default page to serve -->
 
 	<welcome-file-list>

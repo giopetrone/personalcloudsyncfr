@@ -1,5 +1,7 @@
 package com.unito.tableplus.client.gui.quickviewpanels;
 
+import java.util.List;
+
 import com.extjs.gxt.ui.client.Style.Orientation;
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.data.BaseModelData;
@@ -28,8 +30,6 @@ import com.unito.tableplus.client.services.ServiceFactory;
 import com.unito.tableplus.client.services.UserServiceAsync;
 import com.unito.tableplus.shared.model.DriveFile;
 import com.unito.tableplus.shared.model.Provider;
-
-import java.util.List;
 import com.unito.tableplus.shared.model.Resource;
 
 public class MyResourcesPanel extends ContentPanel {

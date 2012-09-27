@@ -2,6 +2,7 @@ package com.unito.tableplus.client.gui;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import com.extjs.gxt.desktop.client.Shortcut;
 import com.unito.tableplus.client.TablePlus;
 import com.unito.tableplus.client.gui.windows.BlackBoardWindow;

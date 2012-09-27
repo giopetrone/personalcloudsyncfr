@@ -3,10 +3,10 @@ package com.unito.tableplus.client.services;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.unito.tableplus.shared.model.BlackBoardMessage;
 import com.unito.tableplus.shared.model.Bookmark;
 import com.unito.tableplus.shared.model.DriveFile;
 import com.unito.tableplus.shared.model.Table;
-import com.unito.tableplus.shared.model.BlackBoardMessage;
 import com.unito.tableplus.shared.model.User;
 
 public interface TableServiceAsync {

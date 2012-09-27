@@ -22,9 +22,9 @@ import com.unito.tableplus.server.TableQueries;
 import com.unito.tableplus.server.UserQueries;
 import com.unito.tableplus.server.WalletQueries;
 import com.unito.tableplus.server.services.DriveServiceImpl;
+import com.unito.tableplus.shared.model.BlackBoardMessage;
 import com.unito.tableplus.shared.model.BlackBoardMessageType;
 import com.unito.tableplus.shared.model.DriveFile;
-import com.unito.tableplus.shared.model.BlackBoardMessage;
 import com.unito.tableplus.shared.model.Table;
 import com.unito.tableplus.shared.model.User;
 import com.unito.tableplus.shared.model.Wallet;
@@ -101,8 +101,8 @@ public class Proxy extends HttpServlet {
 				uj.put("lastname", user.getLastName());
 				uj.put("email", user.getEmail());
 				uj.put("tables", user.getTables());
-				//FIXME
-				//uj.put("online", user.isOnline());
+				// FIXME
+				// uj.put("online", user.isOnline());
 
 				rj.put("results", uj);
 			}
@@ -174,17 +174,19 @@ public class Proxy extends HttpServlet {
 				tableJSON.put("owner", table.getOwner());
 
 				Wallet wallet = WalletQueries.getWallet(userKey);
-				List<DriveFile> docList = DriveServiceImpl
-						.getDriveFileList(wallet.getDriveToken());
-				Map<String, DriveFile> docsMap = new HashMap<String, DriveFile>();
-				for (DriveFile d : docList)
-					docsMap.put(d.getDocId(), d);
-				List<String> tableDocuments = table.getDocuments();
-				for (String d : tableDocuments) {
-					jDoc = new JSONObject(docsMap.get(d));
-					jDocuments.put(jDoc);
+				String token = wallet.getDriveToken();
+				if (token != null) {
+					List<DriveFile> docList = DriveServiceImpl
+							.getDriveFileList(wallet.getDriveToken());
+					Map<String, DriveFile> docsMap = new HashMap<String, DriveFile>();
+					for (DriveFile d : docList)
+						docsMap.put(d.getDocId(), d);
+					List<String> tableDocuments = table.getDocuments();
+					for (String d : tableDocuments) {
+						jDoc = new JSONObject(docsMap.get(d));
+						jDocuments.put(jDoc);
+					}
 				}
-
 				tableJSON.put("documents", jDocuments);
 
 				rj.put("results", tableJSON);
@@ -302,9 +304,11 @@ public class Proxy extends HttpServlet {
 			String type = jo.getString("messageType");
 			String content = jo.getString("messageContent");
 
-			BlackBoardMessageType mType = Enum.valueOf(BlackBoardMessageType.class, type);
+			BlackBoardMessageType mType = Enum.valueOf(
+					BlackBoardMessageType.class, type);
 
-			BlackBoardMessage bbMessage = new BlackBoardMessage(author, mType, content);
+			BlackBoardMessage bbMessage = new BlackBoardMessage(author, mType,
+					content);
 
 			Table table = TableQueries.queryTable(tableKey);
 			table.getBlackBoard().add(bbMessage);
@@ -349,7 +353,7 @@ public class Proxy extends HttpServlet {
 		try {
 			tableKey = jo.getLong("tableKey");
 			Table t = TableQueries.queryTable(tableKey);
-			//FIXME: t.getSelectivePresenceMembers() - getHiddenMembers()
+			// FIXME: t.getSelectivePresenceMembers() - getHiddenMembers()
 			visible = t.getMembers();
 			visible.removeAll(t.getMembers());
 			online = new JSONArray(visible);
@@ -381,7 +385,7 @@ public class Proxy extends HttpServlet {
 			Long user = jo.getLong("userKey");
 			Long tableKey = jo.getLong("tableKey");
 			Table table = TableQueries.queryTable(tableKey);
-			//FIXME: getHiddenMembers
+			// FIXME: getHiddenMembers
 			List<Long> hiddenMembers = table.getMembers();
 
 			if (hiddenMembers.contains(user))
@@ -406,11 +410,11 @@ public class Proxy extends HttpServlet {
 	private void toggleStatus(JSONObject jo, PrintWriter pw) {
 		try {
 			Long user = jo.getLong("userKey");
-			//Boolean online = jo.getBoolean("online");
+			// Boolean online = jo.getBoolean("online");
 
 			User u = UserQueries.queryUser(user);
-			//FIXME
-			//u.setOnline(online);
+			// FIXME
+			// u.setOnline(online);
 			UserQueries.storeUser(u);
 
 			JSONObject rj = new JSONObject();
@@ -435,13 +439,13 @@ public class Proxy extends HttpServlet {
 			Boolean presence = jo.getBoolean("presence");
 
 			table = TableQueries.queryTable(tableKey);
-			
-			//FIXME: getSelectivePresenceMembers()
+
+			// FIXME: getSelectivePresenceMembers()
 			if (presence)
 				table.getMembers().add(user);
 			else
 				table.getMembers().remove(user);
-	
+
 			TableQueries.storeTable(table);
 
 			JSONObject rj = new JSONObject();

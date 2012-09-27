@@ -2,9 +2,10 @@ package com.unito.tableplus.server;
 
 import java.util.List;
 
-import com.unito.tableplus.shared.model.Wallet;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+
+import com.unito.tableplus.shared.model.Wallet;
 
 public class WalletQueries {
 

@@ -1,6 +1,7 @@
 package com.unito.tableplus.client.gui.windows;
 
 import java.util.List;
+
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.Orientation;
 import com.extjs.gxt.ui.client.Style.Scroll;

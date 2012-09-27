@@ -1,6 +1,7 @@
 package com.unito.tableplus.server.services;
 
 import java.util.List;
+
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.unito.tableplus.client.services.BookmarkService;
 import com.unito.tableplus.server.BookmarkQueries;

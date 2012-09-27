@@ -4,10 +4,10 @@ import java.util.List;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
+import com.unito.tableplus.shared.model.BlackBoardMessage;
 import com.unito.tableplus.shared.model.Bookmark;
 import com.unito.tableplus.shared.model.DriveFile;
 import com.unito.tableplus.shared.model.Table;
-import com.unito.tableplus.shared.model.BlackBoardMessage;
 import com.unito.tableplus.shared.model.User;
 
 @RemoteServiceRelativePath("table-service")
