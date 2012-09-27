@@ -34,7 +34,7 @@ public class MessagingServiceImpl extends RemoteServiceServlet implements
 			.getChannelService();
 
 	/**
-	 * A list of connected users. Users ids are stored as strings and must be
+	 * A map of connected users. Users ids are stored as strings and must be
 	 * uniques.
 	 */
 	private final static Map<Long, String> users = new HashMap<Long, String>();
