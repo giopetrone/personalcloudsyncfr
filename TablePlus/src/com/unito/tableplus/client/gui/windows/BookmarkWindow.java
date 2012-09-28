@@ -1,7 +1,6 @@
 package com.unito.tableplus.client.gui.windows;
 
 import java.util.List;
-
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.Orientation;
 import com.extjs.gxt.ui.client.Style.Scroll;
@@ -93,7 +92,6 @@ public class BookmarkWindow extends WindowPlus {
 		mainContainer.setScrollMode(Scroll.AUTO);			
 
 		getObject();
-		//System.out.println("creata finestra!!!"+resource.toString());
 
 	}
 	
@@ -331,7 +329,7 @@ public class BookmarkWindow extends WindowPlus {
 							    
 		commentButton.addSelectionListener(new SelectionListener<ButtonEvent>(){
 			public void componentSelected(ButtonEvent ce) {
-		   	  	final CommentsPopup popup = new CommentsPopup(resource, table);
+		   	  /*	final CommentsPopup popup = new CommentsPopup(resource, table);
 		   	   	popup.setStyleName("popup");
 		       	popup.setPopupPositionAndShow(new PopupPanel.PositionCallback() {
 		           	public void setPosition(int offsetWidth, int offsetHeight) {
@@ -340,7 +338,8 @@ public class BookmarkWindow extends WindowPlus {
 					    popup.setPopupPosition(left, top);
 				    }
 				});	
-				loadComments();	
+				loadComments();	*/
+				//TablePlus.getPersonalTable().show(new CommentWindow(resource, table));
 			}
 		});	
 		//bottone refresh
@@ -354,7 +353,9 @@ public class BookmarkWindow extends WindowPlus {
 		});	
 		//pannello bottoni				
 		HorizontalPanel hpButton= new HorizontalPanel();
-		hpButton.setSpacing(6);
+		refreshButton.setStyleAttribute("padding-left", "5px");
+		goButton.setStyleAttribute("padding-left", "5px");
+		closeButton.setStyleAttribute("padding-left", "5px");
 		hpButton.add(commentButton);
 		hpButton.add(refreshButton);
 		hpButton.add(goButton);
@@ -406,6 +407,7 @@ public class BookmarkWindow extends WindowPlus {
 			@Override
 			public void onSuccess(List<Comment> result) {
 				if (result.size()>0) {
+				message ="<div align=\"left\"><br><b>Comments :<br><br></b></div>";	
 				for(Comment c: result){
 					//se i commenti sono privati
 					if(c.isPrivate()){
@@ -433,7 +435,6 @@ public class BookmarkWindow extends WindowPlus {
 						}
 				}
 				historyContainer.add(new Label(message+"<br>"), "");
-				message ="<div align=\"left\"><br><b>Comments :<br><br></b></div>";
 				}
 				else {
 					message="<div align=\"left\"><br><b>There are no comments for the bookmark!</b><br></div>";
@@ -489,32 +490,32 @@ public class BookmarkWindow extends WindowPlus {
 	
 	public LayoutContainer setFormTag(){
 		final LayoutContainer panel = new LayoutContainer();
-		panel.setStyleAttribute("padding-left", "10px");
+		panel.setStyleAttribute("padding-left", "5px");
 		Label label=new Label("Add a tag to bookmark:");		
 		label.setStyleAttribute("padding-bottom", "10px");
+		label.setStyleAttribute("padding-left", "5px");
 		panel.add(label);	
 		
 	    HorizontalPanel hp1= new HorizontalPanel();  
 	    panel.add(hp1);
-	    hp1.setStyleAttribute("padding-top", "5px");
+	    hp1.setSpacing(5);
 
 		inputTag = new TextArea();
 		inputTag.setHeight(20);
 		
 		inputTag.setPreventScrollbars(true);
 		inputTag.setAllowBlank(false);
-		inputTag.setStyleAttribute("padding-rigth", "10px");
 		
-		
+		hp1.add(inputTag);	
 		if(resource.getTag().size()>0) {
 			inputTag.setValue(resource.getTag().get(0));
 			listTag = new ListBox();
-			inputTag.setWidth(60);
+			inputTag.setWidth(65);
 			for (String tag : resource.getTag()) {
 				listTag.addItem(tag);
 			}
 			listTag.setHeight("20px");
-			listTag.setWidth("80px");
+			listTag.setWidth("65px");
 			listTag.addChangeHandler(new ChangeHandler(){
 				@Override
 				public void onChange(ChangeEvent event) {
@@ -524,14 +525,11 @@ public class BookmarkWindow extends WindowPlus {
 			hp1.add(listTag);
 		}	
 		else inputTag.setWidth(140);
-		hp1.add(inputTag);	
-		
-				
-	    hpTag.setStyleAttribute("padding-top", "7px");
 	    hpTag.setHorizontalAlign(HorizontalAlignment.LEFT);
 		
 		hpTag.add(saveTag);
-		saveTag.setStyleAttribute("padding-right", "10px");
+		saveTag.setStyleAttribute("padding-right", "7px");
+		saveTag.setStyleAttribute("padding-left", "5px");
 		saveTag.setHeight(20);
 		
 		cancelTag.setHeight(20);
@@ -556,6 +554,7 @@ public class BookmarkWindow extends WindowPlus {
 		panel.add(hpTag);
 		return panel;
 	}
+	
 	public LayoutContainer setFormRemoveTag(){
 		final LayoutContainer panel = new LayoutContainer();
 		panel.setStyleAttribute("padding-left", "10px");
