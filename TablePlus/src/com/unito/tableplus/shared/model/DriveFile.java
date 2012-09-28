@@ -61,8 +61,7 @@ public class DriveFile implements Resource {
 	}
 	@Override
 	public Provider getProvider() {
-		// TODO Auto-generated method stub
-		return null;
+		return Provider.DRIVE;
 	}
 
 }
