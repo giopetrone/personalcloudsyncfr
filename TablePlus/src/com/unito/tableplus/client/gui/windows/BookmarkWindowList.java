@@ -38,6 +38,7 @@ import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.PopupPanel;
+import com.unito.tableplus.client.TablePlus;
 import com.unito.tableplus.client.services.BookmarkService;
 import com.unito.tableplus.client.services.BookmarkServiceAsync;
 import com.unito.tableplus.client.services.ServiceFactory;
@@ -63,7 +64,7 @@ public class BookmarkWindowList extends WindowPlus {
 	private Menu contextMenu;
 	private MenuItem deleteItem;
 	private List<String> allTags= new LinkedList<String>();
-
+	private List<Bookmark> resource;
 	
 	public BookmarkWindowList(final Table table) {
 		super();
@@ -179,7 +180,6 @@ public class BookmarkWindowList extends WindowPlus {
 	}
 	
 	public void getBookmarkWindow(final Table table, String key) {
-		System.out.println("***** doppio click entra in getBookmarkWindow(final Table table, String key)");
 		bookmarkService.queryBookmark(key,new AsyncCallback<Bookmark>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -210,7 +210,8 @@ public class BookmarkWindowList extends WindowPlus {
 				}
 				@Override
 				public void onSuccess(List<Bookmark> result) {
-					fillGrid(result);
+					resource= result;
+					fillGrid(resource);
 					unmask();
 				}
 			});
@@ -340,8 +341,10 @@ public class BookmarkWindowList extends WindowPlus {
 		tag.setFieldLabel("Tag");
 		tag.setAllowBlank(true);
 		panel.add(tag, formData);
-		tag.setToolTip("All existing tags: \n"+allTags.toString());
-		
+		if(allTags.size()>0)
+			tag.setToolTip("All existing tags: \n"+allTags.toString());
+		else 
+			tag.setToolTip("There are no tags");
 		Button saveButton = new Button("Save");
 		panel.addButton(saveButton);
 		Button cancelButton = new Button("Cancel");
@@ -371,6 +374,10 @@ public class BookmarkWindowList extends WindowPlus {
 					bookmark.addAnnotation(annotation.getValue());
 				if (tag.getValue()!=null)
 					bookmark.addTag(tag.getValue().toUpperCase());
+				if (comment.getValue()!=null){
+					Comment c = new Comment(comment.getValue(), TablePlus.getUser().getEmail());
+					bookmark.addComment(c);
+				}
 				title.clear();
 				url.clear();
 				legend.clear();
