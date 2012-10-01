@@ -52,5 +52,6 @@ public class NotificationExampleActivity extends Activity {
 	  
 	  public void clearNotification(View v) {
 	    mgr.cancel(NOTIFY_ME_ID);
+	    count=0;
 	  }
 	}
