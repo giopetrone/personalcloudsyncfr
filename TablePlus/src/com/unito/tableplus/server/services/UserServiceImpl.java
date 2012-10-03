@@ -9,6 +9,7 @@ import com.unito.tableplus.server.UserQueries;
 import com.unito.tableplus.server.WalletQueries;
 import com.unito.tableplus.shared.model.DriveFile;
 import com.unito.tableplus.shared.model.DropBoxFile;
+import com.unito.tableplus.shared.model.FacebookEvent;
 import com.unito.tableplus.shared.model.LoginInfo;
 import com.unito.tableplus.shared.model.Resource;
 import com.unito.tableplus.shared.model.User;
@@ -55,7 +56,7 @@ public class UserServiceImpl extends RemoteServiceServlet implements
 		}
 		return user;
 	}
-	
+
 	@Override
 	public List<Resource> loadResources(User user) {
 		Wallet wallet = WalletQueries.getWallet(user.getKey());
@@ -64,10 +65,15 @@ public class UserServiceImpl extends RemoteServiceServlet implements
 		List<DriveFile> driveFiles = loadDriveFiles(wallet.getDriveToken());
 		List<DropBoxFile> dropboxFiles = loadDropboxFiles(
 				wallet.getDropboxToken(), wallet.getDropboxSecret());
+		List<FacebookEvent> facebookEvents = loadFacebookEvents(wallet.getFacebookToken());
+		
 		if (driveFiles != null)
 			resources.addAll(driveFiles);
 		if (dropboxFiles != null)
 			resources.addAll(dropboxFiles);
+		if (facebookEvents != null)
+			resources.addAll(facebookEvents);
+
 		return resources;
 	}
 
@@ -80,6 +86,12 @@ public class UserServiceImpl extends RemoteServiceServlet implements
 	public List<DropBoxFile> loadDropboxFiles(String token, String secret) {
 		if (token != null && secret != null)
 			return DropBoxServiceImpl.loadFiles(token, secret);
+		return null;
+	}
+	
+	public List<FacebookEvent> loadFacebookEvents(String token){
+		if (token != null)
+			return FacebookServiceImpl.loadEvents(token);
 		return null;
 	}
 

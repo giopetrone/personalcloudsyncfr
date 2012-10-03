@@ -20,6 +20,17 @@ public class Wallet {
 
 	@Persistent
 	private String dropboxSecret;
+	
+	@Persistent
+	private String facebookToken;
+
+	public String getFacebookToken() {
+		return facebookToken;
+	}
+
+	public void setFacebookToken(String facebookToken) {
+		this.facebookToken = facebookToken;
+	}
 
 	public String getDriveToken() {
 		return driveToken;

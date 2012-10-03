@@ -8,10 +8,14 @@ import com.extjs.gxt.ui.client.Style.Orientation;
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.data.BaseModel;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
+import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.event.Events;
+import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MenuEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.util.Margins;
+import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.Info;
 import com.extjs.gxt.ui.client.widget.Layout;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -54,7 +58,9 @@ public class BlackBoardWindow extends WindowPlus {
 	private Layout centerLayout = new CenterLayout();
 	private FormPanel inputPanel;
 	private Menu contextMenu;
+	private MenuItem showItem;
 	private MenuItem deleteItem;
+	private Dialog messageDialog;
 
 	public BlackBoardWindow(Table table) {
 		super();
@@ -71,8 +77,21 @@ public class BlackBoardWindow extends WindowPlus {
 		grid = new Grid<BaseModel>(messagesStore, getColumnModel());
 
 		contextMenu = new Menu();
+		showItem = new MenuItem();
+		showItem.setText("Show Message");
 		deleteItem = new MenuItem();
 		deleteItem.setText("Delete Message");
+
+		showItem.addSelectionListener(new SelectionListener<MenuEvent>() {
+			@Override
+			public void componentSelected(MenuEvent ce) {
+				final BaseModel selected = grid.getSelectionModel()
+						.getSelectedItem();
+				String header = selected.get("type").toString();
+				String content = selected.get("content").toString();
+				showMessage(header,content);
+			}
+		});
 
 		deleteItem.addSelectionListener(new SelectionListener<MenuEvent>() {
 			@Override
@@ -97,19 +116,22 @@ public class BlackBoardWindow extends WindowPlus {
 				});
 			}
 		});
+		
 		contextMenu.add(deleteItem);
+		contextMenu.add(showItem);
 
 		grid.setContextMenu(contextMenu);
 
 		mainContainer.add(grid);
 		add(mainContainer, new RowData(1, 1, new Margins(4)));
 
-		loadButton = new Button("Load Messages", new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				loadMessages();
-			}
-		});
+		loadButton = new Button("Load Messages",
+				new SelectionListener<ButtonEvent>() {
+					@Override
+					public void componentSelected(ButtonEvent ce) {
+						loadMessages();
+					}
+				});
 		messageButton = new Button("Add Message",
 				new SelectionListener<ButtonEvent>() {
 					@Override
@@ -119,6 +141,12 @@ public class BlackBoardWindow extends WindowPlus {
 				});
 		addButton(loadButton);
 		addButton(messageButton);
+
+		this.addListener(Events.Show, new Listener<ComponentEvent>() {
+			public void handleEvent(ComponentEvent ce) {
+				loadMessages();
+			}
+		});
 	}
 
 	private void loadMessages() {
@@ -142,7 +170,19 @@ public class BlackBoardWindow extends WindowPlus {
 							unmask();
 						}
 					});
-		
+
+	}
+
+	private void showMessage(String heading, String content) {
+		messageDialog = new Dialog();
+		messageDialog.setButtons(Dialog.CLOSE);
+		messageDialog.setBodyStyleName("pad-text");
+		messageDialog.setScrollMode(Scroll.AUTOY);
+		messageDialog.setHideOnButtonClick(true);
+		messageDialog.setHeading(heading);
+		messageDialog.addText(content);
+		messageDialog.getItem(0).getFocusSupport().setIgnore(true);  
+		messageDialog.show();
 	}
 
 	private void showInputPanel() {
@@ -231,6 +271,8 @@ public class BlackBoardWindow extends WindowPlus {
 		combo.setStore(typeStore);
 		combo.setAllowBlank(false);
 		combo.setEditable(false);
+		combo.setForceSelection(true);
+		combo.setValue(typeStore.getAt(0));
 		combo.setWidth(120);
 		panel.add(combo, formData);
 

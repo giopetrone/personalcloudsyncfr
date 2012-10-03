@@ -30,9 +30,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.unito.tableplus.client.TablePlus;
 import com.unito.tableplus.client.services.ServiceFactory;
 import com.unito.tableplus.client.services.UserServiceAsync;
-import com.unito.tableplus.shared.model.DriveFile;
-import com.unito.tableplus.shared.model.DropBoxFile;
-import com.unito.tableplus.shared.model.Provider;
 import com.unito.tableplus.shared.model.Resource;
 
 public class MyResourcesWindow extends WindowPlus {
@@ -75,14 +72,15 @@ public class MyResourcesWindow extends WindowPlus {
 		});
 		contextMenu.add(insert);
 		grid.setContextMenu(contextMenu);
-		
-		loadButton = new Button("Load Resources", new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				loadResources();
-			}
-		});
-		
+
+		loadButton = new Button("Load Resources",
+				new SelectionListener<ButtonEvent>() {
+					@Override
+					public void componentSelected(ButtonEvent ce) {
+						loadResources();
+					}
+				});
+
 		container.add(grid);
 		addButton(loadButton);
 		add(container, new RowData(1, 1, new Margins(4)));
@@ -112,20 +110,11 @@ public class MyResourcesWindow extends WindowPlus {
 
 		for (Resource r : resources) {
 			mdata = new BaseModel();
-			if (r.getProvider().equals(Provider.DRIVE)) {
-				DriveFile df = (DriveFile) r;
-				mdata.set("icon", "");
-				mdata.set("img", "drive-file.png");
-				mdata.set("name", df.getTitle());
-				mdata.set("provider", "Drive");
-			}
-			if (r.getProvider().equals(Provider.DROPBOX)) {
-				DropBoxFile dbf = (DropBoxFile) r;
-				mdata.set("icon", "");
-				mdata.set("img", dbf.getIcon() + ".gif");
-				mdata.set("name", dbf.getPath().substring(1));
-				mdata.set("provider", "Dropbox");
-			}
+
+			mdata.set("icon", "");
+			mdata.set("img", r.getIcon());
+			mdata.set("name", r.getName());
+			mdata.set("provider", r.getProvider());
 			resourcesStore.add(mdata);
 		}
 	}

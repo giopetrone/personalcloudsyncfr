@@ -154,6 +154,12 @@
 	background-image: url(../images/group_chat.png);
 }
 
+#chat-win-shortcut-notify img {
+	width: 64px;
+	height: 64px;
+	background-image: url(../images/group_chat_notify.png);
+}
+
 #blackboard-win-shortcut img {
 	width: 64px;
 	height: 64px;
@@ -263,4 +269,9 @@
 
 .deleteAll {
 	background-image: url(../images/deleteGreen.png) !important;
+}
+
+.pad-text {
+  font-size: 12px;
+  padding: 5px;
 }

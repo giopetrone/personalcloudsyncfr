@@ -3,7 +3,9 @@ package com.unito.tableplus.client.gui.windows;
 import com.extjs.gxt.ui.client.Style.Orientation;
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.KeyListener;
+import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.HtmlContainer;
@@ -30,12 +32,12 @@ public class ChatWindow extends WindowPlus {
 	private Html history;
 	private HtmlContainer historyContainer;
 	private TextArea inputArea;
-	
+
 	private final String message = "<div align=\"center\"><b>Welcome into the chat!</b> <br><br>"
 			+ "It seems like none of your friends had nothing to say since your coming. "
 			+ "Be the first to say '<i>Hi</i>', test the chat and enjoy!</div>";
 
-	public ChatWindow(TableUI table) {
+	public ChatWindow(final TableUI table) {
 		super();
 		this.table = table;
 
@@ -46,14 +48,13 @@ public class ChatWindow extends WindowPlus {
 		mainContainer = new LayoutContainer();
 		mainContainer.setLayout(new FitLayout());
 		mainContainer.setScrollMode(Scroll.AUTOY);
-		
+
 		historyContainer = new HtmlContainer(message);
 
 		mainContainer.add(historyContainer);
 		historyContainer.scrollIntoView(mainContainer);
 
 		add(mainContainer, new RowData(1, 1, new Margins(4)));
-
 
 		inputArea = new TextArea();
 		inputArea.setHeight(50);
@@ -68,6 +69,12 @@ public class ChatWindow extends WindowPlus {
 					sendMessage();
 			}
 		});
+
+		this.addListener(Events.Show, new Listener<ComponentEvent>() {
+			public void handleEvent(ComponentEvent ce) {
+				table.chatNotify(false);
+			}
+		});
 	}
 
 	public void manageNewMessage(String sender, String content) {
@@ -79,12 +86,16 @@ public class ChatWindow extends WindowPlus {
 						.replace(">", "&gt;").replace("\"", "&quot;") + "<br>");
 		historyContainer.setHtml(history.getHtml());
 
-		mainContainer.getElement().setScrollTop(mainContainer.getElement().getScrollHeight());
-		mainContainer.getElement()
+		mainContainer.getElement().setScrollTop(
+				mainContainer.getElement().getScrollHeight());
+		mainContainer
+				.getElement()
 				.getFirstChildElement()
 				.setScrollTop(
 						mainContainer.getElement().getFirstChildElement()
 								.getScrollHeight());
+		if (!this.isVisible())
+			table.chatNotify(true);
 	}
 
 	public void sendMessage() {
