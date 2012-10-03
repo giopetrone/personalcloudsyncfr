@@ -16,7 +16,7 @@ import com.unito.tableplus.client.gui.windows.WindowPlus;
 import com.unito.tableplus.shared.model.Table;
 
 public class TableUI {
-	
+
 	private RightPanel rightPanel;
 	private List<WindowPlus> windows = new ArrayList<WindowPlus>();
 	private List<Shortcut> shortcuts = new ArrayList<Shortcut>();
@@ -39,7 +39,7 @@ public class TableUI {
 
 	/**
 	 * Costruttore per personal table
-	 *
+	 * 
 	 * @return void
 	 */
 
@@ -60,21 +60,21 @@ public class TableUI {
 		chatWindow = new ChatWindow(this);
 		blackboardWindow = new BlackBoardWindow(getTable());
 		bookmarkWindowList = new BookmarkWindowList(getTable());
-		
-		//provvisorio		
+
+		// provvisorio
 		bookmarkWindow = new BookmarkWindow(getTable());
-		//provvisorio		
+		// provvisorio
 		commentWindow = new CommentWindow(getTable());
-		
+
 		addWindow(tableResourcesWindow);
 		addWindow(chatWindow);
 		addWindow(blackboardWindow);
 		addWindow(bookmarkWindowList);
-		
-		//provvisorio
+
+		// provvisorio
 		addWindow(bookmarkWindow);
 		addWindow(commentWindow);
-		
+
 		// table resources
 		s1 = new Shortcut();
 		s1.setText("Table Resources");
@@ -103,7 +103,7 @@ public class TableUI {
 		s4.setId("mybookmark-win-shortcut");
 		s4.setData("window", bookmarkWindowList);
 		this.addShortcut(s4);
-		
+
 		// bookmark (provvisorio)
 
 		s5 = new Shortcut();
@@ -111,7 +111,7 @@ public class TableUI {
 		s5.setId("mybookmark-win-shortcut");
 		s5.setData("window", bookmarkWindow);
 		this.addShortcut(s5);
-		
+
 		// bookmark comment (provvisorio)
 
 		s6 = new Shortcut();
@@ -125,7 +125,7 @@ public class TableUI {
 	 * Questo metodo viene invocato come conseguenza di un drag n drop che
 	 * termina sul desktop, quindi qui viene creato lo shortcut corrispondente
 	 * al documento che è stato trascinato e rilasciato.
-	 *
+	 * 
 	 * @param docName
 	 *            il titolo del documento
 	 * @param docLink
@@ -248,5 +248,13 @@ public class TableUI {
 		this.table = table;
 	}
 
-
+	public void chatNotify(boolean notify) {
+		if (notify) {
+			this.s2.setId("chat-win-shortcut-notify");
+			this.s2.repaint();
+		} else {
+			this.s2.setId("chat-win-shortcut");
+			this.s2.repaint();
+		}
+	}
 }

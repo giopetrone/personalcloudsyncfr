@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -33,24 +32,6 @@ import com.unito.tableplus.shared.model.Wallet;
 public class Proxy extends HttpServlet {
 
 	private static final long serialVersionUID = -6455653509373554816L;
-
-	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
-		JSONObject jo = new JSONObject();
-		JSONArray ja = new JSONArray();
-		PrintWriter pw = resp.getWriter();
-		try {
-			ja.put(1);
-			ja.put(4);
-			jo.put("userKeysList", ja);
-			
-			queryUsers(jo, pw);
-
-		} catch (JSONException e) {
-			System.err.println(e);
-		}
-	}
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)

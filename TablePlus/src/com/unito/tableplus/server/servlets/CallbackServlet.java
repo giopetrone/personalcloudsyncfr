@@ -18,6 +18,7 @@ import com.unito.tableplus.server.Utils;
 import com.unito.tableplus.server.WalletQueries;
 import com.unito.tableplus.server.services.DriveServiceImpl;
 import com.unito.tableplus.server.services.DropBoxServiceImpl;
+import com.unito.tableplus.server.services.FacebookServiceImpl;
 import com.unito.tableplus.shared.model.LoginInfo;
 import com.unito.tableplus.shared.model.Wallet;
 
@@ -52,7 +53,8 @@ public class CallbackServlet extends HttpServlet {
 		if (user == null) {
 			LoginInfo loginInfo = new LoginInfo();
 			loginInfo.setLoggedIn(false);
-		    loginInfo.setLoginUrl(userService.createLoginURL(Utils.getRequestUrl(req)));
+			loginInfo.setLoginUrl(userService.createLoginURL(Utils
+					.getRequestUrl(req)));
 			resp.sendRedirect(loginInfo.getLoginUrl());
 		} else {
 			com.unito.tableplus.shared.model.User u = null;
@@ -86,6 +88,16 @@ public class CallbackServlet extends HttpServlet {
 						WalletQueries.storeWallet(wallet);
 					}
 
+				}
+			} else if (req.getParameter("provider").equals("facebook")) {
+				String code =  req.getParameter("code");
+				Token accessToken =  FacebookServiceImpl.getAccessToken(code);
+				u = UserQueries.queryUser("email", user.getEmail());
+				if (accessToken != null & u != null) {
+					u = UserQueries.queryUser("email", user.getEmail());
+					wallet = WalletQueries.getWallet(u.getKey());
+					wallet.setFacebookToken(accessToken.getToken());
+					WalletQueries.storeWallet(wallet);
 				}
 			}
 		}

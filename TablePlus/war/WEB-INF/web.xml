@@ -1,8 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
-              http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-	version="2.5" xmlns="http://java.sun.com/xml/ns/javaee">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.5" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee                http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
 
 	<!-- Servlets -->
 
@@ -86,7 +82,7 @@
 		<url-pattern>/_ah/channel/disconnected/</url-pattern>
 	</servlet-mapping>
 
-	<!-- DropBox SERVLET -->
+	<!-- DROPBOX SERVLET -->
 
 	<servlet>
 		<servlet-name>dropboxServlet</servlet-name>
@@ -96,6 +92,18 @@
 	<servlet-mapping>
 		<servlet-name>dropboxServlet</servlet-name>
 		<url-pattern>/tableplus/dropbox-service</url-pattern>
+	</servlet-mapping>
+	
+	<!-- FACEBOOK SERVLET -->
+
+	<servlet>
+		<servlet-name>facebookServlet</servlet-name>
+		<servlet-class>com.unito.tableplus.server.services.FacebookServiceImpl</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>facebookServlet</servlet-name>
+		<url-pattern>/tableplus/facebook-service</url-pattern>
 	</servlet-mapping>
 
 	<!-- PROXY SERVLET -->
@@ -163,5 +171,19 @@
 	<welcome-file-list>
 		<welcome-file>TablePlus.html</welcome-file>
 	</welcome-file-list>
+
+  <servlet>
+    <servlet-name>SystemServiceServlet</servlet-name>
+    <servlet-class>com.google.api.server.spi.SystemServiceServlet</servlet-class>
+    <init-param>
+      <param-name>services</param-name>
+      <param-value/>
+    </init-param>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>SystemServiceServlet</servlet-name>
+    <url-pattern>/_ah/spi/*</url-pattern>
+  </servlet-mapping>
 
 </web-app>
