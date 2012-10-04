@@ -1,5 +1,7 @@
 package com.unito.tableplus.shared.model;
 
+import java.io.Serializable;
+
 public class FacebookEvent implements Resource {
 
 	private static final long serialVersionUID = -6007594027290204640L;
@@ -143,7 +145,9 @@ public class FacebookEvent implements Resource {
 	}
 	
 	@SuppressWarnings("unused")
-	private class Owner {
+	private static class Owner implements Serializable{
+
+		private static final long serialVersionUID = 6632895810759702675L;
 		private String id;
 		private String name;
 
@@ -165,7 +169,9 @@ public class FacebookEvent implements Resource {
 	}
 
 	@SuppressWarnings("unused")
-	private class Venue {
+	private static class Venue implements Serializable{
+
+		private static final long serialVersionUID = 7825466316301329451L;
 		private String id;
 		private String street;
 		private String city;
