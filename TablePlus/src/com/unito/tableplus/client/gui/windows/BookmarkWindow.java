@@ -1,13 +1,17 @@
 package com.unito.tableplus.client.gui.windows;
 
+import java.util.ArrayList;
 import java.util.List;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.Orientation;
 import com.extjs.gxt.ui.client.Style.Scroll;
+import com.extjs.gxt.ui.client.data.BaseModel;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.KeyListener;
+import com.extjs.gxt.ui.client.event.MenuEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
+import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.util.IconHelper;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
@@ -15,14 +19,26 @@ import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.HtmlContainer;
 import com.extjs.gxt.ui.client.widget.Info;
 import com.extjs.gxt.ui.client.widget.Label;
+import com.extjs.gxt.ui.client.widget.Layout;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
 import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.form.FormButtonBinding;
+import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.extjs.gxt.ui.client.widget.form.Radio;
 import com.extjs.gxt.ui.client.widget.form.RadioGroup;
 import com.extjs.gxt.ui.client.widget.form.TextArea;
+import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
+import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
+import com.extjs.gxt.ui.client.widget.grid.Grid;
+import com.extjs.gxt.ui.client.widget.layout.CenterLayout;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
+import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
+import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
+import com.extjs.gxt.ui.client.widget.menu.Menu;
+import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -31,7 +47,6 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.unito.tableplus.client.TablePlus;
 import com.unito.tableplus.client.services.BookmarkService;
@@ -77,6 +92,26 @@ public class BookmarkWindow extends WindowPlus {
 	private Button removeAnnotation=new Button("Remove");
 	private Button addAnnotation=new Button("Add");
 	private TextArea inputTag = new TextArea();
+	private HorizontalPanel radioPanel= new HorizontalPanel();
+	private LayoutContainer commentPanel= new LayoutContainer();
+	private HorizontalPanel hpButton= new HorizontalPanel();
+	private ListStore<BaseModel> commentStore;	
+	private Grid<BaseModel> grid;
+	private Radio radio1;
+	private Layout centerLayout = new CenterLayout();
+	private FormPanel inputPanel;
+	private Menu contextMenu;
+	private MenuItem deleteItem;
+	private MenuItem editItem;
+	private boolean edit=false;	
+	private LayoutContainer lc=new LayoutContainer();
+	private Button loadGridButton= new Button("Refresh");
+	private Button addGridButton = new Button("Add Comment");
+	private Button deleteGridButton = new Button("Delete All");
+	private Button closeGridButton = new Button("Close Comment Property");
+	private HorizontalPanel hp= new HorizontalPanel();
+	private Html title;
+	private LayoutContainer preview=  new LayoutContainer();
 	
 	public BookmarkWindow(final Table table){
 	
@@ -87,14 +122,14 @@ public class BookmarkWindow extends WindowPlus {
 		setSize(590,500);
 		
 		setLayout(new RowLayout(Orientation.VERTICAL));
-				
+	
 		mainContainer = new LayoutContainer();
 		mainContainer.setScrollMode(Scroll.AUTO);			
 
 		getObject();
 
 	}
-	
+
 	private void getObject() {
 		//provvisorio: prendo il primo segnalibro salvato, nella futura implementazione 
 		//verra preso come parametro al doppio click sull'elemento della BookmarkWindowsList
@@ -125,7 +160,7 @@ public class BookmarkWindow extends WindowPlus {
 		//title	
 		String objectName=resource.getClass().getName().substring(33);
 		setHeading(objectName+": "+resource.getTitle());
-		Html title= new Html("<div align=\"center\"><b>\nThe "+objectName
+		title= new Html("<div align=\"center\"><b>\nThe "+objectName
 				+" <u>"+resource.getTitle() +"</u> has been shared on this table\n\n</b></div> ");
 		title.setHeight(30);
 		title.setStyleAttribute("padding-top", "7px");
@@ -134,7 +169,6 @@ public class BookmarkWindow extends WindowPlus {
 	
 	private void setFrame() {
 		//frame anteprima				
-		LayoutContainer preview=  new LayoutContainer();
 		preview.add(hpp);
 		hpp.setStyleAttribute("padding-left", "7px");
 		hpp.add( new Html("<iframe src='"+resource.getUrl()+" width='300'; height='223'<p><a href='"+resource.getUrl()+"'>"+resource.getTitle()+"</a></p></iframe>"));
@@ -246,27 +280,22 @@ public class BookmarkWindow extends WindowPlus {
 				ftable.setWidget(2, 0, setFormRemoveAnnotation());
 			}
 		});			
-	
 	}
 		
 	private void createCommentPanel() {
 		//commenti		
-		LayoutContainer commentPanel= new LayoutContainer();
+		commentPanel.setStyleAttribute("padding-left", "5px");
 		commentPanel.setScrollMode(Scroll.AUTO);	
 		historyContainer = new HtmlContainer(message);
 		commentPanel.add(historyContainer);
 		mainContainer.add(commentPanel);	
 		historyContainer.scrollIntoView(commentPanel);
 		add(mainContainer, new RowData(1, 1, new Margins(4)));
-		HorizontalPanel hp= new HorizontalPanel();
-		mainContainer.add(hp);
 		loadComments();	
 	}
 	
 	private void radioButton() {
-		//radio button
-		HorizontalPanel fp= new HorizontalPanel();
-		
+		//radio button		
 		radio.setSize(55, 5);
 		radio.setBoxLabel("Public");  
 		radio.setValue(true);  
@@ -282,10 +311,10 @@ public class BookmarkWindow extends WindowPlus {
 		
 		radioGroup.add(radio);  
 		radioGroup.add(radio2);
-		fp.add(label);
-		fp.add(radioGroup);
+		radioPanel.add(label);
+		radioPanel.add(radioGroup);
 		
-		add(fp, new RowData(1, -1, new Margins(10)));
+		add(radioPanel, new RowData(1, -1, new Margins(6)));
 	}
 
 	private void createInputArea() {
@@ -303,6 +332,221 @@ public class BookmarkWindow extends WindowPlus {
 				}
 			}
 		});	
+	}
+	
+	private void createGridComment() {
+		commentStore = new ListStore<BaseModel>();
+		
+		lc.setScrollMode(Scroll.AUTOY);
+		lc.setStyleAttribute("padding-left", "10px");
+		lc.setLayout(new FitLayout());
+		lc.setStyleAttribute("padding-right", "10px");
+		grid = new Grid<BaseModel>(commentStore, getColumnModel());
+		grid.setHeight(150);
+		
+		contextMenu = new Menu();
+		deleteItem = new MenuItem();
+		deleteItem.setText("Delete Comment");
+		deleteItem.addSelectionListener(new SelectionListener<MenuEvent>() {
+			@Override
+			public void componentSelected(MenuEvent ce) {
+				delete();
+			}
+		});
+		contextMenu.add(deleteItem);
+		//edit comment, cancella il precedente e crea nuovo commento
+		editItem = new MenuItem();
+		editItem.setText("Edit Comment");
+		editItem.addSelectionListener(new SelectionListener<MenuEvent>() {
+			@Override
+			public void componentSelected(MenuEvent ce) {
+				final BaseModel selected = grid.getSelectionModel().getSelectedItem();
+				final String key = selected.get("key").toString();
+				bookmarkService.editComment(resource, key, new AsyncCallback<String>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GWT.log("Unable to edit comment", caught);
+						Info.display("Error", "Unable to edit comment.");
+					}
+					@Override
+					public void onSuccess(String c) {		
+						showInputPanel(c, key);
+						if (edit){
+							commentStore.remove(selected);
+							contextMenu.setEnabled(commentStore.getCount() > 0);
+						}
+					}
+				});
+			}
+		});
+		contextMenu.add(editItem);		
+		grid.setContextMenu(contextMenu);
+		
+		lc.add(grid);
+		mainContainer.add(lc);	
+		mainContainer.add(commentButton());
+		add(mainContainer, new RowData(1, 1, new Margins(4)));
+		loadGridComments();
+	}
+
+	private HorizontalPanel commentButton() {
+		hp.add(loadGridButton);
+		hp.add(addGridButton);
+		hp.add(deleteGridButton);
+		hp.add(closeGridButton);
+		loadGridButton.setStyleAttribute("padding-left", "5px");
+		hp.setSpacing(5);
+		//refresh		
+		loadGridButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				loadGridComments();
+			}
+		});
+		loadGridButton.setToolTip(new ToolTipConfig("Refresh comments"));
+		loadGridButton.setIcon(IconHelper.createStyle("arrow_refresh"));
+		loadGridButton.setWidth(70);
+		//add
+		addGridButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				inputPanel = newComment();				
+				showForm();
+			}
+		});
+		addGridButton.setToolTip(new ToolTipConfig("Add comment"));
+		addGridButton.setIcon(IconHelper.createStyle("add"));	
+		addGridButton.setWidth(100);
+		//delete	
+		deleteGridButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				deleteComment();
+			}
+		});
+		deleteGridButton.setToolTip(new ToolTipConfig("Delete All"));
+		deleteGridButton.setIcon(IconHelper.createStyle("deleteAll"));	
+		deleteGridButton.setWidth(80);
+		closeGridButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				restoreMainContainer();
+			}
+		});
+		closeGridButton.setToolTip(new ToolTipConfig("Return to normal view"));
+		closeGridButton.setWidth(130);
+		return hp;
+	}
+	
+	protected void restoreMainContainer() {
+		removeAll();
+		lc.removeAll();
+		setLayout(new RowLayout(Orientation.VERTICAL));
+		mainContainer.removeAll();
+		add(title);
+		add(preview);
+		mainContainer.add(commentPanel);	
+		add(mainContainer, new RowData(1, 1, new Margins(4)));
+		loadComments();	
+		add(radioPanel, new RowData(1, -1, new Margins(4)));
+		add(inputArea, new RowData(1, -1, new Margins(4)));
+		add(hpButton);
+		layout();
+		
+	}
+
+	private void showInputPanel(String c, String key) {
+		inputPanel = buildPanel(c, key);
+		showForm();
+	}
+	
+	private void showForm() {	
+		mainContainer.removeAll();
+		mainContainer.setLayout(centerLayout);
+		mainContainer.add(inputPanel);
+		mainContainer.layout();
+	}
+	
+	private FormPanel newComment() {
+		final FormPanel panel = new FormPanel();
+		FormData formData = new FormData("-20");
+		panel.setHeading("New Comment from "+TablePlus.getUser().getEmail());
+		panel.setFrame(true);
+		panel.setWidth(385);
+		
+	    panel.setLabelWidth(110);
+	    
+		radio1 = new Radio();  
+	    radio1.setBoxLabel("Public");  
+	    radio1.setValue(true);  
+	  
+	    Radio radio2 = new Radio();  
+	    radio2.setBoxLabel("Private");  
+	  
+	    RadioGroup radioGroup = new RadioGroup();  
+	    radioGroup.setFieldLabel("Comment Visibility");  
+	    radioGroup.add(radio1);  
+	    radioGroup.add(radio2); 
+	    panel.add(radioGroup);
+	    
+		final TextArea comment = new TextArea();
+		comment.setHeight(35);
+		comment.setPreventScrollbars(true);
+		comment.setFieldLabel("New Comment");
+		comment.setAllowBlank(false);
+		panel.add(comment, formData);	
+	      
+		Button saveButton = new Button("Save");
+		panel.addButton(saveButton);
+		Button cancelButton = new Button("Cancel");
+		panel.addButton(cancelButton);
+		saveButton.setStyleAttribute("padding-left", "35px");
+		panel.setButtonAlign(HorizontalAlignment.CENTER);
+		FormButtonBinding binding = new FormButtonBinding(panel);
+		binding.addButton(saveButton);
+		cancelButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				rebuild();
+			}
+		});
+		saveButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				Comment c;
+				if (radio1.getValue()) c = new Comment(comment.getValue(),TablePlus.getUser().getEmail());
+				else c = new Comment(comment.getValue(),TablePlus.getUser().getEmail(), VisibilityType.PRIVATE);
+				addComment(c);
+				comment.clear();
+				rebuild();
+			}
+		});
+		return panel;
+	}
+
+	private void rebuild() {
+		mainContainer.remove(inputPanel);
+		mainContainer.setSize(585, 200);
+		mainContainer.setLayout(new FlowLayout());
+		mainContainer.add(lc);
+		mainContainer.add(hp);
+		mainContainer.layout();
+	}
+	
+	public void addComment(Comment c) {
+		bookmarkService.addComment(resource.getKey(), c, new AsyncCallback<Boolean>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				GWT.log("Failed to post comment: ", caught);
+				Info.display("Error", "Failed to post comment.");
+			}
+			@Override
+			public void onSuccess(Boolean result) {
+				GWT.log("Successfully posted comment ");
+				Info.display("Success", "Successfully posted comment ");
+				loadGridComments();
+			}
+		});
 	}
 
 	private void createButtonPanel() {
@@ -329,17 +573,13 @@ public class BookmarkWindow extends WindowPlus {
 							    
 		commentButton.addSelectionListener(new SelectionListener<ButtonEvent>(){
 			public void componentSelected(ButtonEvent ce) {
-		   	  /*	final CommentsPopup popup = new CommentsPopup(resource, table);
-		   	   	popup.setStyleName("popup");
-		       	popup.setPopupPositionAndShow(new PopupPanel.PositionCallback() {
-		           	public void setPosition(int offsetWidth, int offsetHeight) {
-			           	int left = (50);
-			            int top = (150);
-					    popup.setPopupPosition(left, top);
-				    }
-				});	
-				loadComments();	*/
-				//TablePlus.getPersonalTable().show(new CommentWindow(resource, table));
+				removeAll();
+				setLayout(new RowLayout(Orientation.VERTICAL));
+				mainContainer.removeAll();
+				add(title);
+				add(preview);
+				createGridComment();
+				layout();
 			}
 		});	
 		//bottone refresh
@@ -352,10 +592,11 @@ public class BookmarkWindow extends WindowPlus {
 			}
 		});	
 		//pannello bottoni				
-		HorizontalPanel hpButton= new HorizontalPanel();
+		
 		refreshButton.setStyleAttribute("padding-left", "5px");
 		goButton.setStyleAttribute("padding-left", "5px");
 		closeButton.setStyleAttribute("padding-left", "5px");
+		commentButton.setStyleAttribute("padding-left", "5px");
 		hpButton.add(commentButton);
 		hpButton.add(refreshButton);
 		hpButton.add(goButton);
@@ -373,12 +614,8 @@ public class BookmarkWindow extends WindowPlus {
 	private void addComment() {
 		if (inputArea.getValue() != null){
 			Comment c;
-			if (radio.getValue()){
-				c = new Comment(inputArea.getValue(), TablePlus.getUser().getEmail());		
-			}
-			else {
-				c = new Comment(inputArea.getValue(), TablePlus.getUser().getEmail(), VisibilityType.PRIVATE);	
-			}
+			if (radio.getValue()) c = new Comment(inputArea.getValue(), TablePlus.getUser().getEmail());		
+			else c = new Comment(inputArea.getValue(), TablePlus.getUser().getEmail(), VisibilityType.PRIVATE);	
 			bookmarkService.addComment(resource.getKey(), c,new AsyncCallback<Boolean>() {
 					@Override
 					public void onFailure(Throwable caught) {
@@ -391,7 +628,6 @@ public class BookmarkWindow extends WindowPlus {
 						loadComments();
 					}
 			});	
-				
 		}
 	}
 	
@@ -824,6 +1060,164 @@ public class BookmarkWindow extends WindowPlus {
 		if (resource.getAnnotation().size()==0) removeAnnotation.disable();
 	}
 	
+	private ColumnModel getColumnModel() {
+		ColumnConfig author = new ColumnConfig("author", "Author", 120);
+		ColumnConfig comment = new ColumnConfig("comment", "Comment", 130);
+		ColumnConfig date = new ColumnConfig("date", "Date", 200);
+		ColumnConfig visibility = new ColumnConfig("visibility", "Visibility", 60);
+		List<ColumnConfig> config = new ArrayList<ColumnConfig>();
+		config.add(author);
+		config.add(comment);
+		config.add(date);
+		config.add(visibility);
+		return new ColumnModel(config);
+	}	
+	
+	public void delete() {
+		final BaseModel selected = grid.getSelectionModel().getSelectedItem();
+		String key = selected.get("key").toString();
+		bookmarkService.deleteComment(key, new AsyncCallback<Boolean>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				GWT.log("Unable to delete comment", caught);
+				Info.display("Error", "Unable to delete comment.");
+			}
+			@Override
+			public void onSuccess(Boolean result) {
+				commentStore.remove(selected);
+				contextMenu.setEnabled(commentStore.getCount() > 0);
+			}
+		});
+	}	
+    
+	private FormPanel buildPanel(String c, final String key) {
+		final FormPanel panel = new FormPanel();
+		FormData formData = new FormData("-20");
+		panel.setHeading("Edit Comment");
+		panel.setFrame(true);
+		panel.setWidth(350);
+	    panel.setLabelWidth(110);
+	    
+		radio1 = new Radio();  
+	    radio1.setBoxLabel("Public");  
+	    radio1.setValue(true);  
+	  
+	    Radio radio2 = new Radio();  
+	    radio2.setBoxLabel("Private");  
+	  
+	    RadioGroup radioGroup = new RadioGroup();  
+	    radioGroup.setFieldLabel("Comment Visibility");  
+	    radioGroup.add(radio1);  
+	    radioGroup.add(radio2); 
+	    panel.add(radioGroup);
+		final TextArea comment = new TextArea();
+		comment.setHeight(35);
+		comment.setPreventScrollbars(true);
+		comment.setFieldLabel("New Comment");
+		comment.setAllowBlank(true);
+		comment.setValue(c);
+		panel.add(comment, formData);	
+	      
+		Button saveButton = new Button("Save");
+		panel.addButton(saveButton);
+		Button cancelButton = new Button("Cancel");
+		panel.addButton(cancelButton);
+		saveButton.setStyleAttribute("padding-left", "70px");
+		panel.setButtonAlign(HorizontalAlignment.CENTER);
+		FormButtonBinding binding = new FormButtonBinding(panel);
+		binding.addButton(saveButton);
+		cancelButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				rebuild();
+			}
+		});
+		saveButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				Comment c;
+				if (radio1.getValue()) c = new Comment(comment.getValue(),TablePlus.getUser().getEmail());
+				else c = new Comment(comment.getValue(),TablePlus.getUser().getEmail(), VisibilityType.PRIVATE);
+				editComment(c, key);
+				comment.clear();
+				rebuild();
+			}
+		});
+		return panel;
+	}
+
+	private void editComment(final Comment comment, final String key) {
+		bookmarkService.addComment(resource.getKey(), comment, new AsyncCallback<Boolean>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				GWT.log("Failed to post comment: ", caught);
+				Info.display("Error", "Failed to post comment.");
+			}
+			@Override
+			public void onSuccess(Boolean result) {
+				bookmarkService.deleteComment(key, new AsyncCallback<Boolean>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GWT.log("Unable to delete comment", caught);
+						Info.display("Error", "Unable to delete comment.");
+					}
+					@Override
+					public void onSuccess(Boolean result) {
+						edit=true;
+					}
+				});
+				loadGridComments();
+			}
+		});
+	}
+
+	private void fillGrid(List<Comment> result) {
+		BaseModel model;
+		for (final Comment c : result) {
+			model = new BaseModel();
+			model.set("key", c.getKey());
+			model.set("author", c.getAuthor());
+			model.set("comment", c.getComment());
+			model.set("date", c.getDate());
+			model.set("visibility", c.getVisibilty());
+			commentStore.add(model);
+		}
+		contextMenu.setEnabled(commentStore.getCount() > 0);
+	}
+
+	private void loadGridComments() {
+		commentStore.removeAll();
+		bookmarkService.getComments(resource.getKey(),new AsyncCallback<List<Comment>>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				GWT.log("Unable to load comments for bookmark: "+ resource.getTitle(), caught);
+				Info.display("Error", "Unable to load comments.");
+			}
+			@Override
+			public void onSuccess(List<Comment> result) {
+				fillGrid(result);
+			}
+		});
+	}
+	
+	private void deleteComment() {
+		for (final BaseModel bm : commentStore.getModels()){
+			if (bm.get("author").equals(TablePlus.getUser().getEmail())){
+				bookmarkService.deleteComment(bm.get("key").toString(), new AsyncCallback<Boolean>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GWT.log("Unable to delete comment", caught);
+						Info.display("Error", "Unable to delete comment.");
+					}
+					@Override
+					public void onSuccess(Boolean result) {
+						commentStore.remove(bm);
+						loadGridComments();
+					}
+				});
+			}
+		}
+	}
 }
 
 
