@@ -3,7 +3,6 @@ package com.unito.tableplus.client.gui.windows;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.Orientation;
 import com.extjs.gxt.ui.client.Style.Scroll;
@@ -166,15 +165,7 @@ public class BookmarkWindowList extends WindowPlus {
 			}
 			@Override
 			public void onSuccess(Bookmark result) {
-			   	final MyPopup popup = new MyPopup(result, table);
-            	popup.setStyleName("popup");
-            	popup.setPopupPositionAndShow(new PopupPanel.PositionCallback() {
-                	public void setPosition(int offsetWidth, int offsetHeight) {
-	                	int left = (50);
-	                	int top = (150);
-	                	popup.setPopupPosition(left, top);
-                	}
-            	});
+			   	
 			}
 		});
 	}
