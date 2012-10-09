@@ -2,14 +2,12 @@ package com.unito.tableplus.client.gui;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import com.extjs.gxt.desktop.client.Shortcut;
 import com.unito.tableplus.client.TablePlus;
 import com.unito.tableplus.client.gui.windows.BlackBoardWindow;
 import com.unito.tableplus.client.gui.windows.BookmarkWindow;
 import com.unito.tableplus.client.gui.windows.BookmarkWindowList;
 import com.unito.tableplus.client.gui.windows.ChatWindow;
-import com.unito.tableplus.client.gui.windows.CommentWindow;
 import com.unito.tableplus.client.gui.windows.DocWindow;
 import com.unito.tableplus.client.gui.windows.TableResourcesWindow;
 import com.unito.tableplus.client.gui.windows.WindowPlus;
@@ -25,13 +23,11 @@ public class TableUI {
 	private Shortcut s3;
 	private Shortcut s4;
 	private Shortcut s5;
-	private Shortcut s6;
 	private WindowPlus chatWindow;
 	private WindowPlus blackboardWindow;
 	private WindowPlus tableResourcesWindow;
 	private WindowPlus bookmarkWindowList;
 	private WindowPlus bookmarkWindow;
-	private WindowPlus commentWindow;
 	private Table table;
 	private String tableName;
 	private Long tableKey;
@@ -63,8 +59,7 @@ public class TableUI {
 
 		// provvisorio
 		bookmarkWindow = new BookmarkWindow(getTable());
-		// provvisorio
-		commentWindow = new CommentWindow(getTable());
+		
 
 		addWindow(tableResourcesWindow);
 		addWindow(chatWindow);
@@ -73,7 +68,7 @@ public class TableUI {
 
 		// provvisorio
 		addWindow(bookmarkWindow);
-		addWindow(commentWindow);
+	
 
 		// table resources
 		s1 = new Shortcut();
@@ -100,7 +95,7 @@ public class TableUI {
 
 		s4 = new Shortcut();
 		s4.setText("My Bookmark List");
-		s4.setId("mybookmark-win-shortcut");
+		s4.setId("resource-win-shortcut");
 		s4.setData("window", bookmarkWindowList);
 		this.addShortcut(s4);
 
@@ -108,17 +103,11 @@ public class TableUI {
 
 		s5 = new Shortcut();
 		s5.setText("Bookmark");
-		s5.setId("mybookmark-win-shortcut");
+		s5.setId("resource-win-shortcut");
 		s5.setData("window", bookmarkWindow);
 		this.addShortcut(s5);
 
-		// bookmark comment (provvisorio)
-
-		s6 = new Shortcut();
-		s6.setText("Bookmark's Comment");
-		s6.setId("mybookmarkcomment-win-shortcut");
-		s6.setData("window", commentWindow);
-		this.addShortcut(s6);
+		
 	}
 
 	/**
