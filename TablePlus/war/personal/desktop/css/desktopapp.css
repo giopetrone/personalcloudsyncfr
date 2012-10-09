@@ -154,12 +154,6 @@
 	background-image: url(../images/group_chat.png);
 }
 
-#chat-win-shortcut-notify img {
-	width: 64px;
-	height: 64px;
-	background-image: url(../images/group_chat_notify.png);
-}
-
 #blackboard-win-shortcut img {
 	width: 64px;
 	height: 64px;
@@ -172,41 +166,10 @@
 	background-image: url(../images/Doc.png);
 }
 
-#mybookmark-win-shortcut img {
+#resource-win-shortcut img {
 	width: 64px;
 	height: 64px;
 	background-image: url(../images/bookmark.png);
-}
-
-#mybookmarkcomment-win-shortcut img {
-	width: 64px;
-	height: 64px;
-	background-image: url(../images/comment2.png);
-}
-
-.popup {
-    background-color       :    LightSteelBlue;
-    border-style           :	groove;
-}
-
-.popup-panel{
-    text-align             :    center;
-	padding				   :	15px;
-}
-
-.popup-title{
-    text-align             :    center;
-	padding				   :	15px;
-}
-
-.popup-footer{
-	style				   :    float;
-    text-align             :    center;
-	padding				   :	15px;
-}
-
-.popup-float{
-	style				   :    float;
 }
 
 .edit {
@@ -233,8 +196,8 @@
   	color:				black;
   	vertical-align: 	top;
   	horizontal-align: 	right;
-  	width: 				170px;
-  	height: 			120px;
+  	width: 				180px;
+  	height: 			86px;
 }
 
 .FlexTable-button0 {
@@ -242,9 +205,8 @@
   	text-align: 		right;
   	vertical-align: 	top;
   	horizontal-align: 	right;
-  	width: 				50px;
-  	height: 			120px;
-  	
+  	width: 				40px;
+  	height: 			86px;  	
 }
 
 .FlexTable-button1 {
@@ -252,26 +214,35 @@
   	text-align: 		right;
   	vertical-align: 	top;
   	horizontal-align: 	right;
-  	width: 				50px;
-  	margin-top:			0;
-  	height: 			80px;
-  	
+  	width: 				40px;
+  	height: 			72px;	
 }
 
 .FlexTable-text1 {
   	color:				black;
   	vertical-align: 	top;
   	horizontal-align: 	right;
-  	width: 				170px;
-  	margin-top:			0;
-  	height: 			80px;
+  	width: 				180px;
+  	height: 			72px;
+}
+
+.FlexTable-button2 {
+  	color:				black;
+  	text-align: 		right;
+  	vertical-align: 	top;
+  	horizontal-align: 	right;
+  	width: 				40px;
+  	height: 			65px;	
+}
+
+.FlexTable-text2 {
+  	color:				black;
+  	vertical-align: 	top;
+  	horizontal-align: 	right;
+  	width: 				180px;
+  	height: 			65px;
 }
 
 .deleteAll {
 	background-image: url(../images/deleteGreen.png) !important;
-}
-
-.pad-text {
-  font-size: 12px;
-  padding: 5px;
 }
