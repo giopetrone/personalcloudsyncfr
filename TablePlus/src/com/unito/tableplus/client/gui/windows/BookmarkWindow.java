@@ -112,6 +112,7 @@ public class BookmarkWindow extends WindowPlus {
 	private HorizontalPanel hp= new HorizontalPanel();
 	private Html title;
 	private LayoutContainer preview=  new LayoutContainer();
+	private Button commentButton = new Button("Comments");
 	
 	public BookmarkWindow(final Table table){
 	
@@ -547,6 +548,7 @@ public class BookmarkWindow extends WindowPlus {
 				loadGridComments();
 			}
 		});
+		commentButton.enable();
 	}
 
 	private void createButtonPanel() {
@@ -567,10 +569,8 @@ public class BookmarkWindow extends WindowPlus {
 			}
 		});	
 		//bottone commento
-		Button commentButton = new Button("Comments");
 		commentButton.setToolTip(new ToolTipConfig("View and edit comments"));
 		commentButton.setIcon(IconHelper.createStyle("comment"));						 			    
-							    
 		commentButton.addSelectionListener(new SelectionListener<ButtonEvent>(){
 			public void componentSelected(ButtonEvent ce) {
 				removeAll();
@@ -601,9 +601,7 @@ public class BookmarkWindow extends WindowPlus {
 		hpButton.add(refreshButton);
 		hpButton.add(goButton);
 		hpButton.add(closeButton);	
-
 		add(hpButton);
-		
 	}
 
 	private Widget getHtmlLegend() {
@@ -628,12 +626,12 @@ public class BookmarkWindow extends WindowPlus {
 						loadComments();
 					}
 			});	
+			commentButton.enable();
 		}
 	}
 	
 	public void loadComments() {
 		bookmarkService.getComments(resource.getKey(),new AsyncCallback<List<Comment>>() {
-			
 			@Override
 			public void onFailure(Throwable caught) {
 				GWT.log("Unable to load comments of bookmarks: "+ resource.getTitle(), caught);
@@ -675,6 +673,7 @@ public class BookmarkWindow extends WindowPlus {
 				else {
 					message="<div align=\"left\"><br><b>There are no comments for the bookmark!</b><br></div>";
 					historyContainer.add(new Label(message+"<br>"), "");
+					commentButton.disable();
 				}
 				unmask();
 			}
