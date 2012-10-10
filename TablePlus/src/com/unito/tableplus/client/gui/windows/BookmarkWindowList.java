@@ -16,6 +16,7 @@ import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.util.IconHelper;
 import com.extjs.gxt.ui.client.util.Margins;
+import com.extjs.gxt.ui.client.widget.BoxComponent;
 import com.extjs.gxt.ui.client.widget.Info;
 import com.extjs.gxt.ui.client.widget.Layout;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -24,8 +25,10 @@ import com.extjs.gxt.ui.client.widget.form.FormButtonBinding;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.extjs.gxt.ui.client.widget.form.TextArea;
 import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
+import com.extjs.gxt.ui.client.widget.grid.ColumnData;
 import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
 import com.extjs.gxt.ui.client.widget.grid.Grid;
+import com.extjs.gxt.ui.client.widget.grid.GridCellRenderer;
 import com.extjs.gxt.ui.client.widget.layout.CenterLayout;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
@@ -35,8 +38,8 @@ import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.PopupPanel;
 import com.unito.tableplus.client.TablePlus;
 import com.unito.tableplus.client.services.BookmarkService;
 import com.unito.tableplus.client.services.BookmarkServiceAsync;
@@ -67,9 +70,9 @@ public class BookmarkWindowList extends WindowPlus {
 	
 	public BookmarkWindowList(final Table table) {
 		super();
-		setSize(650, 350);
+		setSize(635, 350);
 		this.table = table;
-		setHeading("Bookmark");
+		setHeading("Resource");
 		
 		setLayout(new RowLayout(Orientation.VERTICAL));
 		setButtonAlign(HorizontalAlignment.LEFT);
@@ -78,6 +81,7 @@ public class BookmarkWindowList extends WindowPlus {
 		mainContainer.setScrollMode(Scroll.AUTOY);
 		bookmarksStore = new ListStore<BaseModel>();
 		grid = new Grid<BaseModel>(bookmarksStore, getColumnModel());
+		grid.setWidth(595);
 		contextMenu = new Menu();
 		deleteItem = new MenuItem();
 		deleteItem.setText("Delete Bookmark");
@@ -130,9 +134,7 @@ public class BookmarkWindowList extends WindowPlus {
                 if (rowIndex != -1) {               	
                 	final BaseModel selected = grid.getSelectionModel().getSelectedItem();
     				String key = selected.get("key").toString();
-    				//getBookmarkPreview(key);
     				getBookmarkWindow(table, key);
-    				//setPosition(600,200);
                 }
             }
         });
@@ -152,7 +154,6 @@ public class BookmarkWindowList extends WindowPlus {
                 }
             }
         });
-		
 	}
 
 	public void getBookmarkPreview(String key) {
@@ -180,7 +181,6 @@ public class BookmarkWindowList extends WindowPlus {
 			}
 			@Override
 			public void onSuccess(Bookmark b) {
-				//BookmarkWindow bookmarkPopup= new BookmarkWindow(table, b);
 				
 				BookmarkWindow bookmarkPopup= new BookmarkWindow(table);
 				
@@ -267,12 +267,43 @@ public class BookmarkWindowList extends WindowPlus {
 	}
 
 	private ColumnModel getColumnModel() {
-		ColumnConfig title = new ColumnConfig("title", "Title", 80);
-		ColumnConfig url = new ColumnConfig("url", "Url", 170);
-		ColumnConfig legend = new ColumnConfig("legend", "Legend", 145);
-		ColumnConfig comment = new ColumnConfig("comment", "Comment", 60);
-		ColumnConfig tag = new ColumnConfig("tag", "Tag", 100);
-		ColumnConfig annotation = new ColumnConfig("annotation", "Annotation", 60);
+		ColumnConfig title = new ColumnConfig("title", "Title", 70);
+		final ColumnConfig url = new ColumnConfig("url", "Url", 160);
+		ColumnConfig legend = new ColumnConfig("legend", "Legend", 120);
+		ColumnConfig comment = new ColumnConfig("comment", "Comment", 55);
+		ColumnConfig tag = new ColumnConfig("tag", "Tag", 70);
+		ColumnConfig annotation = new ColumnConfig("annotation", "Annotation", 65);
+		ColumnConfig go = new ColumnConfig("go", "Open", 55);  
+		GridCellRenderer<BaseModel> buttonRenderer = new GridCellRenderer<BaseModel>() {  
+			private boolean init;  
+			public Object render(final BaseModel model, String property, ColumnData config, final int rowIndex,  
+		        final int colIndex, ListStore<BaseModel> store, Grid<BaseModel> grid) {  
+		        if (!init) {  
+		            init = true;  
+		            grid.addListener(Events.ColumnResize, new Listener<GridEvent<BaseModel>>() {  
+		    
+			            public void handleEvent(GridEvent<BaseModel> be) {  
+			            	for (int i = 0; i < be.getGrid().getStore().getCount(); i++) {  
+			                	if (be.getGrid().getView().getWidget(i, be.getColIndex()) != null  
+			                		&& be.getGrid().getView().getWidget(i, be.getColIndex()) instanceof BoxComponent) {  
+			                		((BoxComponent) be.getGrid().getView().getWidget(i, be.getColIndex())).setWidth(be.getWidth() - 10);  
+			                	}  
+			                }  
+			            }  
+		            });  
+		        }  
+		        Button goButton = new Button("Go");
+				goButton.setToolTip(new ToolTipConfig("View bookmark"));
+				goButton.setIcon(IconHelper.createStyle("go"));
+				goButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+					public void componentSelected(ButtonEvent ce) {
+						Window.open(model.get("url").toString(), "", "left=100,top=100,width=600,height=400,menubar,toolbar,resizable");
+					}
+				});	
+				return goButton;  
+			}
+		}; 
+		go.setRenderer(buttonRenderer);  
 		List<ColumnConfig> config = new ArrayList<ColumnConfig>();
 		config.add(title);
 		config.add(url);
@@ -280,7 +311,9 @@ public class BookmarkWindowList extends WindowPlus {
 		config.add(comment);
 		config.add(tag);
 		config.add(annotation);
+		config.add(go);
 		return new ColumnModel(config);
+		 
 	}
 
 	private FormPanel buildPanel() {
