@@ -267,7 +267,7 @@ public class BookmarkWindowList extends WindowPlus {
 		         
 		        Button goButton = new Button("Go");
 		        goButton.setWidth(45);
-				goButton.setToolTip(new ToolTipConfig("View bookmark"));
+				goButton.setToolTip(new ToolTipConfig("Open resource in new tab"));
 				goButton.setIcon(IconHelper.createStyle("go"));
 				goButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 					public void componentSelected(ButtonEvent ce) {
