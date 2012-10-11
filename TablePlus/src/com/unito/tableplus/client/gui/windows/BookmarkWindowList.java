@@ -16,7 +16,6 @@ import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.util.IconHelper;
 import com.extjs.gxt.ui.client.util.Margins;
-import com.extjs.gxt.ui.client.widget.BoxComponent;
 import com.extjs.gxt.ui.client.widget.Info;
 import com.extjs.gxt.ui.client.widget.Layout;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
