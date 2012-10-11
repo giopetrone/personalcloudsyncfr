@@ -162,9 +162,11 @@ public class BookmarkWindow extends WindowPlus {
 		String objectName=resource.getClass().getName().substring(33);
 		setHeading(objectName+": "+resource.getTitle());
 		title= new Html("<div align=\"center\"><b>\nThe "+objectName
-				+" <u>"+resource.getTitle() +"</u> has been shared on this table\n\n</b></div> ");
-		title.setHeight(30);
-		title.setStyleAttribute("padding-top", "7px");
+				+" <u>"+resource.getTitle() +"</u> has been shared on this table\n\n</b></div> "
+				+"<div align=\"center\">\nUrl: "+resource.getUrl()+"</div> ");
+		title.setHeight(40);
+		title.setStyleAttribute("padding-top", "4px");
+		title.setStyleAttribute("padding-bottom", "4px");
 		add(title);
 	} 
 	
@@ -561,7 +563,7 @@ public class BookmarkWindow extends WindowPlus {
 		});
 		//go button				
 		Button goButton = new Button("Go");
-		goButton.setToolTip(new ToolTipConfig("View bookmark"));
+		goButton.setToolTip(new ToolTipConfig("Open resource in new tab"));
 		goButton.setIcon(IconHelper.createStyle("go"));
 		goButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			public void componentSelected(ButtonEvent ce) {
