@@ -1,9 +1,7 @@
 package com.unito.tableplus.shared.model;
    
-import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
-
 import javax.jdo.annotations.Extension;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
@@ -12,7 +10,7 @@ import javax.jdo.annotations.PrimaryKey;
 
 
 @PersistenceCapable(detachable = "true")
-public class Bookmark implements Serializable {
+public class Bookmark implements Resource {
 
 	private static final long serialVersionUID = 1L;
 
@@ -170,5 +168,26 @@ public class Bookmark implements Serializable {
 	public void removeAnnotation(int annotation) {
 		this.getAnnotation().remove(annotation);
 	}
+	
+	@Override
+	public Provider getProvider() {
+		return Provider.BOOKMARK;
+	}
+	
+	@Override
+	public String getIcon() {
+		return "bookmark.png";
+	}
+	
+	@Override
+	public String getURI() {
+		return getUrl();
+	}
+
+	@Override
+	public String getName() {
+		return getTitle();
+	}
+
 
 }
