@@ -81,7 +81,7 @@ public class BookmarkWindowList extends WindowPlus {
 		mainContainer.setScrollMode(Scroll.AUTOY);
 		bookmarksStore = new ListStore<BaseModel>();
 		grid = new Grid<BaseModel>(bookmarksStore, getColumnModel());
-		grid.setWidth(595);
+	//	grid.setWidth(595);
 		contextMenu = new Menu();
 		deleteItem = new MenuItem();
 		deleteItem.setText("Delete Bookmark");
@@ -156,20 +156,7 @@ public class BookmarkWindowList extends WindowPlus {
         });
 	}
 
-	public void getBookmarkPreview(String key) {
-		bookmarkService.queryBookmark(key,new AsyncCallback<Bookmark>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GWT.log("Unable to load bookmarks for table: "+ table.getName(), caught);
-				Info.display("Error", "Unable to load bookmarks.");
-				unmask();
-			}
-			@Override
-			public void onSuccess(Bookmark result) {
-			   	
-			}
-		});
-	}
+	
 	
 	public void getBookmarkWindow(final Table table, String key) {
 		bookmarkService.queryBookmark(key,new AsyncCallback<Bookmark>() {
@@ -275,24 +262,11 @@ public class BookmarkWindowList extends WindowPlus {
 		ColumnConfig annotation = new ColumnConfig("annotation", "Annotation", 65);
 		ColumnConfig go = new ColumnConfig("go", "Open", 55);  
 		GridCellRenderer<BaseModel> buttonRenderer = new GridCellRenderer<BaseModel>() {  
-			private boolean init;  
 			public Object render(final BaseModel model, String property, ColumnData config, final int rowIndex,  
 		        final int colIndex, ListStore<BaseModel> store, Grid<BaseModel> grid) {  
-		        if (!init) {  
-		            init = true;  
-		            grid.addListener(Events.ColumnResize, new Listener<GridEvent<BaseModel>>() {  
-		    
-			            public void handleEvent(GridEvent<BaseModel> be) {  
-			            	for (int i = 0; i < be.getGrid().getStore().getCount(); i++) {  
-			                	if (be.getGrid().getView().getWidget(i, be.getColIndex()) != null  
-			                		&& be.getGrid().getView().getWidget(i, be.getColIndex()) instanceof BoxComponent) {  
-			                		((BoxComponent) be.getGrid().getView().getWidget(i, be.getColIndex())).setWidth(be.getWidth() - 10);  
-			                	}  
-			                }  
-			            }  
-		            });  
-		        }  
+		         
 		        Button goButton = new Button("Go");
+		        goButton.setWidth(45);
 				goButton.setToolTip(new ToolTipConfig("View bookmark"));
 				goButton.setIcon(IconHelper.createStyle("go"));
 				goButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
@@ -305,13 +279,14 @@ public class BookmarkWindowList extends WindowPlus {
 		}; 
 		go.setRenderer(buttonRenderer);  
 		List<ColumnConfig> config = new ArrayList<ColumnConfig>();
+		config.add(go);
 		config.add(title);
 		config.add(url);
 		config.add(legend);
 		config.add(comment);
 		config.add(tag);
 		config.add(annotation);
-		config.add(go);
+		
 		return new ColumnModel(config);
 		 
 	}
@@ -365,10 +340,8 @@ public class BookmarkWindowList extends WindowPlus {
 		tag.setFieldLabel("Tag");
 		tag.setAllowBlank(true);
 		panel.add(tag, formData);
-		if(allTags.size()>0)
-			tag.setToolTip("All existing tags: \n"+allTags.toString());
-		else 
-			tag.setToolTip("There are no tags");
+		if(allTags.size()>0) tag.setToolTip("All existing tags: \n"+allTags.toString());
+		else tag.setToolTip("There are no tags");
 		Button saveButton = new Button("Save");
 		panel.addButton(saveButton);
 		Button cancelButton = new Button("Cancel");
