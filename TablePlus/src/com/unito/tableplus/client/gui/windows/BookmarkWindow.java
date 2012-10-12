@@ -558,6 +558,7 @@ public class BookmarkWindow extends WindowPlus {
 		Button closeButton = new Button("Close");
 		closeButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			public void componentSelected(ButtonEvent ce) {
+				restoreMainContainer();
 				hide();
 			}
 		});
@@ -794,15 +795,16 @@ public class BookmarkWindow extends WindowPlus {
 	
 	public LayoutContainer setFormRemoveTag(){
 		final LayoutContainer panel = new LayoutContainer();
-		panel.setStyleAttribute("padding-left", "10px");
+		panel.setStyleAttribute("padding-left", "5px");
 		Label label=new Label("Remove a tag to bookmark:");		
 		label.setStyleAttribute("padding-bottom", "5px");
+		label.setStyleAttribute("padding-left", "5px");
 		panel.add(label);	
 		
 	    HorizontalPanel hp1= new HorizontalPanel();  
 	    panel.add(hp1);
 	    hp1.setStyleAttribute("padding-top", "5px");
-	    
+	    hp1.setStyleAttribute("padding-left", "5px");
 	    listTag = new ListBox();
 		for (String tag : resource.getTag()) {
 			listTag.addItem(tag);
@@ -813,11 +815,11 @@ public class BookmarkWindow extends WindowPlus {
 
 		hp1.add(listTag);
 		hpTag2= new HorizontalPanel();	
-	    hpTag2.setStyleAttribute("padding-top", "5px");
+	    hpTag2.setSpacing(5);
 	    hpTag2.setHorizontalAlign(HorizontalAlignment.LEFT);
 		
 		Button remove=new Button("Remove");
-		remove.setStyleAttribute("padding-right", "10px");
+		remove.setStyleAttribute("padding-right", "5px");
 		remove.setHeight(20);
 		hpTag2.add(remove);
 		
@@ -1173,17 +1175,22 @@ public class BookmarkWindow extends WindowPlus {
 	}
 
 	private void fillGrid(List<Comment> result) {
-		BaseModel model;
+		BaseModel model= new BaseModel();
 		for (final Comment c : result) {
-			model = new BaseModel();
 			model.set("key", c.getKey());
 			model.set("author", c.getAuthor());
 			model.set("comment", c.getComment());
 			model.set("date", c.getDate());
 			model.set("visibility", c.getVisibilty());
 			commentStore.add(model);
+			if (model.get("author").toString().equals(TablePlus.getUser().getEmail())){
+				contextMenu.setEnabled(true);
+			}
+			else {
+				contextMenu.disable();
+			}
 		}
-		contextMenu.setEnabled(commentStore.getCount() > 0);
+		//contextMenu.setEnabled(commentStore.getCount() > 0);
 	}
 
 	private void loadGridComments() {
