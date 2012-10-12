@@ -246,4 +246,8 @@ public class TableUI {
 			this.s2.repaint();
 		}
 	}
+
+	public void show(WindowPlus window) {
+		this.addWindow(window);
+	}
 }
