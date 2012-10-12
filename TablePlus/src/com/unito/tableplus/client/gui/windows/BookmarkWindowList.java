@@ -8,9 +8,6 @@ import com.extjs.gxt.ui.client.Style.Orientation;
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.data.BaseModel;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.Events;
-import com.extjs.gxt.ui.client.event.GridEvent;
-import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MenuEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.store.ListStore;
@@ -64,6 +61,7 @@ public class BookmarkWindowList extends WindowPlus {
 	private FormPanel inputPanel;
 	private Menu contextMenu;
 	private MenuItem deleteItem;
+	private MenuItem openItem;
 	private List<String> allTags= new LinkedList<String>();
 	private List<Bookmark> resource;
 	
@@ -80,7 +78,6 @@ public class BookmarkWindowList extends WindowPlus {
 		mainContainer.setScrollMode(Scroll.AUTOY);
 		bookmarksStore = new ListStore<BaseModel>();
 		grid = new Grid<BaseModel>(bookmarksStore, getColumnModel());
-	//	grid.setWidth(595);
 		contextMenu = new Menu();
 		deleteItem = new MenuItem();
 		deleteItem.setText("Delete Bookmark");
@@ -105,6 +102,31 @@ public class BookmarkWindowList extends WindowPlus {
 		});
 		contextMenu.add(deleteItem);
 		
+		openItem = new MenuItem();
+		openItem.setText("Open Bookmark Properties Window");
+		openItem.addSelectionListener(new SelectionListener<MenuEvent>() {
+			@Override
+			public void componentSelected(MenuEvent ce) {
+				final BaseModel selected = grid.getSelectionModel().getSelectedItem();
+				String key = selected.get("key").toString();
+				bookmarkService.queryBookmark(key,new AsyncCallback<Bookmark>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GWT.log("Unable to load bookmarks for table: "+ table.getName(), caught);
+						Info.display("Error", "Unable to load bookmarks.");
+						unmask();
+					}
+					@Override
+					public void onSuccess(Bookmark b) {
+						//BookmarkWindow bookmarkWindow= new BookmarkWindow(table, b);
+						BookmarkWindow bookmarkWindow= new BookmarkWindow(table);
+						TablePlus.getPersonalTable().show(bookmarkWindow);
+						
+					}
+				});
+			}
+		});
+		contextMenu.add(openItem);
 		grid.setContextMenu(contextMenu);
 		mainContainer.add(grid);
 
@@ -127,51 +149,8 @@ public class BookmarkWindowList extends WindowPlus {
 		addButton.setIcon(IconHelper.createStyle("add"));		
 		addButton(loadButton);
 		addButton(addButton);
-		grid.addListener(Events.CellMouseUp, new Listener<GridEvent<BaseModel>>() {
-            public void handleEvent(GridEvent<BaseModel> ge) {
-                int rowIndex = ge.getRowIndex();
-                if (rowIndex != -1) {               	
-                	final BaseModel selected = grid.getSelectionModel().getSelectedItem();
-    				String key = selected.get("key").toString();
-    				getBookmarkWindow(table, key);
-                }
-            }
-        });
-		//CellDoubleClick();
 
 		loadBookmark();
-	}
-	
-	private void CellDoubleClick() {
-		grid.addListener(Events.CellDoubleClick, new Listener<GridEvent<BaseModel>>() {
-            public void handleEvent(GridEvent<BaseModel> ge) {
-                int rowIndex = ge.getRowIndex();
-                if (rowIndex != -1) {               	
-                	final BaseModel selected = grid.getSelectionModel().getSelectedItem();
-    				String key = selected.get("key").toString();
-    				getBookmarkWindow(table, key);
-                }
-            }
-        });
-	}
-
-	
-	
-	public void getBookmarkWindow(final Table table, String key) {
-		bookmarkService.queryBookmark(key,new AsyncCallback<Bookmark>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GWT.log("Unable to load bookmarks for table: "+ table.getName(), caught);
-				Info.display("Error", "Unable to load bookmarks.");
-				unmask();
-			}
-			@Override
-			public void onSuccess(Bookmark b) {
-				
-				BookmarkWindow bookmarkPopup= new BookmarkWindow(table);
-				
-			}
-		});
 	}
 	
 	private void loadBookmark() {
