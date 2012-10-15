@@ -228,6 +228,7 @@ public class BookmarkWindowList extends WindowPlus {
 			bookmarksStore.add(model);
 		}
 		contextMenu.setEnabled(bookmarksStore.getCount() > 0);
+		TablePlus.getPersonalTable().setAllTags(allTags);
 	}
 
 	private ColumnModel getColumnModel() {
