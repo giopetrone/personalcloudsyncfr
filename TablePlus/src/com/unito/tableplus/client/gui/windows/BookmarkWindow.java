@@ -108,6 +108,7 @@ public class BookmarkWindow extends WindowPlus {
 	private Html title;
 	private LayoutContainer preview=  new LayoutContainer();
 	private Button commentButton = new Button("Comments");
+	
 		
 	public BookmarkWindow(Bookmark resource) {
 		super();
@@ -722,7 +723,7 @@ public class BookmarkWindow extends WindowPlus {
 			inputTag.setValue(resource.getTag().get(0));
 			listTag = new ListBox();
 			inputTag.setWidth(65);
-			for (String tag : resource.getTag()) {
+			for (String tag : TablePlus.getPersonalTable().getAllTags()) {
 				listTag.addItem(tag);
 			}
 			listTag.setHeight("20px");
