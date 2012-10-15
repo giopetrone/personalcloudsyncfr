@@ -1,6 +1,7 @@
 package com.unito.tableplus.client.gui;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import com.extjs.gxt.desktop.client.Shortcut;
 import com.unito.tableplus.client.TablePlus;
@@ -32,7 +33,7 @@ public class TableUI {
 	private String tableName;
 	private Long tableKey;
 	private List<Long> tableMembers;
-
+	private List<String> allTags= new LinkedList<String>();
 	/**
 	 * Costruttore per personal table
 	 * 
@@ -235,6 +236,14 @@ public class TableUI {
         this.bookmarkWindow = new BookmarkWindow(b);
         this.addWindow(this.bookmarkWindow);
         this.bookmarkWindow.show();
+	}
+
+	public List<String> getAllTags() {
+		return allTags;
+	}
+	
+	public void setAllTags(List<String> allTags) {
+		this.allTags=allTags;
 	}
 
 }
