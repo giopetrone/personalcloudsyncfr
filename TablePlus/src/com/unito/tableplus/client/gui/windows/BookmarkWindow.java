@@ -51,19 +51,14 @@ import com.google.gwt.user.client.ui.Widget;
 import com.unito.tableplus.client.TablePlus;
 import com.unito.tableplus.client.services.BookmarkService;
 import com.unito.tableplus.client.services.BookmarkServiceAsync;
-import com.unito.tableplus.client.services.ServiceFactory;
-import com.unito.tableplus.client.services.TableServiceAsync;
 import com.unito.tableplus.shared.model.Bookmark;
 import com.unito.tableplus.shared.model.Comment;
-import com.unito.tableplus.shared.model.Table;
 import com.unito.tableplus.shared.model.VisibilityType;
   
 public class BookmarkWindow extends WindowPlus {
 	
 	private final BookmarkServiceAsync bookmarkService = GWT.create(BookmarkService.class);
-	private final TableServiceAsync tableService = ServiceFactory.getTableServiceInstance();
-	
-	private Table table;
+
 	private LayoutContainer mainContainer;
 	private HtmlContainer historyContainer;
 	private TextArea inputArea;	
@@ -113,13 +108,10 @@ public class BookmarkWindow extends WindowPlus {
 	private Html title;
 	private LayoutContainer preview=  new LayoutContainer();
 	private Button commentButton = new Button("Comments");
-	
-	public BookmarkWindow(final Table table){
-	
-	//public BookmarkWindow(final Table table, Bookmark resource){
+		
+	public BookmarkWindow(final Bookmark resource) {
 		super();
-		this.table = table;
-		//this.resource=resource;
+		this.resource=resource;
 		setSize(590,500);
 		
 		setLayout(new RowLayout(Orientation.VERTICAL));
@@ -127,34 +119,15 @@ public class BookmarkWindow extends WindowPlus {
 		mainContainer = new LayoutContainer();
 		mainContainer.setScrollMode(Scroll.AUTO);			
 
-		getObject();
+		refresh();
+		setTitle();
+		setFrame();
+		createFlexTable();
+		createCommentPanel();
+		radioButton();
+		createInputArea();
+		createButtonPanel();
 
-	}
-
-	private void getObject() {
-		//provvisorio: prendo il primo segnalibro salvato, nella futura implementazione 
-		//verra preso come parametro al doppio click sull'elemento della BookmarkWindowsList
-		tableService.getTableBookmark(table.getKey(),new AsyncCallback<List<Bookmark>>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GWT.log("Unable to load the bookmark! ", caught);
-				Info.display("Error", "Unable to load the bookmarks.");
-				unmask();
-			}
-			@Override
-			public void onSuccess(List<Bookmark> result) {			
-				resource=result.get(0);
-		//fine parte provvisoria	
-				refresh();
-				setTitle();
-				setFrame();
-				createFlexTable();
-				createCommentPanel();
-				radioButton();
-				createInputArea();
-				createButtonPanel();
-			}
-		});
 	}
 	
 	private void setTitle() {
