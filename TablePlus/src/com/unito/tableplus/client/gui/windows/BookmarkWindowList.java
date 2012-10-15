@@ -37,6 +37,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.unito.tableplus.client.TablePlus;
+import com.unito.tableplus.client.gui.TableUI;
 import com.unito.tableplus.client.services.BookmarkService;
 import com.unito.tableplus.client.services.BookmarkServiceAsync;
 import com.unito.tableplus.client.services.ServiceFactory;
@@ -65,7 +66,7 @@ public class BookmarkWindowList extends WindowPlus {
 	private List<String> allTags= new LinkedList<String>();
 	private List<Bookmark> resource;
 	
-	public BookmarkWindowList(final Table table) {
+	public BookmarkWindowList(final TableUI tableUI, final Table table) {
 		super();
 		setSize(635, 350);
 		this.table = table;
@@ -118,9 +119,7 @@ public class BookmarkWindowList extends WindowPlus {
 					}
 					@Override
 					public void onSuccess(Bookmark b) {
-						//BookmarkWindow bookmarkWindow= new BookmarkWindow(table, b);
-						BookmarkWindow bookmarkWindow= new BookmarkWindow(table);
-						TablePlus.getPersonalTable().show(bookmarkWindow);
+						TablePlus.getPersonalTable().showBookmarkWindow(b);
 						
 					}
 				});
