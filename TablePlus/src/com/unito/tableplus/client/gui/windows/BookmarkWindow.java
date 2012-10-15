@@ -109,7 +109,7 @@ public class BookmarkWindow extends WindowPlus {
 	private LayoutContainer preview=  new LayoutContainer();
 	private Button commentButton = new Button("Comments");
 		
-	public BookmarkWindow(final Bookmark resource) {
+	public BookmarkWindow(Bookmark resource) {
 		super();
 		this.resource=resource;
 		setSize(590,500);
@@ -884,8 +884,8 @@ public class BookmarkWindow extends WindowPlus {
 		bookmarkService.queryBookmark(resource.getKey(),new AsyncCallback<Bookmark>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				GWT.log("Unable to load the bookmark! ", caught);
-				Info.display("Error", "Unable to load the bookmarks.");
+				GWT.log("Unable to refresh the bookmark! ", caught);
+				Info.display("Error", "Unable to refresh the bookmarks.");
 			}
 			@Override
 			public void onSuccess(Bookmark result) {			
@@ -1159,11 +1159,8 @@ public class BookmarkWindow extends WindowPlus {
 			if (model.get("author").toString().equals(TablePlus.getUser().getEmail())){
 				contextMenu.setEnabled(true);
 			}
-			else {
-				contextMenu.disable();
-			}
+			else  contextMenu.disable();
 		}
-		//contextMenu.setEnabled(commentStore.getCount() > 0);
 	}
 
 	private void loadGridComments() {
