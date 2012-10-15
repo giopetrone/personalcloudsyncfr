@@ -11,6 +11,7 @@ import com.unito.tableplus.client.gui.windows.ChatWindow;
 import com.unito.tableplus.client.gui.windows.DocWindow;
 import com.unito.tableplus.client.gui.windows.TableResourcesWindow;
 import com.unito.tableplus.client.gui.windows.WindowPlus;
+import com.unito.tableplus.shared.model.Bookmark;
 import com.unito.tableplus.shared.model.Table;
 
 public class TableUI {
@@ -22,7 +23,6 @@ public class TableUI {
 	private Shortcut s2;
 	private Shortcut s3;
 	private Shortcut s4;
-	private Shortcut s5;
 	private WindowPlus chatWindow;
 	private WindowPlus blackboardWindow;
 	private WindowPlus tableResourcesWindow;
@@ -55,20 +55,13 @@ public class TableUI {
 		tableResourcesWindow = new TableResourcesWindow();
 		chatWindow = new ChatWindow(this);
 		blackboardWindow = new BlackBoardWindow(getTable());
-		bookmarkWindowList = new BookmarkWindowList(getTable());
-
-		// provvisorio
-		bookmarkWindow = new BookmarkWindow(getTable());
+		bookmarkWindowList = new BookmarkWindowList(this, getTable());
 		
 
 		addWindow(tableResourcesWindow);
 		addWindow(chatWindow);
 		addWindow(blackboardWindow);
 		addWindow(bookmarkWindowList);
-
-		// provvisorio
-		addWindow(bookmarkWindow);
-	
 
 		// table resources
 		s1 = new Shortcut();
@@ -99,15 +92,6 @@ public class TableUI {
 		s4.setData("window", bookmarkWindowList);
 		this.addShortcut(s4);
 
-		// bookmark (provvisorio)
-
-		s5 = new Shortcut();
-		s5.setText("Bookmark");
-		s5.setId("resource-win-shortcut");
-		s5.setData("window", bookmarkWindow);
-		this.addShortcut(s5);
-
-		
 	}
 
 	/**
@@ -247,7 +231,10 @@ public class TableUI {
 		}
 	}
 
-	public void show(WindowPlus window) {
-		this.addWindow(window);
+	public void showBookmarkWindow(Bookmark b){
+        this.bookmarkWindow = new BookmarkWindow(b);
+        this.addWindow(this.bookmarkWindow);
+        this.bookmarkWindow.show();
 	}
+
 }
