@@ -36,6 +36,7 @@ import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.ListBox;
 import com.unito.tableplus.client.TablePlus;
 import com.unito.tableplus.client.gui.TableUI;
 import com.unito.tableplus.client.services.BookmarkService;
@@ -57,6 +58,7 @@ public class BookmarkWindowList extends WindowPlus {
 	private ListStore<BaseModel> bookmarksStore;
 	private Button loadButton;
 	private Button addButton;
+	private Button filterButton;
 	private Layout fitLayout = new FitLayout();
 	private Layout centerLayout = new CenterLayout();
 	private FormPanel inputPanel;
@@ -138,6 +140,7 @@ public class BookmarkWindowList extends WindowPlus {
 		});
 		loadButton.setToolTip(new ToolTipConfig("Refresh objects"));
 		loadButton.setIcon(IconHelper.createStyle("arrow_refresh"));
+		
 		addButton = new Button("Add",new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
@@ -145,13 +148,95 @@ public class BookmarkWindowList extends WindowPlus {
 			}
 		});
 		addButton.setToolTip(new ToolTipConfig("Add Object"));
-		addButton.setIcon(IconHelper.createStyle("add"));		
+		addButton.setIcon(IconHelper.createStyle("add"));	
+		
+		filterButton = new Button("Filter By Tag",new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				showFilterPanel();
+			}
+		});
+		filterButton.setToolTip(new ToolTipConfig("Filter resources by Tag"));
+		filterButton.setIcon(IconHelper.createStyle("filter"));	
+		
 		addButton(loadButton);
 		addButton(addButton);
+		addButton(filterButton);
 
 		loadBookmark();
 	}
 	
+	private void showFilterPanel() {
+		inputPanel = buildTagPanel();
+		mainContainer.remove(grid);
+		loadButton.disable();
+		addButton.disable();
+		filterButton.disable();
+		mainContainer.setLayout(centerLayout);
+		mainContainer.add(inputPanel);
+		mainContainer.layout();
+	}
+
+	private FormPanel buildTagPanel() {
+		final FormPanel panel = new FormPanel();
+		panel.setLayoutData(Orientation.HORIZONTAL);
+		final FormData formData = new FormData("-20");
+		panel.setHeading("New Filter");
+		panel.setFrame(true);
+		panel.setWidth(350);
+
+		final ListBox listTag = new ListBox();
+		for (String tag : TablePlus.getPersonalTable().getAllTags()) {
+			listTag.addItem(tag);
+		}
+		listTag.setHeight("20px");
+
+		panel.add(listTag, formData);
+		
+		Button saveButton = new Button("Save Filter");
+		panel.addButton(saveButton);
+		Button cancelButton = new Button("Cancel");
+		panel.addButton(cancelButton);
+		panel.setButtonAlign(HorizontalAlignment.CENTER);
+		FormButtonBinding binding = new FormButtonBinding(panel);
+		binding.addButton(saveButton);
+		cancelButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				mainContainer.remove(inputPanel);
+				mainContainer.setLayout(fitLayout);
+				mainContainer.add(grid);
+				loadButton.enable();
+				addButton.enable();
+				filterButton.enable();
+				mainContainer.layout();
+			}
+		});
+		saveButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				bookmarksStore.removeAll();
+				mask();
+				String tag =listTag.getItemText(listTag.getSelectedIndex());
+				List<Bookmark> tagFilter = new LinkedList<Bookmark>();
+				for (Bookmark b: resource){
+					for (String t: b.getTag()) if (t.equals(tag)) tagFilter.add(b);
+				}
+				fillGrid(tagFilter);
+				unmask();
+				mainContainer.remove(inputPanel);
+				mainContainer.setLayout(fitLayout);
+				mainContainer.add(grid);
+				loadButton.enable();
+				addButton.enable();
+				filterButton.enable();
+				mainContainer.layout();
+			}
+		});
+		return panel;
+		
+	}
+
 	private void loadBookmark() {
 		bookmarksStore.removeAll();
 		mask();
@@ -173,13 +258,15 @@ public class BookmarkWindowList extends WindowPlus {
 	}
 
 	private void showInputPanel() {
-		if (inputPanel == null) inputPanel = buildPanel();
+		inputPanel = buildPanel();
 		mainContainer.remove(grid);
 		loadButton.disable();
 		addButton.disable();
+		filterButton.disable();
 		mainContainer.setLayout(centerLayout);
 		mainContainer.add(inputPanel);
 		mainContainer.layout();
+
 	}
 
 	private void shareBookmark(final Bookmark bookmark) {
@@ -229,6 +316,7 @@ public class BookmarkWindowList extends WindowPlus {
 		}
 		contextMenu.setEnabled(bookmarksStore.getCount() > 0);
 		TablePlus.getPersonalTable().setAllTags(allTags);
+		if (TablePlus.getPersonalTable().getAllTags().size()==0) filterButton.disable();
 	}
 
 	private ColumnModel getColumnModel() {
@@ -335,6 +423,7 @@ public class BookmarkWindowList extends WindowPlus {
 				mainContainer.add(grid);
 				loadButton.enable();
 				addButton.enable();
+				filterButton.enable();
 				mainContainer.layout();
 			}
 		});
