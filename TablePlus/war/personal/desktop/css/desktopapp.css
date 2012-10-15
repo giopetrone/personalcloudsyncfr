@@ -246,3 +246,7 @@
 .deleteAll {
 	background-image: url(../images/deleteGreen.png) !important;
 }
+
+.deleteAll {
+	background-image: url(../images/filter.png) !important;
+}
