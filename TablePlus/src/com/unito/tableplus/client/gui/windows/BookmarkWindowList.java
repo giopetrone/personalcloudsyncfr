@@ -290,7 +290,7 @@ public class BookmarkWindowList extends WindowPlus {
 	}
 
 	private void fillGrid(List<Bookmark> bookmarks) {
-		
+		allTags= new LinkedList<String>();
 		for (final Bookmark bookmark : bookmarks) {
 			allTags.addAll(bookmark.getTag());
 			final BaseModel model = new BaseModel();
