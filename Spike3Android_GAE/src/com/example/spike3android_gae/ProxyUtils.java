@@ -16,10 +16,15 @@ public class ProxyUtils {
 
 	private static HttpClient client;
 	private static HttpPost post;
+	//URL quando la Web App e' deployed su GAE
 	// private static final String PROXY_SERVLET_URL =
 	// "http://tableplusplus.appspot.com/tableplus/proxy";
-	private static final String PROXY_SERVLET_URL = "http://10.0.2.2:8888/spike2_gwtgaeapp/proxyServlet";
-
+	
+	//URL quando la Web App e' deployed su GAE, ma la si esegue nel GAE in locale
+	//private static final String PROXY_SERVLET_URL = "http://10.0.2.2:8888/spike2_gwtgaeapp/proxyServlet";
+	private static final String PROXY_SERVLET_URL = "http://10.0.2.2:8888/gaeservletproxy";
+	
+	
 	/**
 	 * Method: first time only create object
 	 */
