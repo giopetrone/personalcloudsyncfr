@@ -1,15 +1,21 @@
 package com.unito.tableplus.server.services;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.unito.tableplus.client.services.TableService;
 import com.unito.tableplus.server.TableQueries;
+import com.unito.tableplus.server.UserQueries;
+import com.unito.tableplus.server.WalletQueries;
 import com.unito.tableplus.shared.model.BlackBoardMessage;
 import com.unito.tableplus.shared.model.Bookmark;
-import com.unito.tableplus.shared.model.DriveFile;
+import com.unito.tableplus.shared.model.Provider;
+import com.unito.tableplus.shared.model.Resource;
+import com.unito.tableplus.shared.model.SharedResource;
 import com.unito.tableplus.shared.model.Table;
 import com.unito.tableplus.shared.model.User;
+import com.unito.tableplus.shared.model.Wallet;
 
 public class TableServiceImpl extends RemoteServiceServlet implements TableService {
 
@@ -37,7 +43,7 @@ public class TableServiceImpl extends RemoteServiceServlet implements TableServi
 
 	@Override
 	public boolean addBlackBoardMessage(Long key, BlackBoardMessage bbMessage) {
-		return TableQueries.addBlackBoardMessage(key, bbMessage);
+		return TableQueries.addMessage(key, bbMessage);
 	}
 
 	@Override
@@ -51,32 +57,58 @@ public class TableServiceImpl extends RemoteServiceServlet implements TableServi
 	}
 
 	@Override
-	public boolean addDocumentToTable(String DocId, User user, Long tableKey) {
-		return TableQueries.addResource(DocId, user, tableKey);
+	public List<SharedResource> loadResources(Long tableKey) {
+			return TableQueries.queryResources(tableKey);
+	}
+	
+	@Override
+	public boolean addResource(Resource resource, User user, Long tableKey) {
+		Provider resourceProvider = resource.getProvider();
+		//TODO check if resource has already been added
+		if(resourceProvider.equals(Provider.DRIVE)){
+			Wallet wallet = WalletQueries.getWallet(user.getKey());
+			List<Long> userKeys = TableQueries.queryTable(tableKey).getMembers();
+			List<User> users = UserQueries.queryUsers(userKeys);
+			List<String> userEmails = new LinkedList<String>();
+			for(User u : users)
+				userEmails.add(u.getEmail());
+			userEmails.remove(user.getEmail());//owner removed from list
+			if(!userEmails.isEmpty())
+			DriveServiceImpl.shareFile(resource.getID(), wallet, userEmails);
+			
+		} else if(resourceProvider.equals(Provider.DROPBOX)){
+			Wallet wallet = WalletQueries.getWallet(user.getKey());
+			String shareLink = DropBoxServiceImpl.shareFile(wallet, resource.getID());
+			resource.setURI(shareLink);
+		}
+			
+		return TableQueries.addResource(resource, tableKey);
 	}
 
 	@Override
-	public void docAccessToNewMember(User newMember, Table table) {
-		TableQueries.docAccessToNewMember(newMember, table);
+	public void addMember(Long currentUserKey, Long newUserKey, Long tableKey) {
+		User user = UserQueries.queryUser(newUserKey);
+		Wallet wallet = WalletQueries.getWallet(currentUserKey);
+		TableQueries.addMember(newUserKey, tableKey);
+		List<SharedResource> resources = TableQueries.queryResources(tableKey);
+		
+		if(wallet.getDriveAccessToken() != null)
+		for(Resource r : resources){
+			List<String> toShare = new LinkedList<String>();
+			if(r.getProvider().equals(Provider.DRIVE))
+				toShare.add(r.getID());
+			if(!toShare.isEmpty())
+			DriveServiceImpl.shareFiles(toShare, wallet, user.getEmail());
+		}
 	}
 
 	@Override
-	public List<DriveFile> getTableDriveFiles(Table table) {
-		return TableQueries.getTableDriveFiles(table);
+	public List<BlackBoardMessage> loadBlackBoardMessages(Long tableKey) {
+		return TableQueries.queryMessages(tableKey);
 	}
 
 	@Override
-	public void addMember(Long userKey, Long tableKey) {
-		TableQueries.addMember(userKey, tableKey);
-	}
-
-	@Override
-	public List<BlackBoardMessage> getTableMessages(Long tableKey) {
-		return TableQueries.getBlackBoardMessages(tableKey);
-	}
-
-	@Override
-	public List<Bookmark> getTableBookmark(Long tableKey) {
+	public List<Bookmark> loadBookmarks(Long tableKey) {
 		return TableQueries.getBookmark(tableKey);
 	}
 

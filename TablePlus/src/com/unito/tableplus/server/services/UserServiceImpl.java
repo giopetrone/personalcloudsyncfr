@@ -1,5 +1,6 @@
 package com.unito.tableplus.server.services;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -47,12 +48,15 @@ public class UserServiceImpl extends RemoteServiceServlet implements
 
 	@Override
 	public User loadUser(LoginInfo info) {
-		User user = queryUser("email", info.getEmailAddress());
+		User user = UserQueries.queryUser("email", info.getEmailAddress());
 		if (user == null) {
 			user = new User();
 			user.setEmail(info.getEmailAddress());
 			user.setUsername(info.getNickname());
-			storeUser(user);
+			Long key = UserQueries.storeUser(user);
+			User queried = UserQueries.queryUser(key);
+			if (queried != null)
+				user = queried;
 		}
 		return user;
 	}
@@ -61,38 +65,31 @@ public class UserServiceImpl extends RemoteServiceServlet implements
 	public List<Resource> loadResources(User user) {
 		Wallet wallet = WalletQueries.getWallet(user.getKey());
 		List<Resource> resources = new LinkedList<Resource>();
+		try {
+			if (wallet.getDriveAccessToken() != null) {
+				List<DriveFile> driveFiles = DriveServiceImpl.loadFiles(wallet);
+				if (driveFiles != null)
+					resources.addAll(driveFiles);
+			}
+		} catch (IOException e) {
+			System.err.println("IO Error while loading Drive Files: " + e);
+		}
 
-		List<DriveFile> driveFiles = loadDriveFiles(wallet.getDriveToken());
-		List<DropBoxFile> dropboxFiles = loadDropboxFiles(
-				wallet.getDropboxToken(), wallet.getDropboxSecret());
-		List<FacebookEvent> facebookEvents = loadFacebookEvents(wallet.getFacebookToken());
-		
-		if (driveFiles != null)
-			resources.addAll(driveFiles);
-		if (dropboxFiles != null)
-			resources.addAll(dropboxFiles);
-		if (facebookEvents != null)
-			resources.addAll(facebookEvents);
+		if (wallet.getDropboxToken() != null) {
+			List<DropBoxFile> dropboxFiles = DropBoxServiceImpl
+					.loadFiles(wallet);
+			if (dropboxFiles != null)
+				resources.addAll(dropboxFiles);
+		}
+
+		if (wallet.getFacebookToken() != null) {
+			List<FacebookEvent> facebookEvents = FacebookServiceImpl
+					.loadEvents(wallet);
+			if (facebookEvents != null)
+				resources.addAll(facebookEvents);
+		}
 
 		return resources;
-	}
-
-	public List<DriveFile> loadDriveFiles(String token) {
-		if (token != null)
-			return DriveServiceImpl.getDriveFileList(token);
-		return null;
-	}
-
-	public List<DropBoxFile> loadDropboxFiles(String token, String secret) {
-		if (token != null && secret != null)
-			return DropBoxServiceImpl.loadFiles(token, secret);
-		return null;
-	}
-	
-	public List<FacebookEvent> loadFacebookEvents(String token){
-		if (token != null)
-			return FacebookServiceImpl.loadEvents(token);
-		return null;
 	}
 
 }

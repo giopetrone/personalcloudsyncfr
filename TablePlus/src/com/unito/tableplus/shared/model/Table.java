@@ -31,7 +31,7 @@ public class Table implements Serializable {
 	private List<Long> members = null;
 
 	@NotPersistent
-	private List<String> membersEmail =  null;
+	private List<String> membersEmail = null;
 
 	@Persistent
 	private Long creator = null;
@@ -42,23 +42,25 @@ public class Table implements Serializable {
 	@Persistent(mappedBy = "table")
 	private List<BlackBoardMessage> blackboard;
 
-	@Persistent
-	private List<String> documents;
+	@Persistent(mappedBy = "table")
+	private List<SharedResource> resources;
 
 	@Persistent(mappedBy = "table")
-	private List<Bookmark> bookmark=new LinkedList<Bookmark>();
+	private List<Bookmark> bookmarks;
 
 	public Table(Long creator) {
 		this.creator = creator;
 		this.owner = creator;
 		this.blackboard = new LinkedList<BlackBoardMessage>();
-		this.setDocuments(new LinkedList<String>());
+		this.setResources(new LinkedList<SharedResource>());
 		this.members = new LinkedList<Long>();
 		this.members.add(creator);
-		this.setBookmarks(new LinkedList<Bookmark>());
+		this.bookmarks = new LinkedList<Bookmark>();
 	}
-
-	public Table() {}
+	
+	//needed by GWT!!!
+	public Table() {
+	}
 
 	public List<BlackBoardMessage> getBlackBoard() {
 		return this.blackboard;
@@ -128,17 +130,16 @@ public class Table implements Serializable {
 		this.members = members;
 	}
 
-
-	public List<String> getDocuments() {
-		return documents;
+	public List<SharedResource> getResources() {
+		return resources;
 	}
 
-	public void setDocuments(List<String> documents) {
-		this.documents = documents;
+	public void setResources(List<SharedResource> resources) {
+		this.resources = resources;
 	}
 
-	public void addDocument(String document) {
-		documents.add(document);
+	public void addResource(SharedResource resource) {
+		resources.add(resource);
 	}
 
 	/**
@@ -149,23 +150,24 @@ public class Table implements Serializable {
 	}
 
 	/**
-	 * @param membersEmail the membersEmail to set
+	 * @param membersEmail
+	 *            the membersEmail to set
 	 */
 	public void setMembersEmail(List<String> membersEmail) {
 		this.membersEmail = membersEmail;
 	}
 
-	//gestione segnalibri relativi ad un tavolo
+	// gestione segnalibri relativi ad un tavolo
 
-	private void setBookmarks(LinkedList<Bookmark> bookmark) {
-		this.bookmark=bookmark;
+	public void setBookmarks(LinkedList<Bookmark> bookmarks) {
+		this.bookmarks = bookmarks;
 	}
 
-	public List<Bookmark> getBookmark() {
-		return bookmark;
+	public List<Bookmark> getBookmarks() {
+		return bookmarks;
 	}
 
 	public void addBookmark(Bookmark b) {
-		getBookmark().add(b);
+		getBookmarks().add(b);
 	}
 }

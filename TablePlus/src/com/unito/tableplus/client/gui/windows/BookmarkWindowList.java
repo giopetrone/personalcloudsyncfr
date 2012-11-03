@@ -241,7 +241,7 @@ public class BookmarkWindowList extends WindowPlus {
 		bookmarksStore.removeAll();
 		mask();
 		if (table.getKey() != null)
-			tableService.getTableBookmark(table.getKey(),new AsyncCallback<List<Bookmark>>() {
+			tableService.loadBookmarks(table.getKey(),new AsyncCallback<List<Bookmark>>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GWT.log("Unable to load bookmarks for table: "+ table.getName(), caught);

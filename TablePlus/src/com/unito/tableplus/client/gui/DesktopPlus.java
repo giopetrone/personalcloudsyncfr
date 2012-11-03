@@ -34,6 +34,11 @@ import com.unito.tableplus.shared.model.ChannelMessageType;
 
 public class DesktopPlus extends Desktop {
 
+	private final UserServiceAsync userService = ServiceFactory
+			.getUserServiceInstance();
+	protected final MessagingServiceAsync messagingService = ServiceFactory
+			.getChatServiceInstance();
+	
 	private List<TableUI> tables;
 	private TableUI activeTable;
 	private RightPanel activeRightPanel;
@@ -47,11 +52,6 @@ public class DesktopPlus extends Desktop {
 	protected StartMenu startMenu;
 	private List<MenuItem> menuItems = new ArrayList<MenuItem>();
 	private Menu tablesSubMenu = new Menu();
-
-	private final UserServiceAsync userService = ServiceFactory
-			.getUserServiceInstance();
-	protected final MessagingServiceAsync messagingService = ServiceFactory
-			.getChatServiceInstance();
 
 	public DesktopPlus() {
 		super();
@@ -261,7 +261,6 @@ public class DesktopPlus extends Desktop {
 
 		for (WindowPlus w : activeTable.getWindows()) {
 			if (w.getWasOpen()) {
-				// w.setPagePosition(w.getPreviousPosition());
 				w.show();
 				w.setWasOpen(false);
 			}
@@ -294,14 +293,10 @@ public class DesktopPlus extends Desktop {
 	public void createRightPanel() {
 		desktop.setLayout(new RowLayout(Orientation.HORIZONTAL));
 
-		// creo due ContentPanel
-		ContentPanel leftCP = new ContentPanel();
-		// rightPersonalPanel = new RightPersonalPanel(desktop, utente, this);
+		ContentPanel panel = new ContentPanel();
+		panel.setVisible(false);
 
-		// definisco il primo
-		leftCP.setVisible(false);
-
-		desktop.add(leftCP, new RowData(1, 100));
+		desktop.add(panel, new RowData(1, 100));
 		desktop.add(activeRightPanel, new RowData(350, 1, new Margins(8)));
 		desktop.layout();
 	}

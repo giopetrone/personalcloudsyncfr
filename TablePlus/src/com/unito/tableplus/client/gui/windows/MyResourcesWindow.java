@@ -11,6 +11,7 @@ import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.MenuEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.store.ListStore;
+import com.extjs.gxt.ui.client.util.IconHelper;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.Info;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -29,21 +30,25 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.unito.tableplus.client.TablePlus;
 import com.unito.tableplus.client.services.ServiceFactory;
+import com.unito.tableplus.client.services.TableServiceAsync;
 import com.unito.tableplus.client.services.UserServiceAsync;
 import com.unito.tableplus.shared.model.Resource;
+import com.unito.tableplus.shared.model.User;
 
 public class MyResourcesWindow extends WindowPlus {
 
 	public static final UserServiceAsync userService = ServiceFactory
 			.getUserServiceInstance();
-
+	public static final TableServiceAsync tableService = ServiceFactory
+			.getTableServiceInstance();
 	private LayoutContainer container;
 	private ListStore<BaseModel> resourcesStore;
+	private List<Resource> resources; // needed for sharing
 	private Grid<BaseModel> grid;
 	private Button loadButton;
 
 	Menu contextMenu;
-	MenuItem insert;
+	MenuItem share;
 
 	public MyResourcesWindow() {
 		super();
@@ -61,16 +66,24 @@ public class MyResourcesWindow extends WindowPlus {
 		grid.setBorders(true);
 
 		contextMenu = new Menu();
-		insert = new MenuItem();
-		insert.setText("Share on Table");
+		share = new MenuItem();
+		share.setText("Share on Table");
+		share.setIcon(IconHelper.createStyle("menu-share"));
 
-		insert.addSelectionListener(new SelectionListener<MenuEvent>() {
+		share.addSelectionListener(new SelectionListener<MenuEvent>() {
 			@Override
 			public void componentSelected(MenuEvent ce) {
-				Info.display("Share resource", "Not implemented yet...");
+				final BaseModel selected = grid.getSelectionModel()
+						.getSelectedItem();
+				String id = selected.get("id").toString();
+				Resource selectedResource = getSelectedResource(id);
+				if (selectedResource != null) {
+					shareResource(selectedResource);
+
+				}
 			}
 		});
-		contextMenu.add(insert);
+		contextMenu.add(share);
 		grid.setContextMenu(contextMenu);
 
 		loadButton = new Button("Load Resources",
@@ -80,6 +93,7 @@ public class MyResourcesWindow extends WindowPlus {
 						loadResources();
 					}
 				});
+		loadButton.setIcon(IconHelper.createStyle("arrow_refresh"));
 
 		container.add(grid);
 		addButton(loadButton);
@@ -95,6 +109,7 @@ public class MyResourcesWindow extends WindowPlus {
 					@Override
 					public void onFailure(Throwable caught) {
 						GWT.log("Failed loading resources.");
+						unmask();
 					}
 
 					@Override
@@ -115,8 +130,10 @@ public class MyResourcesWindow extends WindowPlus {
 			mdata.set("img", r.getIcon());
 			mdata.set("name", r.getName());
 			mdata.set("provider", r.getProvider());
+			mdata.set("id", r.getID());
 			resourcesStore.add(mdata);
 		}
+		this.resources = resources;
 	}
 
 	private ColumnModel getColumnModel() {
@@ -141,5 +158,42 @@ public class MyResourcesWindow extends WindowPlus {
 		config.add(name);
 		config.add(provider);
 		return new ColumnModel(config);
+	}
+
+	private Resource getSelectedResource(String id) {
+		for (Resource r : resources)
+			if (r.getID().equals(id))
+				return r;
+		return null;
+	}
+
+	private void shareResource(Resource selectedResource) {
+		User user = TablePlus.getUser();
+		Long tableKey = TablePlus.getDesktop().getActiveTableKey();
+		if (tableKey.equals(0L))
+			Info.display("Share resource", "Cannot share on personal table!");
+		else
+			tableService.addResource(selectedResource, user, tableKey,
+					new AsyncCallback<Boolean>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+							GWT.log("Failed to share selected resource: ",
+									caught);
+							Info.display("Share resource",
+									"Failed to share selected resource.");
+						}
+
+						@Override
+						public void onSuccess(Boolean result) {
+							if (result)
+								Info.display("Share resource",
+										"Resource has been successfully shared.");
+							else
+								Info.display("Share resource",
+										"Resource could not be shared.");
+						}
+
+					});
 	}
 }

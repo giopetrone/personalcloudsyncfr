@@ -103,7 +103,7 @@ public class TablePlus implements EntryPoint {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				GWT.log("Fail loading user");
+				GWT.log("Failed loading user");
 			}
 
 			@Override
@@ -113,13 +113,8 @@ public class TablePlus implements EntryPoint {
 			}
 		});
 	}
+	
 
-	/**
-	 * Inizia a preparare l'ambiente. Istanzia il timer delle notifiche: eviterà
-	 * che una richiesta client -> server impieghi più di 60 secondi a ricevere
-	 * risposta.
-	 * 
-	 */
 	public void loadActiveDesktop() {
 		// crea il desktop standard
 		desktop = new DesktopPlus();
@@ -131,12 +126,7 @@ public class TablePlus implements EntryPoint {
 		// carica il personal table
 		desktop.loadPersonalTable(personalTable);
 		startCommunicationChannel();
-	}
-
-	/**
-	 * Carica i tavoli degli utenti: per ognuno crea un oggetto tableUI.
-	 */
-	
+	}	
 	
 	/**
 	 * Avvia il canale di comunicazione per la chat

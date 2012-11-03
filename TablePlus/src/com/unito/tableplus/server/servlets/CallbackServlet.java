@@ -7,20 +7,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.scribe.model.Token;
-
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.unito.tableplus.server.ServiceFactory;
-import com.unito.tableplus.server.UserQueries;
 import com.unito.tableplus.server.Utils;
-import com.unito.tableplus.server.WalletQueries;
 import com.unito.tableplus.server.services.DriveServiceImpl;
 import com.unito.tableplus.server.services.DropBoxServiceImpl;
 import com.unito.tableplus.server.services.FacebookServiceImpl;
 import com.unito.tableplus.shared.model.LoginInfo;
-import com.unito.tableplus.shared.model.Wallet;
 
 public class CallbackServlet extends HttpServlet {
 
@@ -57,48 +52,20 @@ public class CallbackServlet extends HttpServlet {
 					.getRequestUrl(req)));
 			resp.sendRedirect(loginInfo.getLoginUrl());
 		} else {
-			com.unito.tableplus.shared.model.User u = null;
-			Wallet wallet = null;
-
-			if (req.getParameter("provider").equals("google")) {
-				String token = req.getParameter("token");
-				if (token != null) {
-					String sessionToken = DriveServiceImpl
-							.getDriveSessionToken(token);
-					u = UserQueries.queryUser("email", user.getEmail());
-					if (u != null) {
-						wallet = WalletQueries.getWallet(u.getKey());
-						wallet.setDriveToken(sessionToken);
-						WalletQueries.storeWallet(wallet);
-					}
-				}
+			if (req.getParameter("provider").equals("drive")) {
+				String code = req.getParameter("code");
+				if (code != null)
+					DriveServiceImpl.storeCredentials(code);
+				
 			} else if (req.getParameter("provider").equals("dropbox")) {
-				Token requestToken = (Token) syncCache.get(user.getEmail());
-				if (requestToken != null) {
-					syncCache.delete(user.getEmail());
 					String oauthToken = req.getParameter("oauth_token");
-					Token accessToken = DropBoxServiceImpl.getAccessToken(
-							oauthToken, requestToken);
-					u = UserQueries.queryUser("email", user.getEmail());
-					if (accessToken != null & u != null) {
-						u = UserQueries.queryUser("email", user.getEmail());
-						wallet = WalletQueries.getWallet(u.getKey());
-						wallet.setDropboxToken(accessToken.getToken());
-						wallet.setDropboxSecret(accessToken.getSecret());
-						WalletQueries.storeWallet(wallet);
-					}
-
-				}
+					if(oauthToken != null)
+					DropBoxServiceImpl.storeAccessToken(oauthToken);
+					
 			} else if (req.getParameter("provider").equals("facebook")) {
-				String code =  req.getParameter("code");
-				Token accessToken =  FacebookServiceImpl.getAccessToken(code);
-				u = UserQueries.queryUser("email", user.getEmail());
-				if (accessToken != null & u != null) {
-					u = UserQueries.queryUser("email", user.getEmail());
-					wallet = WalletQueries.getWallet(u.getKey());
-					wallet.setFacebookToken(accessToken.getToken());
-					WalletQueries.storeWallet(wallet);
-				}
+				String code = req.getParameter("code");
+				if(code != null)
+					FacebookServiceImpl.storeAccessToken(code);
 			}
 		}
 		resp.sendRedirect(Utils.getHomeUrl());

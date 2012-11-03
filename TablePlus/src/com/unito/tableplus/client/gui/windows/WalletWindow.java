@@ -37,7 +37,7 @@ public class WalletWindow extends WindowPlus {
 		driveButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
-				driveService.getRequestTokenURL(new AsyncCallback<String>() {
+				driveService.getAuthorizationURL(new AsyncCallback<String>() {
 					@Override
 					public void onFailure(Throwable caught) {
 					}

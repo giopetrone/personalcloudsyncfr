@@ -1,85 +1,231 @@
 package com.unito.tableplus.server.services;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.security.GeneralSecurityException;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
-import com.google.gdata.client.docs.DocsService;
-import com.google.gdata.client.http.AuthSubUtil;
-import com.google.gdata.data.docs.DocumentListEntry;
-import com.google.gdata.data.docs.DocumentListFeed;
-import com.google.gdata.util.AuthenticationException;
-import com.google.gdata.util.ServiceException;
+import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.Drive.Files;
+import com.google.api.services.drive.DriveScopes;
+import com.google.api.services.drive.model.File;
+import com.google.api.services.drive.model.FileList;
+import com.google.api.services.drive.model.Permission;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.User;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.unito.tableplus.client.services.DriveService;
+import com.unito.tableplus.server.ServiceFactory;
+import com.unito.tableplus.server.UserQueries;
 import com.unito.tableplus.server.Utils;
+import com.unito.tableplus.server.WalletQueries;
 import com.unito.tableplus.shared.model.DriveFile;
+import com.unito.tableplus.shared.model.Wallet;
 
 public class DriveServiceImpl extends RemoteServiceServlet implements
 		DriveService {
 
 	private static final long serialVersionUID = 2603943737426137505L;
 
+	private static final String CLIENT_ID = "843761346041.apps.googleusercontent.com";
+	private static final String CLIENT_SECRET = "GEO0G7BcohMenRnhJix1pfeA";
+	private static final String PROVIDER = "?provider=drive";
+	private static final String REDIRECT_URI = Utils.getCallbackUrl()
+			+ PROVIDER;
+	private static GoogleAuthorizationCodeFlow flow;
+
+	private static final UserService userService = ServiceFactory
+			.getUserService();
+
 	@Override
-	public String getRequestTokenURL() {
-		final String PROVIDER = "?provider=google";
-		final String callbackURL = Utils.getCallbackUrl() + PROVIDER;
-		return AuthSubUtil.getRequestUrl(callbackURL,
-				"https://docs.google.com/feeds/", false, true);
+	public String getAuthorizationURL() {
+		HttpTransport httpTransport = new NetHttpTransport();
+		JsonFactory jsonFactory = new JacksonFactory();
+
+		flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport,
+				jsonFactory, CLIENT_ID, CLIENT_SECRET,
+				Arrays.asList(DriveScopes.DRIVE)).setAccessType("offline")
+				.setApprovalPrompt("force").build();
+		String url = flow.newAuthorizationUrl().setRedirectUri(REDIRECT_URI)
+				.build();
+		return url;
 	}
 
-	public static String getDriveSessionToken(String token) {
-		String sessionToken = null;
-		try {
-			sessionToken = AuthSubUtil.exchangeForSessionToken(token, null);
-		} catch (AuthenticationException e1) {
-			e1.printStackTrace();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		} catch (GeneralSecurityException e1) {
-			e1.printStackTrace();
+	public static void storeCredentials(String authorizationCode)
+			throws IOException {
+		User user = userService.getCurrentUser();
+		HttpTransport transport = new NetHttpTransport();
+		JsonFactory jsonFactory = new JacksonFactory();
+		GoogleTokenResponse response = flow.newTokenRequest(authorizationCode)
+				.setRedirectUri(REDIRECT_URI).execute();
+		Credential credential = new GoogleCredential.Builder()
+				.setTransport(transport).setJsonFactory(jsonFactory)
+				.setClientSecrets(CLIENT_ID, CLIENT_SECRET).build()
+				.setFromTokenResponse(response);
+		Long userKey = UserQueries.queryUser("email", user.getEmail()).getKey();
+		if (userKey != null && credential != null) {
+			Wallet wallet = WalletQueries.getWallet(userKey);
+			wallet.setDriveAccessToken(credential.getAccessToken());
+			wallet.setDriveRefreshToken(credential.getRefreshToken());
+			WalletQueries.storeWallet(wallet);
+		}
+	}
+
+	public static List<DriveFile> loadFiles(Wallet wallet) throws IOException {
+		List<DriveFile> driveFiles = new LinkedList<DriveFile>();
+		Drive service = getService(wallet);
+
+		List<File> result = new LinkedList<File>();
+		Files.List request = service.files().list();
+		do {
+			FileList files = request.execute();
+			result.addAll(files.getItems());
+			request.setPageToken(files.getNextPageToken());
+		} while (request.getPageToken() != null
+				&& request.getPageToken().length() > 0);
+		DriveFile df;
+		for (File f : result) {
+			df = new DriveFile();
+			df.setTitle(f.getTitle());
+			df.setLink(f.getSelfLink());
+			df.setID(f.getId());
+			df.setURI(f.getSelfLink());
+			driveFiles.add(df);
 		}
 
-		return sessionToken;
+		return driveFiles;
 	}
 
-	public static List<DriveFile> getDriveFileList(String sessionToken) {
+	public static Drive getService(Wallet wallet) {
+		HttpTransport transport = new NetHttpTransport();
+		JsonFactory jsonFactory = new JacksonFactory();
 
-		List<DriveFile> myDriveFileList = new ArrayList<DriveFile>();
+		GoogleCredential credential = new GoogleCredential.Builder()
+				.setJsonFactory(jsonFactory).setTransport(transport)
+				.setClientSecrets(CLIENT_ID, CLIENT_SECRET).build();
+		credential.setAccessToken(wallet.getDriveAccessToken());
+		credential.setRefreshToken(wallet.getDriveRefreshToken());
+		return new Drive.Builder(transport, jsonFactory, credential).build();
+	}
 
-		DocsService client = new DocsService("TablePlus");
-		client.setAuthSubToken(sessionToken);
-		client.setProtocolVersion(DocsService.Versions.V2);
-		client.setConnectTimeout(0);
+	/**
+	 * https://developers.google.com/drive/v2/reference/permissions/insert
+	 * Insert a new permission.
+	 * 
+	 * @param service
+	 *            Drive API service instance.
+	 * @param fileId
+	 *            ID of the file to insert permission for.
+	 * @param value
+	 *            User or group e-mail address, domain name or {@code null}
+	 *            "default" type.
+	 * @param type
+	 *            The value "user", "group", "domain" or "default".
+	 * @param role
+	 *            The value "owner", "writer" or "reader".
+	 * @return The inserted permission if successful, {@code null} otherwise.
+	 */
+	private static Permission insertPermission(Drive service, String fileId,
+			String value, String type, String role) {
+		Permission newPermission = new Permission();
 
-		URL feedUri;
+		newPermission.setValue(value);
+		newPermission.setType(type);
+		newPermission.setRole(role);
 		try {
-			feedUri = new URL(
-					"https://docs.google.com/feeds/documents/private/full/");
-			DocumentListFeed feed = client.getFeed(feedUri,
-					DocumentListFeed.class);
-
-			DriveFile d;
-
-			for (DocumentListEntry entry : feed.getEntries()) {
-				d = new DriveFile();
-				d.setTitle(entry.getTitle().getPlainText());
-				d.setDocId(entry.getDocId());
-				d.setLink(entry.getDocumentLink().getHref());
-				myDriveFileList.add(d);
-			}
-
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
+			return service.permissions().insert(fileId, newPermission)
+					.execute();
 		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ServiceException e) {
-			e.printStackTrace();
+			System.err.println("An error occurred: " + e);
 		}
-
-		return myDriveFileList;
+		return null;
 	}
+
+	/**
+	 * https://developers.google.com/drive/v2/reference/permissions/update
+	 * Update a permission's role.
+	 * 
+	 * @param service
+	 *            Drive API service instance.
+	 * @param fileId
+	 *            ID of the file to update permission for.
+	 * @param permissionId
+	 *            ID of the permission to update.
+	 * @param newRole
+	 *            The value "owner", "writer" or "reader".
+	 * @return The updated permission if successful, {@code null} otherwise.
+	 */
+	@SuppressWarnings("unused")
+	private static Permission updatePermission(Drive service, String fileId,
+			String permissionId, String newRole) {
+		try {
+			// First retrieve the permission from the API.
+			Permission permission = service.permissions()
+					.get(fileId, permissionId).execute();
+			permission.setRole(newRole);
+			return service.permissions()
+					.update(fileId, permissionId, permission).execute();
+		} catch (IOException e) {
+			System.out.println("An error occurred: " + e);
+		}
+		return null;
+	}
+
+	/**
+	 * Share a file with a list of users.
+	 * 
+	 * @param file
+	 *            The id of the file to share
+	 * @param wallet
+	 *            File owner's wallet
+	 * @param users
+	 *            Users' email addresses list to share the file with
+	 */
+	public static void shareFile(String fileId, Wallet wallet,
+			List<String> users) {
+		Drive service = getService(wallet);
+		for (String u : users)
+			insertPermission(service, fileId, u, "user", "owner");
+	}
+
+	/**
+	 * Share a file with a user.
+	 * 
+	 * @param fileID
+	 *            The id of the file to share
+	 * @param wallet
+	 *            File owner's wallet
+	 * @param user
+	 *            User's email address to share the file with
+	 */
+	public static void shareFile(String fileID, Wallet wallet, String user) {
+		Drive service = getService(wallet);
+		insertPermission(service, fileID, user, "user", "owner");
+	}
+
+	/**
+	 * Share a list of file with a user.
+	 * 
+	 * @param fileIDs
+	 *            The ids of the files to share
+	 * @param wallet
+	 *            File owner's wallet
+	 * @param user
+	 *            User's email address to share the file with
+	 */
+	public static void shareFiles(List<String> fileIDs, Wallet wallet,
+			String user) {
+		Drive service = getService(wallet);
+		for (String fileID : fileIDs)
+			insertPermission(service, fileID, user, "user", "owner");
+	}
+
 }

@@ -15,10 +15,16 @@ import org.scribe.model.Verb;
 import org.scribe.model.Verifier;
 import org.scribe.oauth.OAuthService;
 
+import com.google.appengine.api.users.User;
+import com.google.appengine.api.users.UserService;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.unito.tableplus.client.services.FacebookService;
+import com.unito.tableplus.server.ServiceFactory;
+import com.unito.tableplus.server.UserQueries;
 import com.unito.tableplus.server.Utils;
+import com.unito.tableplus.server.WalletQueries;
 import com.unito.tableplus.shared.model.FacebookEvent;
+import com.unito.tableplus.shared.model.Wallet;
 
 public class FacebookServiceImpl extends RemoteServiceServlet implements
 		FacebookService {
@@ -27,6 +33,9 @@ public class FacebookServiceImpl extends RemoteServiceServlet implements
 	private static final String APP_SECRET = "bd8c16171ad6acb2f18322bd732b7843";
 	private static final String PROVIDER = "?provider=facebook";
 	private static final Token EMPTY_TOKEN = null;
+	
+	private static final UserService userService = ServiceFactory
+			.getUserService();
 
 	private static final OAuthService service = new ServiceBuilder()
 			.provider(FacebookApi.class)
@@ -49,15 +58,20 @@ public class FacebookServiceImpl extends RemoteServiceServlet implements
 		return APP_SECRET;
 	}
 
-	public static Token getAccessToken(String code) {
+	public static void storeAccessToken(String code) {
 		Verifier verifier = new Verifier(code);
 		Token accessToken = service.getAccessToken(EMPTY_TOKEN, verifier);
-		return accessToken;
+		User user = userService.getCurrentUser();
+		Long userKey = UserQueries.queryUser("email", user.getEmail())
+				.getKey();
+		Wallet wallet = WalletQueries.getWallet(userKey);
+		wallet.setFacebookToken(accessToken.getToken());
+		WalletQueries.storeWallet(wallet);
 	}
 
-	protected static List<FacebookEvent> loadEvents(String token) {
+	protected static List<FacebookEvent> loadEvents(Wallet wallet) {
 		String requestLink = "https://graph.facebook.com/me/events?access_token="
-				+ token;
+				+ wallet.getFacebookToken();
 		OAuthRequest request = new OAuthRequest(Verb.GET, requestLink);
 		Response response = request.send();
 		try {
@@ -72,6 +86,9 @@ public class FacebookServiceImpl extends RemoteServiceServlet implements
 				jEvent = facebookEvents.getJSONObject(i);
 				event = new FacebookEvent();
 				event.setName(jEvent.getString("name"));
+				event.setId(jEvent.getString("id"));
+				String uri = "https://www.facebook.com/events/"+event.getID()+"/";
+				event.setURI(uri);
 				facebookEventList.add(event);
 			}
 			return facebookEventList;
