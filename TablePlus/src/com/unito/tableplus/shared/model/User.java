@@ -32,10 +32,14 @@ public class User implements Serializable {
 	private String email;
 
 	@Persistent
-	private List<Long> tables = new ArrayList<Long>();
+	private List<Long> tables;
 
 	@NotPersistent
 	private UserStatus status;
+	
+	public User(){
+		this.tables = new ArrayList<Long>();
+	}
 
 	public Long getKey() {
 		return key;

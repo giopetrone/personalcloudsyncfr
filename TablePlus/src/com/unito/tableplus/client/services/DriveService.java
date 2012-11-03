@@ -6,5 +6,5 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 @RemoteServiceRelativePath("drive-service")
 public interface DriveService extends RemoteService{
 	
-	public String getRequestTokenURL();
+	public String getAuthorizationURL();
 }

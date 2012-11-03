@@ -5,7 +5,8 @@ import java.util.List;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.unito.tableplus.shared.model.BlackBoardMessage;
 import com.unito.tableplus.shared.model.Bookmark;
-import com.unito.tableplus.shared.model.DriveFile;
+import com.unito.tableplus.shared.model.Resource;
+import com.unito.tableplus.shared.model.SharedResource;
 import com.unito.tableplus.shared.model.Table;
 import com.unito.tableplus.shared.model.User;
 
@@ -23,21 +24,18 @@ public interface TableServiceAsync {
 
 	void clearMessages(Long key, AsyncCallback<Boolean> callback);
 
-	void addDocumentToTable(String DocId, User user, Long tableKey,AsyncCallback<Boolean> callback);
+	void addResource(Resource resource, User user, Long tableKey,AsyncCallback<Boolean> callback);
 
-	void docAccessToNewMember(User newMember, Table table,
-			AsyncCallback<Void> callback);
+	void loadResources(Long tableKey, AsyncCallback<List<SharedResource>> callback);
 
-	void getTableDriveFiles(Table table, AsyncCallback<List<DriveFile>> callback);
-
-	void addMember(Long userKey, Long tableKey, AsyncCallback<Void> callback);
+	void addMember(Long currentUser, Long newUserKey, Long tableKey, AsyncCallback<Void> callback);
 
 	void removeMessage(String messageKey, AsyncCallback<Void> callback);
 
-	void getTableMessages(Long tableKey,
+	void loadBlackBoardMessages(Long tableKey,
 			AsyncCallback<List<BlackBoardMessage>> callback);
 
-	void getTableBookmark(Long tableKey, AsyncCallback<List<Bookmark>> callback);
+	void loadBookmarks(Long tableKey, AsyncCallback<List<Bookmark>> callback);
 
 	void addBookmark(Long key, Bookmark bookmark, AsyncCallback<Boolean> asyncCallback);
 

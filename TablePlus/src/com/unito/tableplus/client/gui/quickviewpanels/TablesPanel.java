@@ -30,34 +30,32 @@ import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.unito.tableplus.client.TablePlus;
 import com.unito.tableplus.client.gui.RightPanel;
 import com.unito.tableplus.client.gui.TableUI;
-import com.unito.tableplus.client.services.TableService;
+import com.unito.tableplus.client.services.ServiceFactory;
 import com.unito.tableplus.client.services.TableServiceAsync;
-import com.unito.tableplus.client.services.UserService;
 import com.unito.tableplus.client.services.UserServiceAsync;
 import com.unito.tableplus.shared.model.Table;
 
-public class MyTablesPanel extends ContentPanel {
+public class TablesPanel extends ContentPanel {
 
-	public RightPanel rightPanel;
+	private RightPanel rightPanel;
+	private LayoutContainer leftLayoutContainer;
+	private LayoutContainer rightLayoutContainer;
+	private TreePanel<ModelData> treePanel;
+	private TreeStore<ModelData> treeStore;
 
-	// componenti
-	public LayoutContainer leftLayoutContainer = new LayoutContainer();
-	public LayoutContainer rightLayoutContainer = new LayoutContainer();
-	public TreePanel<ModelData> treePanel;
-	public TreeStore<ModelData> treeStore = new TreeStore<ModelData>();
+	private final UserServiceAsync userService = ServiceFactory
+			.getUserServiceInstance();
+	private final TableServiceAsync tableService = ServiceFactory
+			.getTableServiceInstance();
 
-	// servizi
-	protected final TableServiceAsync tableService = GWT
-			.create(TableService.class);
-	protected final UserServiceAsync userService = GWT
-			.create(UserService.class);
-
-	public MyTablesPanel(RightPanel rightPanel) {
-		this.rightPanel = rightPanel;
-
+	public TablesPanel(RightPanel rightPanel) {
+		this.setRightPanel(rightPanel);
+		this.leftLayoutContainer = new LayoutContainer();
+		this.rightLayoutContainer = new LayoutContainer();
+		this.treeStore = new TreeStore<ModelData>();
 		setHeading("My Tables");
-		setCollapsible(true);
-		setTitleCollapse(true);
+		setCollapsible(false);
+		setTitleCollapse(false);
 		setBodyStyle("backgroundColor: white;");
 		setLayout(new RowLayout(Orientation.HORIZONTAL));
 		mask("Loading...");
@@ -72,7 +70,7 @@ public class MyTablesPanel extends ContentPanel {
 	 */
 
 	public void populateLeftLayoutContainer() {
-		// Button per creare un tavolo
+		
 		Button addTable = new Button();
 		addTable.setToolTip(new ToolTipConfig("Create new Table"));
 		addTable.setIcon(IconHelper.createStyle("monitor_add"));
@@ -140,7 +138,6 @@ public class MyTablesPanel extends ContentPanel {
 		add(rightLayoutContainer);
 		
 		loadTablesList();
-		// myTables.layout();
 	}
 
 	/**
@@ -151,11 +148,9 @@ public class MyTablesPanel extends ContentPanel {
 
 	public void createNewTable(String tableName) {
 
-		// (10)crea un nuovo tavolo
 		final Table newTable = new Table(TablePlus.getUser().getKey());
 		newTable.setName(tableName);
 
-		// (20)aggiunge il nuovo tavolo al db
 		tableService.storeTable(newTable, new AsyncCallback<Long>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -232,12 +227,20 @@ public class MyTablesPanel extends ContentPanel {
 	 * @return void
 	 */
 
-	public void addNewTableToTree(TableUI t) {
+	public void addNewTableToTree(TableUI table) {
 		ModelData m = new BaseModelData();
-		m.set("name", t.getTableName());
+		m.set("name", table.getTableName());
 		m.set("icon", "monitor");
-		m.set("table", t);
+		m.set("table", table);
 		treeStore.add(m, false);
+	}
+
+	public RightPanel getRightPanel() {
+		return rightPanel;
+	}
+
+	public void setRightPanel(RightPanel rightPanel) {
+		this.rightPanel = rightPanel;
 	}
 
 }

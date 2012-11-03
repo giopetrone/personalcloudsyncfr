@@ -21,8 +21,11 @@ import com.google.appengine.api.users.UserService;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.unito.tableplus.client.services.DropBoxService;
 import com.unito.tableplus.server.ServiceFactory;
+import com.unito.tableplus.server.UserQueries;
 import com.unito.tableplus.server.Utils;
+import com.unito.tableplus.server.WalletQueries;
 import com.unito.tableplus.shared.model.DropBoxFile;
+import com.unito.tableplus.shared.model.Wallet;
 
 public class DropBoxServiceImpl extends RemoteServiceServlet implements
 		DropBoxService {
@@ -34,11 +37,14 @@ public class DropBoxServiceImpl extends RemoteServiceServlet implements
 	private static final String CALLBACK_PARAMETER = "&oauth_callback=";
 	private static final String PROVIDER = "?provider=dropbox";
 
-	private static final OAuthService service = new ServiceBuilder().provider(DropBoxApi.class)
-			.apiKey(APP_KEY).apiSecret(APP_SECRET).build();
+	private static final OAuthService service = new ServiceBuilder()
+			.provider(DropBoxApi.class).apiKey(APP_KEY).apiSecret(APP_SECRET)
+			.build();
 
-	private static final MemcacheService syncCache = ServiceFactory.getSyncCache();
-	private static final UserService userService = ServiceFactory.getUserService();
+	private static final MemcacheService syncCache = ServiceFactory
+			.getSyncCache();
+	private static final UserService userService = ServiceFactory
+			.getUserService();
 
 	@Override
 	public String getAuthUrl() {
@@ -49,19 +55,29 @@ public class DropBoxServiceImpl extends RemoteServiceServlet implements
 				+ Utils.getCallbackUrl() + PROVIDER;
 	}
 
-	public static Token getAccessToken(String oauthToken, Token requestToken) {
-		Verifier verifier = new Verifier(oauthToken);
-		Token accessToken = service.getAccessToken(requestToken, verifier); 
-		return accessToken; 
+	public static void storeAccessToken(String oauthToken) {
+		User user = userService.getCurrentUser();
+		Token requestToken = (Token) syncCache.get(user.getEmail());
+
+		if (requestToken != null) {
+			Verifier verifier = new Verifier(oauthToken);
+			Token accessToken = service.getAccessToken(requestToken, verifier);
+			syncCache.delete(user.getEmail());
+			Long userKey = UserQueries.queryUser("email", user.getEmail())
+					.getKey();
+			Wallet wallet = WalletQueries.getWallet(userKey);
+			wallet.setDropboxToken(accessToken.getToken());
+			wallet.setDropboxSecret(accessToken.getSecret());
+			WalletQueries.storeWallet(wallet);
+		}
+
 	}
 
-
-	
-	
-	protected static List<DropBoxFile> loadFiles(String token, String secret){
+	protected static List<DropBoxFile> loadFiles(Wallet wallet) {
 		String requestLink = "https://api.dropbox.com/1/metadata/sandbox/";
 		OAuthRequest request = new OAuthRequest(Verb.GET, requestLink);
-		Token accessToken = new Token(token,secret);
+		Token accessToken = new Token(wallet.getDropboxToken(),
+				wallet.getDropboxSecret());
 		service.signRequest(accessToken, request);
 		Response response = request.send();
 		try {
@@ -70,20 +86,44 @@ public class DropBoxServiceImpl extends RemoteServiceServlet implements
 		} catch (JSONException e) {
 			System.err.println("Error parsing dropbox json response: " + e);
 			e.printStackTrace();
-		} 
+		}
 		return null;
 	}
 	
+	protected static String shareFile(Wallet wallet, String fileID) {
+		String requestLink = "https://api.dropbox.com/1/shares/sandbox" + fileID;
+		OAuthRequest request = new OAuthRequest(Verb.POST, requestLink);
+		System.out.println(requestLink);
+		request.addBodyParameter("locale", "en");
+		request.addBodyParameter("short_url", "true");
+		Token accessToken = new Token(wallet.getDropboxToken(),
+				wallet.getDropboxSecret());
+		service.signRequest(accessToken, request);
+		Response response = request.send();
+		try {
+			JSONObject value = new JSONObject(response.getBody());
+			return value.getString("url");
+		} catch (JSONException e) {
+			System.err.println("Error parsing dropbox json response: " + e);
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+
 	/**
-	 * Maps json Dropbox metadata to DropboxFile model as list of DropboxFiles objects
+	 * Maps json Dropbox metadata to DropboxFile model as list of DropboxFiles
+	 * objects
+	 * 
 	 * @return The mapped object list
 	 */
-	private static List<DropBoxFile> mapJSON(JSONObject dropbox) throws JSONException{
-		if(dropbox.getBoolean("is_dir")){
+	private static List<DropBoxFile> mapJSON(JSONObject dropbox)
+			throws JSONException {
+		if (dropbox.getBoolean("is_dir")) {
 			JSONArray ja = dropbox.getJSONArray("contents");
 			List<DropBoxFile> filesList = new LinkedList<DropBoxFile>();
 			int size = ja.length();
-			for(int i=0; i<size; i++){
+			for (int i = 0; i < size; i++) {
 				JSONObject jFile = ja.getJSONObject(i);
 				DropBoxFile dbFile = new DropBoxFile();
 				dbFile.setPath(jFile.getString("path"));

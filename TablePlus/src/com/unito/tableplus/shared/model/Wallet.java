@@ -13,7 +13,10 @@ public class Wallet {
 	private Long userKey;
 	
 	@Persistent
-	private String driveToken;
+	private String driveAccessToken;
+	
+	@Persistent
+	private String driveRefreshToken;
 	
 	@Persistent
 	private String dropboxToken;
@@ -32,12 +35,20 @@ public class Wallet {
 		this.facebookToken = facebookToken;
 	}
 
-	public String getDriveToken() {
-		return driveToken;
+	public String getDriveAccessToken() {
+		return driveAccessToken;
 	}
 
-	public void setDriveToken(String driveToken) {
-		this.driveToken = driveToken;
+	public void setDriveAccessToken(String driveAccessToken) {
+		this.driveAccessToken = driveAccessToken;
+	}
+
+	public String getDriveRefreshToken() {
+		return driveRefreshToken;
+	}
+
+	public void setDriveRefreshToken(String driveRefreshToken) {
+		this.driveRefreshToken = driveRefreshToken;
 	}
 
 	public String getDropboxToken() {

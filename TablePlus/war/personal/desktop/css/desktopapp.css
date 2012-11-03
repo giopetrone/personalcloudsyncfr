@@ -113,6 +113,18 @@
 	background-image: url(../images/arrow_refresh.png) !important;
 }
 
+.menu-share {
+	background-image: url(../images/share-icon.png) !important;
+}
+
+.menu-show {
+	background-image: url(../images/filter.png) !important;
+}
+
+.menu-delete {
+	background-image: url(../images/delete.png) !important;
+}
+
 .folder_16 {
 	background-image: url(../images/folder.png) !important;
 }

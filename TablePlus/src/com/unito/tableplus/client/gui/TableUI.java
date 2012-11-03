@@ -4,12 +4,10 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import com.extjs.gxt.desktop.client.Shortcut;
-import com.unito.tableplus.client.TablePlus;
 import com.unito.tableplus.client.gui.windows.BlackBoardWindow;
 import com.unito.tableplus.client.gui.windows.BookmarkWindow;
 import com.unito.tableplus.client.gui.windows.BookmarkWindowList;
 import com.unito.tableplus.client.gui.windows.ChatWindow;
-import com.unito.tableplus.client.gui.windows.DocWindow;
 import com.unito.tableplus.client.gui.windows.TableResourcesWindow;
 import com.unito.tableplus.client.gui.windows.WindowPlus;
 import com.unito.tableplus.shared.model.Bookmark;
@@ -93,33 +91,6 @@ public class TableUI {
 		s4.setData("window", bookmarkWindowList);
 		this.addShortcut(s4);
 
-	}
-
-	/**
-	 * Questo metodo viene invocato come conseguenza di un drag n drop che
-	 * termina sul desktop, quindi qui viene creato lo shortcut corrispondente
-	 * al documento che è stato trascinato e rilasciato.
-	 * 
-	 * @param docName
-	 *            il titolo del documento
-	 * @param docLink
-	 *            l'url al quale reperire il documento
-	 * @param docId
-	 *            id google-generated che identifica il documento
-	 */
-
-	public void addDriveShortcut(String docName, String docLink, String docId) {
-		DocWindow docWindow = new DocWindow(docLink);
-		addWindow(docWindow);
-		Shortcut s = new Shortcut();
-		s.setText(docName);
-		s.setId("doc-win-shortcut");
-		s.setData("window", docWindow);
-		this.addShortcut(s);
-		TablePlus.getDesktop().addShortcut(s);
-		s.setVisible(true);
-		s.addSelectionListener(TablePlus.getDesktop().getShortcutListener());
-		TablePlus.getDesktop().getDesktop().layout();
 	}
 
 	public RightPanel getRightPanel() {

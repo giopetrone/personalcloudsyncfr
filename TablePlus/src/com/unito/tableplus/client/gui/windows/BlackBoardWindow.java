@@ -14,6 +14,7 @@ import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MenuEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.store.ListStore;
+import com.extjs.gxt.ui.client.util.IconHelper;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.Info;
@@ -79,8 +80,10 @@ public class BlackBoardWindow extends WindowPlus {
 		contextMenu = new Menu();
 		showItem = new MenuItem();
 		showItem.setText("Show Message");
+		showItem.setIcon(IconHelper.createStyle("menu-show"));
 		deleteItem = new MenuItem();
 		deleteItem.setText("Delete Message");
+		deleteItem.setIcon(IconHelper.createStyle("menu-delete"));
 
 		showItem.addSelectionListener(new SelectionListener<MenuEvent>() {
 			@Override
@@ -153,7 +156,7 @@ public class BlackBoardWindow extends WindowPlus {
 		messagesStore.removeAll();
 		mask();
 		if (table.getKey() != null)
-			tableService.getTableMessages(table.getKey(),
+			tableService.loadBlackBoardMessages(table.getKey(),
 					new AsyncCallback<List<BlackBoardMessage>>() {
 
 						@Override

@@ -189,5 +189,14 @@ public class Bookmark implements Resource {
 		return getTitle();
 	}
 
+	@Override
+	public String getID() {
+		return this.getKey();
+	}
 
+	@Override
+	public void setURI(String uri) {
+		// TODO Auto-generated method stub
+		
+	}
 }

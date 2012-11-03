@@ -19,7 +19,6 @@ import com.extjs.gxt.ui.client.widget.Info;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.button.ToggleButton;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanel;
@@ -37,27 +36,19 @@ import com.unito.tableplus.shared.model.User;
 
 public class MembersPanel extends ContentPanel {
 
-	// servizi
-	public final UserServiceAsync userService = ServiceFactory
+	private final UserServiceAsync userService = ServiceFactory
 			.getUserServiceInstance();
-	public final TableServiceAsync tableService = ServiceFactory
+	private final TableServiceAsync tableService = ServiceFactory
 			.getTableServiceInstance();
-	protected final MessagingServiceAsync messagingService = ServiceFactory
+	private final MessagingServiceAsync messagingService = ServiceFactory
 			.getChatServiceInstance();
 
 	// componenti
-	public RightPanel rightPanel;
-	public LayoutContainer leftLayoutContainer;
-	public LayoutContainer rightLayoutContainer;
-	public TreePanel<ModelData> treePanel;
-	public TreeStore<ModelData> treeStore;
-	public ToggleButton setHidden;
-
-	/**
-	 * Costruttore
-	 * 
-	 * @return void
-	 */
+	private RightPanel rightPanel;
+	private LayoutContainer leftLayoutContainer;
+	private LayoutContainer rightLayoutContainer;
+	private TreePanel<ModelData> treePanel;
+	private TreeStore<ModelData> treeStore;
 
 	public MembersPanel(RightPanel rightPanel) {
 		this.rightPanel = rightPanel;
@@ -65,9 +56,8 @@ public class MembersPanel extends ContentPanel {
 		rightLayoutContainer = new LayoutContainer();
 		treeStore = new TreeStore<ModelData>();
 		treeStore.setMonitorChanges(true);
-		setHeading("Members");
-		setCollapsible(true);
-		setTitleCollapse(true);
+		setCollapsible(false);
+		setTitleCollapse(false);
 		setBodyStyle("backgroundColor: white;");
 		setLayout(new RowLayout(Orientation.VERTICAL));
 
@@ -87,8 +77,22 @@ public class MembersPanel extends ContentPanel {
 		leftLayoutContainer = new LayoutContainer();
 		leftLayoutContainer.setHeight(22);
 		leftLayoutContainer.setLayout(new RowLayout(Orientation.HORIZONTAL));
+		
+		Button backToPersonalTable = new Button();
+        backToPersonalTable.setToolTip(new ToolTipConfig(
+                        "Back to Personal Table"));
+        backToPersonalTable.setIcon(IconHelper.createStyle("monitor_go"));
+        backToPersonalTable
+                        .addSelectionListener(new SelectionListener<ButtonEvent>() {
+                                @Override
+                                public void componentSelected(ButtonEvent ce) {
+                                        TablePlus.getDesktop().switchToTable("Personal Table");
+                                }
+                        });
+        
+		
 		Button inviteUser = new Button();
-		inviteUser.setToolTip(new ToolTipConfig("Invite new member"));
+		inviteUser.setToolTip(new ToolTipConfig("Add a member"));
 		inviteUser.setIcon(IconHelper.createStyle("invite-user"));
 		inviteUser.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
@@ -106,34 +110,8 @@ public class MembersPanel extends ContentPanel {
 			}
 		});
 
-		leftLayoutContainer.add(inviteUser);
-
-		// ToggleButton per settarsi invisibile
-		setHidden = new ToggleButton();
-		setHidden.setToolTip(new ToolTipConfig("Hidden for this table"));
-		setHidden.setIcon(IconHelper.createStyle("set-hidden"));
-		setHidden.addSelectionListener(new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				if (setHidden.isPressed())
-					GWT.log("");
-				// makeMeHidden();
-				else
-					GWT.log("");
-				// makeMeVisible();
-			}
-		});
-
-		leftLayoutContainer.add(setHidden);
-
-		// togglebutton per visualizzare un'unica lista di utenti online/offline
-		ToggleButton alfabetical = new ToggleButton();
-		alfabetical.setIcon(IconHelper.createStyle("sort_ascending"));
-		alfabetical
-				.setToolTip(new ToolTipConfig("Merge in alphabetical order"));
-		leftLayoutContainer.add(alfabetical);
-		add(leftLayoutContainer);
-
+		
+		
 		Button deleteButton = new Button();
 		deleteButton.setToolTip(new ToolTipConfig("Delete member"));
 		deleteButton.setIcon(IconHelper.createStyle("delete-user"));
@@ -146,8 +124,14 @@ public class MembersPanel extends ContentPanel {
 			}
 
 		});
-
+		
+		leftLayoutContainer.add(backToPersonalTable);
+		leftLayoutContainer.add(inviteUser);
 		leftLayoutContainer.add(deleteButton);
+
+		add(leftLayoutContainer);
+
+		
 
 	}
 
@@ -208,7 +192,8 @@ public class MembersPanel extends ContentPanel {
 				});
 		layout();
 	}
-
+	
+	//TODO: make this method more fancy and pleasant to read
 	private void inviteUser(MessageBoxEvent be) {
 		if (be.getButtonClicked().getItemId().equals(Dialog.OK)) {
 
@@ -274,7 +259,9 @@ public class MembersPanel extends ContentPanel {
 	 */
 
 	public void addMember(final User newUser) {
-		tableService.addMember(newUser.getKey(), rightPanel.getTableUI()
+		Long currentUserKey = TablePlus.getUser().getKey();
+		Long newUserKey = newUser.getKey();
+		tableService.addMember(currentUserKey,newUserKey, rightPanel.getTableUI()
 				.getTableKey(), new AsyncCallback<Void>() {
 
 			@Override
@@ -287,6 +274,8 @@ public class MembersPanel extends ContentPanel {
 				List<Long> recipients = rightPanel.getTableUI()
 						.getTableMembers();
 				recipients.add(newUser.getKey());
+				Info.display("Result",
+						"User has been successfully added to table.");
 				messagingService.sendMessage(TablePlus.getUser().getKey(),
 						newUser.getEmail(), ChannelMessageType.NEWTABLEMEMBER,
 						recipients, rightPanel.getTableUI().getTableKey(),
@@ -299,8 +288,7 @@ public class MembersPanel extends ContentPanel {
 
 							@Override
 							public void onSuccess(String result) {
-								Info.display("Result",
-										"User has been successfully added to table.");
+								GWT.log("User added and notification sent \n" + result);
 							}
 
 						});

@@ -18,6 +18,7 @@ public class DropBoxFile implements Resource{
 	private String icon;
 	private String mimeTipe;
 	private String revision;
+	private String uri; //needed for share
 
 	public String getSize() {
 		return size;
@@ -114,12 +115,6 @@ public class DropBoxFile implements Resource{
 	}
 
 	@Override
-	public String getURI() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public Provider getProvider() {
 		return Provider.DROPBOX;
 	}
@@ -128,5 +123,20 @@ public class DropBoxFile implements Resource{
 	public String toString() {
 		return "Path: " + this.getPath() + " Icon: " + this.getIcon()
 				+ " Is Dir?: " + this.getIsDir();
+	}
+
+	@Override
+	public String getID() {
+		return this.path;
+	}
+	
+	@Override
+	public String getURI() {
+		return this.uri;
+	}
+
+	@Override
+	public void setURI(String uri) {
+		this.uri = uri;
 	}
 }

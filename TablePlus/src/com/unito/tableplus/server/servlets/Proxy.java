@@ -25,6 +25,8 @@ import com.unito.tableplus.server.services.DriveServiceImpl;
 import com.unito.tableplus.shared.model.BlackBoardMessage;
 import com.unito.tableplus.shared.model.BlackBoardMessageType;
 import com.unito.tableplus.shared.model.DriveFile;
+import com.unito.tableplus.shared.model.Resource;
+import com.unito.tableplus.shared.model.SharedResource;
 import com.unito.tableplus.shared.model.Table;
 import com.unito.tableplus.shared.model.User;
 import com.unito.tableplus.shared.model.Wallet;
@@ -41,7 +43,6 @@ public class Proxy extends HttpServlet {
 		try {
 			JSONTokener jt = new JSONTokener(is);
 			JSONObject jo = new JSONObject(jt);
-
 			String request = jo.getString("request");
 			PrintWriter pw = resp.getWriter();
 
@@ -172,16 +173,15 @@ public class Proxy extends HttpServlet {
 				tableJSON.put("owner", table.getOwner());
 
 				Wallet wallet = WalletQueries.getWallet(userKey);
-				String token = wallet.getDriveToken();
-				if (token != null) {
+				if (wallet.getDriveAccessToken() != null) {
 					List<DriveFile> docList = DriveServiceImpl
-							.getDriveFileList(wallet.getDriveToken());
+							.loadFiles(wallet);
 					Map<String, DriveFile> docsMap = new HashMap<String, DriveFile>();
 					for (DriveFile d : docList)
-						docsMap.put(d.getDocId(), d);
-					List<String> tableDocuments = table.getDocuments();
-					for (String d : tableDocuments) {
-						jDoc = new JSONObject(docsMap.get(d));
+						docsMap.put(d.getID(), d);
+					List<SharedResource> tableResources = table.getResources();
+					for (Resource r : tableResources) {
+						jDoc = new JSONObject(docsMap.get(r));
 						jDocuments.put(jDoc);
 					}
 				}
@@ -229,7 +229,7 @@ public class Proxy extends HttpServlet {
 					tableJSON.put("creator", table.getCreator());
 					tableJSON.put("owner", table.getOwner());
 					tableJSON.put("messages", table.getBlackBoard().size());
-					tableJSON.put("documents", table.getDocuments().size());
+					tableJSON.put("documents", table.getResources().size());
 					ja.put(tableJSON);
 				}
 				rj.put("results", ja);
