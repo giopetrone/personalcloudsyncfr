@@ -100,4 +100,9 @@ public class WalletWindow extends WindowPlus {
 	public void redirect(String url) {
 		Window.open(url, "_self", "");
 	}
+
+	@Override
+	public void updateContent() {
+		this.layout();	
+	}
 }

@@ -4,7 +4,7 @@ import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.unito.tableplus.client.services.LoginService;
-import com.unito.tableplus.server.ServiceFactory;
+import com.unito.tableplus.server.util.ServiceFactory;
 import com.unito.tableplus.shared.model.LoginInfo;
 
 public class LoginServiceImpl extends RemoteServiceServlet implements

@@ -10,10 +10,10 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
-import com.unito.tableplus.server.InvitationQueries;
-import com.unito.tableplus.server.TableQueries;
-import com.unito.tableplus.server.UserQueries;
-import com.unito.tableplus.server.Utils;
+import com.unito.tableplus.server.persistence.InvitationQueries;
+import com.unito.tableplus.server.persistence.TableQueries;
+import com.unito.tableplus.server.persistence.UserQueries;
+import com.unito.tableplus.server.util.Utility;
 import com.unito.tableplus.shared.model.Invitation;
 import com.unito.tableplus.shared.model.LoginInfo;
 
@@ -42,7 +42,7 @@ public class InvitationServlet extends HttpServlet {
 		if (user == null) {
 			LoginInfo loginInfo = new LoginInfo();
 			loginInfo.setLoggedIn(false);
-			loginInfo.setLoginUrl(userService.createLoginURL(Utils
+			loginInfo.setLoginUrl(userService.createLoginURL(Utility
 					.getRequestUrl(req)));
 			resp.sendRedirect(loginInfo.getLoginUrl());
 		} else {
@@ -64,6 +64,6 @@ public class InvitationServlet extends HttpServlet {
 				}
 			}
 		}
-		resp.sendRedirect(Utils.getHomeUrl());
+		resp.sendRedirect(Utility.getHomeUrl());
 	}
 }

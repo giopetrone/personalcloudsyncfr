@@ -1,6 +1,7 @@
 package com.unito.tableplus.client.services;
 
 import java.util.List;
+import java.util.Map;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -10,9 +11,28 @@ import com.unito.tableplus.shared.model.Resource;
 import com.unito.tableplus.shared.model.SharedResource;
 import com.unito.tableplus.shared.model.Table;
 import com.unito.tableplus.shared.model.User;
+import com.unito.tableplus.shared.model.UserStatus;
 
 @RemoteServiceRelativePath("table-service")
 public interface TableService extends RemoteService {
+	
+	
+
+	/**
+	 * This methods start a transaction storing a new Table and adding it to the
+	 * user specified as creator. If something goes wrong will be executed a
+	 * rollback.
+	 * 
+	 * @param newTable
+	 *            The Table to store.
+	 * @param creator
+	 *            The user who is creating the table and will be set as its
+	 *            owner.
+	 * @return The stored table if transaction is committed or <i>null</i> otherwise.  
+	 */
+	Table storeNewTable(Table newTable, User creator);
+	
+	boolean storeTable(Table table);
 
 	/**
 	 * Adds a message on the table blackboard.
@@ -60,11 +80,15 @@ public interface TableService extends RemoteService {
 	void addMember(Long currentUserKey, Long newUserKey, Long tableKey);
 
 	/**
-	 * Adds a resource to a table.
-	 * The resource will be shared according with its own share policy.
-	 * @param resource The resource to share
-	 * @param user The user who is committing the share action.
-	 * @param tableKey The table to share the resource with.
+	 * Adds a resource to a table. The resource will be shared according with
+	 * its own share policy.
+	 * 
+	 * @param resource
+	 *            The resource to share
+	 * @param user
+	 *            The user who is committing the share action.
+	 * @param tableKey
+	 *            The table to share the resource with.
 	 * @return
 	 */
 	boolean addResource(Resource resource, User user, Long tableKey);
@@ -81,11 +105,11 @@ public interface TableService extends RemoteService {
 
 	Table queryTable(Long key);
 
-	List<Table> queryTables(List<Long> keys);
+	Map<Long, Table> queryTables(List<Long> keys);
 
 	void removeBookmark(String key);
 
 	void removeMessage(String messageKey);
 
-	Long storeTable(Table table);
+	Map<Long, UserStatus> getUsersStatus(Long tableKey);
 }

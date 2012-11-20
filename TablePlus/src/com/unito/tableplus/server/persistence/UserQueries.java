@@ -1,4 +1,4 @@
-package com.unito.tableplus.server;
+package com.unito.tableplus.server.persistence;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -6,6 +6,7 @@ import java.util.List;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import com.unito.tableplus.server.util.ServiceFactory;
 import com.unito.tableplus.shared.model.User;
 
 public class UserQueries {

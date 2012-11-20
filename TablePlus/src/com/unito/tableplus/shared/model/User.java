@@ -38,6 +38,7 @@ public class User implements Serializable {
 	private UserStatus status;
 	
 	public User(){
+		status = UserStatus.OFFLINE;
 		this.tables = new ArrayList<Long>();
 	}
 

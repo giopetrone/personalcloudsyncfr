@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.unito.tableplus.client.services.BookmarkService;
-import com.unito.tableplus.server.BookmarkQueries;
+import com.unito.tableplus.server.persistence.BookmarkQueries;
 import com.unito.tableplus.shared.model.Bookmark;
 import com.unito.tableplus.shared.model.Comment;
 

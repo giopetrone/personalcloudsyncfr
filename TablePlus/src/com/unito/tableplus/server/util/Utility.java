@@ -1,4 +1,4 @@
-package com.unito.tableplus.server;
+package com.unito.tableplus.server.util;
 
 import java.util.Enumeration;
 
@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.google.appengine.api.utils.SystemProperty;
 import com.google.appengine.api.utils.SystemProperty.Environment.Value;
 
-public class Utils {
+public class Utility {
 	private static final Value environment = SystemProperty.environment.value();
 	private static final Value production =  SystemProperty.Environment.Value.Production;
 

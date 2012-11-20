@@ -1,36 +1,33 @@
 package com.unito.tableplus.client;
 
-import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.widget.Window;
-import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
+import java.util.Map;
+
 import com.google.gwt.appengine.channel.client.ChannelFactory;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.unito.tableplus.client.gui.DesktopPlus;
-import com.unito.tableplus.client.gui.TableUI;
 import com.unito.tableplus.client.services.ChannelCreatedCallbackImpl;
 import com.unito.tableplus.client.services.LoginServiceAsync;
 import com.unito.tableplus.client.services.MessagingServiceAsync;
 import com.unito.tableplus.client.services.ServiceFactory;
+import com.unito.tableplus.client.services.TableServiceAsync;
 import com.unito.tableplus.client.services.UserServiceAsync;
 import com.unito.tableplus.shared.model.LoginInfo;
+import com.unito.tableplus.shared.model.Table;
 import com.unito.tableplus.shared.model.User;
+import com.unito.tableplus.shared.model.UserStatus;
 
 public class TablePlus implements EntryPoint {
-
-	private static DesktopPlus desktop;
-
-	private static TableUI personalTable;
 
 	private static final UserServiceAsync userService = ServiceFactory
 			.getUserServiceInstance();
 
+	private static final TableServiceAsync tableService = ServiceFactory
+			.getTableServiceInstance();
 
 	protected final MessagingServiceAsync chatService = ServiceFactory
-			.getChatServiceInstance();
+			.getMessagingServiceInstance();
 
 	private final LoginServiceAsync loginService = ServiceFactory
 			.getloginServiceInstance();
@@ -41,7 +38,14 @@ public class TablePlus implements EntryPoint {
 
 	private LoginInfo loginInfo = null;
 
+	/**
+	 * Current user.
+	 */
 	private static User user;
+
+	private static DesktopPlus desktop;
+
+	private static Map<Long, Table> tablesMap;
 
 	@Override
 	public void onModuleLoad() {
@@ -62,43 +66,16 @@ public class TablePlus implements EntryPoint {
 					loadUser();
 				} else {
 					loginUrl = loginInfo.getLoginUrl();
-					loadLoginWindow();
+					new DesktopPlus();
 				}
 			}
 		});
 	}
 
 	/**
-	 * Crea e visualizza la finestra di login
-	 * */
-	public void loadLoginWindow() {
-		desktop = new DesktopPlus();
-		desktop.getTaskBar().disable();
-
-		Window loginWindow = new Window();
-		Button loginButton = new Button("Login Google");
-
-		loginButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				com.google.gwt.user.client.Window.open(loginUrl, "_self", "");
-			}
-		});
-
-		loginWindow.setHeading("Google Login Window");
-		loginWindow.setLayout(new FlowLayout());
-		loginWindow.add(loginButton);
-		loginWindow.setClosable(false);
-		desktop.addWindow(loginWindow);
-		loginWindow.show();
-	}
-
-	/**
-	 * Questo metodo viene eseguito se l'utente risulta loggato a TablePlus. Si
-	 * occupa di istanziare l'oggetto "user", che rappresenta l'utente corrente.
-	 * 
+	 * Loads the current logged user then calls the loadsTable method.
 	 */
-	public void loadUser() {
+	private void loadUser() {
 		userService.loadUser(loginInfo, new AsyncCallback<User>() {
 
 			@Override
@@ -108,31 +85,87 @@ public class TablePlus implements EntryPoint {
 
 			@Override
 			public void onSuccess(User result) {
+				result.setStatus(UserStatus.ONLINE);
 				user = result;
-				loadActiveDesktop();
+				loadTables();
 			}
 		});
 	}
-	
 
-	public void loadActiveDesktop() {
-		// crea il desktop standard
-		desktop = new DesktopPlus();
-		desktop.addFixedShortcuts();
-
-		// crea il personalTable
-		personalTable = new TableUI();
-
-		// carica il personal table
-		desktop.loadPersonalTable(personalTable);
-		startCommunicationChannel();
-	}	
-	
 	/**
-	 * Avvia il canale di comunicazione per la chat
+	 * Loads tables for current user then calls the loadsMembers method.
 	 */
+	private void loadTables() {
+		tableService.queryTables(user.getTables(),
+				new AsyncCallback<Map<Long, Table>>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GWT.log("Failed loading user tables");
+					}
 
-	public void startCommunicationChannel() {
+					@Override
+					public void onSuccess(Map<Long, Table> result) {
+						tablesMap = result;
+						for (final Table t : tablesMap.values()) {
+							loadTableMembers(t);
+						}
+						startCommunicationChannel();
+						desktop = new DesktopPlus(tablesMap);
+					}
+				});
+	}
+
+	/**
+	 * Loads the members for the loaded tables. Sets current user status as
+	 * <b>ONLINE</b> on all tables.
+	 * 
+	 */
+	public static void loadTableMembers(final Table t) {
+		userService.queryUsers(t.getMembers(),
+				new AsyncCallback<Map<Long, User>>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						GWT.log("Failed loading members for table: "
+								+ t.getName(), caught);
+					}
+
+					@Override
+					public void onSuccess(Map<Long, User> result) {
+						result.get(user.getKey()).setStatus(UserStatus.ONLINE);
+						t.setUsersMap(result);
+						tablesMap.put(t.getKey(), t);
+						if(t.getMembers()!= null)
+							loadMembersStatus(t);
+					}
+
+				});
+	}
+	
+	private static void loadMembersStatus(final Table t){
+		tableService.getUsersStatus(t.getKey(), new AsyncCallback<Map<Long, UserStatus>>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				GWT.log("Failed loading members for table: "
+						+ t.getName(), caught);
+				
+			}
+
+			@Override
+			public void onSuccess(Map<Long, UserStatus> result) {
+				if(result != null)
+				for(Long k : result.keySet())
+					t.getUsersMap().get(k).setStatus(result.get(k));
+			}
+			
+		});
+	}
+
+	/**
+	 * Starts the communication channel.
+	 */
+	private void startCommunicationChannel() {
 		final String id = user.getKey().toString();
 		chatService.createChannel(id, new AsyncCallback<String>() {
 
@@ -149,21 +182,49 @@ public class TablePlus implements EntryPoint {
 		});
 
 	}
-	
-	public static void updateUser(){
+
+	/**
+	 * Updates current user querying database.
+	 */
+	public static void updateUser() {
 		userService.queryUser(user.getKey(), new AsyncCallback<User>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				GWT.log("Failure querying user in updateUser",caught);
+				GWT.log("Failure querying user in updateUser.", caught);
 			}
 
 			@Override
 			public void onSuccess(User result) {
-				setUser(result);
+				user = result;
+				for (Long key : result.getTables()) {
+					if (!tablesMap.containsKey(key)) {
+						addNewTable(key);
+					}
+				}
 			}
 		});
 	}
-	
+
+	private static void addNewTable(Long tableKey) {
+		tableService.queryTable(tableKey, new AsyncCallback<Table>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				GWT.log("Failed to add new table.", caught);
+
+			}
+
+			@Override
+			public void onSuccess(Table result) {
+				tablesMap.put(result.getKey(), result);
+				desktop.getRightPanel().getTablesPanel().updateContent();
+				desktop.updateContent();
+				loadTableMembers(result);
+			}
+
+		});
+	}
+
 	public static User getUser() {
 		return user;
 	}
@@ -171,7 +232,7 @@ public class TablePlus implements EntryPoint {
 	public static void setUser(User user) {
 		TablePlus.user = user;
 	}
-	
+
 	public static String getLoginUrl() {
 		return loginUrl;
 	}
@@ -180,7 +241,6 @@ public class TablePlus implements EntryPoint {
 		TablePlus.loginUrl = loginUrl;
 	}
 
-	
 	/**
 	 * @return the logoutUrl
 	 */
@@ -189,7 +249,10 @@ public class TablePlus implements EntryPoint {
 	}
 
 	/**
-	 * @param logoutUrl the logoutUrl to set
+	 * Sets the logout URL
+	 * 
+	 * @param logoutUrl
+	 *            the logoutUrl to set
 	 */
 	public static void setLogoutUrl(String logoutUrl) {
 		TablePlus.logoutUrl = logoutUrl;
@@ -199,15 +262,7 @@ public class TablePlus implements EntryPoint {
 		return desktop;
 	}
 
-	public static void setDesktop(DesktopPlus desktop) {
-		TablePlus.desktop = desktop;
-	}
-
-	public static TableUI getPersonalTable() {
-		return personalTable;
-	}
-
-	public static void setPersonalTable(TableUI personalTable) {
-		TablePlus.personalTable = personalTable;
+	public static void setDesktop(DesktopPlus desktopPlus) {
+		desktop = desktopPlus;
 	}
 }

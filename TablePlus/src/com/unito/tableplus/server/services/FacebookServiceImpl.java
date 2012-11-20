@@ -19,10 +19,10 @@ import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.unito.tableplus.client.services.FacebookService;
-import com.unito.tableplus.server.ServiceFactory;
-import com.unito.tableplus.server.UserQueries;
-import com.unito.tableplus.server.Utils;
-import com.unito.tableplus.server.WalletQueries;
+import com.unito.tableplus.server.persistence.UserQueries;
+import com.unito.tableplus.server.persistence.WalletQueries;
+import com.unito.tableplus.server.util.ServiceFactory;
+import com.unito.tableplus.server.util.Utility;
 import com.unito.tableplus.shared.model.FacebookEvent;
 import com.unito.tableplus.shared.model.Wallet;
 
@@ -42,7 +42,7 @@ public class FacebookServiceImpl extends RemoteServiceServlet implements
 			.apiKey(API_KEY)
 			.apiSecret(APP_SECRET)
 			.scope("user_events")
-			.callback(Utils.getCallbackUrl() + PROVIDER)
+			.callback(Utility.getCallbackUrl() + PROVIDER)
 			.build();
 
 	@Override

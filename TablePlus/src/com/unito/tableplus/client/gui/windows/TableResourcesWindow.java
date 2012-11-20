@@ -35,6 +35,7 @@ import com.unito.tableplus.client.services.TableServiceAsync;
 import com.unito.tableplus.client.services.UserServiceAsync;
 import com.unito.tableplus.shared.model.Resource;
 import com.unito.tableplus.shared.model.SharedResource;
+import com.unito.tableplus.shared.model.Table;
 
 public class TableResourcesWindow extends WindowPlus {
 
@@ -42,6 +43,8 @@ public class TableResourcesWindow extends WindowPlus {
 			.getUserServiceInstance();
 	public static final TableServiceAsync tableService = ServiceFactory
 			.getTableServiceInstance();
+
+	private Table activeTable;
 	private LayoutContainer container;
 	private ListStore<BaseModel> resourcesStore;
 	private Grid<BaseModel> grid;
@@ -56,6 +59,7 @@ public class TableResourcesWindow extends WindowPlus {
 		setHeading("Table Resources");
 		setLayout(new RowLayout(Orientation.VERTICAL));
 		setButtonAlign(HorizontalAlignment.LEFT);
+		setVisible(false);
 
 		container = new LayoutContainer();
 		container.setLayout(new FitLayout());
@@ -115,7 +119,10 @@ public class TableResourcesWindow extends WindowPlus {
 
 					@Override
 					public void onSuccess(List<SharedResource> result) {
-						fillGrid(result);
+						if (result != null) {
+							activeTable.setResources(result);
+							fillGrid(result);
+						}
 						unmask();
 					}
 				});
@@ -159,5 +166,15 @@ public class TableResourcesWindow extends WindowPlus {
 		config.add(name);
 		config.add(provider);
 		return new ColumnModel(config);
+	}
+
+	@Override
+	public void updateContent() {
+		this.activeTable = TablePlus.getDesktop().getActiveTable();
+		if (this.activeTable.getResources() != null) {
+			resourcesStore.removeAll();
+			fillGrid(this.activeTable.getResources());
+		} else
+			loadResources();
 	}
 }

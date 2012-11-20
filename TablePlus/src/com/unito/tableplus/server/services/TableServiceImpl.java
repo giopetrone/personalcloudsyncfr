@@ -1,13 +1,15 @@
 package com.unito.tableplus.server.services;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.unito.tableplus.client.services.TableService;
-import com.unito.tableplus.server.TableQueries;
-import com.unito.tableplus.server.UserQueries;
-import com.unito.tableplus.server.WalletQueries;
+import com.unito.tableplus.server.persistence.TableQueries;
+import com.unito.tableplus.server.persistence.UserQueries;
+import com.unito.tableplus.server.persistence.WalletQueries;
 import com.unito.tableplus.shared.model.BlackBoardMessage;
 import com.unito.tableplus.shared.model.Bookmark;
 import com.unito.tableplus.shared.model.Provider;
@@ -15,19 +17,32 @@ import com.unito.tableplus.shared.model.Resource;
 import com.unito.tableplus.shared.model.SharedResource;
 import com.unito.tableplus.shared.model.Table;
 import com.unito.tableplus.shared.model.User;
+import com.unito.tableplus.shared.model.UserStatus;
 import com.unito.tableplus.shared.model.Wallet;
 
 public class TableServiceImpl extends RemoteServiceServlet implements TableService {
 
 	private static final long serialVersionUID = -3403034728905706407L;
-
+	
 	@Override
-	public List<Table> queryTables(List<Long> keys) {
-		return TableQueries.queryTables(keys);
+	public Table storeNewTable(Table table, User creator){
+		return TableQueries.storeNewTable(table, creator);
 	}
 
 	@Override
-	public Long storeTable(Table table) {
+	public Map<Long,Table> queryTables(List<Long> keys) {
+		Map<Long,Table> tablesMap = null;
+		List<Table> tablesList = TableQueries.queryTables(keys);
+		if(tablesList != null){
+			tablesMap = new HashMap<Long,Table>();
+			for(Table t : tablesList)
+				tablesMap.put(t.getKey(), t);
+			}
+		return tablesMap;
+	}
+
+	@Override
+	public boolean storeTable(Table table) {
 		return TableQueries.storeTable(table);
 	}
 
@@ -39,6 +54,11 @@ public class TableServiceImpl extends RemoteServiceServlet implements TableServi
 	@Override
 	public void deleteTable(Long key) {
 		TableQueries.deleteTable(key);
+	}
+	
+	@Override
+	public Map<Long,UserStatus> getUsersStatus(Long tableKey){
+		return MessagingServiceImpl.getTableStatus(tableKey);
 	}
 
 	@Override

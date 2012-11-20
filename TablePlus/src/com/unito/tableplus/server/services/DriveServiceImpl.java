@@ -23,10 +23,10 @@ import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.User;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.unito.tableplus.client.services.DriveService;
-import com.unito.tableplus.server.ServiceFactory;
-import com.unito.tableplus.server.UserQueries;
-import com.unito.tableplus.server.Utils;
-import com.unito.tableplus.server.WalletQueries;
+import com.unito.tableplus.server.persistence.UserQueries;
+import com.unito.tableplus.server.persistence.WalletQueries;
+import com.unito.tableplus.server.util.ServiceFactory;
+import com.unito.tableplus.server.util.Utility;
 import com.unito.tableplus.shared.model.DriveFile;
 import com.unito.tableplus.shared.model.Wallet;
 
@@ -38,7 +38,7 @@ public class DriveServiceImpl extends RemoteServiceServlet implements
 	private static final String CLIENT_ID = "843761346041.apps.googleusercontent.com";
 	private static final String CLIENT_SECRET = "GEO0G7BcohMenRnhJix1pfeA";
 	private static final String PROVIDER = "?provider=drive";
-	private static final String REDIRECT_URI = Utils.getCallbackUrl()
+	private static final String REDIRECT_URI = Utility.getCallbackUrl()
 			+ PROVIDER;
 	private static GoogleAuthorizationCodeFlow flow;
 

@@ -21,11 +21,11 @@ public class BlackBoardMessage implements Serializable {
 	private String key;
 
 	@Persistent
-	private String author = null;
+	private String author;
 	@Persistent
-	private BlackBoardMessageType type = null;
+	private BlackBoardMessageType type;
 	@Persistent
-	private String content = null;
+	private String content;
 	@Persistent
 	private String date;
 	@Persistent
@@ -33,16 +33,14 @@ public class BlackBoardMessage implements Serializable {
 	@Persistent
 	private Table table;
 
+	public BlackBoardMessage(){
+	}
+	
 	public BlackBoardMessage(String author, BlackBoardMessageType type, String content) {
 		date = new Timestamp(new Date().getTime()).toString();
 		this.author = author;
 		this.type = type;
 		this.content = content;
-		this.hashcode = this.hashCode();
-	}
-	
-	public BlackBoardMessage(){
-		date = new Timestamp(new Date().getTime()).toString();
 		this.hashcode = this.hashCode();
 	}
 

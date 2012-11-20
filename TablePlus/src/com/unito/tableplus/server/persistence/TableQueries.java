@@ -1,4 +1,4 @@
-package com.unito.tableplus.server;
+package com.unito.tableplus.server.persistence;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -6,6 +6,7 @@ import java.util.List;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Transaction;
 
+import com.unito.tableplus.server.util.ServiceFactory;
 import com.unito.tableplus.shared.model.BlackBoardMessage;
 import com.unito.tableplus.shared.model.Bookmark;
 import com.unito.tableplus.shared.model.Resource;
@@ -14,6 +15,26 @@ import com.unito.tableplus.shared.model.Table;
 import com.unito.tableplus.shared.model.User;
 
 public class TableQueries {
+	
+	public static Table storeNewTable(Table table, User creator) {
+		PersistenceManager pm = ServiceFactory.getPmfInstance().getPersistenceManager();
+		Transaction tx = pm.currentTransaction();
+		try {
+			tx.begin();
+			table = pm.makePersistent(table);
+			table = pm.detachCopy(table);
+			creator.addTable(table.getKey());
+			pm.makePersistent(creator);
+			tx.commit();
+		} catch (Exception e) {
+			System.err.println("There has been an error storing new Table: " + e);
+			return null;
+		} finally {
+			if (tx.isActive()) tx.rollback();
+			pm.close();
+		}
+		return table;
+	}
 	
 	public static Table queryTable(Long key) {
 		PersistenceManager pm = ServiceFactory.getPmfInstance().getPersistenceManager();
@@ -46,19 +67,18 @@ public class TableQueries {
 		return tables;
 	}
 
-	public static Long storeTable(Table table) {
-		Long key = null;
+	public static boolean storeTable(Table table) {
 		PersistenceManager pm = ServiceFactory.getPmfInstance().getPersistenceManager();
 		try {
 			pm.makePersistent(table);
-			key = table.getKey();
 		} catch (Exception e) {
 			System.err.println("There has been an error storing the table: "
 					+ e);
+			return false;
 		} finally {
 			pm.close();
 		}
-		return key;
+		return true;
 	}
 
 	
@@ -80,10 +100,10 @@ public class TableQueries {
 		Transaction tx = pm.currentTransaction();
 		try {
 			Table t = pm.getObjectById(Table.class, tableKey);
-			if (t == null)
+			if (t == null || t.getBlackboard() == null)
 				return false;
 			tx.begin();
-			t.getBlackBoard().add(bbMessage);
+			t.getBlackboard().add(bbMessage);
 			tx.commit();
 		} catch (Exception e) {
 			System.err.println("There has been an error adding message: " + e);
@@ -101,14 +121,14 @@ public class TableQueries {
 		try {
 			Table table = pm.getObjectById(Table.class, tableKey);
 			if (table == null) return null;
-			table.getBlackBoard(); // needed because of lazy behaviour
+			table.getBlackboard(); // needed because of lazy behaviour
 			detached = pm.detachCopy(table);
 		} catch (Exception e) {
 			System.err.println("Error querying blackboard messages");
 		} finally {
 			pm.close();
 		}
-		return detached.getBlackBoard();
+		return detached.getBlackboard();
 	}
 
 	public static void removeMessage(String messageKey) {
@@ -129,7 +149,7 @@ public class TableQueries {
 		try {
 			Table table = pm.getObjectById(Table.class, key);
 			if (table == null) return false;
-			blackboard = table.getBlackBoard();
+			blackboard = table.getBlackboard();
 			blackboard.clear();
 		} catch (Exception e) {
 			System.err.println("There has been an error clearing messages: "+ e);
