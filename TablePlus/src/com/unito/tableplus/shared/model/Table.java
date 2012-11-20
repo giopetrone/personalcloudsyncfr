@@ -1,9 +1,11 @@
 package com.unito.tableplus.shared.model;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.NotPersistent;
@@ -20,18 +22,11 @@ public class Table implements Serializable {
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
 	private Long key;
 
-	public void setKey(Long key) {
-		this.key = key;
-	}
-
 	@Persistent
 	private String name = null;
 
 	@Persistent
 	private List<Long> members = null;
-
-	@NotPersistent
-	private List<String> membersEmail = null;
 
 	@Persistent
 	private Long creator = null;
@@ -48,22 +43,34 @@ public class Table implements Serializable {
 	@Persistent(mappedBy = "table")
 	private List<Bookmark> bookmarks;
 
+	@NotPersistent
+	private Map<Long, User> usersMap;
+
+	@NotPersistent
+	private String chatHistory;
+
+	@NotPersistent
+	private boolean isActive;
+
+	/* Needed by GWT */
+	public Table() {
+	}
+
 	public Table(Long creator) {
 		this.creator = creator;
 		this.owner = creator;
 		this.blackboard = new LinkedList<BlackBoardMessage>();
-		this.setResources(new LinkedList<SharedResource>());
+		this.resources = new LinkedList<SharedResource>();
 		this.members = new LinkedList<Long>();
 		this.members.add(creator);
 		this.bookmarks = new LinkedList<Bookmark>();
-	}
-	
-	//needed by GWT!!!
-	public Table() {
+		this.usersMap = new HashMap<Long, User>();
+		this.chatHistory = "";
+		this.isActive = false;
 	}
 
-	public List<BlackBoardMessage> getBlackBoard() {
-		return this.blackboard;
+	public void setKey(Long key) {
+		this.key = key;
 	}
 
 	public Long getKey() {
@@ -115,13 +122,6 @@ public class Table implements Serializable {
 		members.add(owner);
 	}
 
-	@Override
-	public String toString() {
-		return "Table Name:" + this.name + " - Creator: " + this.creator
-				+ " - Owner: " + this.owner + " - " + this.members.size()
-				+ "members.";
-	}
-
 	public List<Long> getMembers() {
 		return members;
 	}
@@ -142,32 +142,74 @@ public class Table implements Serializable {
 		resources.add(resource);
 	}
 
-	/**
-	 * @return the membersEmail
-	 */
-	public List<String> getMembersEmail() {
-		return membersEmail;
+	public List<BlackBoardMessage> getBlackboard() {
+		return blackboard;
 	}
 
-	/**
-	 * @param membersEmail
-	 *            the membersEmail to set
-	 */
-	public void setMembersEmail(List<String> membersEmail) {
-		this.membersEmail = membersEmail;
+	public void setBlackboard(List<BlackBoardMessage> blackboard) {
+		this.blackboard = blackboard;
 	}
 
-	// gestione segnalibri relativi ad un tavolo
-
-	public void setBookmarks(LinkedList<Bookmark> bookmarks) {
+	public void setBookmarks(List<Bookmark> bookmarks) {
 		this.bookmarks = bookmarks;
 	}
 
 	public List<Bookmark> getBookmarks() {
-		return bookmarks;
+		return this.bookmarks;
 	}
 
 	public void addBookmark(Bookmark b) {
 		getBookmarks().add(b);
+	}
+
+	public void setUserStatus(Long userKey, UserStatus status) {
+		if (usersMap != null && !usersMap.isEmpty())
+			usersMap.get(userKey).setStatus(status);
+	}
+
+	public Map<Long, User> getUsersMap() {
+		return usersMap;
+	}
+
+	public void setUsersMap(Map<Long, User> users) {
+		this.usersMap = new HashMap<Long, User>(users);
+	}
+	
+	public void setUsersMap(User user) {
+		this.usersMap = new HashMap<Long,User>();
+		this.usersMap.put(user.getKey(), user);
+	}
+
+	public String getChatHistory() {
+		return chatHistory;
+	}
+
+	public void setChatHistory(String chatHistory) {
+		this.chatHistory = chatHistory;
+	}
+
+	public void appendChat(String message) {
+		if (this.chatHistory == null)
+		this.chatHistory = message;
+		else this.chatHistory += message;
+	}
+
+	public void clearChatHistory() {
+		this.chatHistory = "";
+	}
+
+	public boolean isActive() {
+		return this.isActive;
+	}
+
+	public void setActive(boolean value) {
+		this.isActive = value;
+	}
+	
+	@Override
+	public String toString() {
+		return "Table Name: " + this.name + " - Creator ID: " + this.creator
+				+ " - Owner ID: " + this.owner + " - There are "
+				+ this.members.size() + " member(s).";
 	}
 }

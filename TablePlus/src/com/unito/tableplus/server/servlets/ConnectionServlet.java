@@ -9,8 +9,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.appengine.api.channel.ChannelPresence;
 import com.google.appengine.api.channel.ChannelService;
-import com.unito.tableplus.server.ServiceFactory;
 import com.unito.tableplus.server.services.MessagingServiceImpl;
+import com.unito.tableplus.server.util.ServiceFactory;
 
 public class ConnectionServlet extends HttpServlet {
 
@@ -21,6 +21,7 @@ public class ConnectionServlet extends HttpServlet {
 			throws ServletException, IOException {
 		ChannelService channelService = ServiceFactory.getChannelService();
 		ChannelPresence presence = channelService.parsePresence(req);
-		MessagingServiceImpl.addUser(presence.clientId());
+		Long userKey = Long.parseLong(presence.clientId());
+		MessagingServiceImpl.userConnection(userKey);
 	}
 }

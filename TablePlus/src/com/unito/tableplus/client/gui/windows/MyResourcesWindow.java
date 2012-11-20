@@ -33,6 +33,7 @@ import com.unito.tableplus.client.services.ServiceFactory;
 import com.unito.tableplus.client.services.TableServiceAsync;
 import com.unito.tableplus.client.services.UserServiceAsync;
 import com.unito.tableplus.shared.model.Resource;
+import com.unito.tableplus.shared.model.Table;
 import com.unito.tableplus.shared.model.User;
 
 public class MyResourcesWindow extends WindowPlus {
@@ -101,8 +102,8 @@ public class MyResourcesWindow extends WindowPlus {
 	}
 
 	private void loadResources() {
-		resourcesStore.removeAll();
 		mask();
+		resourcesStore.removeAll();
 		userService.loadResources(TablePlus.getUser(),
 				new AsyncCallback<List<Resource>>() {
 
@@ -169,11 +170,11 @@ public class MyResourcesWindow extends WindowPlus {
 
 	private void shareResource(Resource selectedResource) {
 		User user = TablePlus.getUser();
-		Long tableKey = TablePlus.getDesktop().getActiveTableKey();
-		if (tableKey.equals(0L))
+		Table table = TablePlus.getDesktop().getActiveTable();
+		if (table == null)
 			Info.display("Share resource", "Cannot share on personal table!");
 		else
-			tableService.addResource(selectedResource, user, tableKey,
+			tableService.addResource(selectedResource, user, table.getKey(),
 					new AsyncCallback<Boolean>() {
 
 						@Override
@@ -195,5 +196,10 @@ public class MyResourcesWindow extends WindowPlus {
 						}
 
 					});
+	}
+
+	@Override
+	public void updateContent() {
+		loadResources();
 	}
 }

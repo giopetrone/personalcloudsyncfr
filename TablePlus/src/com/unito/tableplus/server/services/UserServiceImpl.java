@@ -1,13 +1,15 @@
 package com.unito.tableplus.server.services;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.unito.tableplus.client.services.UserService;
-import com.unito.tableplus.server.UserQueries;
-import com.unito.tableplus.server.WalletQueries;
+import com.unito.tableplus.server.persistence.UserQueries;
+import com.unito.tableplus.server.persistence.WalletQueries;
 import com.unito.tableplus.shared.model.DriveFile;
 import com.unito.tableplus.shared.model.DropBoxFile;
 import com.unito.tableplus.shared.model.FacebookEvent;
@@ -42,8 +44,16 @@ public class UserServiceImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public List<User> queryUsers(List<Long> keys) {
-		return UserQueries.queryUsers(keys);
+	public Map<Long,User> queryUsers(List<Long> keys) {
+		Map<Long,User> usersMap = null;
+		List<User> usersList = UserQueries.queryUsers(keys); 
+		if(usersList != null && !usersList.isEmpty()){
+			usersMap =  new HashMap<Long,User>();
+			for(User u : usersList)
+				usersMap.put(u.getKey(), u);
+		}
+		return usersMap;
+		
 	}
 
 	@Override

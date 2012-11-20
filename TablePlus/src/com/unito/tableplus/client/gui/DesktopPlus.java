@@ -1,410 +1,440 @@
 package com.unito.tableplus.client.gui;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import com.extjs.gxt.desktop.client.Desktop;
 import com.extjs.gxt.desktop.client.Shortcut;
 import com.extjs.gxt.desktop.client.StartMenu;
 import com.extjs.gxt.ui.client.Style.Orientation;
+import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MenuEvent;
+import com.extjs.gxt.ui.client.event.MessageBoxEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.util.IconHelper;
 import com.extjs.gxt.ui.client.util.Margins;
-import com.extjs.gxt.ui.client.widget.ContentPanel;
+import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.Info;
-import com.extjs.gxt.ui.client.widget.TabItem;
-import com.extjs.gxt.ui.client.widget.TabPanel;
-import com.extjs.gxt.ui.client.widget.layout.FitLayout;
+import com.extjs.gxt.ui.client.widget.MessageBox;
+import com.extjs.gxt.ui.client.widget.Window;
+import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
-import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.unito.tableplus.client.TablePlus;
+import com.unito.tableplus.client.gui.panels.RightPanel;
+import com.unito.tableplus.client.gui.windows.BlackBoardWindow;
+import com.unito.tableplus.client.gui.windows.BookmarkWindow;
+import com.unito.tableplus.client.gui.windows.BookmarksListWindow;
+import com.unito.tableplus.client.gui.windows.ChatWindow;
 import com.unito.tableplus.client.gui.windows.MyResourcesWindow;
+import com.unito.tableplus.client.gui.windows.TableResourcesWindow;
 import com.unito.tableplus.client.gui.windows.WalletWindow;
 import com.unito.tableplus.client.gui.windows.WindowPlus;
 import com.unito.tableplus.client.services.MessagingServiceAsync;
 import com.unito.tableplus.client.services.ServiceFactory;
+import com.unito.tableplus.client.services.TableServiceAsync;
 import com.unito.tableplus.client.services.UserServiceAsync;
+import com.unito.tableplus.shared.model.Bookmark;
 import com.unito.tableplus.shared.model.ChannelMessageType;
+import com.unito.tableplus.shared.model.Table;
 
 public class DesktopPlus extends Desktop {
 
-	private final UserServiceAsync userService = ServiceFactory
+	private static final UserServiceAsync userService = ServiceFactory
 			.getUserServiceInstance();
-	protected final MessagingServiceAsync messagingService = ServiceFactory
-			.getChatServiceInstance();
-	
-	private List<TableUI> tables;
-	private TableUI activeTable;
-	private RightPanel activeRightPanel;
+	private static final TableServiceAsync tableService = ServiceFactory
+			.getTableServiceInstance();
+	private static final MessagingServiceAsync messagingService = ServiceFactory
+			.getMessagingServiceInstance();
 
-	// listener dedicato al menu
-	private SelectionListener<MenuEvent> menuListener;
-	private SelectionListener<MenuEvent> tableMenuListener;
+	private Map<Long, Table> tables;
+	private Table activeTable;
 
-	// listener dedicato agli shortcut
+	private RightPanel rightPanel;
+
+	private StartMenu startMenu;
+
+	private WindowPlus walletWindow;
+	private WindowPlus myResourcesWindow;
+	private WindowPlus chatWindow;
+	private WindowPlus blackboardWindow;
+	private WindowPlus tableResourcesWindow;
+	private WindowPlus bookmarksListWindow;
+	private WindowPlus bookmarkWindow;
+
+	private Shortcut walletShortcut;
+	private Shortcut myResourcesShortcut;
+	private Shortcut tableResourcesShortcut;
+	private Shortcut chatShortcut;
+	private Shortcut blackboardShortcut;
+	private Shortcut bookmarksShortcut;
+
 	private SelectionListener<ComponentEvent> shortcutListener;
-	protected StartMenu startMenu;
-	private List<MenuItem> menuItems = new ArrayList<MenuItem>();
-	private Menu tablesSubMenu = new Menu();
 
+	private Menu switchTableMenu;
+
+	private List<String> allTags;
+
+	/**
+	 * This constructor must be called when user is <b>NOT</b> logged in. It
+	 * shows the login window ad a minimal, disabled desktop.
+	 * 
+	 * @param loginUrl
+	 *            The url where the user will be redirected for logging in.
+	 */
 	public DesktopPlus() {
-		super();
-		tables = new ArrayList<TableUI>();
-		// setta il listener del menu
-		setMenuListener(new SelectionListener<MenuEvent>() {
+		super.getTaskBar().disable();
+		
+		Window loginWindow = new Window();
+		Button loginButton = new Button("Login");
+
+		loginButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
-			public void componentSelected(MenuEvent me) {
-				String s = ((MenuItem) me.getItem()).getText();
-				if (s.contains("Table") || s.contains("Personal Table")) {
-					switchToTable(s);
-				} else if (s.equals("Add Table")) {
-					// TODO: do something
-				} else {
-					itemSelected(me);
-				}
+			public void componentSelected(ButtonEvent ce) {
+				com.google.gwt.user.client.Window.open(TablePlus.getLoginUrl(),
+						"_self", "");
 			}
 		});
 
-		// setta il listener per il cambio dei tavoli
-		tableMenuListener = new SelectionListener<MenuEvent>() {
+		loginWindow.setHeading("Google Login");
+		loginWindow.setLayout(new FlowLayout());
+		loginWindow.add(loginButton);
+		loginWindow.setClosable(false);
+		addWindow(loginWindow);
+		loginWindow.show();
+	}
+
+	/**
+	 * This constructor generates the full desktop environment. Initializes
+	 * shortcuts and windows.
+	 * 
+	 * @param tables
+	 *            The map of tables which logged user belongs to.
+	 */
+	public DesktopPlus(Map<Long, Table> tables) {
+		super();
+		TablePlus.setDesktop(this);
+		super.desktop.setLayout(new RowLayout(Orientation.HORIZONTAL));
+
+		this.tables = tables;
+
+		walletWindow = new WalletWindow();
+		myResourcesWindow = new MyResourcesWindow();
+		tableResourcesWindow = new TableResourcesWindow();
+		chatWindow = new ChatWindow();
+		blackboardWindow = new BlackBoardWindow();
+		bookmarksListWindow = new BookmarksListWindow();
+
+		this.shortcutListener = new SelectionListener<ComponentEvent>() {
 			@Override
-			public void componentSelected(MenuEvent me) {
-				String s = ((MenuItem) me.getItem()).getText();
-				switchToTable(s);
+			public void componentSelected(ComponentEvent ce) {
+				WindowPlus w = ce.getComponent().getData("window");
+				w.show();
+				w.toFront();
 			}
 		};
 
-		// (4)setta il listener delle icone
-		setShortcutListener(new SelectionListener<ComponentEvent>() {
-			@Override
-			public void componentSelected(ComponentEvent ce) {
-				itemSelected(ce);
-			}
-		});
+		walletShortcut = new Shortcut();
+		walletShortcut.setText("Wallet");
+		walletShortcut.setId("wallet-win-shortcut");
+		walletShortcut.setData("window", walletWindow);
+		walletShortcut.setVisible(true);
+		walletShortcut.addSelectionListener(shortcutListener);
 
-		setStartMenu();
+		myResourcesShortcut = new Shortcut();
+		myResourcesShortcut.setText("My Resources");
+		myResourcesShortcut.setId("myresources-win-shortcut");
+		myResourcesShortcut.setData("window", myResourcesWindow);
+		myResourcesShortcut.setVisible(true);
+		myResourcesShortcut.addSelectionListener(shortcutListener);
 
-	}
+		bookmarksShortcut = new Shortcut();
+		bookmarksShortcut.setText("My Bookmarks");
+		bookmarksShortcut.setId("resource-win-shortcut");
+		bookmarksShortcut.setData("window", bookmarksListWindow);
+		bookmarksShortcut.setVisible(true);
+		bookmarksShortcut.addSelectionListener(shortcutListener);
 
-	public void addFixedShortcuts() {
-		// (5) crea degli shortcuts da associare alle windows
-		// wallet
-		WindowPlus walletWindow = new WalletWindow();
-		addWindow(walletWindow);
-		Shortcut s = new Shortcut();
-		s.setText("Wallet");
-		s.setId("wallet-win-shortcut");
-		s.setData("window", walletWindow);
-		s.addSelectionListener(shortcutListener);
-		this.addShortcut(s);
+		tableResourcesShortcut = new Shortcut();
+		tableResourcesShortcut.setText("Table Resources");
+		tableResourcesShortcut.setId("tableresources-win-shortcut");
+		tableResourcesShortcut.setData("window", tableResourcesWindow);
+		tableResourcesShortcut.setVisible(false);
+		tableResourcesShortcut.addSelectionListener(shortcutListener);
 
-		// my resources
-		WindowPlus myResourcesWindow = new MyResourcesWindow();
-		addWindow(myResourcesWindow);
-		s = new Shortcut();
-		s.setText("My Resources");
-		s.setId("myresources-win-shortcut");
-		s.setData("window", myResourcesWindow);
-		s.addSelectionListener(shortcutListener);
-		this.addShortcut(s);
-	}
+		chatShortcut = new Shortcut();
+		chatShortcut.setText("Table Chat");
+		chatShortcut.setId("chat-win-shortcut");
+		chatShortcut.setData("window", chatWindow);
+		chatShortcut.setVisible(false);
+		chatShortcut.addSelectionListener(shortcutListener);
 
-	public void setStartMenu() {
-		startMenu = taskBar.getStartMenu();
+		blackboardShortcut = new Shortcut();
+		blackboardShortcut.setText("Blackboard");
+		blackboardShortcut.setId("blackboard-win-shortcut");
+		blackboardShortcut.setData("window", blackboardWindow);
+		blackboardShortcut.setVisible(false);
+		blackboardShortcut.addSelectionListener(shortcutListener);
 
-		// popola lo StartMenu
-		if (TablePlus.getUser() != null)
-			startMenu.setHeading(TablePlus.getUser().getEmail());
+		this.addWindow(tableResourcesWindow);
+		this.addWindow(chatWindow);
+		this.addWindow(blackboardWindow);
+		this.addWindow(bookmarksListWindow);
+		this.addWindow(walletWindow);
+		this.addWindow(myResourcesWindow);
+
+		this.addShortcut(walletShortcut);
+		this.addShortcut(myResourcesShortcut);
+		this.addShortcut(bookmarksShortcut);
+		this.addShortcut(tableResourcesShortcut);
+		this.addShortcut(chatShortcut);
+		this.addShortcut(blackboardShortcut);
+
+		rightPanel = new RightPanel();
+		int leftMargin = (int) (super.desktop.getWidth() * 0.75);
+		super.desktop.add(rightPanel, new RowData(1, 1, new Margins(8, 8, 8,
+				leftMargin)));
+		super.desktop.layout();
+
+		startMenu = super.getStartMenu();
+		startMenu.setHeading(TablePlus.getUser().getEmail());
 		startMenu.setIconStyle("user");
 
-		MenuItem menuItem = new MenuItem("Add Table");
-		menuItem.addSelectionListener(menuListener);
-		menuItems.add(menuItem);
-		startMenu.add(menuItem);
-
-		menuItem = new MenuItem("Switch Table");
-		setTableSubMenu();
-		menuItem.setSubMenu(tablesSubMenu);
-		startMenu.add(menuItem);
-
-		menuItem = new MenuItem("Tab Window");
-		menuItem.setIcon(IconHelper.createStyle("tabs"));
-		menuItem.addSelectionListener(menuListener);
-		menuItems.add(menuItem);
-		menuItem.setData("window", createTabWindow());
-		startMenu.add(menuItem);
-
-		menuItem = new MenuItem("Bogus Submenu");
-		menuItem.setIcon(IconHelper.createStyle("bogus"));
-
-		Menu sub = new Menu();
-
-		for (int i = 0; i < 5; i++) {
-			MenuItem item = new MenuItem("Bogus Window " + (i + 1));
-			item.setData("window", createBogusWindow(i));
-			item.addSelectionListener(menuListener);
-			menuItems.add(item);
-			sub.add(item);
-		}
-
-		menuItem.setSubMenu(sub);
-		startMenu.add(menuItem);
-
-		// tools
-		MenuItem tool = new MenuItem("Settings");
-		tool.setIcon(IconHelper.createStyle("settings"));
-		tool.addSelectionListener(new SelectionListener<MenuEvent>() {
+		MenuItem newTableItem = new MenuItem("Create new Table");
+		newTableItem.setIconStyle("monitor_add");
+		newTableItem.addSelectionListener(new SelectionListener<MenuEvent>() {
 			@Override
 			public void componentSelected(MenuEvent ce) {
-				Info.display("Event", "The 'Settings' tool was clicked");
+				createNewTable();
 			}
 		});
-		startMenu.addTool(tool);
 
-		startMenu.addToolSeperator();
+		MenuItem personalTableItem = new MenuItem("Go to Personal Table");
+		personalTableItem.setIconStyle("monitor");
+		personalTableItem
+				.addSelectionListener(new SelectionListener<MenuEvent>() {
+					@Override
+					public void componentSelected(MenuEvent ce) {
+						switchToPersonalTable();
+					}
+				});
 
-		tool = new MenuItem("Logout");
-		tool.setIcon(IconHelper.createStyle("logout"));
-		tool.addSelectionListener(new SelectionListener<MenuEvent>() {
+		switchTableMenu = new Menu();
+
+		MenuItem switchTableItem = new MenuItem("Switch to table");
+		switchTableItem.setSubMenu(switchTableMenu);
+		switchTableItem.setIconStyle("monitor_go");
+
+		switchTableMenu.add(personalTableItem);
+
+		startMenu.add(personalTableItem);
+		startMenu.add(newTableItem);
+		startMenu.add(switchTableItem);
+
+		MenuItem settings = new MenuItem("Settings");
+		settings.setIcon(IconHelper.createStyle("settings"));
+		settings.addSelectionListener(new SelectionListener<MenuEvent>() {
 			@Override
 			public void componentSelected(MenuEvent ce) {
-				// TODO: send message
+				Info.display("Settings", "Not implemented yet...");
+			}
+		});
+
+		startMenu.addTool(settings);
+		startMenu.addToolSeperator();
+
+		settings = new MenuItem("Logout");
+		settings.setIcon(IconHelper.createStyle("logout"));
+		settings.addSelectionListener(new SelectionListener<MenuEvent>() {
+			@Override
+			public void componentSelected(MenuEvent ce) {
+				// TODO: send message and close channel
 				redirect(TablePlus.getLogoutUrl());
 			}
 		});
-		startMenu.addTool(tool);
+		startMenu.addTool(settings);
+
+		allTags = new LinkedList<String>();
+		updateContent();
 	}
 
-	public void setTableSubMenu() {
-		MenuItem item = new MenuItem("Personal Table");
-		item.addSelectionListener(tableMenuListener);
-		menuItems.add(item);
-		tablesSubMenu.add(item);
-	}
+	public void switchToPersonalTable() {
+		if (activeTable != null) {
+			sendStatusChange(ChannelMessageType.USERAWAY, getActiveTableKey());
+			activeTable.setActive(false);
 
-	public void loadPersonalTable(TableUI personalTable) {
-
-		activeTable = TablePlus.getPersonalTable();
-		activeRightPanel = activeTable.getRightPanel();
-		createRightPanel();
-
-		for (Shortcut s : activeTable.getShortcuts()) {
-			this.addShortcut(s);
-			s.addSelectionListener(shortcutListener);
+			activeTable = null;
+			tableResourcesShortcut.setVisible(false);
+			chatShortcut.setVisible(false);
+			blackboardShortcut.setVisible(false);
+			chatWindow.setVisible(false);
+			blackboardWindow.setVisible(false);
+			tableResourcesWindow.setVisible(false);
+			bookmarksListWindow.setVisible(false);
+			rightPanel.updateContent();
 		}
-
-		switchToTable("Personal Table");
-
 	}
 
-	public void switchToTable(String s) {
-		unloadCurrentTable();
+	public void switchToTable(Long tableKey) {
+		if (activeTable != null) {
+			sendStatusChange(ChannelMessageType.USERAWAY, getActiveTableKey());
+			activeTable.setActive(false);
+		}
+		activeTable = tables.get(tableKey);
+		activeTable.setActive(true);
+		tableResourcesShortcut.setVisible(true);
+		chatShortcut.setVisible(true);
+		blackboardShortcut.setVisible(true);
 
-		if (s.equals("Personal Table")) {
-			loadTable(TablePlus.getPersonalTable());
-		} else
-			for (TableUI t : tables) {
-				if (t.getTableName().equals(s)) {
-					loadTable(t);
+		sendStatusChange(ChannelMessageType.USERONLINE, getActiveTableKey());
+		chatWindow.updateContent();
+		blackboardWindow.updateContent();
+		tableResourcesWindow.updateContent();
+		bookmarksListWindow.updateContent();
+		rightPanel.updateContent();
+	}
+
+	/**
+	 * Creates a new table and stores table data. If everything goes fine
+	 * corresponding Table will be stored and added to current user.
+	 */
+	public void createNewTable() {
+
+		final MessageBox box = MessageBox.prompt("New Table",
+				"Please enter new Table name:");
+		box.setButtons(MessageBox.OKCANCEL);
+		box.addCallback(new Listener<MessageBoxEvent>() {
+
+			@Override
+			public void handleEvent(MessageBoxEvent be) {
+				if (be.getButtonClicked().getItemId().equals(Dialog.OK)) {
+					// TODO Check table name is not empty
+					storeNewTable(be.getValue());
 				}
 			}
 
+		});
 	}
 
-	private void unloadCurrentTable() {
+	private void sendStatusChange(ChannelMessageType type, Long tableKey) {
+		messagingService.sendMessage(TablePlus.getUser().getKey(), "", type,
+				activeTable.getKey(), new AsyncCallback<String>() {
 
-		// if the active table is not the Personal Table
-		if (!activeTable.getTableKey().equals(0L)) {
-			for (Shortcut s : activeTable.getShortcuts()) {
-				s.setVisible(false);
-			}
-			messagingService.sendMessage(TablePlus.getUser().getKey(), "",
-					ChannelMessageType.USERAWAY, activeTable.getTableMembers(),
-					activeTable.getTableKey(), new AsyncCallback<String>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GWT.log("Failed to send AWAY notification to table."
+								+ caught);
+					}
 
-						@Override
-						public void onFailure(Throwable caught) {
-							GWT.log("Unable to send AWAY message");
+					@Override
+					public void onSuccess(String result) {
+						GWT.log(result);
+					}
+				});
+	}
+
+	private void storeNewTable(String tableName) {
+		final Table newTable = new Table(TablePlus.getUser().getKey());
+		newTable.setName(tableName);
+		tableService.storeNewTable(newTable, TablePlus.getUser(),
+				new AsyncCallback<Table>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						Info.display(
+								"Table creation",
+								"Impossible to create table "
+										+ newTable.getName());
+						GWT.log("Error creating table " + newTable.getName(),
+								caught);
+					}
+
+					@Override
+					public void onSuccess(Table result) {
+						if (result != null) {
+							Info.display("Table creation",
+									"Table " + result.getName()
+											+ " has been created.");
+							GWT.log("Table " + result.getName()
+									+ " has been created.");
+							TablePlus.updateUser();
+						} else {
+							Info.display(
+									"Table creation",
+									"Failed to create table "
+											+ newTable.getName());
+							GWT.log("Failed to create table "
+									+ newTable.getName());
 						}
+					}
 
-						@Override
-						public void onSuccess(String result) {
-						}
+				});
+	}
 
-					});
+	public void updateContent() {
+		switchTableMenu.removeAll();
+		MenuItem tableItem;
+		for (Table t : tables.values()) {
+			tableItem = new MenuItem(t.getName());
+			tableItem.setId(t.getKey().toString());
+			tableItem.setIconStyle("monitor");
+
+			tableItem.addSelectionListener(new SelectionListener<MenuEvent>() {
+				@Override
+				public void componentSelected(MenuEvent ce) {
+					Long tableKey = Long.parseLong(ce.getItem().getId());
+					switchToTable(tableKey);
+				}
+			});
+			switchTableMenu.add(tableItem);
 		}
 
-		for (WindowPlus w : activeTable.getWindows()) {
-			if (w.isVisible()) {
-				w.setClosedBySwitch(true);
-				w.setWasOpen(true);
-				w.hide();
-			}
-		}
-
-		activeRightPanel.removeFromParent();
 	}
 
-	public void loadTable(TableUI table) {
-		this.activeTable = table;
-
-		// carica gli shortcuts e i rispettivi listener
-		for (Shortcut s : activeTable.getShortcuts()) {
-			s.setVisible(true);
-		}
-
-		for (WindowPlus w : activeTable.getWindows()) {
-			if (w.getWasOpen()) {
-				w.show();
-				w.setWasOpen(false);
-			}
-		}
-
-		// carica il pannello di destra
-		activeRightPanel = table.getRightPanel();
-		desktop.add(activeRightPanel, new RowData(350, 1, new Margins(8)));
-		desktop.layout();
-
-		if (!activeTable.getTableKey().equals(0L))
-			messagingService.sendMessage(TablePlus.getUser().getKey(), "",
-					ChannelMessageType.USERONLINE,
-					activeTable.getTableMembers(), activeTable.getTableKey(),
-					new AsyncCallback<String>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							GWT.log("Unable to send ONLINE message");
-						}
-
-						@Override
-						public void onSuccess(String result) {
-
-						}
-
-					});
+	public void showBookmarkWindow(Bookmark b) {
+		this.bookmarkWindow = new BookmarkWindow(b);
+		this.addWindow(this.bookmarkWindow);
+		this.bookmarkWindow.show();
 	}
 
-	public void createRightPanel() {
-		desktop.setLayout(new RowLayout(Orientation.HORIZONTAL));
-
-		ContentPanel panel = new ContentPanel();
-		panel.setVisible(false);
-
-		desktop.add(panel, new RowData(1, 100));
-		desktop.add(activeRightPanel, new RowData(350, 1, new Margins(8)));
-		desktop.layout();
-	}
-
-	// reazione agli eventi
-	private void itemSelected(ComponentEvent ce) {
-		WindowPlus w;
-		if (ce instanceof MenuEvent) {
-			MenuEvent me = (MenuEvent) ce;
-			w = me.getItem().getData("window");
-		} else {
-			w = ce.getComponent().getData("window");
-		}
-		if (!getWindows().contains(w)) {
-			addWindow(w);
-		}
-		if (w != null && !w.isVisible()) {
-			w.show();
-		} else {
-			w.toFront();
-		}
-	}
-
-	public void addTable(TableUI t) {
-		this.tables.add(t);
-		for (Shortcut s : t.getShortcuts()) {
-			this.addShortcut(s);
-			s.addSelectionListener(shortcutListener);
-			s.setVisible(false);
-		}
-		updateTablesList(t);
-	}
-
-	public void updateTablesList(TableUI t) {
-		MenuItem item = new MenuItem(t.getTableName());
-		item.addSelectionListener(tableMenuListener);
-		menuItems.add(item);
-		tablesSubMenu.add(item);
-		taskBar.layout();
-	}
-
-	private WindowPlus createTabWindow() {
-		WindowPlus w = new WindowPlus();
-		w.setMinimizable(true);
-		w.setMaximizable(true);
-		w.setSize(740, 480);
-		w.setIcon(IconHelper.createStyle("tabs"));
-		w.setHeading("Tab Window");
-
-		w.setLayout(new FitLayout());
-
-		TabPanel panel = new TabPanel();
-
-		for (int i = 0; i < 4; i++) {
-			TabItem item = new TabItem("Tab Item " + (i + 1));
-			item.addText("Something useful would be here");
-			panel.add(item);
-		}
-
-		w.add(panel);
-		return w;
-	}
-
-	private WindowPlus createBogusWindow(int index) {
-		WindowPlus w = new WindowPlus();
-		w.setIcon(IconHelper.createStyle("bogus"));
-		w.setMinimizable(true);
-		w.setMaximizable(true);
-		w.setHeading("Bogus Window " + ++index);
-		w.setSize(400, 300);
-		return w;
-	}
-
-	public SelectionListener<MenuEvent> getMenuListener() {
-		return menuListener;
-	}
-
-	public void setMenuListener(SelectionListener<MenuEvent> menuListener) {
-		this.menuListener = menuListener;
-	}
-
-	public SelectionListener<ComponentEvent> getShortcutListener() {
-		return shortcutListener;
-	}
-
-	public void setShortcutListener(
-			SelectionListener<ComponentEvent> shortcutListener) {
-		this.shortcutListener = shortcutListener;
-	}
-
-	public RightPanel getCurrentRightPanel() {
-		return activeRightPanel;
-	}
-
-	public void setCurrentRightPanel(RightPanel rightPanel) {
-		this.activeRightPanel = rightPanel;
-	}
-
-	public List<TableUI> getTables() {
+	public Map<Long, Table> getTables() {
 		return tables;
 	}
 
-	public void setTables(List<TableUI> tables) {
+	public void setTables(Map<Long, Table> tables) {
 		this.tables = tables;
 	}
 
 	public Long getActiveTableKey() {
-		return activeTable.getTableKey();
+		return activeTable.getKey();
+	}
+
+	public Table getActiveTable() {
+		return activeTable;
+	}
+
+	public RightPanel getRightPanel() {
+		return rightPanel;
+	}
+
+	public WindowPlus getChatWindow() {
+		return chatWindow;
+	}
+
+	public List<String> getAllTags() {
+		return allTags;
+	}
+
+	public void setAllTags(List<String> allTags) {
+		this.allTags = allTags;
 	}
 
 	public static native void redirect(String url)

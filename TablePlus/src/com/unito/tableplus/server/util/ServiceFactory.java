@@ -1,4 +1,4 @@
-package com.unito.tableplus.server;
+package com.unito.tableplus.server.util;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManagerFactory;

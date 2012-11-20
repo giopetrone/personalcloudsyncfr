@@ -49,7 +49,7 @@ public class BlackBoardWindow extends WindowPlus {
 	private final TableServiceAsync tableService = ServiceFactory
 			.getTableServiceInstance();
 
-	private Table table;
+	private Table activeTable;
 	private LayoutContainer mainContainer;
 	private Grid<BaseModel> grid;
 	private ListStore<BaseModel> messagesStore;
@@ -63,13 +63,14 @@ public class BlackBoardWindow extends WindowPlus {
 	private MenuItem deleteItem;
 	private Dialog messageDialog;
 
-	public BlackBoardWindow(Table table) {
+	public BlackBoardWindow() {
 		super();
 		setSize(600, 300);
-		this.table = table;
 		setHeading("Blackboard");
 		setLayout(new RowLayout(Orientation.VERTICAL));
 		setButtonAlign(HorizontalAlignment.LEFT);
+		setVisible(false);
+
 		mainContainer = new LayoutContainer();
 		mainContainer.setLayout(fitLayout);
 		mainContainer.setScrollMode(Scroll.AUTOY);
@@ -92,7 +93,7 @@ public class BlackBoardWindow extends WindowPlus {
 						.getSelectedItem();
 				String header = selected.get("type").toString();
 				String content = selected.get("content").toString();
-				showMessage(header,content);
+				showMessage(header, content);
 			}
 		});
 
@@ -119,7 +120,7 @@ public class BlackBoardWindow extends WindowPlus {
 				});
 			}
 		});
-		
+
 		contextMenu.add(deleteItem);
 		contextMenu.add(showItem);
 
@@ -155,21 +156,24 @@ public class BlackBoardWindow extends WindowPlus {
 	private void loadMessages() {
 		messagesStore.removeAll();
 		mask();
-		if (table.getKey() != null)
-			tableService.loadBlackBoardMessages(table.getKey(),
+		if (activeTable.getKey() != null)
+			tableService.loadBlackBoardMessages(activeTable.getKey(),
 					new AsyncCallback<List<BlackBoardMessage>>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
 							GWT.log("Unable to load blackboard messages for table: "
-									+ table.getName(), caught);
+									+ activeTable.getName(), caught);
 							Info.display("Error", "Unable to load messages.");
 							unmask();
 						}
 
 						@Override
 						public void onSuccess(List<BlackBoardMessage> result) {
-							fillGrid(result);
+							if (result != null) {
+								activeTable.setBlackboard(result);
+								fillGrid(result);
+							}
 							unmask();
 						}
 					});
@@ -184,7 +188,7 @@ public class BlackBoardWindow extends WindowPlus {
 		messageDialog.setHideOnButtonClick(true);
 		messageDialog.setHeading(heading);
 		messageDialog.addText(content);
-		messageDialog.getItem(0).getFocusSupport().setIgnore(true);  
+		messageDialog.getItem(0).getFocusSupport().setIgnore(true);
 		messageDialog.show();
 	}
 
@@ -200,7 +204,7 @@ public class BlackBoardWindow extends WindowPlus {
 	}
 
 	private void postMessage(final BlackBoardMessage message) {
-		tableService.addBlackBoardMessage(table.getKey(), message,
+		tableService.addBlackBoardMessage(activeTable.getKey(), message,
 				new AsyncCallback<Boolean>() {
 
 					@Override
@@ -322,5 +326,15 @@ public class BlackBoardWindow extends WindowPlus {
 		});
 
 		return panel;
+	}
+
+	@Override
+	public void updateContent() {
+		this.activeTable = TablePlus.getDesktop().getActiveTable();
+		if (this.activeTable.getBlackboard() != null) {
+			messagesStore.removeAll();
+			fillGrid(activeTable.getBlackboard());
+		} else
+			loadMessages();
 	}
 }

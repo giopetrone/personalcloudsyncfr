@@ -20,10 +20,10 @@ import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.unito.tableplus.client.services.DropBoxService;
-import com.unito.tableplus.server.ServiceFactory;
-import com.unito.tableplus.server.UserQueries;
-import com.unito.tableplus.server.Utils;
-import com.unito.tableplus.server.WalletQueries;
+import com.unito.tableplus.server.persistence.UserQueries;
+import com.unito.tableplus.server.persistence.WalletQueries;
+import com.unito.tableplus.server.util.ServiceFactory;
+import com.unito.tableplus.server.util.Utility;
 import com.unito.tableplus.shared.model.DropBoxFile;
 import com.unito.tableplus.shared.model.Wallet;
 
@@ -52,7 +52,7 @@ public class DropBoxServiceImpl extends RemoteServiceServlet implements
 		Token requestToken = service.getRequestToken();
 		syncCache.put(user.getEmail(), requestToken);
 		return service.getAuthorizationUrl(requestToken) + CALLBACK_PARAMETER
-				+ Utils.getCallbackUrl() + PROVIDER;
+				+ Utility.getCallbackUrl() + PROVIDER;
 	}
 
 	public static void storeAccessToken(String oauthToken) {

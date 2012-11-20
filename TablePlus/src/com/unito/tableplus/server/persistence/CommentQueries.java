@@ -1,7 +1,8 @@
-package com.unito.tableplus.server;
+package com.unito.tableplus.server.persistence;
 
 import javax.jdo.PersistenceManager;
 
+import com.unito.tableplus.server.util.ServiceFactory;
 import com.unito.tableplus.shared.model.Comment;
 
 public class CommentQueries {

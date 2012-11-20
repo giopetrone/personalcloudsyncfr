@@ -10,11 +10,11 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
-import com.unito.tableplus.server.ServiceFactory;
-import com.unito.tableplus.server.Utils;
 import com.unito.tableplus.server.services.DriveServiceImpl;
 import com.unito.tableplus.server.services.DropBoxServiceImpl;
 import com.unito.tableplus.server.services.FacebookServiceImpl;
+import com.unito.tableplus.server.util.ServiceFactory;
+import com.unito.tableplus.server.util.Utility;
 import com.unito.tableplus.shared.model.LoginInfo;
 
 public class CallbackServlet extends HttpServlet {
@@ -48,7 +48,7 @@ public class CallbackServlet extends HttpServlet {
 		if (user == null) {
 			LoginInfo loginInfo = new LoginInfo();
 			loginInfo.setLoggedIn(false);
-			loginInfo.setLoginUrl(userService.createLoginURL(Utils
+			loginInfo.setLoginUrl(userService.createLoginURL(Utility
 					.getRequestUrl(req)));
 			resp.sendRedirect(loginInfo.getLoginUrl());
 		} else {
@@ -68,6 +68,6 @@ public class CallbackServlet extends HttpServlet {
 					FacebookServiceImpl.storeAccessToken(code);
 			}
 		}
-		resp.sendRedirect(Utils.getHomeUrl());
+		resp.sendRedirect(Utility.getHomeUrl());
 	}
 }

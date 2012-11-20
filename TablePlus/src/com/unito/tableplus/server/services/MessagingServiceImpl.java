@@ -17,15 +17,16 @@ import com.google.appengine.api.mail.MailService.Message;
 import com.google.appengine.api.mail.MailServiceFactory;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.unito.tableplus.client.services.MessagingService;
-import com.unito.tableplus.server.InvitationQueries;
-import com.unito.tableplus.server.ServiceFactory;
-import com.unito.tableplus.server.TableQueries;
-import com.unito.tableplus.server.UserQueries;
-import com.unito.tableplus.server.Utils;
+import com.unito.tableplus.server.persistence.InvitationQueries;
+import com.unito.tableplus.server.persistence.TableQueries;
+import com.unito.tableplus.server.persistence.UserQueries;
+import com.unito.tableplus.server.util.ServiceFactory;
+import com.unito.tableplus.server.util.Utility;
 import com.unito.tableplus.shared.model.ChannelMessageType;
 import com.unito.tableplus.shared.model.Invitation;
 import com.unito.tableplus.shared.model.Table;
 import com.unito.tableplus.shared.model.User;
+import com.unito.tableplus.shared.model.UserStatus;
 
 public class MessagingServiceImpl extends RemoteServiceServlet implements
 		MessagingService {
@@ -33,72 +34,42 @@ public class MessagingServiceImpl extends RemoteServiceServlet implements
 	private static final ChannelService channelService = ServiceFactory
 			.getChannelService();
 
-	/**
-	 * A map of connected users. Users ids are stored as strings and must be
-	 * uniques.
-	 */
-	private final static Map<Long, String> users = new HashMap<Long, String>();
+	private final static Map<Long, HashMap<Long, UserStatus>> usersStatus = new HashMap<Long, HashMap<Long, UserStatus>>();
 
 	@Override
 	public String createChannel(String userId) {
+		String token = null;
 		try {
-			String token = channelService.createChannel(userId);
-			return token;
+			token = channelService.createChannel(userId);
 		} catch (ChannelFailureException channelFailureException) {
 			System.err.println("Error creating the channel: "
 					+ channelFailureException);
-			return null;
 		} catch (Exception otherException) {
 			System.err.println("Unknown exception while creating channel: "
 					+ otherException);
-			return null;
 		}
+		return token;
 	}
 
 	@Override
 	public String sendMessage(Long senderId, String content,
-			ChannelMessageType type, List<Long> recipients) {
+			ChannelMessageType type, Long table) {
+		updateUserStatus(table, senderId, type);
 		try {
-			JSONObject jsonMessage = JSONMessageBuilder(senderId,
-					users.get(senderId), type.toString(), content);
-			for (Long user : recipients)
-				if (users.containsKey(user))
-					channelService.sendMessage(new ChannelMessage(user
-							.toString(), jsonMessage.toString()));
-			return "Message sent";
-		} catch (JSONException e) {
-			return "Error creating JSON";
-		}
-	}
+			JSONObject jsonMessage = new JSONObject();
+			jsonMessage.append("id", senderId);
+			jsonMessage.append("type", type.toString());
+			jsonMessage.append("content", content);
+			jsonMessage.append("tableKey", table);
 
-	@Override
-	public String sendMessage(Long senderId, String content,
-			ChannelMessageType type, List<Long> recipients, Long tableKey) {
-		try {
-			JSONObject jsonMessage = JSONMessageBuilder(senderId,
-					users.get(senderId), type.toString(), content,
-					tableKey.toString());
-			for (Long user : recipients)
-				if (users.containsKey(user))
-					channelService.sendMessage(new ChannelMessage(user
-							.toString(), jsonMessage.toString()));
-			return "Message sent";
-		} catch (JSONException e) {
-			return "Error creating JSON";
-		}
-	}
-
-	@Override
-	public String sendMessage(Long senderId, String content,
-			ChannelMessageType type, Long recipient, Long tableKey) {
-		try {
-			JSONObject jsonMessage = JSONMessageBuilder(senderId,
-					users.get(senderId), type.toString(), content,
-					tableKey.toString());
-			if (users.containsKey(recipient))
-				channelService.sendMessage(new ChannelMessage(recipient
-						.toString(), jsonMessage.toString()));
-			return "Message sent";
+			Map<Long, UserStatus> recipients = usersStatus.get(table);
+			if (recipients != null) { // if there are online users
+				for (Long r : recipients.keySet())
+					// send a message to each user
+					channelService.sendMessage(new ChannelMessage(r.toString(),
+							jsonMessage.toString()));
+			}
+			return "Message sent: " + jsonMessage;
 		} catch (JSONException e) {
 			return "Error creating JSON";
 		}
@@ -110,25 +81,37 @@ public class MessagingServiceImpl extends RemoteServiceServlet implements
 	 * @param user
 	 *            The user id to add to the list.
 	 */
-	public static void addUser(String userId) {
-		Long userKey = Long.parseLong(userId);
+	public static void userConnection(Long userKey) {
 		User u = UserQueries.queryUser(userKey);
-		users.put(userKey, u.getEmail());
 		List<Table> tables = TableQueries.queryTables(u.getTables());
-		JSONObject jsonMessage = null;
-		for (Table t : tables) {
-			try {
-				jsonMessage = JSONMessageBuilder(u.getKey(), u.getEmail(),
-						ChannelMessageType.NEWCONNECTION.toString(), "", t
-								.getKey().toString());
-			} catch (JSONException e) {
-				System.err.println("Error creating JSON: " + e);
+		try {
+			JSONObject jsonMessage = new JSONObject();
+			jsonMessage.append("id", userKey);
+			jsonMessage.append("type",
+					ChannelMessageType.NEWCONNECTION.toString());
+			jsonMessage.append("content", "");
+
+			for (Table t : tables) { // for each user table
+				Map<Long, UserStatus> recipients = usersStatus.get(t.getKey());
+				if (recipients != null) { // if there are online users
+					jsonMessage.append("tableKey", t.getKey());
+					for (Long r : recipients.keySet())
+						// send a message to each user
+						channelService.sendMessage(new ChannelMessage(r
+								.toString(), jsonMessage.toString()));
+					recipients.put(userKey, UserStatus.AWAY); // add current
+																// user to table
+				} else { // if there are no users online
+					HashMap<Long, UserStatus> hm = new HashMap<Long, UserStatus>();
+					hm.put(userKey, UserStatus.AWAY);
+					usersStatus.put(t.getKey(), hm);
+				}
 			}
-			for (Long user : t.getMembers())
-				if (users.containsKey(user))
-					channelService.sendMessage(new ChannelMessage(user
-							.toString(), jsonMessage.toString()));
+			printMap();
+		} catch (JSONException e) {
+			System.err.println("Error creating JSON: " + e);
 		}
+
 	}
 
 	/**
@@ -138,57 +121,57 @@ public class MessagingServiceImpl extends RemoteServiceServlet implements
 	 * @param user
 	 *            The user id to remove.
 	 */
-	public static void removeUser(String userId) {
-		Long userKey = Long.parseLong(userId);
+	public static void userDisconnection(Long userKey) {
 		User u = UserQueries.queryUser(userKey);
-		users.remove(u.getKey());
 		List<Table> tables = TableQueries.queryTables(u.getTables());
-		JSONObject jsonMessage = null;
-		for (Table t : tables) {
-			try {
-				jsonMessage = JSONMessageBuilder(u.getKey(), u.getEmail(),
-						ChannelMessageType.DISCONNECTION.toString(), "", t
-								.getKey().toString());
-			} catch (JSONException e) {
-				System.err.println("Error creating JSON: " + e);
+		try {
+			JSONObject jsonMessage = new JSONObject();
+			jsonMessage.append("id", userKey);
+			jsonMessage.append("type",
+					ChannelMessageType.DISCONNECTION.toString());
+			jsonMessage.append("content", "");
+
+			for (Table t : tables) { // for each user table
+				Map<Long, UserStatus> recipients = usersStatus.get(t.getKey());
+				if (recipients != null) { // if there are online users
+					jsonMessage.append("tableKey", t.getKey());
+					recipients.remove(userKey);
+					for (Long r : recipients.keySet())
+						// send a message to each user
+						channelService.sendMessage(new ChannelMessage(r
+								.toString(), jsonMessage.toString()));
+				}
 			}
-			for (Long user : t.getMembers())
-				if (users.containsKey(user))
-					channelService.sendMessage(new ChannelMessage(user
-							.toString(), jsonMessage.toString()));
+			printMap();
+		} catch (JSONException e) {
+			System.err.println("Error creating JSON: " + e);
 		}
 	}
 
-	/**
-	 * Returns the number of users connected to the chat service.
-	 * 
-	 * @return The integer representing the number of connected users.
-	 */
-	public int usersCount() {
-		return users.size();
+	public static Map<Long, UserStatus> getTableStatus(Long tableKey) {
+		return usersStatus.get(tableKey);
 	}
 
-	private static JSONObject JSONMessageBuilder(Long senderId,
-			String senderEmail, String type, String content)
-			throws JSONException {
-		JSONObject jsonMessage = new JSONObject();
-		jsonMessage.append("id", senderId);
-		jsonMessage.append("email", senderEmail);
-		jsonMessage.append("type", type);
-		jsonMessage.append("content", content);
-		return jsonMessage;
-	}
-
-	private static JSONObject JSONMessageBuilder(Long senderId,
-			String senderEmail, String type, String content, String tableKey)
-			throws JSONException {
-		JSONObject jsonMessage = new JSONObject();
-		jsonMessage.append("id", senderId);
-		jsonMessage.append("email", senderEmail);
-		jsonMessage.append("type", type);
-		jsonMessage.append("content", content);
-		jsonMessage.append("tableKey", tableKey);
-		return jsonMessage;
+	private static void updateUserStatus(Long tableKey, Long userKey,
+			ChannelMessageType messageType) {
+		UserStatus status = null;
+		if (messageType.equals(ChannelMessageType.USERAWAY))
+			status = UserStatus.AWAY;
+		else if (messageType.equals(ChannelMessageType.USERONLINE))
+			status = UserStatus.ONLINE;
+		else if (messageType.equals(ChannelMessageType.USERBUSY))
+			status = UserStatus.BUSY;
+		if (status != null) {
+			Map<Long, UserStatus> tableStatus = usersStatus.get(tableKey);
+			if (tableStatus != null)
+				tableStatus.put(userKey, status);
+			else {
+				HashMap<Long, UserStatus> s = new HashMap<Long, UserStatus>();
+				s.put(userKey, status);
+				usersStatus.put(tableKey, s);
+			}
+			printMap();
+		}
 	}
 
 	@Override
@@ -206,7 +189,7 @@ public class MessagingServiceImpl extends RemoteServiceServlet implements
 
 		try {
 			MailService mailService = MailServiceFactory.getMailService();
-			String invitationUrl = Utils.getInvitationServletUrl() + "?code="
+			String invitationUrl = Utility.getInvitationServletUrl() + "?code="
 					+ code;
 			String body = "You have been invited by "
 					+ sender
@@ -226,5 +209,14 @@ public class MessagingServiceImpl extends RemoteServiceServlet implements
 			e.printStackTrace();
 		}
 		return true;
+	}
+
+	public static void printMap() {
+		for (Long t : usersStatus.keySet()) {
+			System.out.println("Tavolo " + t);
+			Map<Long, UserStatus> m = usersStatus.get(t);
+			for (Long s : m.keySet())
+				System.out.println("\t User " + s + " is " + m.get(s));
+		}
 	}
 }

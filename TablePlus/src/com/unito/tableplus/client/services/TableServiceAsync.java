@@ -1,6 +1,7 @@
 package com.unito.tableplus.client.services;
 
 import java.util.List;
+import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.unito.tableplus.shared.model.BlackBoardMessage;
@@ -9,14 +10,17 @@ import com.unito.tableplus.shared.model.Resource;
 import com.unito.tableplus.shared.model.SharedResource;
 import com.unito.tableplus.shared.model.Table;
 import com.unito.tableplus.shared.model.User;
+import com.unito.tableplus.shared.model.UserStatus;
 
 public interface TableServiceAsync {
-
-	void queryTables(List<Long> keys, AsyncCallback<List<Table>> callback);
-
-	void storeTable(Table table, AsyncCallback<Long> callback);
+	void storeNewTable(Table newTable, User user,
+			AsyncCallback<Table> callback);
 
 	void queryTable(Long key, AsyncCallback<Table> callback);
+	
+	void queryTables(List<Long> keys, AsyncCallback<Map<Long,Table>> callback);
+
+	void storeTable(Table table, AsyncCallback<Boolean> callback);
 
 	void deleteTable(Long key, AsyncCallback<Void> callback);
 
@@ -41,5 +45,6 @@ public interface TableServiceAsync {
 
 	void removeBookmark(String key, AsyncCallback<Void> asyncCallback);
 
-
+	void getUsersStatus(Long tableKey,
+			AsyncCallback<Map<Long, UserStatus>> callback);
 }

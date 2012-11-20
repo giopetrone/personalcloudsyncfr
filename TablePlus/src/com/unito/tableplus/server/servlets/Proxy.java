@@ -18,9 +18,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import com.unito.tableplus.server.TableQueries;
-import com.unito.tableplus.server.UserQueries;
-import com.unito.tableplus.server.WalletQueries;
+import com.unito.tableplus.server.persistence.TableQueries;
+import com.unito.tableplus.server.persistence.UserQueries;
+import com.unito.tableplus.server.persistence.WalletQueries;
 import com.unito.tableplus.server.services.DriveServiceImpl;
 import com.unito.tableplus.shared.model.BlackBoardMessage;
 import com.unito.tableplus.shared.model.BlackBoardMessageType;
@@ -228,7 +228,7 @@ public class Proxy extends HttpServlet {
 					tableJSON.put("members", table.getMembers().size());
 					tableJSON.put("creator", table.getCreator());
 					tableJSON.put("owner", table.getOwner());
-					tableJSON.put("messages", table.getBlackBoard().size());
+					tableJSON.put("messages", table.getBlackboard().size());
 					tableJSON.put("documents", table.getResources().size());
 					ja.put(tableJSON);
 				}
@@ -258,7 +258,7 @@ public class Proxy extends HttpServlet {
 				rj.put("error", "No table found for requested key");
 			} else {
 				rj.put("status", "OK");
-				List<BlackBoardMessage> bbMessages = table.getBlackBoard();
+				List<BlackBoardMessage> bbMessages = table.getBlackboard();
 
 				int n = 1;
 				int size = bbMessages.size();
@@ -309,7 +309,7 @@ public class Proxy extends HttpServlet {
 					content);
 
 			Table table = TableQueries.queryTable(tableKey);
-			table.getBlackBoard().add(bbMessage);
+			table.getBlackboard().add(bbMessage);
 			TableQueries.storeTable(table);
 
 			rj.put("status", "OK");
