@@ -8,7 +8,6 @@ import java.util.Map;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.unito.tableplus.client.services.UserService;
-import com.unito.tableplus.server.persistence.TableQueries;
 import com.unito.tableplus.server.persistence.UserQueries;
 import com.unito.tableplus.server.persistence.WalletQueries;
 import com.unito.tableplus.shared.model.Bookmark;

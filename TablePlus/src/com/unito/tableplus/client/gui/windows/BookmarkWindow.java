@@ -661,7 +661,7 @@ public class BookmarkWindow extends WindowPlus {
 								message += "<div><div style=\"color: #191970;float:left;\">&lt<u>"
 										+ c.getAuthor()
 										+ "</u>&gt </div><div style=\"color:	#3D3D4C;float:left;\">"
-										+ c.getDateString()
+										+ c.getDate()
 										+ "</div> - "
 										+ c.getComment()
 										+ "</div>";
@@ -679,7 +679,7 @@ public class BookmarkWindow extends WindowPlus {
 								message += "<div><div style=\"color: #191970;float:left;\">&lt<u>"
 										+ c.getAuthor()
 										+ "</u>&gt </div><div style=\"color:	#3D3D4C;float:left;\">"
-										+ c.getDateString()
+										+ c.getDate()
 										+ "</div> - "
 										+ c.getComment()
 										+ "</div>";
@@ -687,7 +687,7 @@ public class BookmarkWindow extends WindowPlus {
 								message += "<div><div style=\"color: #191970;float:left;\">&lt"
 										+ c.getAuthor()
 										+ "&gt </div><div style=\"color:	#3D3D4C;float:left;\">"
-										+ c.getDateString()
+										+ c.getDate()
 										+ "</div> - "
 										+ c.getComment()
 										+ "</div>";

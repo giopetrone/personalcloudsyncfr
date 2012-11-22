@@ -8,7 +8,6 @@ import javax.jdo.Transaction;
 
 import com.unito.tableplus.server.util.ServiceFactory;
 import com.unito.tableplus.shared.model.BlackBoardMessage;
-import com.unito.tableplus.shared.model.Bookmark;
 import com.unito.tableplus.shared.model.Resource;
 import com.unito.tableplus.shared.model.SharedResource;
 import com.unito.tableplus.shared.model.Table;

@@ -5,8 +5,10 @@ import java.util.Map;
 import com.google.gwt.appengine.channel.client.ChannelFactory;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.Window.Location;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.unito.tableplus.client.gui.DesktopPlus;
+import com.unito.tableplus.client.gui.ProgressBox;
 import com.unito.tableplus.client.services.ChannelCreatedCallbackImpl;
 import com.unito.tableplus.client.services.LoginServiceAsync;
 import com.unito.tableplus.client.services.MessagingServiceAsync;
@@ -37,6 +39,9 @@ public class TablePlus implements EntryPoint {
 	private static String logoutUrl;
 
 	private LoginInfo loginInfo = null;
+	
+	private ProgressBox box;
+	
 
 	/**
 	 * Current user.
@@ -49,8 +54,9 @@ public class TablePlus implements EntryPoint {
 
 	@Override
 	public void onModuleLoad() {
-		String homepageURL = com.google.gwt.user.client.Window.Location
-				.getHref();
+		box = new ProgressBox("Please Wait", "Loading environment...", "Initializing...");
+		box.show();
+		String homepageURL = Location.getHref();
 
 		loginService.login(homepageURL, new AsyncCallback<LoginInfo>() {
 			@Override
@@ -65,6 +71,7 @@ public class TablePlus implements EntryPoint {
 					setLogoutUrl(loginInfo.getLogoutUrl());
 					loadUser();
 				} else {
+					box.updateContent(101, "All done");
 					loginUrl = loginInfo.getLoginUrl();
 					new DesktopPlus();
 				}
@@ -76,6 +83,7 @@ public class TablePlus implements EntryPoint {
 	 * Loads the current logged user then calls the loadsTable method.
 	 */
 	private void loadUser() {
+		box.updateContent(0, "Loading user data...");
 		userService.loadUser(loginInfo, new AsyncCallback<User>() {
 
 			@Override
@@ -85,6 +93,7 @@ public class TablePlus implements EntryPoint {
 
 			@Override
 			public void onSuccess(User result) {
+				box.updateContent(20, "User data loaded");
 				result.setStatus(UserStatus.ONLINE);
 				user = result;
 				loadTables();
@@ -96,6 +105,7 @@ public class TablePlus implements EntryPoint {
 	 * Loads tables for current user then calls the loadsMembers method.
 	 */
 	private void loadTables() {
+		box.updateContent(0, "Loading tables...");
 		tableService.queryTables(user.getTables(),
 				new AsyncCallback<Map<Long, Table>>() {
 					@Override
@@ -105,12 +115,14 @@ public class TablePlus implements EntryPoint {
 
 					@Override
 					public void onSuccess(Map<Long, Table> result) {
+						box.updateContent(30, "Tables loaded.");
 						tablesMap = result;
 						for (final Table t : tablesMap.values()) {
 							loadTableMembers(t);
 						}
 						startCommunicationChannel();
 						desktop = new DesktopPlus(tablesMap);
+						box.updateContent(100, "Loading desktop...");
 					}
 				});
 	}

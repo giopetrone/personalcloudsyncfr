@@ -1,9 +1,9 @@
 package com.unito.tableplus.shared.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -58,9 +58,9 @@ public class Table implements Serializable {
 	public Table(Long creator) {
 		this.creator = creator;
 		this.owner = creator;
-		this.blackboard = new LinkedList<BlackBoardMessage>();
-		this.resources = new LinkedList<SharedResource>();
-		this.members = new LinkedList<Long>();
+		this.blackboard = new ArrayList<BlackBoardMessage>();
+		this.resources = new ArrayList<SharedResource>();
+		this.members = new ArrayList<Long>();
 		this.members.add(creator);
 
 		this.usersMap = new HashMap<Long, User>();
@@ -200,4 +200,54 @@ public class Table implements Serializable {
 				+ " - Owner ID: " + this.owner + " - There are "
 				+ this.members.size() + " member(s).";
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((creator == null) ? 0 : creator.hashCode());
+		result = prime * result + ((key == null) ? 0 : key.hashCode());
+		result = prime * result + ((members == null) ? 0 : members.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((owner == null) ? 0 : owner.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Table other = (Table) obj;
+		if (creator == null) {
+			if (other.creator != null)
+				return false;
+		} else if (!creator.equals(other.creator))
+			return false;
+		if (key == null) {
+			if (other.key != null)
+				return false;
+		} else if (!key.equals(other.key))
+			return false;
+		if (members == null) {
+			if (other.members != null)
+				return false;
+		} else if (!members.equals(other.members))
+			return false;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		if (owner == null) {
+			if (other.owner != null)
+				return false;
+		} else if (!owner.equals(other.owner))
+			return false;
+		return true;
+	}
+	
 }

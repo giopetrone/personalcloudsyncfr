@@ -11,7 +11,6 @@ import com.unito.tableplus.server.persistence.TableQueries;
 import com.unito.tableplus.server.persistence.UserQueries;
 import com.unito.tableplus.server.persistence.WalletQueries;
 import com.unito.tableplus.shared.model.BlackBoardMessage;
-import com.unito.tableplus.shared.model.Bookmark;
 import com.unito.tableplus.shared.model.Provider;
 import com.unito.tableplus.shared.model.Resource;
 import com.unito.tableplus.shared.model.SharedResource;

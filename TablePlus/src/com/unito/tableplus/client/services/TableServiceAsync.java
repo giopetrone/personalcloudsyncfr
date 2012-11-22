@@ -5,7 +5,6 @@ import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.unito.tableplus.shared.model.BlackBoardMessage;
-import com.unito.tableplus.shared.model.Bookmark;
 import com.unito.tableplus.shared.model.Resource;
 import com.unito.tableplus.shared.model.SharedResource;
 import com.unito.tableplus.shared.model.Table;

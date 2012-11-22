@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -18,18 +17,14 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import com.unito.tableplus.server.services.MessagingServiceImpl;
 import com.unito.tableplus.server.persistence.TableQueries;
 import com.unito.tableplus.server.persistence.UserQueries;
-import com.unito.tableplus.server.persistence.WalletQueries;
-import com.unito.tableplus.server.services.DriveServiceImpl;
 import com.unito.tableplus.shared.model.BlackBoardMessage;
 import com.unito.tableplus.shared.model.BlackBoardMessageType;
-import com.unito.tableplus.shared.model.DriveFile;
-import com.unito.tableplus.shared.model.Resource;
-import com.unito.tableplus.shared.model.SharedResource;
 import com.unito.tableplus.shared.model.Table;
 import com.unito.tableplus.shared.model.User;
-import com.unito.tableplus.shared.model.Wallet;
+import com.unito.tableplus.shared.model.UserStatus;
 
 public class Proxy extends HttpServlet {
 
@@ -62,10 +57,8 @@ public class Proxy extends HttpServlet {
 				writeMessage(jo, pw);
 			else if (request.equals("deleteMessage"))
 				deleteMessage(jo, pw);
-			else if (request.equals("toggleStatus"))
-				toggleStatus(jo, pw);
-			else if (request.equals("setPresence"))
-				setPresence(jo, pw);
+			else if (request.equals("setStatus"))
+				setStatus(jo, pw);
 			else {
 				JSONObject rj = new JSONObject();
 				rj.put("status", "ERROR");
@@ -100,8 +93,6 @@ public class Proxy extends HttpServlet {
 				uj.put("lastname", user.getLastName());
 				uj.put("email", user.getEmail());
 				uj.put("tables", user.getTables());
-				// FIXME
-				// uj.put("online", user.isOnline());
 
 				rj.put("results", uj);
 			}
@@ -154,12 +145,9 @@ public class Proxy extends HttpServlet {
 	private void queryTable(JSONObject jo, PrintWriter pw) {
 		try {
 			Long tableKey = jo.getLong("tableKey");
-			Long userKey = jo.getLong("userKey");
 			Table table = TableQueries.queryTable(tableKey);
 			JSONObject rj = new JSONObject();
 			JSONObject tableJSON = new JSONObject();
-			JSONArray jDocuments = new JSONArray();
-			JSONObject jDoc;
 
 			if (table == null) {
 				rj.put("status", "ERROR");
@@ -171,21 +159,7 @@ public class Proxy extends HttpServlet {
 				tableJSON.put("members", table.getMembers());
 				tableJSON.put("creator", table.getCreator());
 				tableJSON.put("owner", table.getOwner());
-
-				Wallet wallet = WalletQueries.getWallet(userKey);
-				if (wallet.getDriveAccessToken() != null) {
-					List<DriveFile> docList = DriveServiceImpl
-							.loadFiles(wallet);
-					Map<String, DriveFile> docsMap = new HashMap<String, DriveFile>();
-					for (DriveFile d : docList)
-						docsMap.put(d.getID(), d);
-					List<SharedResource> tableResources = table.getResources();
-					for (Resource r : tableResources) {
-						jDoc = new JSONObject(docsMap.get(r));
-						jDocuments.put(jDoc);
-					}
-				}
-				tableJSON.put("documents", jDocuments);
+				tableJSON.put("resources", table.getResources());
 
 				rj.put("results", tableJSON);
 				rj.put("status", "OK");
@@ -229,7 +203,7 @@ public class Proxy extends HttpServlet {
 					tableJSON.put("creator", table.getCreator());
 					tableJSON.put("owner", table.getOwner());
 					tableJSON.put("messages", table.getBlackboard().size());
-					tableJSON.put("documents", table.getResources().size());
+					tableJSON.put("resources", table.getResources().size());
 					ja.put(tableJSON);
 				}
 				rj.put("results", ja);
@@ -344,20 +318,20 @@ public class Proxy extends HttpServlet {
 	}
 
 	private void queryUsersStatus(JSONObject jo, PrintWriter pw) {
-		List<Long> visible, others;
+		List<Long> allUsers;
+		Map<Long,UserStatus> onlineUsers;
 		JSONObject sj, rj;
 		JSONArray online, offline;
 		Long tableKey;
 		try {
 			tableKey = jo.getLong("tableKey");
 			Table t = TableQueries.queryTable(tableKey);
-			// FIXME: t.getSelectivePresenceMembers() - getHiddenMembers()
-			visible = t.getMembers();
-			visible.removeAll(t.getMembers());
-			online = new JSONArray(visible);
-			others = t.getMembers();
-			others.removeAll(visible);
-			offline = new JSONArray(others);
+			allUsers = t.getMembers();
+			onlineUsers = MessagingServiceImpl.getTableStatus(tableKey);
+			allUsers.removeAll(onlineUsers.keySet());
+			
+			offline = new JSONArray(allUsers);
+			online = new JSONArray(onlineUsers.keySet());
 
 			sj = new JSONObject();
 			sj.put("online", online);
@@ -378,15 +352,17 @@ public class Proxy extends HttpServlet {
 		}
 	}
 
-	private void toggleStatus(JSONObject jo, PrintWriter pw) {
+	private void setStatus(JSONObject jo, PrintWriter pw) {
 		try {
-			Long user = jo.getLong("userKey");
-			// Boolean online = jo.getBoolean("online");
-
-			User u = UserQueries.queryUser(user);
-			// FIXME
-			// u.setOnline(online);
-			UserQueries.storeUser(u);
+			//Long user = jo.getLong("userKey");
+			Boolean online = jo.getBoolean("online");
+			
+			if(online){
+				//TODO: add user to online users list
+			}
+			else{
+				//TODO: remove user from online users list
+			}
 
 			JSONObject rj = new JSONObject();
 			rj.put("status", "OK");
@@ -394,41 +370,11 @@ public class Proxy extends HttpServlet {
 			pw.flush();
 
 		} catch (Exception e) {
-			System.err.println("Error while toggling status.");
+			System.err.println("Error while setting status.");
 			System.err.println(e);
 		} finally {
 			pw.close();
 		}
 	}
 
-	private void setPresence(JSONObject jo, PrintWriter pw) {
-		try {
-			Table table;
-
-			Long user = jo.getLong("userKey");
-			Long tableKey = jo.getLong("tableKey");
-			Boolean presence = jo.getBoolean("presence");
-
-			table = TableQueries.queryTable(tableKey);
-
-			// FIXME: getSelectivePresenceMembers()
-			if (presence)
-				table.getMembers().add(user);
-			else
-				table.getMembers().remove(user);
-
-			TableQueries.storeTable(table);
-
-			JSONObject rj = new JSONObject();
-			rj.put("status", "OK");
-			pw.print(rj);
-			pw.flush();
-
-		} catch (Exception e) {
-			System.err.println("Error while changing presence.");
-			System.err.println(e);
-		} finally {
-			pw.close();
-		}
-	}
 }

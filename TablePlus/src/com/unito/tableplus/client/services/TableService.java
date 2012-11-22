@@ -6,7 +6,6 @@ import java.util.Map;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.unito.tableplus.shared.model.BlackBoardMessage;
-import com.unito.tableplus.shared.model.Bookmark;
 import com.unito.tableplus.shared.model.Resource;
 import com.unito.tableplus.shared.model.SharedResource;
 import com.unito.tableplus.shared.model.Table;
