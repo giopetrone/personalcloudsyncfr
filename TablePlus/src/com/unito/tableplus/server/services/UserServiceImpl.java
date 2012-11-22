@@ -8,8 +8,10 @@ import java.util.Map;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.unito.tableplus.client.services.UserService;
+import com.unito.tableplus.server.persistence.TableQueries;
 import com.unito.tableplus.server.persistence.UserQueries;
 import com.unito.tableplus.server.persistence.WalletQueries;
+import com.unito.tableplus.shared.model.Bookmark;
 import com.unito.tableplus.shared.model.DriveFile;
 import com.unito.tableplus.shared.model.DropBoxFile;
 import com.unito.tableplus.shared.model.FacebookEvent;
@@ -101,5 +103,20 @@ public class UserServiceImpl extends RemoteServiceServlet implements
 
 		return resources;
 	}
+	
+	@Override
+	public List<Bookmark> loadBookmarks(Long userKey) {
+		return UserQueries.getBookmark(userKey);
+	}
 
+	@Override
+	public boolean addBookmark(Long key, Bookmark bookmark) {
+		return UserQueries.addBookmark(key, bookmark);
+	}
+
+	@Override
+	public void removeBookmark(String key) {
+		UserQueries.removeBookmark(key);
+		
+	}
 }

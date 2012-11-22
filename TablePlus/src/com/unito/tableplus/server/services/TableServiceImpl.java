@@ -127,20 +127,6 @@ public class TableServiceImpl extends RemoteServiceServlet implements TableServi
 		return TableQueries.queryMessages(tableKey);
 	}
 
-	@Override
-	public List<Bookmark> loadBookmarks(Long tableKey) {
-		return TableQueries.getBookmark(tableKey);
-	}
 
-	@Override
-	public boolean addBookmark(Long key, Bookmark bookmark) {
-		return TableQueries.addBookmark(key, bookmark);
-	}
-
-	@Override
-	public void removeBookmark(String key) {
-		TableQueries.removeBookmark(key);
-		
-	}
 
 }
