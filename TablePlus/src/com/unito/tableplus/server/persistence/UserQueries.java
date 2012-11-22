@@ -2,11 +2,11 @@ package com.unito.tableplus.server.persistence;
 
 import java.util.LinkedList;
 import java.util.List;
-
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
-
+import javax.jdo.Transaction;
 import com.unito.tableplus.server.util.ServiceFactory;
+import com.unito.tableplus.shared.model.Bookmark;
 import com.unito.tableplus.shared.model.User;
 
 public class UserQueries {
@@ -88,5 +88,50 @@ public class UserQueries {
 		}
 		return users;
 	}
+	
+	public static List<Bookmark> getBookmark(Long userKey) {
+		PersistenceManager pm = ServiceFactory.getPmfInstance().getPersistenceManager();
+		User detached = null;
+		try {
+			User user = pm.getObjectById(User.class, userKey);
+			if (user == null) return null;
+			user.getBookmarks();
+			detached = pm.detachCopy(user);
+		} catch (Exception e) {
+			System.err.println("Error querying bookmarks");
+		} finally {
+			pm.close();
+		}
+		return detached.getBookmarks();
+	}
 
+	public static boolean addBookmark(Long key, Bookmark bookmark) {
+		PersistenceManager pm = ServiceFactory.getPmfInstance().getPersistenceManager();
+		Transaction tx = pm.currentTransaction();
+		try {
+			User user = pm.getObjectById(User.class, key);
+			if (user == null) return false;
+			tx.begin();
+			user.getBookmarks().add(bookmark);
+			tx.commit();
+		} catch (Exception e) {
+			System.err.println("There has been an error adding message: " + e);
+		} finally {
+			if (tx.isActive()) tx.rollback();
+			pm.close();
+		}
+		return true;
+	}
+
+	public static void removeBookmark(String key) {
+		PersistenceManager pm = ServiceFactory.getPmfInstance().getPersistenceManager();
+		try {
+			Bookmark b = pm.getObjectById(Bookmark.class, key);
+			pm.deletePersistentAll(b);
+		} catch (Exception e) {
+			System.err.println("There has been an error removing bookmark: " + e);
+		} finally {
+			pm.close();
+		}	
+	}
 }
