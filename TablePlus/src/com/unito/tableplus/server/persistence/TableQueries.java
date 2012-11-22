@@ -80,9 +80,7 @@ public class TableQueries {
 		}
 		return true;
 	}
-
 	
-
 	public static void deleteTable(Long key) {
 		PersistenceManager pm = ServiceFactory.getPmfInstance().getPersistenceManager();
 		try {
@@ -208,50 +206,5 @@ public class TableQueries {
 		UserQueries.storeUser(u);
 	}
 
-	public static List<Bookmark> getBookmark(Long tableKey) {
-		PersistenceManager pm = ServiceFactory.getPmfInstance().getPersistenceManager();
-		Table detached = null;
-		try {
-			Table table = pm.getObjectById(Table.class, tableKey);
-			if (table == null) return null;
-			table.getBookmarks();
-			detached = pm.detachCopy(table);
-		} catch (Exception e) {
-			System.err.println("Error querying bookmarks");
-		} finally {
-			pm.close();
-		}
-		return detached.getBookmarks();
-	}
 
-	public static boolean addBookmark(Long key, Bookmark bookmark) {
-		PersistenceManager pm = ServiceFactory.getPmfInstance().getPersistenceManager();
-		Transaction tx = pm.currentTransaction();
-		try {
-			Table t = pm.getObjectById(Table.class, key);
-			if (t == null)
-				return false;
-			tx.begin();
-			t.getBookmarks().add(bookmark);
-			tx.commit();
-		} catch (Exception e) {
-			System.err.println("There has been an error adding message: " + e);
-		} finally {
-			if (tx.isActive()) tx.rollback();
-			pm.close();
-		}
-		return true;
-	}
-
-	public static void removeBookmark(String key) {
-		PersistenceManager pm = ServiceFactory.getPmfInstance().getPersistenceManager();
-		try {
-			Bookmark b = pm.getObjectById(Bookmark.class, key);
-			pm.deletePersistentAll(b);
-		} catch (Exception e) {
-			System.err.println("There has been an error removing bookmark: " + e);
-		} finally {
-			pm.close();
-		}	
-	}
 }
