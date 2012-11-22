@@ -27,9 +27,12 @@ public class Bookmark implements Resource {
 	
 	@Persistent
 	private String legend;
-
+	
 	@Persistent
-	private Table table;
+	private User user;	
+	
+	//@Persistent
+	//private Table table;
 	
 	@Persistent
 	private List<String> annotation=new LinkedList<String>();	
@@ -55,8 +58,12 @@ public class Bookmark implements Resource {
 		this.legend = legend;
 	}
 	
-	public void setTable(Table table) {
+/*	public void setTable(Table table) {
 		this.table=table;		
+	}
+*/	
+	public void setUser(User user) {
+		this.user=user;		
 	}
 	
 	public void setAnnotation(List<String> annotation) {
@@ -84,13 +91,15 @@ public class Bookmark implements Resource {
 	public String getLegend() {
 		return legend;
 	}
-	
-	public Table getTable() {	
+	public User getUser() {	
+		return user;
+	}
+/*	public Table getTable() {	
 		return table;
 	}
-
-	public String getTableName() {
-		return getTable().getName();
+*/
+	public String getUserName() {
+		return getUser().getFirstName()+" "+getUser().getLastName();
 	}	
 	
 	public List<String> getAnnotation() {	
