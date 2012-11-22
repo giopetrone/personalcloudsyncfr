@@ -1,7 +1,6 @@
 package com.unito.tableplus.client.gui.windows;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.Orientation;
@@ -74,7 +73,7 @@ public class BookmarksListWindow extends WindowPlus {
 	private MenuItem openItem;
 	private MenuItem share;
 	private MenuItem commentItem;
-	private List<String> allTags = new LinkedList<String>();
+	private List<String> allTags = new ArrayList<String>();
 	private List<Bookmark> resource;
 	
 	private ListStore<BaseModel> commentStore;
@@ -575,7 +574,7 @@ public class BookmarksListWindow extends WindowPlus {
 				bookmarksStore.removeAll();
 				mask();
 				String tag = listTag.getItemText(listTag.getSelectedIndex());
-				List<Bookmark> tagFilter = new LinkedList<Bookmark>();
+				List<Bookmark> tagFilter = new ArrayList<Bookmark>();
 				for (Bookmark b : resource) {
 					for (String t : b.getTag())
 						if (t.equals(tag)) tagFilter.add(b);
@@ -653,7 +652,7 @@ public class BookmarksListWindow extends WindowPlus {
 	}
 
 	private void fillGrid(List<Bookmark> bookmarks) {
-		allTags = new LinkedList<String>();
+		allTags = new ArrayList<String>();
 		for (final Bookmark bookmark : bookmarks) {
 			allTags.addAll(bookmark.getTag());
 			final BaseModel model = new BaseModel();

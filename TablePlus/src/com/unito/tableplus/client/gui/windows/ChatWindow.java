@@ -69,7 +69,7 @@ public class ChatWindow extends WindowPlus {
 
 		this.addListener(Events.Show, new Listener<ComponentEvent>() {
 			public void handleEvent(ComponentEvent ce) {
-				TablePlus.getDesktop().notifyChat(false);
+				TablePlus.getDesktop().setChatStatus(activeTable.getKey(),false);
 			}
 		});
 	}

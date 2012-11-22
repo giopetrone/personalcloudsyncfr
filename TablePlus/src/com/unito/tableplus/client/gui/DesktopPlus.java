@@ -1,7 +1,7 @@
 package com.unito.tableplus.client.gui;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -266,7 +266,7 @@ public class DesktopPlus extends Desktop {
 		});
 		startMenu.addTool(settings);
 
-		allTags = new LinkedList<String>();
+		allTags = new ArrayList<String>();
 		updateContent();
 	}
 
@@ -295,8 +295,8 @@ public class DesktopPlus extends Desktop {
 		activeTable = tables.get(tableKey);
 		activeTable.setActive(true);
 		tableResourcesShortcut.setVisible(true);
-		notifyChat(chatUnread(tableKey));
 		chatShortcut.setVisible(true);
+		setChatIcon();
 		blackboardShortcut.setVisible(true);
 
 		sendStatusChange(ChannelMessageType.USERONLINE, getActiveTableKey());
@@ -404,28 +404,24 @@ public class DesktopPlus extends Desktop {
 
 	}
 
-	public void notifyChat(boolean notify) {
-		if (notify) {
-			chatShortcut.setId("chat-win-shortcut-notify");
-			chatShortcut.repaint();
-		} else {
-			chatShortcut.setId("chat-win-shortcut");
+	public void setChatStatus(Long tableKey, boolean notify) {
+		chatStatus.put(tableKey, notify);
+		if (tableKey.equals(activeTable.getKey()))
+			if (notify && !chatWindow.isVisible())
+				chatShortcut.setId("chat-win-shortcut-notify");
+			else
+				chatShortcut.setId("chat-win-shortcut");
+		chatShortcut.repaint();
+	}
+
+	private void setChatIcon() {
+		if (chatStatus.containsKey(activeTable.getKey())) {
+			if (chatStatus.get(activeTable.getKey()))
+				chatShortcut.setId("chat-win-shortcut-notify");
+			else
+				chatShortcut.setId("chat-win-shortcut");
 			chatShortcut.repaint();
 		}
-	}
-
-	public void setChatStatus(Long tableKey, Boolean status) {
-		if (activeTable.equals(tableKey)) {
-			notifyChat(true);
-		} else
-			chatStatus.put(tableKey, status);
-	}
-
-	private boolean chatUnread(Long tableKey) {
-		if (chatStatus.containsKey(tableKey))
-			return chatStatus.get(tableKey);
-		else
-			return false;
 	}
 
 	public void showBookmarkWindow(Bookmark b) {

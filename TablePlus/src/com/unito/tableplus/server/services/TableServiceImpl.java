@@ -1,7 +1,7 @@
 package com.unito.tableplus.server.services;
 
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -88,7 +88,7 @@ public class TableServiceImpl extends RemoteServiceServlet implements TableServi
 			Wallet wallet = WalletQueries.getWallet(user.getKey());
 			List<Long> userKeys = TableQueries.queryTable(tableKey).getMembers();
 			List<User> users = UserQueries.queryUsers(userKeys);
-			List<String> userEmails = new LinkedList<String>();
+			List<String> userEmails = new ArrayList<String>();
 			for(User u : users)
 				userEmails.add(u.getEmail());
 			userEmails.remove(user.getEmail());//owner removed from list
@@ -113,7 +113,7 @@ public class TableServiceImpl extends RemoteServiceServlet implements TableServi
 		
 		if(wallet.getDriveAccessToken() != null)
 		for(Resource r : resources){
-			List<String> toShare = new LinkedList<String>();
+			List<String> toShare = new ArrayList<String>();
 			if(r.getProvider().equals(Provider.DRIVE))
 				toShare.add(r.getID());
 			if(!toShare.isEmpty())

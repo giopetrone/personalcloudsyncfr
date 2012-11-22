@@ -89,7 +89,8 @@ public class MessageListenerImpl implements SocketListener {
 		}
 
 		else if (type.equals(ChannelMessageType.NEWTABLEMEMBER)) {
-			if (content.equals(TablePlus.getUser().getKey()))
+			Long userKey = Long.parseLong(content);
+			if (userKey.equals(TablePlus.getUser().getKey()))
 				TablePlus.updateUser();
 			else {
 				TablePlus.loadTableMembers(t);

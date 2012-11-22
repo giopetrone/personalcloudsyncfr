@@ -1,6 +1,6 @@
 package com.unito.tableplus.server.persistence;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -74,7 +74,7 @@ public class UserQueries {
 
 	public static List<User> queryUsers(List<Long> keys) {
 		PersistenceManager pm = ServiceFactory.getPmfInstance().getPersistenceManager();
-		List<User> users = new LinkedList<User>();
+		List<User> users = new ArrayList<User>();
 		Object object = null;
 		try {
 			for (Long key : keys) {

@@ -1,6 +1,6 @@
 package com.unito.tableplus.server.services;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -81,7 +81,7 @@ public class FacebookServiceImpl extends RemoteServiceServlet implements
 			int size = facebookEvents.length();
 			FacebookEvent event;
 			JSONObject jEvent;
-			List<FacebookEvent> facebookEventList = new LinkedList<FacebookEvent>();
+			List<FacebookEvent> facebookEventList = new ArrayList<FacebookEvent>();
 			for (int i = 0; i < size; i++) {
 				jEvent = facebookEvents.getJSONObject(i);
 				event = new FacebookEvent();

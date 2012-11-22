@@ -2,7 +2,7 @@ package com.unito.tableplus.server.services;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -75,7 +75,7 @@ public class UserServiceImpl extends RemoteServiceServlet implements
 	@Override
 	public List<Resource> loadResources(User user) {
 		Wallet wallet = WalletQueries.getWallet(user.getKey());
-		List<Resource> resources = new LinkedList<Resource>();
+		List<Resource> resources = new ArrayList<Resource>();
 		try {
 			if (wallet.getDriveAccessToken() != null) {
 				List<DriveFile> driveFiles = DriveServiceImpl.loadFiles(wallet);

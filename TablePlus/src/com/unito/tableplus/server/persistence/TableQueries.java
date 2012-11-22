@@ -1,6 +1,6 @@
 package com.unito.tableplus.server.persistence;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.jdo.PersistenceManager;
@@ -52,7 +52,7 @@ public class TableQueries {
 
 	public static List<Table> queryTables(List<Long> keys) {
 		PersistenceManager pm = ServiceFactory.getPmfInstance().getPersistenceManager();
-		List<Table> tables = new LinkedList<Table>();
+		List<Table> tables = new ArrayList<Table>();
 		try {
 			for (Long key : keys) {
 				Table t = pm.getObjectById(Table.class, key);
