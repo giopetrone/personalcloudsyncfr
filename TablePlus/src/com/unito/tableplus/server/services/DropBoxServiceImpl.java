@@ -1,6 +1,6 @@
 package com.unito.tableplus.server.services;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -121,7 +121,7 @@ public class DropBoxServiceImpl extends RemoteServiceServlet implements
 			throws JSONException {
 		if (dropbox.getBoolean("is_dir")) {
 			JSONArray ja = dropbox.getJSONArray("contents");
-			List<DropBoxFile> filesList = new LinkedList<DropBoxFile>();
+			List<DropBoxFile> filesList = new ArrayList<DropBoxFile>();
 			int size = ja.length();
 			for (int i = 0; i < size; i++) {
 				JSONObject jFile = ja.getJSONObject(i);

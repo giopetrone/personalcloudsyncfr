@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -115,7 +114,7 @@ public class Proxy extends HttpServlet {
 
 			kja = jo.getJSONArray("userKeysList");
 			int size = kja.length();
-			List<Long> keys = new LinkedList<Long>();
+			List<Long> keys = new ArrayList<Long>();
 			for (int i = 0; i < size; i++) {
 				keys.add(kja.getLong(i));
 			}

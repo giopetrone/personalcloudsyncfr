@@ -1,7 +1,6 @@
 package com.unito.tableplus.shared.model;
    
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import javax.jdo.annotations.Extension;
 import javax.jdo.annotations.IdGeneratorStrategy;
@@ -68,7 +67,7 @@ public class Bookmark implements Resource {
 		this.annotation=annotation;		
 	}
 	
-	public void setTagCategory (LinkedList<String> tag) {
+	public void setTagCategory (List<String> tag) {
 		this.tag=tag;			
 	}
 

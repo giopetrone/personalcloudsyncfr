@@ -1,8 +1,8 @@
 package com.unito.tableplus.server.services;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 import com.google.api.client.auth.oauth2.Credential;
@@ -80,10 +80,10 @@ public class DriveServiceImpl extends RemoteServiceServlet implements
 	}
 
 	public static List<DriveFile> loadFiles(Wallet wallet) throws IOException {
-		List<DriveFile> driveFiles = new LinkedList<DriveFile>();
+		List<DriveFile> driveFiles = new ArrayList<DriveFile>();
 		Drive service = getService(wallet);
 
-		List<File> result = new LinkedList<File>();
+		List<File> result = new ArrayList<File>();
 		Files.List request = service.files().list();
 		do {
 			FileList files = request.execute();
