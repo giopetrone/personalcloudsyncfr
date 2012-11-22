@@ -253,7 +253,7 @@ public class BookmarksListWindow extends WindowPlus {
 		commentContextMenu = new Menu();
 		deleteCommentItem = new MenuItem();
 		deleteCommentItem.setText("Delete Comment");
-		deleteCommentItem.setIcon(IconHelper.createStyle("delete"));
+		deleteCommentItem.setIcon(IconHelper.createStyle("remove"));
 		deleteCommentItem.addSelectionListener(new SelectionListener<MenuEvent>() {
 			@Override
 			public void componentSelected(MenuEvent ce) {
@@ -829,7 +829,8 @@ public class BookmarksListWindow extends WindowPlus {
 	private void shareResource(Resource selectedResource) {
 		User user = TablePlus.getUser();
 		Table table = TablePlus.getDesktop().getActiveTable();
-		if (table == null) Info.display("Share resource", "Cannot share on personal table!");
+		if (table == null)
+			Info.display("Share resource", "Cannot share on personal table!");
 		else
 			tableService.addResource(selectedResource, user, table.getKey(),new AsyncCallback<Boolean>() {
 				@Override
@@ -837,6 +838,7 @@ public class BookmarksListWindow extends WindowPlus {
 					GWT.log("Failed to share selected resource: ",caught);
 					Info.display("Share resource","Failed to share selected resource.");
 				}
+
 				@Override
 				public void onSuccess(Boolean result) {
 					if (result)
