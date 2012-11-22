@@ -29,8 +29,6 @@ public class BlackBoardMessage implements Serializable {
 	@Persistent
 	private String date;
 	@Persistent
-	private int hashcode;
-	@Persistent
 	private Table table;
 
 	public BlackBoardMessage(){
@@ -41,7 +39,6 @@ public class BlackBoardMessage implements Serializable {
 		this.author = author;
 		this.type = type;
 		this.content = content;
-		this.hashcode = this.hashCode();
 	}
 
 	public String getAuthor() {
@@ -72,30 +69,6 @@ public class BlackBoardMessage implements Serializable {
 		return date;
 	}
 
-	public int getHashcode() {
-		return hashcode;
-	}
-
-	public boolean equals(BlackBoardMessage bbMessage) {
-		return (this.hashcode == bbMessage.getHashcode());
-	}
-
-	@Override
-	public int hashCode() {
-		StringBuilder builder = new StringBuilder();
-		builder.append(this.date);
-		builder.append(this.author);
-		builder.append(this.type);
-		builder.append(this.content);
-		return builder.hashCode();
-	}
-
-	@Override
-	public String toString() {
-		return this.getDate() + "--" + this.getAuthor() + "--"
-				+ this.getContent() + "--" + this.getType();
-	}
-
 	public String getKey() {
 		return key;
 	}
@@ -103,4 +76,12 @@ public class BlackBoardMessage implements Serializable {
 	public Table getTable() {
 		return table;
 	}
+	
+	@Override
+	public String toString() {
+		return "BlackBoardMessage [key=" + key + ", author=" + author
+				+ ", type=" + type + ", content=" + content + ", date=" + date
+				+ ", table=" + table + "]";
+	}
+	
 }

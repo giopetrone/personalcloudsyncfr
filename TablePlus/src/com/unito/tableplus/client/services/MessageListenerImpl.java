@@ -4,7 +4,6 @@ import com.extjs.gxt.ui.client.widget.Info;
 import com.google.gwt.appengine.channel.client.SocketError;
 import com.google.gwt.appengine.channel.client.SocketListener;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
@@ -29,7 +28,7 @@ public class MessageListenerImpl implements SocketListener {
 		GWT.log("Message received: " + message);
 		ChannelMessageType type = ChannelMessageType.valueOf(getJsonValue(jo,
 				"type"));
-		Long senderId = Long.valueOf(getJsonValue(jo, "id"));
+		Long senderId = Long.valueOf(getJsonValue(jo, "senderId"));
 		String content = getJsonValue(jo, "content");
 		Long tableKey = Long.valueOf(getJsonValue(jo, "tableKey"));
 		
@@ -44,6 +43,7 @@ public class MessageListenerImpl implements SocketListener {
 			else
 				t.appendChat("<b>" + senderName + ":</b> " + content
 						+ "<br />");
+			TablePlus.getDesktop().setChatStatus(t.getKey(), true);
 			if (t.isActive())
 				TablePlus.getDesktop().getChatWindow().updateContent();
 		}
@@ -112,32 +112,23 @@ public class MessageListenerImpl implements SocketListener {
 
 	private String getJsonValue(JSONObject jo, String key) {
 		JSONValue jvContent = null;
-		JSONArray jaContent = null;
 		JSONString jsContent = null;
 		JSONNumber jsNumber = null;
 		String value = null;
 
 		jvContent = jo.get(key);
 		if (jvContent != null) {
-			jaContent = jvContent.isArray();
-			if (jaContent != null) {
-				jvContent = jaContent.get(0);
-				if (jvContent != null) {
-					jsContent = jvContent.isString();
-					if (jsContent != null) {
-						value = jsContent.stringValue();
-					} else {
-						jsNumber = jvContent.isNumber();
-						if (jsNumber != null) {
-							value = jsNumber.toString();
-						} else
-							GWT.log("I could not parse jNumber or jsContent: "
-									+ jsNumber);
-					}
-				} else
-					GWT.log("I could not parse jvcontent: " + jaContent);
-			} else
-				GWT.log("I could not parse jaContent. jvContent: " + jvContent);
+			jsNumber = jvContent.isNumber();
+			if(jsNumber != null)
+				value = jsNumber.toString();
+			else{
+				jsContent = jvContent.isString();
+				if(jsContent != null){
+					value = jsContent.stringValue();
+				}
+				else
+					GWT.log("Failed to parse key " + key +":"+ jsContent);
+			}
 		} else
 			GWT.log("I could not get key " + key + " from jvContent");
 

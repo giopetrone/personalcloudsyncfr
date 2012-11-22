@@ -1,5 +1,6 @@
 package com.unito.tableplus.client.gui.windows;
 
+
 import com.extjs.gxt.ui.client.Style.Orientation;
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
@@ -42,7 +43,7 @@ public class ChatWindow extends WindowPlus {
 		setHeading("Table Chat");
 		setLayout(new RowLayout(Orientation.VERTICAL));
 		setVisible(false);
-
+		
 		mainContainer = new LayoutContainer();
 		mainContainer.setLayout(new FitLayout());
 		mainContainer.setScrollMode(Scroll.AUTOY);
@@ -68,6 +69,7 @@ public class ChatWindow extends WindowPlus {
 
 		this.addListener(Events.Show, new Listener<ComponentEvent>() {
 			public void handleEvent(ComponentEvent ce) {
+				TablePlus.getDesktop().notifyChat(false);
 			}
 		});
 	}

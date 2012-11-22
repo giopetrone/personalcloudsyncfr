@@ -1,5 +1,6 @@
 package com.unito.tableplus.client.gui;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +57,7 @@ public class DesktopPlus extends Desktop {
 			.getMessagingServiceInstance();
 
 	private Map<Long, Table> tables;
+	private Map<Long, Boolean> chatStatus;
 	private Table activeTable;
 
 	private RightPanel rightPanel;
@@ -92,7 +94,7 @@ public class DesktopPlus extends Desktop {
 	 */
 	public DesktopPlus() {
 		super.getTaskBar().disable();
-		
+
 		Window loginWindow = new Window();
 		Button loginButton = new Button("Login");
 
@@ -125,6 +127,8 @@ public class DesktopPlus extends Desktop {
 		super.desktop.setLayout(new RowLayout(Orientation.HORIZONTAL));
 
 		this.tables = tables;
+
+		chatStatus = new HashMap<Long, Boolean>();
 
 		walletWindow = new WalletWindow();
 		myResourcesWindow = new MyResourcesWindow();
@@ -291,6 +295,7 @@ public class DesktopPlus extends Desktop {
 		activeTable = tables.get(tableKey);
 		activeTable.setActive(true);
 		tableResourcesShortcut.setVisible(true);
+		notifyChat(chatUnread(tableKey));
 		chatShortcut.setVisible(true);
 		blackboardShortcut.setVisible(true);
 
@@ -397,6 +402,30 @@ public class DesktopPlus extends Desktop {
 			switchTableMenu.add(tableItem);
 		}
 
+	}
+
+	public void notifyChat(boolean notify) {
+		if (notify) {
+			chatShortcut.setId("chat-win-shortcut-notify");
+			chatShortcut.repaint();
+		} else {
+			chatShortcut.setId("chat-win-shortcut");
+			chatShortcut.repaint();
+		}
+	}
+
+	public void setChatStatus(Long tableKey, Boolean status) {
+		if (activeTable.equals(tableKey)) {
+			notifyChat(true);
+		} else
+			chatStatus.put(tableKey, status);
+	}
+
+	private boolean chatUnread(Long tableKey) {
+		if (chatStatus.containsKey(tableKey))
+			return chatStatus.get(tableKey);
+		else
+			return false;
 	}
 
 	public void showBookmarkWindow(Bookmark b) {

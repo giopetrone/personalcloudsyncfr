@@ -34,6 +34,24 @@ public class MessagingServiceImpl extends RemoteServiceServlet implements
 	private static final ChannelService channelService = ServiceFactory
 			.getChannelService();
 
+	/**
+	 * This map of hashmaps contains the users statuses. The external map key of
+	 * type <i>long</i> refers to tables keys. The inner map key refers to users
+	 * keys. Furthermore it contains the user status for connected users. If a
+	 * user is not in the map he is offline.
+	 * <p>
+	 * <b>Example:</b> <br />
+	 * Lets' suppose user <i>123L</i> is <i>ONLINE</i> on table <i>111L</i> and
+	 * <i>AWAY</i> on table <i>222L</i>, the map content will be then: <br />
+	 * [(111L, [(123L, ONLINE)]), (222L, [(123L, AWAY)])] <br />
+	 * If user <i>456L</i> goes <i>ONLINE</i> on table <i>222L</i> the map will
+	 * be: <br />
+	 * [(111L, [(123L, ONLINE)]), (222L, [(123L, AWAY),(456L, ONLINE)])]
+	 * 
+	 * Obviously user <i>456L</i> is not a member of table <i>111L</i>.
+	 * </p>
+	 * 
+	 */
 	private final static Map<Long, HashMap<Long, UserStatus>> usersStatus = new HashMap<Long, HashMap<Long, UserStatus>>();
 
 	@Override
@@ -54,24 +72,30 @@ public class MessagingServiceImpl extends RemoteServiceServlet implements
 	@Override
 	public String sendMessage(Long senderId, String content,
 			ChannelMessageType type, Long table) {
-		updateUserStatus(table, senderId, type);
+		if (!content.equals(ChannelMessageType.CHAT))
+			updateUserStatus(table, senderId, type);
 		try {
 			JSONObject jsonMessage = new JSONObject();
-			jsonMessage.append("id", senderId);
-			jsonMessage.append("type", type.toString());
-			jsonMessage.append("content", content);
-			jsonMessage.append("tableKey", table);
+			jsonMessage.put("senderId", senderId);
+			jsonMessage.put("type", type.toString());
+			jsonMessage.put("content", content);
+			jsonMessage.put("tableKey", table);
+			String message = jsonMessage.toString();
 
 			Map<Long, UserStatus> recipients = usersStatus.get(table);
 			if (recipients != null) { // if there are online users
 				for (Long r : recipients.keySet())
 					// send a message to each user
 					channelService.sendMessage(new ChannelMessage(r.toString(),
-							jsonMessage.toString()));
+							message));
 			}
+			if (type.equals(ChannelMessageType.NEWTABLEMEMBER))
+				channelService
+						.sendMessage(new ChannelMessage(content, message));
+
 			return "Message sent: " + jsonMessage;
 		} catch (JSONException e) {
-			return "Error creating JSON";
+			return "Error creating JSON on server: " + e;
 		}
 	}
 
@@ -86,15 +110,15 @@ public class MessagingServiceImpl extends RemoteServiceServlet implements
 		List<Table> tables = TableQueries.queryTables(u.getTables());
 		try {
 			JSONObject jsonMessage = new JSONObject();
-			jsonMessage.append("id", userKey);
-			jsonMessage.append("type",
-					ChannelMessageType.NEWCONNECTION.toString());
-			jsonMessage.append("content", "");
+			jsonMessage.put("senderId", userKey);
+			jsonMessage
+					.put("type", ChannelMessageType.NEWCONNECTION.toString());
+			jsonMessage.put("content", "");
 
 			for (Table t : tables) { // for each user table
 				Map<Long, UserStatus> recipients = usersStatus.get(t.getKey());
 				if (recipients != null) { // if there are online users
-					jsonMessage.append("tableKey", t.getKey());
+					jsonMessage.put("tableKey", t.getKey());
 					for (Long r : recipients.keySet())
 						// send a message to each user
 						channelService.sendMessage(new ChannelMessage(r
@@ -109,7 +133,7 @@ public class MessagingServiceImpl extends RemoteServiceServlet implements
 			}
 			printMap();
 		} catch (JSONException e) {
-			System.err.println("Error creating JSON: " + e);
+			System.err.println("Error creating JSON on server: " + e);
 		}
 
 	}
@@ -126,15 +150,15 @@ public class MessagingServiceImpl extends RemoteServiceServlet implements
 		List<Table> tables = TableQueries.queryTables(u.getTables());
 		try {
 			JSONObject jsonMessage = new JSONObject();
-			jsonMessage.append("id", userKey);
-			jsonMessage.append("type",
-					ChannelMessageType.DISCONNECTION.toString());
-			jsonMessage.append("content", "");
+			jsonMessage.put("senderId", userKey);
+			jsonMessage
+					.put("type", ChannelMessageType.DISCONNECTION.toString());
+			jsonMessage.put("content", "");
 
 			for (Table t : tables) { // for each user table
 				Map<Long, UserStatus> recipients = usersStatus.get(t.getKey());
 				if (recipients != null) { // if there are online users
-					jsonMessage.append("tableKey", t.getKey());
+					jsonMessage.put("tableKey", t.getKey());
 					recipients.remove(userKey);
 					for (Long r : recipients.keySet())
 						// send a message to each user
@@ -144,7 +168,7 @@ public class MessagingServiceImpl extends RemoteServiceServlet implements
 			}
 			printMap();
 		} catch (JSONException e) {
-			System.err.println("Error creating JSON: " + e);
+			System.err.println("Error creating JSON on server: " + e);
 		}
 	}
 

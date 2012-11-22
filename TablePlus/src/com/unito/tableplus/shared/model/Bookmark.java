@@ -1,5 +1,6 @@
 package com.unito.tableplus.shared.model;
    
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import javax.jdo.annotations.Extension;
@@ -31,17 +32,14 @@ public class Bookmark implements Resource {
 	@Persistent
 	private User user;	
 	
-	//@Persistent
-	//private Table table;
+	@Persistent
+	private List<String> annotation=new ArrayList<String>();	
 	
 	@Persistent
-	private List<String> annotation=new LinkedList<String>();	
-	
-	@Persistent
-	private LinkedList<String> tag= new LinkedList<String>();	
+	private List<String> tag= new ArrayList<String>();	
 	
 	@Persistent(mappedBy = "bookmark")
-	private LinkedList<Comment> commentList = new LinkedList<Comment>();
+	private List<Comment> commentList = new ArrayList<Comment>();
 
 	
 	//setters
@@ -109,7 +107,7 @@ public class Bookmark implements Resource {
 		return getAnnotation().size();
 	}
 	
-	public LinkedList<String> getTag() {	
+	public List<String> getTag() {	
 		return tag;
 	}
 	
@@ -121,7 +119,7 @@ public class Bookmark implements Resource {
 		else return "No Tag";
 	}	
 	
-	public LinkedList<Comment> getComments(){		
+	public List<Comment> getComments(){		
 		return commentList;
 	}		
 	
@@ -205,7 +203,7 @@ public class Bookmark implements Resource {
 
 	@Override
 	public void setURI(String uri) {
-		// TODO Auto-generated method stub
+		this.url = uri;
 		
 	}
 }

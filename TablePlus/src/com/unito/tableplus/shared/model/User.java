@@ -2,7 +2,6 @@ package com.unito.tableplus.shared.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
@@ -39,12 +38,11 @@ public class User implements Serializable {
 	private UserStatus status;
 	
 	@Persistent(mappedBy = "user")
-	private List<Bookmark> bookmarks= new LinkedList<Bookmark>();
+	private List<Bookmark> bookmarks= new ArrayList<Bookmark>();
 	
 	public User(){
 		status = UserStatus.OFFLINE;
 		this.tables = new ArrayList<Long>();
-		
 	}
 
 	public Long getKey() {
@@ -95,16 +93,10 @@ public class User implements Serializable {
 		this.tables.add(table);
 	}
 
-	/**
-	 * @return the status
-	 */
 	public UserStatus getStatus() {
 		return status;
 	}
 
-	/**
-	 * @param status the status to set
-	 */
 	public void setStatus(UserStatus status) {
 		this.status = status;
 	}
@@ -120,5 +112,52 @@ public class User implements Serializable {
 	public void addBookmark(Bookmark b) {
 		getBookmarks().add(b);
 	}
+
+	@Override
+	public String toString() {
+		return "User [key=" + key + ", username=" + username + ", firstName="
+				+ firstName + ", lastName=" + lastName + ", email=" + email
+				+ ", tables=" + tables + "]";
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((email == null) ? 0 : email.hashCode());
+		result = prime * result + ((key == null) ? 0 : key.hashCode());
+		result = prime * result
+				+ ((username == null) ? 0 : username.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		User other = (User) obj;
+		if (email == null) {
+			if (other.email != null)
+				return false;
+		} else if (!email.equals(other.email))
+			return false;
+		if (key == null) {
+			if (other.key != null)
+				return false;
+		} else if (!key.equals(other.key))
+			return false;
+		if (username == null) {
+			if (other.username != null)
+				return false;
+		} else if (!username.equals(other.username))
+			return false;
+		return true;
+	}
+	
+	
 
 }
