@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
+import com.unito.tableplus.shared.model.Bookmark;
 import com.unito.tableplus.shared.model.LoginInfo;
 import com.unito.tableplus.shared.model.Resource;
 import com.unito.tableplus.shared.model.User;
@@ -25,4 +26,19 @@ public interface UserService extends RemoteService {
 	List<Resource> loadResources(User user);
 
 	User loadUser(LoginInfo info);
+	
+	/**
+	 * Adds a bookmark on the table bookmarks list
+	 * 
+	 * @param tableKey
+	 *            The key of the table where the bookmark should be added.
+	 * @param bookmark
+	 *            The bookmark to add
+	 * @return True if the bookmark has been added, false instead.
+	 */
+	boolean addBookmark(Long Key, Bookmark bookmark);	
+	
+	List<Bookmark> loadBookmarks(Long userKey);	
+	
+	void removeBookmark(String key);
 }

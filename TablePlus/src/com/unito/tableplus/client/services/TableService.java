@@ -45,16 +45,7 @@ public interface TableService extends RemoteService {
 	 */
 	boolean addBlackBoardMessage(Long tableKey, BlackBoardMessage message);
 
-	/**
-	 * Adds a bookmark on the table bookmarks list
-	 * 
-	 * @param tableKey
-	 *            The key of the table where the bookmark should be added.
-	 * @param bookmark
-	 *            The bookmark to add
-	 * @return True if the bookmark has been added, false instead.
-	 */
-	boolean addBookmark(Long Key, Bookmark bookmark);
+
 
 	/**
 	 * Adds a registered TablePlus user as a new member to a table and shares
@@ -97,7 +88,7 @@ public interface TableService extends RemoteService {
 
 	void deleteTable(Long key);
 
-	List<Bookmark> loadBookmarks(Long tableKey);
+
 
 	List<BlackBoardMessage> loadBlackBoardMessages(Long tableKey);
 
@@ -106,8 +97,6 @@ public interface TableService extends RemoteService {
 	Table queryTable(Long key);
 
 	Map<Long, Table> queryTables(List<Long> keys);
-
-	void removeBookmark(String key);
 
 	void removeMessage(String messageKey);
 

@@ -39,11 +39,7 @@ public interface TableServiceAsync {
 	void loadBlackBoardMessages(Long tableKey,
 			AsyncCallback<List<BlackBoardMessage>> callback);
 
-	void loadBookmarks(Long tableKey, AsyncCallback<List<Bookmark>> callback);
 
-	void addBookmark(Long key, Bookmark bookmark, AsyncCallback<Boolean> asyncCallback);
-
-	void removeBookmark(String key, AsyncCallback<Void> asyncCallback);
 
 	void getUsersStatus(Long tableKey,
 			AsyncCallback<Map<Long, UserStatus>> callback);
