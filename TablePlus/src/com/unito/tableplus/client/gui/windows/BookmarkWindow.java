@@ -51,7 +51,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.unito.tableplus.client.TablePlus;
 import com.unito.tableplus.client.services.BookmarkService;
 import com.unito.tableplus.client.services.BookmarkServiceAsync;
-import com.unito.tableplus.client.services.ServiceFactory;
 import com.unito.tableplus.shared.model.Bookmark;
 import com.unito.tableplus.shared.model.Comment;
 import com.unito.tableplus.shared.model.VisibilityType;
@@ -244,8 +243,7 @@ public class BookmarkWindow extends WindowPlus {
 		addAnnotation.setStyleAttribute("padding-bottom", "5px");
 
 		vp2.add(addAnnotation);
-		addAnnotation
-				.addSelectionListener(new SelectionListener<ButtonEvent>() {
+		addAnnotation.addSelectionListener(new SelectionListener<ButtonEvent>() {
 					public void componentSelected(ButtonEvent ce) {
 						addAnnotation.disable();
 						removeAnnotation.disable();
@@ -262,8 +260,7 @@ public class BookmarkWindow extends WindowPlus {
 		removeAnnotation.setIcon(IconHelper.createStyle("removeTag"));
 		vp2.add(removeAnnotation);
 		ftable.setWidget(2, 1, vp2);
-		removeAnnotation
-				.addSelectionListener(new SelectionListener<ButtonEvent>() {
+		removeAnnotation.addSelectionListener(new SelectionListener<ButtonEvent>() {
 					public void componentSelected(ButtonEvent ce) {
 						addAnnotation.disable();
 						removeAnnotation.disable();
@@ -414,8 +411,7 @@ public class BookmarkWindow extends WindowPlus {
 		addGridButton.setIcon(IconHelper.createStyle("add"));
 		addGridButton.setWidth(100);
 		// delete
-		deleteGridButton
-				.addSelectionListener(new SelectionListener<ButtonEvent>() {
+		deleteGridButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 					@Override
 					public void componentSelected(ButtonEvent ce) {
 						deleteComment();
@@ -424,8 +420,7 @@ public class BookmarkWindow extends WindowPlus {
 		deleteGridButton.setToolTip(new ToolTipConfig("Delete All"));
 		deleteGridButton.setIcon(IconHelper.createStyle("deleteAll"));
 		deleteGridButton.setWidth(80);
-		closeGridButton
-				.addSelectionListener(new SelectionListener<ButtonEvent>() {
+		closeGridButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 					@Override
 					public void componentSelected(ButtonEvent ce) {
 						restoreMainContainer();
@@ -536,21 +531,19 @@ public class BookmarkWindow extends WindowPlus {
 	}
 
 	public void addComment(Comment c) {
-		bookmarkService.addComment(resource.getKey(), c,
-				new AsyncCallback<Boolean>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GWT.log("Failed to post comment: ", caught);
-						Info.display("Error", "Failed to post comment.");
-					}
-
-					@Override
-					public void onSuccess(Boolean result) {
-						GWT.log("Successfully posted comment ");
-						Info.display("Success", "Successfully posted comment ");
-						loadGridComments();
-					}
-				});
+		bookmarkService.addComment(resource.getKey(), c,new AsyncCallback<Boolean>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				GWT.log("Failed to post comment: ", caught);
+				Info.display("Error", "Failed to post comment.");
+			}
+			@Override
+			public void onSuccess(Boolean result) {
+				GWT.log("Successfully posted comment ");
+				Info.display("Success", "Successfully posted comment ");
+				loadGridComments();
+			}
+		});
 		commentButton.enable();
 	}
 
@@ -647,75 +640,68 @@ public class BookmarkWindow extends WindowPlus {
 	}
 
 	public void loadComments() {
-		bookmarkService.getComments(resource.getKey(),
-				new AsyncCallback<List<Comment>>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GWT.log("Unable to load comments of bookmarks: "
-								+ resource.getTitle(), caught);
-						Info.display("Error", "Unable to load comments.");
-						unmask();
-					}
-
-					@Override
-					public void onSuccess(List<Comment> result) {
-						if (result.size() > 0) {
-							message = "<div align=\"left\"><br><b>Comments :<br><br></b></div>";
-							for (Comment c : result) {
-								// se i commenti sono privati
-								if (c.isPrivate()) {
-									// se i commenti sono stati fatti dallo
-									// stesso utente sono visualizzati e
-									// sottolineati
-									if (c.getAuthor().equals(
-											TablePlus.getUser().getEmail())) {
-										message += "<div><div style=\"color: #191970;float:left;\">&lt<u>"
-												+ c.getAuthor()
-												+ "</u>&gt </div><div style=\"color:	#3D3D4C;float:left;\">"
-												+ c.getDateString()
-												+ "</div> - "
-												+ c.getComment()
-												+ "</div>";
-									} else
-										message += "<div><div style=\"color: #191970;float:left;\">&lt"
-												+ c.getAuthor()
-												+ "&gt Commento Privato</div>";
-								}
-								// se sono pubblici
-								else {
-									// se i commenti sono stati fatti dallo
-									// stesso utente sono visualizzati e
-									// sottolineati
-									if (c.getAuthor().equals(
-											TablePlus.getUser().getEmail())) {
-										message += "<div><div style=\"color: #191970;float:left;\">&lt<u>"
-												+ c.getAuthor()
-												+ "</u>&gt </div><div style=\"color:	#3D3D4C;float:left;\">"
-												+ c.getDateString()
-												+ "</div> - "
-												+ c.getComment()
-												+ "</div>";
-									} else
-										message += "<div><div style=\"color: #191970;float:left;\">&lt"
-												+ c.getAuthor()
-												+ "&gt </div><div style=\"color:	#3D3D4C;float:left;\">"
-												+ c.getDateString()
-												+ "</div> - "
-												+ c.getComment()
-												+ "</div>";
-								}
-							}
-							historyContainer.add(new Label(message + "<br>"),
-									"");
-						} else {
-							message = "<div align=\"left\"><br><b>There are no comments for the bookmark!</b><br></div>";
-							historyContainer.add(new Label(message + "<br>"),
-									"");
-							commentButton.disable();
+		bookmarkService.getComments(resource.getKey(),new AsyncCallback<List<Comment>>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				GWT.log("Unable to load comments of bookmarks: "+ resource.getTitle(), caught);
+				Info.display("Error", "Unable to load comments.");
+				unmask();
+			}
+			@Override
+			public void onSuccess(List<Comment> result) {
+				if (result.size() > 0) {
+					message = "<div align=\"left\"><br><b>Comments :<br><br></b></div>";
+					for (Comment c : result) {
+						// se i commenti sono privati
+						if (c.isPrivate()) {
+							// se i commenti sono stati fatti dallo
+							// stesso utente sono visualizzati e
+							// sottolineati
+							if (c.getAuthor().equals(TablePlus.getUser().getEmail())) {
+								message += "<div><div style=\"color: #191970;float:left;\">&lt<u>"
+										+ c.getAuthor()
+										+ "</u>&gt </div><div style=\"color:	#3D3D4C;float:left;\">"
+										+ c.getDateString()
+										+ "</div> - "
+										+ c.getComment()
+										+ "</div>";
+							} else
+								message += "<div><div style=\"color: #191970;float:left;\">&lt"
+										+ c.getAuthor()
+										+ "&gt Commento Privato</div>";
 						}
-						unmask();
+						// se sono pubblici
+						else {
+							// se i commenti sono stati fatti dallo
+							// stesso utente sono visualizzati e
+							// sottolineati
+							if (c.getAuthor().equals(TablePlus.getUser().getEmail())) {
+								message += "<div><div style=\"color: #191970;float:left;\">&lt<u>"
+										+ c.getAuthor()
+										+ "</u>&gt </div><div style=\"color:	#3D3D4C;float:left;\">"
+										+ c.getDateString()
+										+ "</div> - "
+										+ c.getComment()
+										+ "</div>";
+							} else
+								message += "<div><div style=\"color: #191970;float:left;\">&lt"
+										+ c.getAuthor()
+										+ "&gt </div><div style=\"color:	#3D3D4C;float:left;\">"
+										+ c.getDateString()
+										+ "</div> - "
+										+ c.getComment()
+										+ "</div>";
+						}
 					}
-				});
+					historyContainer.add(new Label(message + "<br>"),"");
+				} else {
+					message = "<div align=\"left\"><br><b>There are no comments for the bookmark!</b><br></div>";
+					historyContainer.add(new Label(message + "<br>"),"");
+					commentButton.disable();
+				}
+				unmask();
+			}
+		});
 	}
 
 	public LayoutContainer setFormLegend() {
@@ -891,8 +877,7 @@ public class BookmarkWindow extends WindowPlus {
 	}
 
 	public void addTag(final String tag) {
-		bookmarkService.addTag(resource.getKey(), tag,
-				new AsyncCallback<Boolean>() {
+		bookmarkService.addTag(resource.getKey(), tag,new AsyncCallback<Boolean>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GWT.log("Unable to add tag! ", caught);
@@ -912,8 +897,7 @@ public class BookmarkWindow extends WindowPlus {
 	}
 
 	public void removeTag(final int tag) {
-		bookmarkService.removeTag(resource.getKey(), tag,
-				new AsyncCallback<Boolean>() {
+		bookmarkService.removeTag(resource.getKey(), tag,new AsyncCallback<Boolean>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GWT.log("Unable to remove tag! ", caught);
@@ -933,8 +917,7 @@ public class BookmarkWindow extends WindowPlus {
 	}
 
 	public void editLegend(final String value) {
-		bookmarkService.editLegend(resource.getKey(), value,
-				new AsyncCallback<Boolean>() {
+		bookmarkService.editLegend(resource.getKey(), value,new AsyncCallback<Boolean>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GWT.log("Unable to edit the bookmark's legend! ",
@@ -956,8 +939,7 @@ public class BookmarkWindow extends WindowPlus {
 	}
 
 	public void refresh() {
-		bookmarkService.queryBookmark(resource.getKey(),
-				new AsyncCallback<Bookmark>() {
+		bookmarkService.queryBookmark(resource.getKey(),new AsyncCallback<Bookmark>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GWT.log("Unable to refresh the bookmark! ", caught);
@@ -1082,8 +1064,7 @@ public class BookmarkWindow extends WindowPlus {
 		cancelAnnotation.setHeight(20);
 		hpAnnotation2.add(cancelAnnotation);
 
-		cancelAnnotation
-				.addSelectionListener(new SelectionListener<ButtonEvent>() {
+		cancelAnnotation.addSelectionListener(new SelectionListener<ButtonEvent>() {
 					@Override
 					public void componentSelected(ButtonEvent ce) {
 						addAnnotation.enable();
@@ -1207,11 +1188,9 @@ public class BookmarkWindow extends WindowPlus {
 			public void componentSelected(ButtonEvent ce) {
 				Comment c;
 				if (radio1.getValue())
-					c = new Comment(comment.getValue(), TablePlus.getUser()
-							.getEmail());
+					c = new Comment(comment.getValue(), TablePlus.getUser().getEmail());
 				else
-					c = new Comment(comment.getValue(), TablePlus.getUser()
-							.getEmail(), VisibilityType.PRIVATE);
+					c = new Comment(comment.getValue(), TablePlus.getUser().getEmail(), VisibilityType.PRIVATE);
 				editComment(c, key);
 				comment.clear();
 				rebuild();
@@ -1310,7 +1289,6 @@ public class BookmarkWindow extends WindowPlus {
 
 	@Override
 	public void updateContent() {
-		// TODO Auto-generated method stub
-		
+		refresh();
 	}
 }
