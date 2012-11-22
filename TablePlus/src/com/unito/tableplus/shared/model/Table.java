@@ -40,8 +40,7 @@ public class Table implements Serializable {
 	@Persistent(mappedBy = "table")
 	private List<SharedResource> resources;
 
-	@Persistent(mappedBy = "table")
-	private List<Bookmark> bookmarks;
+
 
 	@NotPersistent
 	private Map<Long, User> usersMap;
@@ -63,7 +62,7 @@ public class Table implements Serializable {
 		this.resources = new LinkedList<SharedResource>();
 		this.members = new LinkedList<Long>();
 		this.members.add(creator);
-		this.bookmarks = new LinkedList<Bookmark>();
+
 		this.usersMap = new HashMap<Long, User>();
 		this.chatHistory = "";
 		this.isActive = false;
@@ -150,17 +149,6 @@ public class Table implements Serializable {
 		this.blackboard = blackboard;
 	}
 
-	public void setBookmarks(List<Bookmark> bookmarks) {
-		this.bookmarks = bookmarks;
-	}
-
-	public List<Bookmark> getBookmarks() {
-		return this.bookmarks;
-	}
-
-	public void addBookmark(Bookmark b) {
-		getBookmarks().add(b);
-	}
 
 	public void setUserStatus(Long userKey, UserStatus status) {
 		if (usersMap != null && !usersMap.isEmpty())

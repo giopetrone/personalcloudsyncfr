@@ -2,6 +2,7 @@ package com.unito.tableplus.shared.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
@@ -37,9 +38,13 @@ public class User implements Serializable {
 	@NotPersistent
 	private UserStatus status;
 	
+	@Persistent(mappedBy = "user")
+	private List<Bookmark> bookmarks= new LinkedList<Bookmark>();
+	
 	public User(){
 		status = UserStatus.OFFLINE;
 		this.tables = new ArrayList<Long>();
+		
 	}
 
 	public Long getKey() {
@@ -103,4 +108,17 @@ public class User implements Serializable {
 	public void setStatus(UserStatus status) {
 		this.status = status;
 	}
+	
+	public void setBookmarks(List<Bookmark> bookmarks) {
+		this.bookmarks = bookmarks;
+	}
+
+	public List<Bookmark> getBookmarks() {
+		return this.bookmarks;
+	}
+
+	public void addBookmark(Bookmark b) {
+		getBookmarks().add(b);
+	}
+
 }
