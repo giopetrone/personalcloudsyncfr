@@ -49,6 +49,7 @@ import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.unito.tableplus.client.TablePlus;
+import com.unito.tableplus.client.services.BookmarkService;
 import com.unito.tableplus.client.services.BookmarkServiceAsync;
 import com.unito.tableplus.client.services.ServiceFactory;
 import com.unito.tableplus.shared.model.Bookmark;
@@ -57,8 +58,7 @@ import com.unito.tableplus.shared.model.VisibilityType;
 
 public class BookmarkWindow extends WindowPlus {
 
-	private final BookmarkServiceAsync bookmarkService = ServiceFactory
-			.getBookmarkServiceInstance();
+	private final BookmarkServiceAsync bookmarkService = GWT.create(BookmarkService.class);
 
 	private LayoutContainer mainContainer;
 	private HtmlContainer historyContainer;

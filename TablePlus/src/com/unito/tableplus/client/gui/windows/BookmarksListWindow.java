@@ -38,21 +38,24 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.ListBox;
 import com.unito.tableplus.client.TablePlus;
+import com.unito.tableplus.client.services.BookmarkService;
 import com.unito.tableplus.client.services.BookmarkServiceAsync;
 import com.unito.tableplus.client.services.ServiceFactory;
 import com.unito.tableplus.client.services.TableServiceAsync;
+import com.unito.tableplus.client.services.UserService;
+import com.unito.tableplus.client.services.UserServiceAsync;
 import com.unito.tableplus.shared.model.Bookmark;
 import com.unito.tableplus.shared.model.Comment;
+import com.unito.tableplus.shared.model.Resource;
 import com.unito.tableplus.shared.model.Table;
+import com.unito.tableplus.shared.model.User;
 
 public class BookmarksListWindow extends WindowPlus {
 
-	private final TableServiceAsync tableService = ServiceFactory
-			.getTableServiceInstance();
-	private final BookmarkServiceAsync bookmarkService = ServiceFactory
-			.getBookmarkServiceInstance();
+	private final UserServiceAsync userService = GWT.create(UserService.class);
+	private final BookmarkServiceAsync bookmarkService = GWT.create(BookmarkService.class);
+	public static final TableServiceAsync tableService = ServiceFactory.getTableServiceInstance();
 
-	private Table activeTable;
 	private LayoutContainer mainContainer;
 	private Grid<BaseModel> grid;
 	private ListStore<BaseModel> bookmarksStore;
@@ -65,6 +68,7 @@ public class BookmarksListWindow extends WindowPlus {
 	private Menu contextMenu;
 	private MenuItem deleteItem;
 	private MenuItem openItem;
+	private MenuItem share;
 	private List<String> allTags = new LinkedList<String>();
 	private List<Bookmark> resource;
 
@@ -90,7 +94,7 @@ public class BookmarksListWindow extends WindowPlus {
 				final BaseModel selected = grid.getSelectionModel()
 						.getSelectedItem();
 				String key = selected.get("key").toString();
-				tableService.removeBookmark(key, new AsyncCallback<Void>() {
+				userService.removeBookmark(key, new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GWT.log("Unable to delete bookmark", caught);
@@ -112,29 +116,51 @@ public class BookmarksListWindow extends WindowPlus {
 		openItem.addSelectionListener(new SelectionListener<MenuEvent>() {
 			@Override
 			public void componentSelected(MenuEvent ce) {
-				final BaseModel selected = grid.getSelectionModel()
-						.getSelectedItem();
+				final BaseModel selected = grid.getSelectionModel().getSelectedItem();
 				String key = selected.get("key").toString();
-				bookmarkService.queryBookmark(key,
-						new AsyncCallback<Bookmark>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GWT.log("Unable to load bookmarks for table: "
-										+ activeTable.getName(), caught);
-								Info.display("Error",
-										"Unable to load bookmarks.");
-								unmask();
-							}
-
-							@Override
-							public void onSuccess(Bookmark b) {
-								TablePlus.getDesktop().showBookmarkWindow(b);
-
-							}
-						});
+				bookmarkService.queryBookmark(key,new AsyncCallback<Bookmark>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GWT.log("Unable to load bookmarks for user: "+ 
+								TablePlus.getUser().getFirstName()+" "+TablePlus.getUser().getLastName(), caught);
+						Info.display("Error","Unable to load bookmarks.");
+						unmask();
+					}
+					@Override
+					public void onSuccess(Bookmark b) {
+						TablePlus.getDesktop().showBookmarkWindow(b);
+					}
+				});
 			}
 		});
 		contextMenu.add(openItem);
+		share = new MenuItem();
+		share.setText("Share on Table");
+		share.setIcon(IconHelper.createStyle("menu-share"));
+
+		share.addSelectionListener(new SelectionListener<MenuEvent>() {
+			@Override
+			public void componentSelected(MenuEvent ce) {
+				final BaseModel selected = grid.getSelectionModel()
+						.getSelectedItem();
+				String key = selected.get("key").toString();
+				bookmarkService.queryBookmark(key,new AsyncCallback<Bookmark>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GWT.log("Unable to load bookmarks for user: "+ 
+								TablePlus.getUser().getFirstName()+" "+TablePlus.getUser().getLastName(), caught);
+						Info.display("Error","Unable to load bookmarks.");
+						unmask();
+					}
+					@Override
+					public void onSuccess(Bookmark b) {
+						shareResource(b);
+					}
+				});
+			}
+				
+		});
+		contextMenu.add(share);
 		grid.setContextMenu(contextMenu);
 		mainContainer.add(grid);
 
@@ -248,27 +274,25 @@ public class BookmarksListWindow extends WindowPlus {
 	private void loadBookmark() {
 		bookmarksStore.removeAll();
 		mask();
-		if (activeTable.getKey() != null)
-			tableService.loadBookmarks(activeTable.getKey(),
-					new AsyncCallback<List<Bookmark>>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GWT.log("Unable to load bookmarks for table: "
-									+ activeTable.getName(), caught);
-							Info.display("Error", "Unable to load bookmarks.");
-							unmask();
-						}
+		//if (activeTable.getKey() != null)
+			userService.loadBookmarks(TablePlus.getUser().getKey(),new AsyncCallback<List<Bookmark>>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					GWT.log("Unable to load bookmarks for user: "+ TablePlus.getUser().getFirstName(), caught);
+					Info.display("Error", "Unable to load bookmarks.");
+					unmask();
+				}
 
-						@Override
-						public void onSuccess(List<Bookmark> result) {
-							if (result != null) {
-								activeTable.setBookmarks(result);
-								resource = result;
-								fillGrid(resource);
-							}
-							unmask();
-						}
-					});
+				@Override
+				public void onSuccess(List<Bookmark> result) {
+					if (result != null) {
+						//activeTable.setBookmarks(result);
+						resource = result;
+						fillGrid(resource);
+					}
+					unmask();
+				}
+			});
 	}
 
 	private void showInputPanel() {
@@ -284,25 +308,24 @@ public class BookmarksListWindow extends WindowPlus {
 	}
 
 	private void shareBookmark(final Bookmark bookmark) {
-		tableService.addBookmark(activeTable.getKey(), bookmark,
-				new AsyncCallback<Boolean>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GWT.log("Failed to share bookmark: ", caught);
-						Info.display("Error", "Failed to share bookmark.");
-					}
+		userService.addBookmark(TablePlus.getUser().getKey(),bookmark,new AsyncCallback<Boolean>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				GWT.log("Failed to share bookmark: ", caught);
+				Info.display("Error", "Failed to share bookmark.");
+			}
 
-					@Override
-					public void onSuccess(Boolean result) {
-						mainContainer.remove(inputPanel);
-						mainContainer.setLayout(fitLayout);
-						mainContainer.add(grid);
-						loadButton.enable();
-						addButton.enable();
-						mainContainer.layout();
-						loadBookmark();
-					}
-				});
+			@Override
+			public void onSuccess(Boolean result) {
+				mainContainer.remove(inputPanel);
+				mainContainer.setLayout(fitLayout);
+				mainContainer.add(grid);
+				loadButton.enable();
+				addButton.enable();
+				mainContainer.layout();
+				loadBookmark();
+			}
+		});
 	}
 
 	private void fillGrid(List<Bookmark> bookmarks) {
@@ -314,31 +337,26 @@ public class BookmarksListWindow extends WindowPlus {
 			model.set("title", bookmark.getTitle());
 			model.set("url", bookmark.getUrl());
 			model.set("legend", bookmark.getLegend());
-			bookmarkService.getComments(bookmark.getKey(),
-					new AsyncCallback<List<Comment>>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GWT.log("Unable to load the comment's number",
-									caught);
-							Info.display("Error",
-									"Unable to load the comment's number.");
-							unmask();
-						}
-
-						@Override
-						public void onSuccess(List<Comment> result) {
-							model.set("comment", result.size());
-							unmask();
-						}
-					});
+			bookmarkService.getComments(bookmark.getKey(),new AsyncCallback<List<Comment>>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					GWT.log("Unable to load the comment's number",caught);
+					Info.display("Error","Unable to load the comment's number.");
+					unmask();
+				}
+				@Override
+				public void onSuccess(List<Comment> result) {
+					model.set("comment", result.size());
+					unmask();
+				}
+			});
 			model.set("tag", bookmark.getTagString());
 			model.set("annotation", bookmark.getAnnotationNumber());
 			bookmarksStore.add(model);
 		}
 		contextMenu.setEnabled(bookmarksStore.getCount() > 0);
 		TablePlus.getDesktop().setAllTags(allTags);
-		if (TablePlus.getDesktop().getAllTags().size() == 0)
-			filterButton.disable();
+		if (TablePlus.getDesktop().getAllTags().size() == 0) filterButton.disable();
 	}
 
 	private ColumnModel getColumnModel() {
@@ -485,11 +503,36 @@ public class BookmarksListWindow extends WindowPlus {
 
 	@Override
 	public void updateContent() {
-		this.activeTable = TablePlus.getDesktop().getActiveTable();
-		if (this.activeTable.getBookmarks() != null) {
-			bookmarksStore.removeAll();
-			fillGrid(this.activeTable.getBookmarks());
-		} else
-			loadBookmark();
+		loadBookmark();
+	}
+
+	private void shareResource(Resource selectedResource) {
+		User user = TablePlus.getUser();
+		Table table = TablePlus.getDesktop().getActiveTable();
+		if (table == null)
+			Info.display("Share resource", "Cannot share on personal table!");
+		else
+			tableService.addResource(selectedResource, user, table.getKey(),
+					new AsyncCallback<Boolean>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+							GWT.log("Failed to share selected resource: ",
+									caught);
+							Info.display("Share resource",
+									"Failed to share selected resource.");
+						}
+
+						@Override
+						public void onSuccess(Boolean result) {
+							if (result)
+								Info.display("Share resource",
+										"Resource has been successfully shared.");
+							else
+								Info.display("Share resource",
+										"Resource could not be shared.");
+						}
+
+					});
 	}
 }
