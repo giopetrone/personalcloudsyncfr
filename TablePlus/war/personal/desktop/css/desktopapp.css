@@ -262,3 +262,7 @@
 .filter {
 	background-image: url(../images/filter.png) !important;
 }
+
+.property {
+	background-image: url(../images/gears.gif) !important;
+}
