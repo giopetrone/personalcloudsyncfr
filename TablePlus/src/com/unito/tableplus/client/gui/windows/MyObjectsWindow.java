@@ -53,7 +53,7 @@ import com.unito.tableplus.shared.model.Table;
 import com.unito.tableplus.shared.model.User;
 import com.unito.tableplus.shared.model.VisibilityType;
 
-public class BookmarksListWindow extends WindowPlus {
+public class MyObjectsWindow extends WindowPlus {
 
 	private final UserServiceAsync userService = GWT.create(UserService.class);
 	private final BookmarkServiceAsync bookmarkService = GWT.create(BookmarkService.class);
@@ -64,7 +64,7 @@ public class BookmarksListWindow extends WindowPlus {
 	private ListStore<BaseModel> bookmarksStore;
 	private Button loadButton;
 	private Button addButton;
-	private Button filterButton;
+	//private Button filterButton;
 	private Layout fitLayout = new FitLayout();
 	private Layout centerLayout = new CenterLayout();
 	private FormPanel inputPanel;
@@ -74,7 +74,7 @@ public class BookmarksListWindow extends WindowPlus {
 	private MenuItem share;
 	private MenuItem commentItem;
 	private List<String> allTags = new ArrayList<String>();
-	private List<Bookmark> resource;
+	private List<Resource> resource;
 	
 	private ListStore<BaseModel> commentStore;
 	private LayoutContainer lc;
@@ -90,7 +90,7 @@ public class BookmarksListWindow extends WindowPlus {
 	private HorizontalPanel hp = new HorizontalPanel();
 	private Radio radio1;
 
-	public BookmarksListWindow() {
+	public MyObjectsWindow() {
 		super();
 		setSize(635, 350);
 		setHeading("Resource");
@@ -225,7 +225,7 @@ public class BookmarksListWindow extends WindowPlus {
 		addButton.setToolTip(new ToolTipConfig("Add Object"));
 		addButton.setIcon(IconHelper.createStyle("add"));
 
-		filterButton = new Button("Filter By Tag",new SelectionListener<ButtonEvent>() {
+/*		filterButton = new Button("Filter By Tag",new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
 				showFilterPanel();
@@ -233,13 +233,15 @@ public class BookmarksListWindow extends WindowPlus {
 		});
 		filterButton.setToolTip(new ToolTipConfig("Filter resources by Tag"));
 		filterButton.setIcon(IconHelper.createStyle("filter"));
-
+		
+*/
 		addButton(loadButton);
 		addButton(addButton);
-		addButton(filterButton);
+//		addButton(filterButton);
 		loadBookmark();
 	}
-	
+
+
 	private void commentView(final Bookmark b) {
 		commentStore = new ListStore<BaseModel>();
 		lc = new LayoutContainer();
@@ -294,7 +296,7 @@ public class BookmarksListWindow extends WindowPlus {
 		mainContainer.setLayout(centerLayout);
 		loadButton.disable();
 		addButton.disable();
-		filterButton.disable();
+//		filterButton.disable();
 		
 		lc.add(gridComment);
 		mainContainer.add(lc);
@@ -378,7 +380,7 @@ public class BookmarksListWindow extends WindowPlus {
 		mainContainer.setLayout(centerLayout);
 		loadButton.enable();
 		addButton.enable();
-		filterButton.enable();
+//		filterButton.enable();
 		mainContainer.add(grid);
 		mainContainer.layout();
 	}
@@ -524,17 +526,18 @@ public class BookmarksListWindow extends WindowPlus {
 		});
 	}
 	
-	private void showFilterPanel() {
+/*	private void showFilterPanel() {
 		inputPanel = buildTagPanel();
 		mainContainer.remove(grid);
 		loadButton.disable();
 		addButton.disable();
-		filterButton.disable();
+//		filterButton.disable();
 		mainContainer.setLayout(centerLayout);
 		mainContainer.add(inputPanel);
 		mainContainer.layout();
 	}
 
+	
 	private FormPanel buildTagPanel() {
 		final FormPanel panel = new FormPanel();
 		panel.setLayoutData(Orientation.HORIZONTAL);
@@ -564,7 +567,7 @@ public class BookmarksListWindow extends WindowPlus {
 				mainContainer.add(grid);
 				loadButton.enable();
 				addButton.enable();
-				filterButton.enable();
+	//			filterButton.enable();
 				mainContainer.layout();
 			}
 		});
@@ -574,30 +577,32 @@ public class BookmarksListWindow extends WindowPlus {
 				bookmarksStore.removeAll();
 				mask();
 				String tag = listTag.getItemText(listTag.getSelectedIndex());
-				List<Bookmark> tagFilter = new ArrayList<Bookmark>();
-				for (Bookmark b : resource) {
+				List<Resource> tagFilter = new ArrayList<Resource>();
+				for (Resource b : resource) {
 					for (String t : b.getTag())
 						if (t.equals(tag)) tagFilter.add(b);
 				}
 				fillGrid(tagFilter);
+			
 				mainContainer.remove(inputPanel);
 				mainContainer.setLayout(fitLayout);
 				mainContainer.add(grid);
 				loadButton.enable();
 				addButton.enable();
-				filterButton.enable();
+			//	filterButton.enable();
 				mainContainer.layout();
 			}
 		});
 		return panel;
 
 	}
-
+	*/
+	
 	private void loadBookmark() {
 		bookmarksStore.removeAll();
 		mask();
 		//if (activeTable.getKey() != null)
-			userService.loadBookmarks(TablePlus.getUser().getKey(),new AsyncCallback<List<Bookmark>>() {
+			userService.loadResources(TablePlus.getUser(),new AsyncCallback<List<Resource>>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GWT.log("Unable to load bookmarks for user: "+ TablePlus.getUser().getFirstName(), caught);
@@ -606,7 +611,7 @@ public class BookmarksListWindow extends WindowPlus {
 				}
 
 				@Override
-				public void onSuccess(List<Bookmark> result) {
+				public void onSuccess(List<Resource> result) {
 					if (result != null) {
 						//activeTable.setBookmarks(result);
 						resource = result;
@@ -622,7 +627,7 @@ public class BookmarksListWindow extends WindowPlus {
 		mainContainer.remove(grid);
 		loadButton.disable();
 		addButton.disable();
-		filterButton.disable();
+//		filterButton.disable();
 		mainContainer.setLayout(centerLayout);
 		mainContainer.add(inputPanel);
 		mainContainer.layout();
@@ -644,23 +649,23 @@ public class BookmarksListWindow extends WindowPlus {
 				mainContainer.add(grid);
 				loadButton.enable();
 				addButton.enable();
-				filterButton.enable();
+			//	filterButton.enable();
 				mainContainer.layout();
 				loadBookmark();
 			}
 		});
 	}
 
-	private void fillGrid(List<Bookmark> bookmarks) {
+	private void fillGrid(List<Resource> bookmarks) {
 		allTags = new ArrayList<String>();
-		for (final Bookmark bookmark : bookmarks) {
-			allTags.addAll(bookmark.getTag());
+		for (final Resource bookmark : bookmarks) {
+			//allTags.addAll(bookmark.getTag());
 			final BaseModel model = new BaseModel();
-			model.set("key", bookmark.getKey());
-			model.set("title", bookmark.getTitle());
-			model.set("url", bookmark.getUrl());
-			model.set("legend", bookmark.getLegend());
-			bookmarkService.getComments(bookmark.getKey(),new AsyncCallback<List<Comment>>() {
+			model.set("key", bookmark.getID());
+			model.set("title", bookmark.getName());
+			model.set("url", bookmark.getURI());
+			//model.set("legend", bookmark.getLegend());
+			bookmarkService.getComments(bookmark.getID(),new AsyncCallback<List<Comment>>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GWT.log("Unable to load the comment's number",caught);
@@ -673,13 +678,13 @@ public class BookmarksListWindow extends WindowPlus {
 					unmask();
 				}
 			});
-			model.set("tag", bookmark.getTagString());
-			model.set("annotation", bookmark.getAnnotationNumber());
+			//model.set("tag", bookmark.getTag());
+			//model.set("annotation", bookmark.getAnnotationNumber());
 			bookmarksStore.add(model);
 		}
 		contextMenu.setEnabled(bookmarksStore.getCount() > 0);
-		TablePlus.getDesktop().setAllTags(allTags);
-		if (TablePlus.getDesktop().getAllTags().size() == 0) filterButton.disable();
+		//TablePlus.getDesktop().setAllTags(allTags);
+		//if (TablePlus.getDesktop().getAllTags().size() == 0) filterButton.disable();
 	}
 
 	private ColumnModel getColumnModel() {
@@ -789,7 +794,7 @@ public class BookmarksListWindow extends WindowPlus {
 				mainContainer.add(grid);
 				loadButton.enable();
 				addButton.enable();
-				filterButton.enable();
+//				filterButton.enable();
 				mainContainer.layout();
 			}
 		});

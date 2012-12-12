@@ -26,17 +26,17 @@ import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
-import com.extjs.gxt.ui.client.widget.menu.MenuItem;
-import com.google.gwt.core.shared.GWT;
+import com.extjs.gxt.ui.client.widget.menu.MenuItem; 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.unito.tableplus.client.TablePlus;
 import com.unito.tableplus.client.gui.panels.RightPanel;
 import com.unito.tableplus.client.gui.windows.BlackBoardWindow;
 import com.unito.tableplus.client.gui.windows.BookmarkWindow;
-import com.unito.tableplus.client.gui.windows.BookmarksListWindow;
+import com.unito.tableplus.client.gui.windows.MyObjectsWindow;
 import com.unito.tableplus.client.gui.windows.ChatWindow;
 import com.unito.tableplus.client.gui.windows.MyResourcesWindow;
-import com.unito.tableplus.client.gui.windows.TableResourcesWindow;
+import com.unito.tableplus.client.gui.windows.TableObjectsWindow;
 import com.unito.tableplus.client.gui.windows.WalletWindow;
 import com.unito.tableplus.client.gui.windows.WindowPlus;
 import com.unito.tableplus.client.services.MessagingServiceAsync;
@@ -132,10 +132,10 @@ public class DesktopPlus extends Desktop {
 
 		walletWindow = new WalletWindow();
 		myResourcesWindow = new MyResourcesWindow();
-		tableResourcesWindow = new TableResourcesWindow();
+		tableResourcesWindow = new TableObjectsWindow();
 		chatWindow = new ChatWindow();
 		blackboardWindow = new BlackBoardWindow();
-		bookmarksListWindow = new BookmarksListWindow();
+		bookmarksListWindow = new MyObjectsWindow();
 
 		this.shortcutListener = new SelectionListener<ComponentEvent>() {
 			@Override
@@ -161,8 +161,8 @@ public class DesktopPlus extends Desktop {
 		myResourcesShortcut.addSelectionListener(shortcutListener);
 
 		bookmarksShortcut = new Shortcut();
-		bookmarksShortcut.setText("My Bookmarks");
-		bookmarksShortcut.setId("resource-win-shortcut");
+		bookmarksShortcut.setText("My Objects"); //replace My Bookmarks
+		bookmarksShortcut.setId("myresources-win-shortcut"); // replace "resource-win-shortcut"
 		bookmarksShortcut.setData("window", bookmarksListWindow);
 		bookmarksShortcut.setVisible(true);
 		bookmarksShortcut.addSelectionListener(shortcutListener);
@@ -424,7 +424,7 @@ public class DesktopPlus extends Desktop {
 		}
 	}
 
-	public void showBookmarkWindow(Bookmark b) {
+	public void showBookmarkWindow(Object b) {
 		this.bookmarkWindow = new BookmarkWindow(b);
 		this.addWindow(this.bookmarkWindow);
 		this.bookmarkWindow.show();

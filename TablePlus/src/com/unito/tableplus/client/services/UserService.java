@@ -8,6 +8,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.unito.tableplus.shared.model.Bookmark;
 import com.unito.tableplus.shared.model.LoginInfo;
 import com.unito.tableplus.shared.model.Resource;
+import com.unito.tableplus.shared.model.TableObject;
 import com.unito.tableplus.shared.model.User;
 
 @RemoteServiceRelativePath("user-service")
@@ -38,7 +39,9 @@ public interface UserService extends RemoteService {
 	 */
 	boolean addBookmark(Long Key, Bookmark bookmark);	
 	
-	List<Bookmark> loadBookmarks(Long userKey);	
+	//List<Resource> loadBookmarks(Long userKey);	
 	
 	void removeBookmark(String key);
+
+	boolean addObject(Long key, TableObject o);
 }

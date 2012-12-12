@@ -38,7 +38,7 @@ public class Table implements Serializable {
 	private List<BlackBoardMessage> blackboard;
 
 	@Persistent(mappedBy = "table")
-	private List<SharedResource> resources;
+	private List<TableObject> resources;
 
 
 
@@ -59,7 +59,7 @@ public class Table implements Serializable {
 		this.creator = creator;
 		this.owner = creator;
 		this.blackboard = new ArrayList<BlackBoardMessage>();
-		this.resources = new ArrayList<SharedResource>();
+		this.resources = new ArrayList<TableObject>();
 		this.members = new ArrayList<Long>();
 		this.members.add(creator);
 
@@ -129,15 +129,15 @@ public class Table implements Serializable {
 		this.members = members;
 	}
 
-	public List<SharedResource> getResources() {
+	public List<TableObject> getResources() {
 		return resources;
 	}
 
-	public void setResources(List<SharedResource> resources) {
+	public void setResources(List<TableObject> resources) {
 		this.resources = resources;
 	}
 
-	public void addResource(SharedResource resource) {
+	public void addResource(TableObject resource) {
 		resources.add(resource);
 	}
 

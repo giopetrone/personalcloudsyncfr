@@ -6,7 +6,7 @@ import java.util.Map;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.unito.tableplus.shared.model.BlackBoardMessage;
 import com.unito.tableplus.shared.model.Resource;
-import com.unito.tableplus.shared.model.SharedResource;
+import com.unito.tableplus.shared.model.TableObject;
 import com.unito.tableplus.shared.model.Table;
 import com.unito.tableplus.shared.model.User;
 import com.unito.tableplus.shared.model.UserStatus;
@@ -29,7 +29,7 @@ public interface TableServiceAsync {
 
 	void addResource(Resource resource, User user, Long tableKey,AsyncCallback<Boolean> callback);
 
-	void loadResources(Long tableKey, AsyncCallback<List<SharedResource>> callback);
+	void loadResources(Long tableKey, AsyncCallback<List<TableObject>> callback);
 
 	void addMember(Long currentUser, Long newUserKey, Long tableKey, AsyncCallback<Void> callback);
 
@@ -42,4 +42,9 @@ public interface TableServiceAsync {
 
 	void getUsersStatus(Long tableKey,
 			AsyncCallback<Map<Long, UserStatus>> callback);
+
+	void queryObject(String key, AsyncCallback<TableObject> asyncCallback);
+
+	void editComment(TableObject b, String key,
+			AsyncCallback<String> asyncCallback);
 }

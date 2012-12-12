@@ -32,12 +32,12 @@ public class Bookmark implements Resource {
 	private User user;	
 	
 	@Persistent
-	private List<String> annotation=new ArrayList<String>();	
+	private List<String> annotation= new ArrayList<String>();	
 	
 	@Persistent
 	private List<String> tag= new ArrayList<String>();	
 	
-	@Persistent(mappedBy = "bookmark")
+	@Persistent(mappedBy = "tableObject")
 	private List<Comment> commentList = new ArrayList<Comment>();
 
 	
@@ -55,10 +55,6 @@ public class Bookmark implements Resource {
 		this.legend = legend;
 	}
 	
-/*	public void setTable(Table table) {
-		this.table=table;		
-	}
-*/	
 	public void setUser(User user) {
 		this.user=user;		
 	}
@@ -91,10 +87,7 @@ public class Bookmark implements Resource {
 	public User getUser() {	
 		return user;
 	}
-/*	public Table getTable() {	
-		return table;
-	}
-*/
+
 	public String getUserName() {
 		return getUser().getFirstName()+" "+getUser().getLastName();
 	}	

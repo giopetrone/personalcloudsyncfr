@@ -7,7 +7,7 @@ import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.unito.tableplus.shared.model.BlackBoardMessage;
 import com.unito.tableplus.shared.model.Resource;
-import com.unito.tableplus.shared.model.SharedResource;
+import com.unito.tableplus.shared.model.TableObject;
 import com.unito.tableplus.shared.model.Table;
 import com.unito.tableplus.shared.model.User;
 import com.unito.tableplus.shared.model.UserStatus;
@@ -91,7 +91,7 @@ public interface TableService extends RemoteService {
 
 	List<BlackBoardMessage> loadBlackBoardMessages(Long tableKey);
 
-	List<SharedResource> loadResources(Long tableKey);
+	List<TableObject> loadResources(Long tableKey);
 
 	Table queryTable(Long key);
 
@@ -100,4 +100,8 @@ public interface TableService extends RemoteService {
 	void removeMessage(String messageKey);
 
 	Map<Long, UserStatus> getUsersStatus(Long tableKey);
+
+	TableObject queryObject(String key);
+
+	String editComment(TableObject b, String key);
 }

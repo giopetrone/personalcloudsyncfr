@@ -1,5 +1,7 @@
 package com.unito.tableplus.shared.model;
 
+import java.util.List;
+
 public class FacebookEvent implements Resource {
 
 	private static final long serialVersionUID = -6007594027290204640L;
@@ -117,4 +119,6 @@ public class FacebookEvent implements Resource {
 	public void setURI(String uri) {
 		this.uri = uri;
 	}
+
+
 }
