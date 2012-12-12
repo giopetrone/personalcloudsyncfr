@@ -5,6 +5,7 @@
  */
 package com.unito.tableplus.shared.model;
 
+
 /**
  * This is the class for Google Drive objects descriptor.
  * 
@@ -75,5 +76,5 @@ public class DriveFile implements Resource {
 		this.link = uri;
 	}
 
-	
+
 }

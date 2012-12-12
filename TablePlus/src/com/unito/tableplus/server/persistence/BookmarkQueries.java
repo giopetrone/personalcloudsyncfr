@@ -8,6 +8,7 @@ import javax.jdo.Transaction;
 import com.unito.tableplus.server.util.ServiceFactory;
 import com.unito.tableplus.shared.model.Bookmark;
 import com.unito.tableplus.shared.model.Comment;
+import com.unito.tableplus.shared.model.TableObject;
 
 public class BookmarkQueries {
 	
@@ -72,9 +73,9 @@ public class BookmarkQueries {
 
 	public static List<Comment> getComments(String key) {
 		PersistenceManager pm = ServiceFactory.getPmfInstance().getPersistenceManager();
-		Bookmark detached = null;
+		TableObject detached = null;
 		try {
-			Bookmark bookmark = pm.getObjectById(Bookmark.class, key);
+			TableObject bookmark = pm.getObjectById(TableObject.class, key);
 			if (bookmark == null) return null;
 			bookmark.getComments();
 			detached = pm.detachCopy(bookmark);

@@ -2,6 +2,7 @@ package com.unito.tableplus.shared.model;
 
 import java.io.Serializable;
 
+
 public interface Resource extends Serializable {
 	public String getID();
 	
@@ -14,4 +15,6 @@ public interface Resource extends Serializable {
 	public void setURI(String uri);
 	
 	public Provider getProvider();
+
+
 }

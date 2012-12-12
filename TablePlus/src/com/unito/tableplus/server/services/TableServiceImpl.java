@@ -5,15 +5,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.jdo.PersistenceManager;
+
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.unito.tableplus.client.services.TableService;
+import com.unito.tableplus.server.persistence.BookmarkQueries;
 import com.unito.tableplus.server.persistence.TableQueries;
 import com.unito.tableplus.server.persistence.UserQueries;
 import com.unito.tableplus.server.persistence.WalletQueries;
+import com.unito.tableplus.server.util.ServiceFactory;
 import com.unito.tableplus.shared.model.BlackBoardMessage;
+import com.unito.tableplus.shared.model.Bookmark;
 import com.unito.tableplus.shared.model.Provider;
 import com.unito.tableplus.shared.model.Resource;
-import com.unito.tableplus.shared.model.SharedResource;
+import com.unito.tableplus.shared.model.TableObject;
 import com.unito.tableplus.shared.model.Table;
 import com.unito.tableplus.shared.model.User;
 import com.unito.tableplus.shared.model.UserStatus;
@@ -76,7 +81,7 @@ public class TableServiceImpl extends RemoteServiceServlet implements TableServi
 	}
 
 	@Override
-	public List<SharedResource> loadResources(Long tableKey) {
+	public List<TableObject> loadResources(Long tableKey) {
 			return TableQueries.queryResources(tableKey);
 	}
 	
@@ -109,7 +114,7 @@ public class TableServiceImpl extends RemoteServiceServlet implements TableServi
 		User user = UserQueries.queryUser(newUserKey);
 		Wallet wallet = WalletQueries.getWallet(currentUserKey);
 		TableQueries.addMember(newUserKey, tableKey);
-		List<SharedResource> resources = TableQueries.queryResources(tableKey);
+		List<TableObject> resources = TableQueries.queryResources(tableKey);
 		
 		if(wallet.getDriveAccessToken() != null)
 		for(Resource r : resources){
@@ -126,6 +131,24 @@ public class TableServiceImpl extends RemoteServiceServlet implements TableServi
 		return TableQueries.queryMessages(tableKey);
 	}
 
+	@Override
+	public TableObject queryObject(String key) {
+		PersistenceManager pm = ServiceFactory.getPmfInstance().getPersistenceManager();
+		TableObject o = null;
+		try {
+			Object object = pm.getObjectById(Bookmark.class, key);
+			o = (TableObject) pm.detachCopy(object);
+		} catch (Exception e) {
+			System.err.println("There has been an error querying object: " + e);
+		} finally {
+			pm.close();
+		}
+		return o;
+	}
 
+	public String editComment(TableObject b, String key) {
+		return TableQueries.editComment(b, key);
+		
+	}
 
 }

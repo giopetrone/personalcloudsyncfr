@@ -1,5 +1,7 @@
 package com.unito.tableplus.shared.model;
 
+import java.util.List;
+
 /**
  * This is the class for DropBox objects descriptor.
  * 
@@ -139,4 +141,6 @@ public class DropBoxFile implements Resource{
 	public void setURI(String uri) {
 		this.uri = uri;
 	}
+
+
 }

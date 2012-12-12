@@ -21,7 +21,7 @@ public class Comment implements Serializable {
 	private String key;
 
 	@Persistent
-	private Bookmark bookmark;
+	private TableObject tableObject;
 
 	@Persistent
 	private String author;

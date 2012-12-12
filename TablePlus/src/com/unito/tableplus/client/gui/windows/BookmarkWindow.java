@@ -109,9 +109,9 @@ public class BookmarkWindow extends WindowPlus {
 	private LayoutContainer preview = new LayoutContainer();
 	private Button commentButton = new Button("Comments");
 
-	public BookmarkWindow(Bookmark resource) {
+	public BookmarkWindow(Object resource) {
 		super();
-		this.resource = resource;
+		this.resource = (Bookmark)resource;
 		setSize(590, 500);
 		setVisible(false);
 

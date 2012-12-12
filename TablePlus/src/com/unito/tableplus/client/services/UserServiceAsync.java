@@ -7,6 +7,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.unito.tableplus.shared.model.Bookmark;
 import com.unito.tableplus.shared.model.LoginInfo;
 import com.unito.tableplus.shared.model.Resource;
+import com.unito.tableplus.shared.model.TableObject;
 import com.unito.tableplus.shared.model.User;
 
 public interface UserServiceAsync {
@@ -26,10 +27,12 @@ public interface UserServiceAsync {
 
 	void loadUser(LoginInfo info, AsyncCallback<User> callback);
 	
-	void loadBookmarks(Long userKey, AsyncCallback<List<Bookmark>> callback);
+	//void loadBookmarks(Long userKey, AsyncCallback<List<Resource>> asyncCallback);
 
 	void addBookmark(Long key, Bookmark bookmark, AsyncCallback<Boolean> asyncCallback);
 
 	void removeBookmark(String key, AsyncCallback<Void> asyncCallback);
+
+	void addObject(Long key, TableObject o, AsyncCallback<Boolean> asyncCallback);
 
 }

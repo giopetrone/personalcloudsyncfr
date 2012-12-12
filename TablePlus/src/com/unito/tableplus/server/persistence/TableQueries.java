@@ -8,8 +8,9 @@ import javax.jdo.Transaction;
 
 import com.unito.tableplus.server.util.ServiceFactory;
 import com.unito.tableplus.shared.model.BlackBoardMessage;
+import com.unito.tableplus.shared.model.Comment;
 import com.unito.tableplus.shared.model.Resource;
-import com.unito.tableplus.shared.model.SharedResource;
+import com.unito.tableplus.shared.model.TableObject;
 import com.unito.tableplus.shared.model.Table;
 import com.unito.tableplus.shared.model.User;
 
@@ -163,7 +164,7 @@ public class TableQueries {
 			Table table = pm.getObjectById(Table.class, tableKey);
 			if (table == null)
 				return false;
-			SharedResource sr = new SharedResource(resource,table);
+			TableObject sr = new TableObject(resource,table);
 			tx.begin();
 			table.getResources().add(sr);
 			tx.commit();
@@ -178,7 +179,7 @@ public class TableQueries {
 		
 	}
 	
-	public static List<SharedResource> queryResources(Long tableKey){
+	public static List<TableObject> queryResources(Long tableKey){
 		PersistenceManager pm = ServiceFactory.getPmfInstance().getPersistenceManager();
 		Table detached = null;
 		try {
@@ -203,6 +204,20 @@ public class TableQueries {
 		storeTable(t);
 		u.addTable(t.getKey());
 		UserQueries.storeUser(u);
+	}
+
+	public static String editComment(TableObject b, String key) {
+		String editable=null;
+		PersistenceManager pm = ServiceFactory.getPmfInstance().getPersistenceManager();
+		try {
+			final Comment c = pm.getObjectById(Comment.class, key);
+			editable= c.getComment();
+		} catch (Exception e) {
+			System.err.println("There has been an error editing comment: " + e);
+		} finally {
+			pm.close();
+		}	
+		return editable;
 	}
 
 

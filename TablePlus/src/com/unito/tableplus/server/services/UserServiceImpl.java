@@ -16,6 +16,7 @@ import com.unito.tableplus.shared.model.DropBoxFile;
 import com.unito.tableplus.shared.model.FacebookEvent;
 import com.unito.tableplus.shared.model.LoginInfo;
 import com.unito.tableplus.shared.model.Resource;
+import com.unito.tableplus.shared.model.TableObject;
 import com.unito.tableplus.shared.model.User;
 import com.unito.tableplus.shared.model.Wallet;
 
@@ -99,15 +100,15 @@ public class UserServiceImpl extends RemoteServiceServlet implements
 			if (facebookEvents != null)
 				resources.addAll(facebookEvents);
 		}
-
+		resources.addAll(UserQueries.getBookmark(user.getKey()));
 		return resources;
 	}
 	
-	@Override
+/*	@Override
 	public List<Bookmark> loadBookmarks(Long userKey) {
 		return UserQueries.getBookmark(userKey);
 	}
-
+*/
 	@Override
 	public boolean addBookmark(Long key, Bookmark bookmark) {
 		return UserQueries.addBookmark(key, bookmark);
@@ -117,5 +118,11 @@ public class UserServiceImpl extends RemoteServiceServlet implements
 	public void removeBookmark(String key) {
 		UserQueries.removeBookmark(key);
 		
+	}
+
+	@Override
+	public boolean addObject(Long key, TableObject o) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }
