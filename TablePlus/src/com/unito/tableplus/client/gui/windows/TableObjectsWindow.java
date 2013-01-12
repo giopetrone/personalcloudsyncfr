@@ -215,7 +215,7 @@ public class TableObjectsWindow extends WindowPlus {
 		loadButton = new Button("Refresh", new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
-				loadBookmark();
+				loadObjects();
 			}
 		});
 		loadButton.setToolTip(new ToolTipConfig("Refresh objects"));
@@ -256,7 +256,6 @@ public class TableObjectsWindow extends WindowPlus {
 		addButton(addBookmarkButton);
 		addButton(addObjectButton);
 		addButton(filterButton);
-		loadBookmark();
 	}
 
 
@@ -620,15 +619,15 @@ public class TableObjectsWindow extends WindowPlus {
 
 	}
 	
-	private void loadBookmark() {
+	private void loadObjects() {
 		bookmarksStore.removeAll();
 		mask();
 		//if (activeTable.getKey() != null)
-			tableService.loadResources(TablePlus.getUser().getKey(),new AsyncCallback<List<TableObject>>() {
+			tableService.loadTableObjects(TablePlus.getDesktop().getActiveTableKey(),new AsyncCallback<List<TableObject>>() {
 				@Override
 				public void onFailure(Throwable caught) {
-					GWT.log("Unable to load bookmarks for user: "+ TablePlus.getUser().getFirstName(), caught);
-					Info.display("Error", "Unable to load bookmarks.");
+					GWT.log("Unable to load objects for table: "+ TablePlus.getUser().getUsername(), caught);
+					Info.display("Error", "Unable to load objects.");
 					unmask();
 				}
 
@@ -675,7 +674,7 @@ public class TableObjectsWindow extends WindowPlus {
 				addObjectButton.enable();
 				filterButton.enable();
 				mainContainer.layout();
-				loadBookmark();
+				loadObjects();
 			}
 		});
 	}
@@ -852,7 +851,7 @@ public class TableObjectsWindow extends WindowPlus {
 
 	@Override
 	public void updateContent() {
-		loadBookmark();
+		loadObjects();
 	}
 
 	private void shareResource(Resource selectedResource) {
@@ -861,7 +860,7 @@ public class TableObjectsWindow extends WindowPlus {
 		if (table == null)
 			Info.display("Share resource", "Cannot share on personal table!");
 		else
-			tableService.addResource(selectedResource, user, table.getKey(),new AsyncCallback<Boolean>() {
+			tableService.addObject(selectedResource, user, table.getKey(),new AsyncCallback<Boolean>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GWT.log("Failed to share selected resource: ",caught);

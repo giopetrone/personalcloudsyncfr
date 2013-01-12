@@ -1,7 +1,5 @@
 package com.unito.tableplus.shared.model;
 
-import java.util.List;
-
 /**
  * This is the class for DropBox objects descriptor.
  * 

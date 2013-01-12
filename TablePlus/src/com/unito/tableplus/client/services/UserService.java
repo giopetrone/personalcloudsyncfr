@@ -24,7 +24,7 @@ public interface UserService extends RemoteService {
 
 	void deleteUser(Long key);
 
-	List<Resource> loadResources(User user);
+	List<Resource> loadUserObjects(User user);
 
 	User loadUser(LoginInfo info);
 	

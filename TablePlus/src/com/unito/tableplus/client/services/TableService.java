@@ -81,7 +81,7 @@ public interface TableService extends RemoteService {
 	 *            The table to share the resource with.
 	 * @return
 	 */
-	boolean addResource(Resource resource, User user, Long tableKey);
+	boolean addObject(Resource resource, User user, Long tableKey);
 
 	boolean clearMessages(Long key);
 
@@ -91,7 +91,7 @@ public interface TableService extends RemoteService {
 
 	List<BlackBoardMessage> loadBlackBoardMessages(Long tableKey);
 
-	List<TableObject> loadResources(Long tableKey);
+	List<TableObject> loadTableObjects(Long tableKey);
 
 	Table queryTable(Long key);
 

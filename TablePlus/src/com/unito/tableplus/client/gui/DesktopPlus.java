@@ -35,7 +35,6 @@ import com.unito.tableplus.client.gui.windows.BlackBoardWindow;
 import com.unito.tableplus.client.gui.windows.BookmarkWindow;
 import com.unito.tableplus.client.gui.windows.MyObjectsWindow;
 import com.unito.tableplus.client.gui.windows.ChatWindow;
-import com.unito.tableplus.client.gui.windows.MyResourcesWindow;
 import com.unito.tableplus.client.gui.windows.TableObjectsWindow;
 import com.unito.tableplus.client.gui.windows.WalletWindow;
 import com.unito.tableplus.client.gui.windows.WindowPlus;
@@ -43,7 +42,6 @@ import com.unito.tableplus.client.services.MessagingServiceAsync;
 import com.unito.tableplus.client.services.ServiceFactory;
 import com.unito.tableplus.client.services.TableServiceAsync;
 import com.unito.tableplus.client.services.UserServiceAsync;
-import com.unito.tableplus.shared.model.Bookmark;
 import com.unito.tableplus.shared.model.ChannelMessageType;
 import com.unito.tableplus.shared.model.Table;
 
@@ -65,19 +63,17 @@ public class DesktopPlus extends Desktop {
 	private StartMenu startMenu;
 
 	private WindowPlus walletWindow;
-	private WindowPlus myResourcesWindow;
 	private WindowPlus chatWindow;
 	private WindowPlus blackboardWindow;
-	private WindowPlus tableResourcesWindow;
-	private WindowPlus bookmarksListWindow;
+	private WindowPlus tableObjectsWindow;
+	private WindowPlus myObjectsWindow;
 	private WindowPlus bookmarkWindow;
 
 	private Shortcut walletShortcut;
-	private Shortcut myResourcesShortcut;
-	private Shortcut tableResourcesShortcut;
+	private Shortcut tableObjectsShortcut;
 	private Shortcut chatShortcut;
 	private Shortcut blackboardShortcut;
-	private Shortcut bookmarksShortcut;
+	private Shortcut myObjectsShortcut;
 
 	private SelectionListener<ComponentEvent> shortcutListener;
 
@@ -131,11 +127,10 @@ public class DesktopPlus extends Desktop {
 		chatStatus = new HashMap<Long, Boolean>();
 
 		walletWindow = new WalletWindow();
-		myResourcesWindow = new MyResourcesWindow();
-		tableResourcesWindow = new TableObjectsWindow();
+		tableObjectsWindow = new TableObjectsWindow();
 		chatWindow = new ChatWindow();
 		blackboardWindow = new BlackBoardWindow();
-		bookmarksListWindow = new MyObjectsWindow();
+		myObjectsWindow = new MyObjectsWindow();
 
 		this.shortcutListener = new SelectionListener<ComponentEvent>() {
 			@Override
@@ -153,26 +148,19 @@ public class DesktopPlus extends Desktop {
 		walletShortcut.setVisible(true);
 		walletShortcut.addSelectionListener(shortcutListener);
 
-		myResourcesShortcut = new Shortcut();
-		myResourcesShortcut.setText("My Resources");
-		myResourcesShortcut.setId("myresources-win-shortcut");
-		myResourcesShortcut.setData("window", myResourcesWindow);
-		myResourcesShortcut.setVisible(true);
-		myResourcesShortcut.addSelectionListener(shortcutListener);
+		myObjectsShortcut = new Shortcut();
+		myObjectsShortcut.setText("My Objects");
+		myObjectsShortcut.setId("myresources-win-shortcut");
+		myObjectsShortcut.setData("window", myObjectsWindow);
+		myObjectsShortcut.setVisible(true);
+		myObjectsShortcut.addSelectionListener(shortcutListener);
 
-		bookmarksShortcut = new Shortcut();
-		bookmarksShortcut.setText("My Objects"); //replace My Bookmarks
-		bookmarksShortcut.setId("myresources-win-shortcut"); // replace "resource-win-shortcut"
-		bookmarksShortcut.setData("window", bookmarksListWindow);
-		bookmarksShortcut.setVisible(true);
-		bookmarksShortcut.addSelectionListener(shortcutListener);
-
-		tableResourcesShortcut = new Shortcut();
-		tableResourcesShortcut.setText("Table Resources");
-		tableResourcesShortcut.setId("tableresources-win-shortcut");
-		tableResourcesShortcut.setData("window", tableResourcesWindow);
-		tableResourcesShortcut.setVisible(false);
-		tableResourcesShortcut.addSelectionListener(shortcutListener);
+		tableObjectsShortcut = new Shortcut();
+		tableObjectsShortcut.setText("Table Objects");
+		tableObjectsShortcut.setId("tableresources-win-shortcut");
+		tableObjectsShortcut.setData("window", tableObjectsWindow);
+		tableObjectsShortcut.setVisible(false);
+		tableObjectsShortcut.addSelectionListener(shortcutListener);
 
 		chatShortcut = new Shortcut();
 		chatShortcut.setText("Table Chat");
@@ -188,17 +176,15 @@ public class DesktopPlus extends Desktop {
 		blackboardShortcut.setVisible(false);
 		blackboardShortcut.addSelectionListener(shortcutListener);
 
-		this.addWindow(tableResourcesWindow);
+		this.addWindow(tableObjectsWindow);
 		this.addWindow(chatWindow);
 		this.addWindow(blackboardWindow);
-		this.addWindow(bookmarksListWindow);
+		this.addWindow(myObjectsWindow);
 		this.addWindow(walletWindow);
-		this.addWindow(myResourcesWindow);
 
 		this.addShortcut(walletShortcut);
-		this.addShortcut(myResourcesShortcut);
-		this.addShortcut(bookmarksShortcut);
-		this.addShortcut(tableResourcesShortcut);
+		this.addShortcut(myObjectsShortcut);
+		this.addShortcut(tableObjectsShortcut);
 		this.addShortcut(chatShortcut);
 		this.addShortcut(blackboardShortcut);
 
@@ -276,13 +262,13 @@ public class DesktopPlus extends Desktop {
 			activeTable.setActive(false);
 
 			activeTable = null;
-			tableResourcesShortcut.setVisible(false);
+			tableObjectsShortcut.setVisible(false);
 			chatShortcut.setVisible(false);
 			blackboardShortcut.setVisible(false);
 			chatWindow.setVisible(false);
 			blackboardWindow.setVisible(false);
-			tableResourcesWindow.setVisible(false);
-			bookmarksListWindow.setVisible(false);
+			tableObjectsWindow.setVisible(false);
+			myObjectsWindow.setVisible(false);
 			rightPanel.updateContent();
 		}
 	}
@@ -294,7 +280,7 @@ public class DesktopPlus extends Desktop {
 		}
 		activeTable = tables.get(tableKey);
 		activeTable.setActive(true);
-		tableResourcesShortcut.setVisible(true);
+		tableObjectsShortcut.setVisible(true);
 		chatShortcut.setVisible(true);
 		setChatIcon();
 		blackboardShortcut.setVisible(true);
@@ -302,8 +288,8 @@ public class DesktopPlus extends Desktop {
 		sendStatusChange(ChannelMessageType.USERONLINE, getActiveTableKey());
 		chatWindow.updateContent();
 		blackboardWindow.updateContent();
-		tableResourcesWindow.updateContent();
-		bookmarksListWindow.updateContent();
+		tableObjectsWindow.updateContent();
+		myObjectsWindow.updateContent();
 		rightPanel.updateContent();
 	}
 

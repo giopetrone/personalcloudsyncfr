@@ -9,7 +9,6 @@ import javax.jdo.PersistenceManager;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.unito.tableplus.client.services.TableService;
-import com.unito.tableplus.server.persistence.BookmarkQueries;
 import com.unito.tableplus.server.persistence.TableQueries;
 import com.unito.tableplus.server.persistence.UserQueries;
 import com.unito.tableplus.server.persistence.WalletQueries;
@@ -81,14 +80,14 @@ public class TableServiceImpl extends RemoteServiceServlet implements TableServi
 	}
 
 	@Override
-	public List<TableObject> loadResources(Long tableKey) {
-			return TableQueries.queryResources(tableKey);
+	public List<TableObject> loadTableObjects(Long tableKey) {
+			return TableQueries.queryObjects(tableKey);
 	}
 	
 	@Override
-	public boolean addResource(Resource resource, User user, Long tableKey) {
+	public boolean addObject(Resource resource, User user, Long tableKey) {
 		Provider resourceProvider = resource.getProvider();
-		//TODO check if resource has already been added
+		//TODO check if object has already been added
 		if(resourceProvider.equals(Provider.DRIVE)){
 			Wallet wallet = WalletQueries.getWallet(user.getKey());
 			List<Long> userKeys = TableQueries.queryTable(tableKey).getMembers();
@@ -114,7 +113,7 @@ public class TableServiceImpl extends RemoteServiceServlet implements TableServi
 		User user = UserQueries.queryUser(newUserKey);
 		Wallet wallet = WalletQueries.getWallet(currentUserKey);
 		TableQueries.addMember(newUserKey, tableKey);
-		List<TableObject> resources = TableQueries.queryResources(tableKey);
+		List<TableObject> resources = TableQueries.queryObjects(tableKey);
 		
 		if(wallet.getDriveAccessToken() != null)
 		for(Resource r : resources){

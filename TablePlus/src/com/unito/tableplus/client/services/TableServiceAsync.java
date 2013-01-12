@@ -27,9 +27,9 @@ public interface TableServiceAsync {
 
 	void clearMessages(Long key, AsyncCallback<Boolean> callback);
 
-	void addResource(Resource resource, User user, Long tableKey,AsyncCallback<Boolean> callback);
+	void addObject(Resource resource, User user, Long tableKey,AsyncCallback<Boolean> callback);
 
-	void loadResources(Long tableKey, AsyncCallback<List<TableObject>> callback);
+	void loadTableObjects(Long tableKey, AsyncCallback<List<TableObject>> callback);
 
 	void addMember(Long currentUser, Long newUserKey, Long tableKey, AsyncCallback<Void> callback);
 

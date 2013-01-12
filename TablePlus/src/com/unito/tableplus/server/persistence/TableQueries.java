@@ -57,6 +57,8 @@ public class TableQueries {
 		try {
 			for (Long key : keys) {
 				Table t = pm.getObjectById(Table.class, key);
+				t.getBlackboard(); //needed because of lazy behavior
+				t.getTableObjects(); // as above
 				tables.add(pm.detachCopy(t));
 			}
 		} catch (Exception e) {
@@ -166,7 +168,7 @@ public class TableQueries {
 				return false;
 			TableObject sr = new TableObject(resource,table);
 			tx.begin();
-			table.getResources().add(sr);
+			table.getTableObjects().add(sr);
 			tx.commit();
 		} catch (Exception e) {
 			System.err.println("There has been an error adding message: " + e);
@@ -179,21 +181,20 @@ public class TableQueries {
 		
 	}
 	
-	public static List<TableObject> queryResources(Long tableKey){
+	public static List<TableObject> queryObjects(Long tableKey){
 		PersistenceManager pm = ServiceFactory.getPmfInstance().getPersistenceManager();
-		Table detached = null;
+		Table detachedTable = null;
 		try {
 			Table table = pm.getObjectById(Table.class, tableKey);
 			if (table == null) return null;
-			table.getResources(); // needed because of lazy behaviour
-			detached = pm.detachCopy(table);
+			table.getTableObjects(); // needed because of lazy behaviour
+			detachedTable = pm.detachCopy(table);
 		} catch (Exception e) {
-			System.err.println("Error querying blackboard messages");
+			System.err.println("Error querying table objects");
 		} finally {
 			pm.close();
 		}
-		return detached.getResources();
-		
+		return detachedTable.getTableObjects();
 	}
 
 	public static void addMember(Long userKey, Long tableKey) {

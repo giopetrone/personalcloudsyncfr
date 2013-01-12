@@ -38,7 +38,6 @@ import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.ListBox;
 import com.unito.tableplus.client.TablePlus;
 import com.unito.tableplus.client.services.BookmarkService;
 import com.unito.tableplus.client.services.BookmarkServiceAsync;
@@ -602,7 +601,7 @@ public class MyObjectsWindow extends WindowPlus {
 		bookmarksStore.removeAll();
 		mask();
 		//if (activeTable.getKey() != null)
-			userService.loadResources(TablePlus.getUser(),new AsyncCallback<List<Resource>>() {
+			userService.loadUserObjects(TablePlus.getUser(),new AsyncCallback<List<Resource>>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GWT.log("Unable to load bookmarks for user: "+ TablePlus.getUser().getFirstName(), caught);
@@ -836,7 +835,7 @@ public class MyObjectsWindow extends WindowPlus {
 		if (table == null)
 			Info.display("Share resource", "Cannot share on personal table!");
 		else
-			tableService.addResource(selectedResource, user, table.getKey(),new AsyncCallback<Boolean>() {
+			tableService.addObject(selectedResource, user, table.getKey(),new AsyncCallback<Boolean>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GWT.log("Failed to share selected resource: ",caught);

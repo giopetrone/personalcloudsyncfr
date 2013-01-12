@@ -9,7 +9,7 @@ import com.google.appengine.api.utils.SystemProperty.Environment.Value;
 
 public class Utility {
 	private static final Value environment = SystemProperty.environment.value();
-	private static final Value production =  SystemProperty.Environment.Value.Production;
+	private static final Value production = SystemProperty.Environment.Value.Production;
 
 	/**
 	 * Returns the appropriate server callback path according to the environment
@@ -18,9 +18,9 @@ public class Utility {
 	 * @return The server callback path
 	 */
 	public static String getHomeUrl() {
-		if (environment == production) {
-			return "http://" + SystemProperty.applicationVersion.get() + "."
-					+ SystemProperty.applicationId.get() + ".appspot.com";
+		if (environment.equals(production)) {
+			return "http://" + SystemProperty.applicationId.get()
+					+ ".appspot.com";
 		}
 		return "http://127.0.0.1:8888/TablePlus.html?gwt.codesvr=127.0.0.1:9997";
 	}
@@ -33,8 +33,7 @@ public class Utility {
 	 */
 	public static String getCallbackUrl() {
 		if (environment == production) {
-			return "http://" + SystemProperty.applicationVersion.get() + "."
-					+ SystemProperty.applicationId.get()
+			return "http://" + SystemProperty.applicationId.get()
 					+ ".appspot.com/tableplus/callback";
 		}
 		return "http://127.0.0.1:8888/tableplus/callback";
@@ -48,8 +47,7 @@ public class Utility {
 	 */
 	public static String getInvitationServletUrl() {
 		if (environment == production) {
-			return "http://" + SystemProperty.applicationVersion.get() + "."
-					+ SystemProperty.applicationId.get()
+			return "http://" + SystemProperty.applicationId.get()
 					+ ".appspot.com/tableplus/invitation";
 		}
 		return "http://127.0.0.1:8888/tableplus/invitation";
