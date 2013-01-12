@@ -1,6 +1,5 @@
 package com.unito.tableplus.shared.model;
 
-import java.util.List;
 
 public class FacebookEvent implements Resource {
 

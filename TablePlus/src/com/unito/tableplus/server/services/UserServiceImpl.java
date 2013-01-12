@@ -74,7 +74,7 @@ public class UserServiceImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public List<Resource> loadResources(User user) {
+	public List<Resource> loadUserObjects(User user) {
 		Wallet wallet = WalletQueries.getWallet(user.getKey());
 		List<Resource> resources = new ArrayList<Resource>();
 		try {
@@ -104,11 +104,6 @@ public class UserServiceImpl extends RemoteServiceServlet implements
 		return resources;
 	}
 	
-/*	@Override
-	public List<Bookmark> loadBookmarks(Long userKey) {
-		return UserQueries.getBookmark(userKey);
-	}
-*/
 	@Override
 	public boolean addBookmark(Long key, Bookmark bookmark) {
 		return UserQueries.addBookmark(key, bookmark);

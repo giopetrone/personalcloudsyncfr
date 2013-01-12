@@ -23,7 +23,7 @@ public interface UserServiceAsync {
 
 	void queryUsers(List<Long> keys, AsyncCallback<Map<Long,User>> callback);
 
-	void loadResources(User user, AsyncCallback<List<Resource>> callback);
+	void loadUserObjects(User user, AsyncCallback<List<Resource>> callback);
 
 	void loadUser(LoginInfo info, AsyncCallback<User> callback);
 	

@@ -158,7 +158,7 @@ public class Proxy extends HttpServlet {
 				tableJSON.put("members", table.getMembers());
 				tableJSON.put("creator", table.getCreator());
 				tableJSON.put("owner", table.getOwner());
-				tableJSON.put("resources", table.getResources());
+				tableJSON.put("resources", table.getTableObjects());
 
 				rj.put("results", tableJSON);
 				rj.put("status", "OK");
@@ -202,7 +202,7 @@ public class Proxy extends HttpServlet {
 					tableJSON.put("creator", table.getCreator());
 					tableJSON.put("owner", table.getOwner());
 					tableJSON.put("messages", table.getBlackboard().size());
-					tableJSON.put("resources", table.getResources().size());
+					tableJSON.put("resources", table.getTableObjects().size());
 					ja.put(tableJSON);
 				}
 				rj.put("results", ja);
