@@ -17,6 +17,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import com.unito.tableplus.server.services.MessagingServiceImpl;
+import com.unito.tableplus.server.gcm.Datastore;
 import com.unito.tableplus.server.persistence.TableQueries;
 import com.unito.tableplus.server.persistence.UserQueries;
 import com.unito.tableplus.shared.model.BlackBoardMessage;
@@ -32,6 +33,8 @@ public class Proxy extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
+
+		System.out.println("DEBUG Sono arrivato al Proxy Table plus");
 
 		InputStream is = req.getInputStream();
 		try {
@@ -58,6 +61,8 @@ public class Proxy extends HttpServlet {
 				deleteMessage(jo, pw);
 			else if (request.equals("setStatus"))
 				setStatus(jo, pw);
+			else if (request.equals("gcmRegId"))
+				queryGcmRegId(jo, pw);
 			else {
 				JSONObject rj = new JSONObject();
 				rj.put("status", "ERROR");
@@ -70,6 +75,45 @@ public class Proxy extends HttpServlet {
 		} catch (Exception e) {
 			System.err.println("Error while processing post request.");
 			System.err.println(e);
+		}
+	}
+	
+	private void queryGcmRegId(JSONObject jo, PrintWriter pw) {
+		// TODO Auto-generated method stub
+		try {
+			String email = jo.getString("user");
+			User user = UserQueries.queryUser("email", email);
+			JSONObject rj = new JSONObject();
+			JSONObject uj = new JSONObject();
+
+			if (user == null) {
+				rj.put("status", "ERROR");
+				rj.put("error", "User not found");
+			} else {
+				rj.put("status", "OK");
+
+				uj.put("key", user.getKey());
+				uj.put("username", user.getUsername());
+				uj.put("firstname", user.getFirstName());
+				uj.put("lastname", user.getLastName());
+				uj.put("email", user.getEmail());
+				// uj.put("gcmid", user.getGcmId());
+				uj.put("tables", user.getTables());
+				// FUNZIONAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+				List<String> regIdsGcm = Datastore.getRegIdFromEmail(email);
+				uj.put("gcmId", regIdsGcm.get(0));
+
+				rj.put("results", uj);
+			}
+
+			pw.print(rj);
+			pw.flush();
+
+		} catch (Exception e) {
+			System.err.println("Error while querying user");
+			System.err.println(e);
+		} finally {
+			pw.close();
 		}
 	}
 

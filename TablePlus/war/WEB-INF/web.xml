@@ -1,6 +1,93 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.5" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee                http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    version="2.5" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+                   http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
 
 	<!-- Servlets -->
+	
+	
+	 <servlet>
+    <servlet-name>senddevicegcm</servlet-name>
+    <servlet-class>  com.unito.tableplus.server.gcm.SendDeviceGCM </servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>senddevicegcm</servlet-name>
+    <url-pattern>/tableplus/senddevicegcm</url-pattern>
+  </servlet-mapping>
+	
+	
+    <servlet>
+    <servlet-name>homeservlet</servlet-name>
+    <servlet-class>  com.unito.tableplus.server.gcm.HomeServlet </servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>homeservlet</servlet-name>
+    <url-pattern>/tableplus/home</url-pattern>
+  </servlet-mapping>
+  
+   <listener>
+    <listener-class>
+     				 com.unito.tableplus.server.gcm.ApiKeyInitializer
+    </listener-class>
+  </listener>
+
+  <servlet>
+    <servlet-name>registerservlet</servlet-name>
+    <servlet-class>
+      				 com.unito.tableplus.server.gcm.RegisterServlet
+    </servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>registerservlet</servlet-name>
+    <url-pattern>/tableplus/register</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>unregisterservlet</servlet-name>
+    <servlet-class>
+       com.unito.tableplus.server.gcm.UnregisterServlet
+    </servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>unregisterservlet</servlet-name>
+    <url-pattern>/tableplus/unregister</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>sendallmessagesservlet</servlet-name>
+    <servlet-class>
+       com.unito.tableplus.server.gcm.SendAllMessagesServlet
+    </servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>sendallmessagesservlet</servlet-name>
+    <url-pattern>/tableplus/sendAll</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>sendmessageservlet</servlet-name>
+    <servlet-class>
+     com.unito.tableplus.server.gcm.SendMessageServlet
+    </servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>sendmessageservlet</servlet-name>
+    <url-pattern>/tableplus/send</url-pattern>
+  </servlet-mapping>
+  
 
 	<!-- TABLE SERVLET -->
 
