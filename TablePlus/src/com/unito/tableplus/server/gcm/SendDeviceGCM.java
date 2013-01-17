@@ -18,7 +18,12 @@ import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.appengine.api.taskqueue.TaskOptions.Method;
 
-
+/**
+ * This class send notification  to Android device using email's email
+ * 
+ * @param user
+ *            the email of user
+ */
 public class SendDeviceGCM extends BaseServlet {
 
 	private static final long serialVersionUID = 1L;
