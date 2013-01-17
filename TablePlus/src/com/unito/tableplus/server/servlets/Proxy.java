@@ -45,7 +45,7 @@ public class Proxy extends HttpServlet {
 
 			if (request.equals("queryUser"))
 				queryUser(jo, pw);
-			else if (request.equals("queryUsers"))
+			else if (request.equals("queryUsers")) //Restituisce la lista di user.
 				queryUsers(jo, pw);
 			else if (request.equals("queryUsersStatus"))
 				queryUsersStatus(jo, pw);

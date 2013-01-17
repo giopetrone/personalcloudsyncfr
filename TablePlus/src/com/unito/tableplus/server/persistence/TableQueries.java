@@ -42,6 +42,7 @@ public class TableQueries {
 		try {
 			Table table = pm.getObjectById(Table.class, key);
 			if (table == null) return table;
+			table.getTableObjects();
 			detached = pm.detachCopy(table);
 		} catch (Exception e) {
 			System.err.println("There has been an error querying table: " + e);
