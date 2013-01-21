@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -29,12 +30,28 @@ import com.unito.tableplus.shared.model.UserStatus;
 public class Proxy extends HttpServlet {
 
 	private static final long serialVersionUID = -6455653509373554816L;
+	
+	@Override
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException{
+		JSONObject jo = new JSONObject();
+		PrintWriter pw = resp.getWriter();
+		try {
+			jo.put("author", "text@example.com");
+			jo.put("tableKey", 62L);
+			jo.put("messageType", BlackBoardMessageType.WARNING.toString());
+			jo.put("messageContent", "Inserito dal proxy");
+			jo.put("messageKey", "ag10YWJsZXBsdXNwbHVzciILEgVUYWJsZRg-DAsSEUJsYWNrQm9hcmRNZXNzYWdlGEAM");
+			deleteMessage(jo,pw);
+			pw.print("ciao");
+		} catch (JSONException e) {
+			System.err.println("JSON exception");
+		}
+		
+	}
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-
-		System.out.println("DEBUG Sono arrivato al Proxy Table plus");
 
 		InputStream is = req.getInputStream();
 		try {
@@ -79,7 +96,6 @@ public class Proxy extends HttpServlet {
 	}
 	
 	private void queryGcmRegId(JSONObject jo, PrintWriter pw) {
-		// TODO Auto-generated method stub
 		try {
 			String email = jo.getString("user");
 			User user = UserQueries.queryUser("email", email);
@@ -315,7 +331,7 @@ public class Proxy extends HttpServlet {
 		try {
 			JSONObject rj = new JSONObject();
 			Long tableKey = jo.getLong("tableKey");
-			String author = jo.getString("authorKey");
+			String author = jo.getString("author");
 			String type = jo.getString("messageType");
 			String content = jo.getString("messageContent");
 
