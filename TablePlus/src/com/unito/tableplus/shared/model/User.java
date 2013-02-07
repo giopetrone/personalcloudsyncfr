@@ -32,7 +32,7 @@ public class User implements Serializable {
 	private String email;
 
 	@Persistent
-	private List<Long> tables;
+	private ArrayList<Long> tables;
 
 	@NotPersistent
 	private UserStatus status;
@@ -81,11 +81,11 @@ public class User implements Serializable {
 		this.email = email;
 	}
 
-	public List<Long> getTables() {
+	public ArrayList<Long> getTables() {
 		return tables;
 	}
 
-	public void setTables(List<Long> tables) {
+	public void setTables(ArrayList<Long> tables) {
 		this.tables = tables;
 	}
 

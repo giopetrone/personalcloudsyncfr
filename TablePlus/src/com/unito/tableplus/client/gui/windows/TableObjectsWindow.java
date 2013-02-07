@@ -468,7 +468,7 @@ public class TableObjectsWindow extends WindowPlus {
 		deleteGridButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
-				deleteAllComment(b);
+				deleteAllComments(b);
 			}
 		});
 		deleteGridButton.setToolTip(new ToolTipConfig("Delete All"));
@@ -623,7 +623,7 @@ public class TableObjectsWindow extends WindowPlus {
 		bookmarksStore.removeAll();
 		mask();
 		//if (activeTable.getKey() != null)
-			tableService.loadTableObjects(TablePlus.getDesktop().getActiveTableKey(),new AsyncCallback<List<TableObject>>() {
+			tableService.loadTableObjects(TablePlus.getDesktop().getActiveTableKey(),new AsyncCallback<ArrayList<TableObject>>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GWT.log("Unable to load objects for table: "+ TablePlus.getUser().getUsername(), caught);
@@ -632,7 +632,7 @@ public class TableObjectsWindow extends WindowPlus {
 				}
 
 				@Override
-				public void onSuccess(List<TableObject> result) {
+				public void onSuccess(ArrayList<TableObject> result) {
 					if (result != null) {
 						//activeTable.setBookmarks(result);
 						resource = result;
@@ -877,7 +877,7 @@ public class TableObjectsWindow extends WindowPlus {
 			});
 	}
 
-	private void deleteAllComment(final TableObject b) {
+	private void deleteAllComments(final TableObject b) {
 		for (final BaseModel bm : commentStore.getModels()) {
 			if (bm.get("author").equals(TablePlus.getUser().getEmail())) {
 				bookmarkService.deleteComment(bm.get("key").toString(),new AsyncCallback<Boolean>() {

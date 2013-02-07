@@ -44,6 +44,7 @@ import com.unito.tableplus.client.services.TableServiceAsync;
 import com.unito.tableplus.client.services.UserServiceAsync;
 import com.unito.tableplus.shared.model.ChannelMessageType;
 import com.unito.tableplus.shared.model.Table;
+import com.unito.tableplus.shared.model.UserStatus;
 
 public class DesktopPlus extends Desktop {
 
@@ -259,6 +260,7 @@ public class DesktopPlus extends Desktop {
 	public void switchToPersonalTable() {
 		if (activeTable != null) {
 			sendStatusChange(ChannelMessageType.USERAWAY, getActiveTableKey());
+			setUserStatus(TablePlus.getUser().getKey(), getActiveTableKey(), UserStatus.AWAY);
 			activeTable.setActive(false);
 
 			activeTable = null;
@@ -276,6 +278,7 @@ public class DesktopPlus extends Desktop {
 	public void switchToTable(Long tableKey) {
 		if (activeTable != null) {
 			sendStatusChange(ChannelMessageType.USERAWAY, getActiveTableKey());
+			setUserStatus(TablePlus.getUser().getKey(), getActiveTableKey(), UserStatus.AWAY);
 			activeTable.setActive(false);
 		}
 		activeTable = tables.get(tableKey);
@@ -286,6 +289,7 @@ public class DesktopPlus extends Desktop {
 		blackboardShortcut.setVisible(true);
 
 		sendStatusChange(ChannelMessageType.USERONLINE, getActiveTableKey());
+		setUserStatus(TablePlus.getUser().getKey(), getActiveTableKey(), UserStatus.ONLINE);
 		chatWindow.updateContent();
 		blackboardWindow.updateContent();
 		tableObjectsWindow.updateContent();
@@ -330,6 +334,25 @@ public class DesktopPlus extends Desktop {
 						GWT.log(result);
 					}
 				});
+	}
+	
+	private void setUserStatus(Long userkey, Long tableKey, UserStatus status){
+		tableService.setUserStatus(tableKey, TablePlus.getUser().getKey(),
+				status, new AsyncCallback<String>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void onSuccess(String result) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
 	}
 
 	private void storeNewTable(String tableName) {

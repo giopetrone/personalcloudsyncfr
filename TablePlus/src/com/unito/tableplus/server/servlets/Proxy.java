@@ -13,11 +13,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import com.unito.tableplus.server.services.MessagingServiceImpl;
 import com.unito.tableplus.server.gcm.Datastore;
 import com.unito.tableplus.server.persistence.TableQueries;
 import com.unito.tableplus.server.persistence.UserQueries;
@@ -31,24 +29,6 @@ public class Proxy extends HttpServlet {
 
 	private static final long serialVersionUID = -6455653509373554816L;
 	
-	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException{
-		JSONObject jo = new JSONObject();
-		PrintWriter pw = resp.getWriter();
-		try {
-			jo.put("author", "text@example.com");
-			jo.put("tableKey", 62L);
-			jo.put("messageType", BlackBoardMessageType.WARNING.toString());
-			jo.put("messageContent", "Inserito dal proxy");
-			jo.put("messageKey", "ag10YWJsZXBsdXNwbHVzciILEgVUYWJsZRg-DAsSEUJsYWNrQm9hcmRNZXNzYWdlGEAM");
-			deleteMessage(jo,pw);
-			pw.print("ciao");
-		} catch (JSONException e) {
-			System.err.println("JSON exception");
-		}
-		
-	}
-
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
@@ -386,7 +366,7 @@ public class Proxy extends HttpServlet {
 			tableKey = jo.getLong("tableKey");
 			Table t = TableQueries.queryTable(tableKey);
 			allUsers = t.getMembers();
-			onlineUsers = MessagingServiceImpl.getTableStatus(tableKey);
+			onlineUsers = TableQueries.queryMembersStatus(tableKey);
 			allUsers.removeAll(onlineUsers.keySet());
 			
 			offline = new JSONArray(allUsers);

@@ -3,6 +3,7 @@ package com.unito.tableplus.shared.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -35,10 +36,16 @@ public class Table implements Serializable {
 	private Long owner = null;
 
 	@Persistent(mappedBy = "table")
-	private List<BlackBoardMessage> blackboard;
+	private ArrayList<BlackBoardMessage> blackboard;
 
 	@Persistent(mappedBy = "table")
-	private List<TableObject> tableObjects;
+	private ArrayList<TableObject> tableObjects;
+	
+	@Persistent
+	private HashSet<Long> onlineMembers;
+	
+	@Persistent
+	private HashSet<Long> awayMembers;
 
 	@NotPersistent
 	private Map<Long, User> usersMap;
@@ -60,6 +67,8 @@ public class Table implements Serializable {
 		this.tableObjects = new ArrayList<TableObject>();
 		this.members = new ArrayList<Long>();
 		this.members.add(creator);
+		this.onlineMembers = new HashSet<Long>();
+		this.awayMembers = new HashSet<Long>();
 
 		this.usersMap = new HashMap<Long, User>();
 		this.chatHistory = "";
@@ -127,11 +136,11 @@ public class Table implements Serializable {
 		this.members = members;
 	}
 
-	public List<TableObject> getTableObjects() {
+	public ArrayList<TableObject> getTableObjects() {
 		return tableObjects;
 	}
 
-	public void setTableObjects(List<TableObject> tableObjects) {
+	public void setTableObjects(ArrayList<TableObject> tableObjects) {
 		this.tableObjects = tableObjects;
 	}
 
@@ -139,11 +148,11 @@ public class Table implements Serializable {
 		tableObjects.add(tableObject);
 	}
 
-	public List<BlackBoardMessage> getBlackboard() {
+	public ArrayList<BlackBoardMessage> getBlackboard() {
 		return blackboard;
 	}
 
-	public void setBlackboard(List<BlackBoardMessage> blackboard) {
+	public void setBlackboard(ArrayList<BlackBoardMessage> blackboard) {
 		this.blackboard = blackboard;
 	}
 
@@ -164,6 +173,29 @@ public class Table implements Serializable {
 	public void setUsersMap(User user) {
 		this.usersMap = new HashMap<Long,User>();
 		this.usersMap.put(user.getKey(), user);
+	}
+	
+	public void setMemberStatus(Long memberKey, UserStatus status){
+		if (status.equals(UserStatus.ONLINE)){
+			awayMembers.remove(memberKey);
+			onlineMembers.add(memberKey);
+		}
+		else if(status.equals(UserStatus.AWAY)){
+			onlineMembers.remove(memberKey);
+			awayMembers.add(memberKey);
+		}
+		//TODO manage UserStatus.BUSY case
+	}
+	
+	public Map<Long, UserStatus> getMembersStatus(){
+		Map<Long, UserStatus> hmap = new HashMap<Long,UserStatus>();
+		Iterator<Long> i = awayMembers.iterator();
+		while(i.hasNext())
+			hmap.put(i.next(), UserStatus.AWAY);
+		i = onlineMembers.iterator();
+		while(i.hasNext())
+			hmap.put((Long)i.next(), UserStatus.ONLINE);
+		return hmap;
 	}
 
 	public String getChatHistory() {
