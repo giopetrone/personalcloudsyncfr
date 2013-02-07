@@ -33,7 +33,7 @@ public class TableServiceImpl extends RemoteServiceServlet implements TableServi
 	}
 
 	@Override
-	public Map<Long,Table> queryTables(List<Long> keys) {
+	public Map<Long,Table> queryTables(ArrayList<Long> keys) {
 		Map<Long,Table> tablesMap = null;
 		List<Table> tablesList = TableQueries.queryTables(keys);
 		if(tablesList != null){
@@ -60,8 +60,13 @@ public class TableServiceImpl extends RemoteServiceServlet implements TableServi
 	}
 	
 	@Override
-	public Map<Long,UserStatus> getUsersStatus(Long tableKey){
-		return MessagingServiceImpl.getTableStatus(tableKey);
+	public Map<Long,UserStatus> queryUsersStatus(Long tableKey){
+		return TableQueries.queryMembersStatus(tableKey);
+	}
+	
+	@Override
+	public String setUserStatus(Long tableKey, Long userKey, UserStatus status){
+		return TableQueries.setUserStatus(tableKey,userKey,status);
 	}
 
 	@Override
@@ -80,7 +85,7 @@ public class TableServiceImpl extends RemoteServiceServlet implements TableServi
 	}
 
 	@Override
-	public List<TableObject> loadTableObjects(Long tableKey) {
+	public ArrayList<TableObject> loadTableObjects(Long tableKey) {
 			return TableQueries.queryObjects(tableKey);
 	}
 	
@@ -126,7 +131,7 @@ public class TableServiceImpl extends RemoteServiceServlet implements TableServi
 	}
 
 	@Override
-	public List<BlackBoardMessage> loadBlackBoardMessages(Long tableKey) {
+	public ArrayList<BlackBoardMessage> loadBlackBoardMessages(Long tableKey) {
 		return TableQueries.queryMessages(tableKey);
 	}
 

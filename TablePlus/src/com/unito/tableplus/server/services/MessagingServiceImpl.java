@@ -1,6 +1,7 @@
 package com.unito.tableplus.server.services;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +27,6 @@ import com.unito.tableplus.shared.model.ChannelMessageType;
 import com.unito.tableplus.shared.model.Invitation;
 import com.unito.tableplus.shared.model.Table;
 import com.unito.tableplus.shared.model.User;
-import com.unito.tableplus.shared.model.UserStatus;
 
 public class MessagingServiceImpl extends RemoteServiceServlet implements
 		MessagingService {
@@ -34,25 +34,13 @@ public class MessagingServiceImpl extends RemoteServiceServlet implements
 	private static final ChannelService channelService = ServiceFactory
 			.getChannelService();
 
+	
 	/**
-	 * This map of hashmaps contains the users statuses. The external map key of
-	 * type <i>long</i> refers to tables keys. The inner map key refers to users
-	 * keys. Furthermore it contains the user status for connected users. If a
-	 * user is not in the map he is offline.
-	 * <p>
-	 * <b>Example:</b> <br />
-	 * Lets' suppose user <i>123L</i> is <i>ONLINE</i> on table <i>111L</i> and
-	 * <i>AWAY</i> on table <i>222L</i>, the map content will be then: <br />
-	 * [(111L, [(123L, ONLINE)]), (222L, [(123L, AWAY)])] <br />
-	 * If user <i>456L</i> goes <i>ONLINE</i> on table <i>222L</i> the map will
-	 * be: <br />
-	 * [(111L, [(123L, ONLINE)]), (222L, [(123L, AWAY),(456L, ONLINE)])]
-	 * 
-	 * Obviously user <i>456L</i> is not a member of table <i>111L</i>.
-	 * </p>
-	 * 
+	 * The following map contains the connected users lists, 
+	 * where the key is the table key and the ArrayList is the list
+	 * of connected users, meant as users using the Channel Service.
 	 */
-	private final static Map<Long, HashMap<Long, UserStatus>> usersStatus = new HashMap<Long, HashMap<Long, UserStatus>>();
+	private final static Map<Long, ArrayList<Long>> connectedUsers = new HashMap<Long, ArrayList<Long>>();
 
 	@Override
 	public String createChannel(String userId) {
@@ -72,8 +60,6 @@ public class MessagingServiceImpl extends RemoteServiceServlet implements
 	@Override
 	public String sendMessage(Long senderId, String content,
 			ChannelMessageType type, Long table) {
-		if (!content.equals(ChannelMessageType.CHAT))
-			updateUserStatus(table, senderId, type);
 		try {
 			JSONObject jsonMessage = new JSONObject();
 			jsonMessage.put("senderId", senderId);
@@ -82,13 +68,13 @@ public class MessagingServiceImpl extends RemoteServiceServlet implements
 			jsonMessage.put("tableKey", table);
 			String message = jsonMessage.toString();
 
-			Map<Long, UserStatus> recipients = usersStatus.get(table);
-			if (recipients != null) { // if there are online users
-				for (Long r : recipients.keySet())
-					// send a message to each user
+			ArrayList<Long> recipients = connectedUsers.get(table);
+			if (recipients != null) {
+				for (Long r : recipients)
 					channelService.sendMessage(new ChannelMessage(r.toString(),
 							message));
 			}
+			//TODO avoid this if
 			if (type.equals(ChannelMessageType.NEWTABLEMEMBER))
 				channelService
 						.sendMessage(new ChannelMessage(content, message));
@@ -115,23 +101,20 @@ public class MessagingServiceImpl extends RemoteServiceServlet implements
 					.put("type", ChannelMessageType.NEWCONNECTION.toString());
 			jsonMessage.put("content", "");
 
-			for (Table t : tables) { // for each user table
-				Map<Long, UserStatus> recipients = usersStatus.get(t.getKey());
-				if (recipients != null) { // if there are online users
+			for (Table t : tables) {
+				List<Long> recipients = connectedUsers.get(t.getKey());
+				if (recipients != null) { 
 					jsonMessage.put("tableKey", t.getKey());
-					for (Long r : recipients.keySet())
-						// send a message to each user
+					for (Long r : recipients)
 						channelService.sendMessage(new ChannelMessage(r
 								.toString(), jsonMessage.toString()));
-					recipients.put(userKey, UserStatus.AWAY); // add current
-																// user to table
-				} else { // if there are no users online
-					HashMap<Long, UserStatus> hm = new HashMap<Long, UserStatus>();
-					hm.put(userKey, UserStatus.AWAY);
-					usersStatus.put(t.getKey(), hm);
+					recipients.add(userKey); 
+				} else {
+					ArrayList<Long> list = new ArrayList<Long>();
+					list.add(userKey);
+					connectedUsers.put(t.getKey(), list);
 				}
 			}
-			printMap();
 		} catch (JSONException e) {
 			System.err.println("Error creating JSON on server: " + e);
 		}
@@ -155,46 +138,19 @@ public class MessagingServiceImpl extends RemoteServiceServlet implements
 					.put("type", ChannelMessageType.DISCONNECTION.toString());
 			jsonMessage.put("content", "");
 
-			for (Table t : tables) { // for each user table
-				Map<Long, UserStatus> recipients = usersStatus.get(t.getKey());
-				if (recipients != null) { // if there are online users
+			for (Table t : tables) {
+				ArrayList<Long> recipients = connectedUsers.get(t.getKey());
+				if (recipients != null) {
 					jsonMessage.put("tableKey", t.getKey());
 					recipients.remove(userKey);
-					for (Long r : recipients.keySet())
-						// send a message to each user
+					for (Long r : recipients)
 						channelService.sendMessage(new ChannelMessage(r
 								.toString(), jsonMessage.toString()));
 				}
 			}
-			printMap();
+			
 		} catch (JSONException e) {
 			System.err.println("Error creating JSON on server: " + e);
-		}
-	}
-
-	public static Map<Long, UserStatus> getTableStatus(Long tableKey) {
-		return usersStatus.get(tableKey);
-	}
-
-	private static void updateUserStatus(Long tableKey, Long userKey,
-			ChannelMessageType messageType) {
-		UserStatus status = null;
-		if (messageType.equals(ChannelMessageType.USERAWAY))
-			status = UserStatus.AWAY;
-		else if (messageType.equals(ChannelMessageType.USERONLINE))
-			status = UserStatus.ONLINE;
-		else if (messageType.equals(ChannelMessageType.USERBUSY))
-			status = UserStatus.BUSY;
-		if (status != null) {
-			Map<Long, UserStatus> tableStatus = usersStatus.get(tableKey);
-			if (tableStatus != null)
-				tableStatus.put(userKey, status);
-			else {
-				HashMap<Long, UserStatus> s = new HashMap<Long, UserStatus>();
-				s.put(userKey, status);
-				usersStatus.put(tableKey, s);
-			}
-			printMap();
 		}
 	}
 
@@ -233,14 +189,5 @@ public class MessagingServiceImpl extends RemoteServiceServlet implements
 			e.printStackTrace();
 		}
 		return true;
-	}
-
-	public static void printMap() {
-		for (Long t : usersStatus.keySet()) {
-			System.out.println("Tavolo " + t);
-			Map<Long, UserStatus> m = usersStatus.get(t);
-			for (Long s : m.keySet())
-				System.out.println("\t User " + s + " is " + m.get(s));
-		}
 	}
 }

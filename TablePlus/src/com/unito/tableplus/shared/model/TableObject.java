@@ -35,7 +35,7 @@ public class TableObject implements Resource {
 	private String legend;
 	
 	@Persistent(mappedBy = "tableObject")
-	private List<Comment> commentList = new ArrayList<Comment>();
+	private ArrayList<Comment> commentList = new ArrayList<Comment>();
 	
 	//delete this and the sky will tumble and fall!!!
 	public TableObject(){

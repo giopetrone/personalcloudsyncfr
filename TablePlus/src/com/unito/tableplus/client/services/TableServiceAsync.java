@@ -1,6 +1,6 @@
 package com.unito.tableplus.client.services;
 
-import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -17,7 +17,8 @@ public interface TableServiceAsync {
 
 	void queryTable(Long key, AsyncCallback<Table> callback);
 	
-	void queryTables(List<Long> keys, AsyncCallback<Map<Long,Table>> callback);
+	void queryTables(ArrayList<Long> keys,
+			AsyncCallback<Map<Long, Table>> callback);
 
 	void storeTable(Table table, AsyncCallback<Boolean> callback);
 
@@ -29,22 +30,25 @@ public interface TableServiceAsync {
 
 	void addObject(Resource resource, User user, Long tableKey,AsyncCallback<Boolean> callback);
 
-	void loadTableObjects(Long tableKey, AsyncCallback<List<TableObject>> callback);
+	void loadTableObjects(Long tableKey, AsyncCallback<ArrayList<TableObject>> callback);
 
 	void addMember(Long currentUser, Long newUserKey, Long tableKey, AsyncCallback<Void> callback);
 
 	void removeMessage(String messageKey, AsyncCallback<Void> callback);
 
 	void loadBlackBoardMessages(Long tableKey,
-			AsyncCallback<List<BlackBoardMessage>> callback);
+			AsyncCallback<ArrayList<BlackBoardMessage>> callback);
 
 
 
-	void getUsersStatus(Long tableKey,
+	void queryUsersStatus(Long tableKey,
 			AsyncCallback<Map<Long, UserStatus>> callback);
 
 	void queryObject(String key, AsyncCallback<TableObject> asyncCallback);
 
 	void editComment(TableObject b, String key,
 			AsyncCallback<String> asyncCallback);
+
+	void setUserStatus(Long tableKey, Long userKey, UserStatus status,
+			AsyncCallback<String> callback);
 }

@@ -1,6 +1,6 @@
 package com.unito.tableplus.client.services;
 
-import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 
 import com.google.gwt.user.client.rpc.RemoteService;
@@ -89,19 +89,21 @@ public interface TableService extends RemoteService {
 
 
 
-	List<BlackBoardMessage> loadBlackBoardMessages(Long tableKey);
+	ArrayList<BlackBoardMessage> loadBlackBoardMessages(Long tableKey);
 
-	List<TableObject> loadTableObjects(Long tableKey);
+	ArrayList<TableObject> loadTableObjects(Long tableKey);
 
 	Table queryTable(Long key);
 
-	Map<Long, Table> queryTables(List<Long> keys);
+	Map<Long, Table> queryTables(ArrayList<Long> keys);
 
 	void removeMessage(String messageKey);
 
-	Map<Long, UserStatus> getUsersStatus(Long tableKey);
+	Map<Long, UserStatus> queryUsersStatus(Long tableKey);
 
 	TableObject queryObject(String key);
 
 	String editComment(TableObject b, String key);
+
+	String setUserStatus(Long tableKey, Long userKey, UserStatus status);
 }

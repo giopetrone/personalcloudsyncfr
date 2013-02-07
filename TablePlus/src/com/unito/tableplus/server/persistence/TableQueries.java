@@ -2,6 +2,7 @@ package com.unito.tableplus.server.persistence;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Transaction;
@@ -13,6 +14,7 @@ import com.unito.tableplus.shared.model.Resource;
 import com.unito.tableplus.shared.model.TableObject;
 import com.unito.tableplus.shared.model.Table;
 import com.unito.tableplus.shared.model.User;
+import com.unito.tableplus.shared.model.UserStatus;
 
 public class TableQueries {
 	
@@ -44,6 +46,7 @@ public class TableQueries {
 			if (table == null) return table;
 			table.getTableObjects();
 			table.getBlackboard();
+			table.getMembersStatus();
 			detached = pm.detachCopy(table);
 		} catch (Exception e) {
 			System.err.println("There has been an error querying table: " + e);
@@ -91,7 +94,7 @@ public class TableQueries {
 			Table table = pm.getObjectById(Table.class, key);
 			pm.deletePersistentAll(table);
 		} catch (Exception e) {
-			System.err.println("Something gone wrong deleting the Table: " + e);
+			System.err.println("Something gone wrong deleting the table: " + e);
 		} finally {
 			pm.close();
 		}
@@ -117,7 +120,7 @@ public class TableQueries {
 		return true;
 	}
 
-	public static List<BlackBoardMessage> queryMessages(Long tableKey) {
+	public static ArrayList<BlackBoardMessage> queryMessages(Long tableKey) {
 		PersistenceManager pm = ServiceFactory.getPmfInstance().getPersistenceManager();
 		Table detached = null;
 		try {
@@ -173,7 +176,7 @@ public class TableQueries {
 			table.getTableObjects().add(sr);
 			tx.commit();
 		} catch (Exception e) {
-			System.err.println("There has been an error adding message: " + e);
+			System.err.println("There has been an error adding resource: " + e);
 			return false;
 		} finally {
 			if (tx.isActive()) tx.rollback();
@@ -183,7 +186,7 @@ public class TableQueries {
 		
 	}
 	
-	public static List<TableObject> queryObjects(Long tableKey){
+	public static ArrayList<TableObject> queryObjects(Long tableKey){
 		PersistenceManager pm = ServiceFactory.getPmfInstance().getPersistenceManager();
 		Table detachedTable = null;
 		try {
@@ -223,5 +226,27 @@ public class TableQueries {
 		return editable;
 	}
 
+	public static Map<Long, UserStatus> queryMembersStatus(Long tableKey) {
+		Table t = queryTable(tableKey);
+		return t.getMembersStatus();
+	}
 
+	public static String setUserStatus(Long tableKey, Long userKey, UserStatus status) {
+		PersistenceManager pm = ServiceFactory.getPmfInstance().getPersistenceManager();
+		try {
+			Table table = pm.getObjectById(Table.class, tableKey);
+			if (table == null) 
+				return "Unable to find table";
+			table.setMemberStatus(userKey, status);
+		} catch (Exception e) {
+			System.err.println("There has been an error setting user status: " + e);
+			System.err.println("TableKey: " + tableKey);
+			System.err.println("UserKey: " + userKey);
+			System.err.println("Status: " + status);
+			return "Error querying table";
+		} finally {
+			pm.close();
+		}
+		return "Status has been successfully set";
+	}
 }

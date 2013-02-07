@@ -155,7 +155,7 @@ public class TablePlus implements EntryPoint {
 	}
 	
 	private static void loadMembersStatus(final Table t){
-		tableService.getUsersStatus(t.getKey(), new AsyncCallback<Map<Long, UserStatus>>() {
+		tableService.queryUsersStatus(t.getKey(), new AsyncCallback<Map<Long, UserStatus>>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

@@ -158,7 +158,7 @@ public class BlackBoardWindow extends WindowPlus {
 		mask();
 		if (activeTable.getKey() != null)
 			tableService.loadBlackBoardMessages(activeTable.getKey(),
-					new AsyncCallback<List<BlackBoardMessage>>() {
+					new AsyncCallback<ArrayList<BlackBoardMessage>>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -169,7 +169,7 @@ public class BlackBoardWindow extends WindowPlus {
 						}
 
 						@Override
-						public void onSuccess(List<BlackBoardMessage> result) {
+						public void onSuccess(ArrayList<BlackBoardMessage> result) {
 							if (result != null) {
 								activeTable.setBlackboard(result);
 								fillGrid(result);
