@@ -12,19 +12,16 @@ import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.util.IconHelper;
 import com.extjs.gxt.ui.client.util.Margins;
-import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.Info;
 import com.extjs.gxt.ui.client.widget.Layout;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.FormButtonBinding;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
-import com.extjs.gxt.ui.client.widget.form.Radio;
-import com.extjs.gxt.ui.client.widget.form.RadioGroup;
 import com.extjs.gxt.ui.client.widget.form.TextArea;
 import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
-import com.extjs.gxt.ui.client.widget.grid.ColumnData;
 import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
+import com.extjs.gxt.ui.client.widget.grid.ColumnData;
 import com.extjs.gxt.ui.client.widget.grid.Grid;
 import com.extjs.gxt.ui.client.widget.grid.GridCellRenderer;
 import com.extjs.gxt.ui.client.widget.layout.CenterLayout;
@@ -39,8 +36,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.unito.tableplus.client.TablePlus;
-import com.unito.tableplus.client.services.BookmarkService;
-import com.unito.tableplus.client.services.BookmarkServiceAsync;
 import com.unito.tableplus.client.services.ServiceFactory;
 import com.unito.tableplus.client.services.TableServiceAsync;
 import com.unito.tableplus.client.services.UserService;
@@ -50,13 +45,10 @@ import com.unito.tableplus.shared.model.Comment;
 import com.unito.tableplus.shared.model.Resource;
 import com.unito.tableplus.shared.model.Table;
 import com.unito.tableplus.shared.model.User;
-import com.unito.tableplus.shared.model.VisibilityType;
 
 public class MyObjectsWindow extends WindowPlus {
 
 	private final UserServiceAsync userService = GWT.create(UserService.class);
-	private final BookmarkServiceAsync bookmarkService = GWT
-			.create(BookmarkService.class);
 	public static final TableServiceAsync tableService = ServiceFactory
 			.getTableServiceInstance();
 
@@ -65,31 +57,27 @@ public class MyObjectsWindow extends WindowPlus {
 	private ListStore<BaseModel> objectsStore;
 	private Button loadButton;
 	private Button addButton;
-	// private Button filterButton;
 	private Layout fitLayout = new FitLayout();
 	private Layout centerLayout = new CenterLayout();
 	private FormPanel inputPanel;
+	
+	
+	/**
+	 * Right-click context menu
+	 */
 	private Menu contextMenu;
-	private MenuItem deleteItem;
-	private MenuItem openItem;
-	private MenuItem share;
-	private MenuItem commentItem;
-	private List<String> allTags = new ArrayList<String>();
-	private List<Resource> resource;
 
-	private ListStore<BaseModel> commentStore;
-	private LayoutContainer lc;
-	private Grid<BaseModel> gridComment;
-	private Menu commentContextMenu;
-	private MenuItem deleteCommentItem;
-	private MenuItem editItem;
-	private boolean edit = false;
-	private Button loadGridButton = new Button("Refresh");
-	private Button addGridButton = new Button("Add Comment");
-	private Button deleteGridButton = new Button("Delete All");
-	private Button closeGridButton = new Button("Close Comment Property");
-	private HorizontalPanel hp = new HorizontalPanel();
-	private Radio radio1;
+	/*Right click menu entries*/
+	private MenuItem share;
+	private MenuItem open;
+
+	private List<String> allTags = new ArrayList<String>();
+	/**
+	 * The list of the object contained in the grid.
+	 * It is needed to know which object has been selected
+	 * on a right-click.
+	 */
+	private List<Resource> objects;
 
 	public MyObjectsWindow() {
 		super();
@@ -105,94 +93,7 @@ public class MyObjectsWindow extends WindowPlus {
 		objectsStore = new ListStore<BaseModel>();
 		grid = new Grid<BaseModel>(objectsStore, getColumnModel());
 		contextMenu = new Menu();
-		deleteItem = new MenuItem();
-		deleteItem.setText("Delete Bookmark");
-		deleteItem.setIcon(IconHelper.createStyle("deleteAll"));
-		deleteItem.addSelectionListener(new SelectionListener<MenuEvent>() {
-			@Override
-			public void componentSelected(MenuEvent ce) {
-				final BaseModel selected = grid.getSelectionModel()
-						.getSelectedItem();
-				String key = selected.get("key").toString();
-				userService.removeBookmark(key, new AsyncCallback<Void>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GWT.log("Unable to delete bookmark", caught);
-						Info.display("Error", "Unable to delete bookmark.");
-					}
 
-					@Override
-					public void onSuccess(Void result) {
-						objectsStore.remove(selected);
-						contextMenu.setEnabled(objectsStore.getCount() > 0);
-					}
-				});
-			}
-		});
-		contextMenu.add(deleteItem);
-
-		openItem = new MenuItem();
-		openItem.setText("Open Bookmark Properties Window");
-		openItem.setIcon(IconHelper.createStyle("property"));
-		openItem.addSelectionListener(new SelectionListener<MenuEvent>() {
-			@Override
-			public void componentSelected(MenuEvent ce) {
-				final BaseModel selected = grid.getSelectionModel()
-						.getSelectedItem();
-				String key = selected.get("key").toString();
-				bookmarkService.queryBookmark(key,
-						new AsyncCallback<Bookmark>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GWT.log("Unable to load bookmarks for user: "
-										+ TablePlus.getUser().getFirstName()
-										+ " "
-										+ TablePlus.getUser().getLastName(),
-										caught);
-								Info.display("Error",
-										"Unable to load bookmarks.");
-								unmask();
-							}
-
-							@Override
-							public void onSuccess(Bookmark b) {
-								TablePlus.getDesktop().showBookmarkWindow(b);
-							}
-						});
-			}
-		});
-		contextMenu.add(openItem);
-		commentItem = new MenuItem();
-		commentItem.setText("Add & Edit Comments");
-		commentItem.setIcon(IconHelper.createStyle("comment"));
-		commentItem.addSelectionListener(new SelectionListener<MenuEvent>() {
-			@Override
-			public void componentSelected(MenuEvent ce) {
-				final BaseModel selected = grid.getSelectionModel()
-						.getSelectedItem();
-				String key = selected.get("key").toString();
-				bookmarkService.queryBookmark(key,
-						new AsyncCallback<Bookmark>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GWT.log("Unable to load bookmarks for user: "
-										+ TablePlus.getUser().getFirstName()
-										+ " "
-										+ TablePlus.getUser().getLastName(),
-										caught);
-								Info.display("Error",
-										"Unable to load bookmarks.");
-								unmask();
-							}
-
-							@Override
-							public void onSuccess(Bookmark b) {
-								commentView(b);
-							}
-						});
-			}
-		});
-		contextMenu.add(commentItem);
 		share = new MenuItem();
 		share.setText("Share on Table");
 		share.setIcon(IconHelper.createStyle("menu-share"));
@@ -202,30 +103,35 @@ public class MyObjectsWindow extends WindowPlus {
 			public void componentSelected(MenuEvent ce) {
 				final BaseModel selected = grid.getSelectionModel()
 						.getSelectedItem();
-				String key = selected.get("key").toString();
-				bookmarkService.queryBookmark(key,
-						new AsyncCallback<Bookmark>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GWT.log("Unable to load bookmarks for user: "
-										+ TablePlus.getUser().getFirstName()
-										+ " "
-										+ TablePlus.getUser().getLastName(),
-										caught);
-								Info.display("Error",
-										"Unable to load bookmarks.");
-								unmask();
-							}
+				String id = selected.get("id").toString();
+				Resource selectedObject = getSelectedObject(id);
+				if (selectedObject != null) {
+					shareObject(selectedObject);
 
-							@Override
-							public void onSuccess(Bookmark b) {
-								shareObject(b);
-							}
-						});
+				}
 			}
-
 		});
 		contextMenu.add(share);
+		
+		open = new MenuItem();
+		open.setText("Open");
+		open.setIcon(IconHelper.createStyle("go"));
+
+		open.addSelectionListener(new SelectionListener<MenuEvent>() {
+			@Override
+			public void componentSelected(MenuEvent ce) {
+				BaseModel selected = grid.getSelectionModel().getSelectedItem();
+				String id = selected.get("url").toString();
+				if (id != null)
+					Window.open(id, "_blank", "");
+				else
+					Info.display("Open resource",
+							"This resource cannot be opened.");
+			}
+		});
+
+		contextMenu.add(open);
+
 		grid.setContextMenu(contextMenu);
 		mainContainer.add(grid);
 
@@ -240,388 +146,26 @@ public class MyObjectsWindow extends WindowPlus {
 		loadButton.setToolTip(new ToolTipConfig("Refresh objects"));
 		loadButton.setIcon(IconHelper.createStyle("arrow_refresh"));
 
-		addButton = new Button("Add", new SelectionListener<ButtonEvent>() {
+		addButton = new Button("New bookmark", new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
 				showInputPanel();
 			}
 		});
-		addButton.setToolTip(new ToolTipConfig("Add Object"));
+		addButton.setToolTip(new ToolTipConfig("Open new bookmark panel"));
 		addButton.setIcon(IconHelper.createStyle("add"));
 
-		/*
-		 * filterButton = new Button("Filter By Tag",new
-		 * SelectionListener<ButtonEvent>() {
-		 * 
-		 * @Override public void componentSelected(ButtonEvent ce) {
-		 * showFilterPanel(); } }); filterButton.setToolTip(new
-		 * ToolTipConfig("Filter resources by Tag"));
-		 * filterButton.setIcon(IconHelper.createStyle("filter"));
-		 */
 		addButton(loadButton);
 		addButton(addButton);
-		// addButton(filterButton);
-		loadObjects();
 	}
 
-	private void commentView(final Bookmark b) {
-		commentStore = new ListStore<BaseModel>();
-		lc = new LayoutContainer();
-		lc.setScrollMode(Scroll.AUTOY);
-		lc.setWidth(530);
-		lc.setLayout(new FitLayout());
-		gridComment = new Grid<BaseModel>(commentStore, getCommentColumnModel());
-		gridComment.setHeight(200);
-
-		commentContextMenu = new Menu();
-		deleteCommentItem = new MenuItem();
-		deleteCommentItem.setText("Delete Comment");
-		deleteCommentItem.setIcon(IconHelper.createStyle("remove"));
-		deleteCommentItem
-				.addSelectionListener(new SelectionListener<MenuEvent>() {
-					@Override
-					public void componentSelected(MenuEvent ce) {
-						deleteComment();
-					}
-				});
-		commentContextMenu.add(deleteCommentItem);
-		// edit comment, cancella il precedente e crea nuovo commento
-		editItem = new MenuItem();
-		editItem.setText("Edit Comment");
-		editItem.setIcon(IconHelper.createStyle("edit"));
-		editItem.addSelectionListener(new SelectionListener<MenuEvent>() {
-			@Override
-			public void componentSelected(MenuEvent ce) {
-				final BaseModel selected = gridComment.getSelectionModel()
-						.getSelectedItem();
-				final String key = selected.get("key").toString();
-				bookmarkService.editComment(b, key,
-						new AsyncCallback<String>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GWT.log("Unable to edit comment", caught);
-								Info.display("Error", "Unable to edit comment.");
-							}
-
-							@Override
-							public void onSuccess(String c) {
-								showInputPanel(b, c, key);
-								if (edit) {
-									commentStore.remove(selected);
-									commentContextMenu.setEnabled(commentStore
-											.getCount() > 0);
-								}
-							}
-						});
-			}
-		});
-		commentContextMenu.add(editItem);
-		gridComment.setContextMenu(commentContextMenu);
-
-		loadGridComments(b);
-		mainContainer.remove(grid);
-		mainContainer.setLayout(centerLayout);
-		loadButton.disable();
-		addButton.disable();
-		// filterButton.disable();
-
-		lc.add(gridComment);
-		mainContainer.add(lc);
-		lc.add(commentButton(b));
-		mainContainer.layout();
-
-	}
-
-	private void showInputPanel(Bookmark b, String c, String key) {
-		inputPanel = buildPanel(b, c, key);
-		showForm();
-	}
-
-	private void showForm() {
-		mainContainer.removeAll();
-		mainContainer.setLayout(centerLayout);
-		mainContainer.add(inputPanel);
-		mainContainer.layout();
-	}
-
-	private FormPanel buildPanel(final Bookmark b, String c, final String key) {
-		final FormPanel panel = new FormPanel();
-		FormData formData = new FormData("-20");
-		panel.setHeading("Edit Comment");
-		panel.setFrame(true);
-		panel.setWidth(350);
-		panel.setLabelWidth(110);
-
-		radio1 = new Radio();
-		radio1.setBoxLabel("Public");
-		radio1.setValue(true);
-
-		Radio radio2 = new Radio();
-		radio2.setBoxLabel("Private");
-
-		RadioGroup radioGroup = new RadioGroup();
-		radioGroup.setFieldLabel("Comment Visibility");
-		radioGroup.add(radio1);
-		radioGroup.add(radio2);
-		panel.add(radioGroup);
-		final TextArea comment = new TextArea();
-		comment.setHeight(35);
-		comment.setPreventScrollbars(true);
-		comment.setFieldLabel("New Comment");
-		comment.setAllowBlank(true);
-		comment.setValue(c);
-		panel.add(comment, formData);
-
-		Button saveButton = new Button("Save");
-		panel.addButton(saveButton);
-		Button cancelButton = new Button("Cancel");
-		panel.addButton(cancelButton);
-		saveButton.setStyleAttribute("padding-left", "70px");
-		panel.setButtonAlign(HorizontalAlignment.CENTER);
-		FormButtonBinding binding = new FormButtonBinding(panel);
-		binding.addButton(saveButton);
-		cancelButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				rebuildCommentView(b);
-			}
-		});
-		saveButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				Comment c;
-				if (radio1.getValue())
-					c = new Comment(comment.getValue(), TablePlus.getUser()
-							.getEmail());
-				else
-					c = new Comment(comment.getValue(), TablePlus.getUser()
-							.getEmail(), VisibilityType.PRIVATE);
-				editComment(b, c, key);
-				comment.clear();
-				rebuildCommentView(b);
-			}
-		});
-		return panel;
-	}
-
-	private void rebuildBookmarkList() {
-		mainContainer.remove(lc);
-		mainContainer.setLayout(centerLayout);
-		loadButton.enable();
-		addButton.enable();
-		// filterButton.enable();
-		mainContainer.add(grid);
-		mainContainer.layout();
-	}
-
-	private void rebuildCommentView(Bookmark b) {
-		mainContainer.remove(inputPanel);
-		mainContainer.setLayout(centerLayout);
-		mainContainer.add(lc);
-		mainContainer.layout();
-	}
-
-	private void editComment(final Bookmark b, final Comment comment,
-			final String key) {
-		bookmarkService.addComment(b.getKey(), comment,
-				new AsyncCallback<Boolean>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GWT.log("Failed to post comment: ", caught);
-						Info.display("Error", "Failed to post comment.");
-					}
-
-					@Override
-					public void onSuccess(Boolean result) {
-						bookmarkService.deleteComment(key,
-								new AsyncCallback<Boolean>() {
-									@Override
-									public void onFailure(Throwable caught) {
-										GWT.log("Unable to delete comment",
-												caught);
-										Info.display("Error",
-												"Unable to delete comment.");
-									}
-
-									@Override
-									public void onSuccess(Boolean result) {
-										edit = true;
-									}
-								});
-						loadGridComments(b);
-					}
-				});
-	}
-
-	private HorizontalPanel commentButton(final Bookmark b) {
-		hp.add(loadGridButton);
-		hp.add(addGridButton);
-		hp.add(deleteGridButton);
-		hp.add(closeGridButton);
-		hp.setStyleAttribute("padding-left", "60px");
-		hp.setSpacing(5);
-		// refresh
-		loadGridButton
-				.addSelectionListener(new SelectionListener<ButtonEvent>() {
-					@Override
-					public void componentSelected(ButtonEvent ce) {
-						loadGridComments(b);
-					}
-				});
-		loadGridButton.setToolTip(new ToolTipConfig("Refresh comments"));
-		loadGridButton.setIcon(IconHelper.createStyle("arrow_refresh"));
-		loadGridButton.setWidth(70);
-		// add
-		addGridButton
-				.addSelectionListener(new SelectionListener<ButtonEvent>() {
-					@Override
-					public void componentSelected(ButtonEvent ce) {
-						inputPanel = newComment(b);
-						showForm();
-					}
-				});
-		addGridButton.setToolTip(new ToolTipConfig("Add comment"));
-		addGridButton.setIcon(IconHelper.createStyle("add"));
-		addGridButton.setWidth(100);
-		// delete
-		deleteGridButton
-				.addSelectionListener(new SelectionListener<ButtonEvent>() {
-					@Override
-					public void componentSelected(ButtonEvent ce) {
-						deleteAllComments(b);
-					}
-				});
-		deleteGridButton.setToolTip(new ToolTipConfig("Delete All"));
-		deleteGridButton.setIcon(IconHelper.createStyle("deleteAll"));
-		deleteGridButton.setWidth(80);
-		closeGridButton
-				.addSelectionListener(new SelectionListener<ButtonEvent>() {
-					@Override
-					public void componentSelected(ButtonEvent ce) {
-						rebuildBookmarkList();
-					}
-				});
-		closeGridButton.setToolTip(new ToolTipConfig("Return to normal view"));
-		closeGridButton.setWidth(130);
-		return hp;
-	}
-
-	private void loadGridComments(final Bookmark b) {
-		commentStore.removeAll();
-		bookmarkService.getComments(b.getKey(),
-				new AsyncCallback<List<Comment>>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GWT.log("Unable to load comments for bookmark: "
-								+ b.getTitle(), caught);
-						Info.display("Error", "Unable to load comments.");
-					}
-
-					@Override
-					public void onSuccess(List<Comment> result) {
-						fillCommentGrid(result);
-					}
-				});
-	}
-
-	private void fillCommentGrid(List<Comment> result) {
-		BaseModel model = new BaseModel();
-		for (final Comment c : result) {
-			model.set("key", c.getKey());
-			model.set("author", c.getAuthor());
-			model.set("comment", c.getComment());
-			model.set("date", c.getDate());
-			model.set("visibility", c.getVisibilty());
-			commentStore.add(model);
-			if (model.get("author").toString()
-					.equals(TablePlus.getUser().getEmail()))
-				commentContextMenu.setEnabled(true);
-			else
-				commentContextMenu.disable();
-		}
-	}
-
-	private ColumnModel getCommentColumnModel() {
-		ColumnConfig author = new ColumnConfig("author", "Author", 120);
-		ColumnConfig comment = new ColumnConfig("comment", "Comment", 130);
-		ColumnConfig date = new ColumnConfig("date", "Date", 200);
-		ColumnConfig visibility = new ColumnConfig("visibility", "Visibility",
-				60);
-		List<ColumnConfig> config = new ArrayList<ColumnConfig>();
-		config.add(author);
-		config.add(comment);
-		config.add(date);
-		config.add(visibility);
-		return new ColumnModel(config);
-	}
-
-	public void deleteComment() {
-		final BaseModel selected = gridComment.getSelectionModel()
-				.getSelectedItem();
-		String key = selected.get("key").toString();
-		bookmarkService.deleteComment(key, new AsyncCallback<Boolean>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GWT.log("Unable to delete comment", caught);
-				Info.display("Error", "Unable to delete comment.");
-			}
-
-			@Override
-			public void onSuccess(Boolean result) {
-				commentStore.remove(selected);
-				commentContextMenu.setEnabled(commentStore.getCount() > 0);
-			}
-		});
-	}
-
-	/*
-	 * private void showFilterPanel() { inputPanel = buildTagPanel();
-	 * mainContainer.remove(grid); loadButton.disable(); addButton.disable(); //
-	 * filterButton.disable(); mainContainer.setLayout(centerLayout);
-	 * mainContainer.add(inputPanel); mainContainer.layout(); }
-	 * 
-	 * 
-	 * private FormPanel buildTagPanel() { final FormPanel panel = new
-	 * FormPanel(); panel.setLayoutData(Orientation.HORIZONTAL); final FormData
-	 * formData = new FormData("-20"); panel.setHeading("New Filter");
-	 * panel.setFrame(true); panel.setWidth(350);
-	 * 
-	 * final ListBox listTag = new ListBox(); for (String tag :
-	 * TablePlus.getDesktop().getAllTags()) listTag.addItem(tag);
-	 * listTag.setHeight("20px");
-	 * 
-	 * panel.add(listTag, formData);
-	 * 
-	 * Button saveButton = new Button("Save Filter");
-	 * panel.addButton(saveButton); Button cancelButton = new Button("Cancel");
-	 * panel.addButton(cancelButton);
-	 * panel.setButtonAlign(HorizontalAlignment.CENTER); FormButtonBinding
-	 * binding = new FormButtonBinding(panel); binding.addButton(saveButton);
-	 * cancelButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-	 * 
-	 * @Override public void componentSelected(ButtonEvent ce) {
-	 * mainContainer.remove(inputPanel); mainContainer.setLayout(fitLayout);
-	 * mainContainer.add(grid); loadButton.enable(); addButton.enable(); //
-	 * filterButton.enable(); mainContainer.layout(); } });
-	 * saveButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-	 * 
-	 * @Override public void componentSelected(ButtonEvent ce) {
-	 * bookmarksStore.removeAll(); mask(); String tag =
-	 * listTag.getItemText(listTag.getSelectedIndex()); List<Resource> tagFilter
-	 * = new ArrayList<Resource>(); for (Resource b : resource) { for (String t
-	 * : b.getTag()) if (t.equals(tag)) tagFilter.add(b); } fillGrid(tagFilter);
-	 * 
-	 * mainContainer.remove(inputPanel); mainContainer.setLayout(fitLayout);
-	 * mainContainer.add(grid); loadButton.enable(); addButton.enable(); //
-	 * filterButton.enable(); mainContainer.layout(); } }); return panel;
-	 * 
-	 * }
+	/**
+	 * Clean the objects store and refills it with
+	 * the result of a remote call fetching user objects.
 	 */
-
 	private void loadObjects() {
 		objectsStore.removeAll();
 		mask();
-		// if (activeTable.getKey() != null)
 		userService.loadUserObjects(TablePlus.getUser(),
 				new AsyncCallback<List<Resource>>() {
 					@Override
@@ -635,55 +179,51 @@ public class MyObjectsWindow extends WindowPlus {
 					@Override
 					public void onSuccess(List<Resource> result) {
 						if (result != null) {
-							//TablePlus.getDesktop().getActiveTable().setTableObjects(result);
-							resource = result;
-							fillGrid(resource);
+							objects = result;
+							fillGrid(objects);
 						}
 						unmask();
 					}
 				});
 	}
-
+	
+	/**
+	 * Shows the input panel for inserting a new Bookmark.
+	 */
 	private void showInputPanel() {
 		inputPanel = buildPanel();
 		mainContainer.remove(grid);
 		loadButton.disable();
 		addButton.disable();
-		// filterButton.disable();
 		mainContainer.setLayout(centerLayout);
 		mainContainer.add(inputPanel);
 		mainContainer.layout();
 
 	}
 
-	private void shareBookmark(final Bookmark bookmark) {
-		userService.addBookmark(TablePlus.getUser().getKey(), bookmark,
-				new AsyncCallback<Boolean>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GWT.log("Failed to share bookmark: ", caught);
-						Info.display("Error", "Failed to share bookmark.");
-					}
-
-					@Override
-					public void onSuccess(Boolean result) {
-						mainContainer.remove(inputPanel);
-						mainContainer.setLayout(fitLayout);
-						mainContainer.add(grid);
-						loadButton.enable();
-						addButton.enable();
-						// filterButton.enable();
-						mainContainer.layout();
-						loadObjects();
-					}
-				});
-	}
-
 	@Override
 	public void updateContent() {
 		loadObjects();
 	}
+	
+	/**
+	 * Determines which object has been selected
+	 * after a right click.
+	 * @param id The object id
+	 * @return	The selected object
+	 */
+	private Resource getSelectedObject(String id) {
+		for (Resource r : objects)
+			if (r.getID().equals(id))
+				return r;
+		return null;
+	}
 
+	/**
+	 * Makes a remote call performing the sharing operation
+	 * with current table and user.
+	 * @param selectedResource The resource that has been selected for sharing.
+	 */
 	private void shareObject(Resource selectedResource) {
 		User user = TablePlus.getUser();
 		Table table = TablePlus.getDesktop().getActiveTable();
@@ -692,6 +232,7 @@ public class MyObjectsWindow extends WindowPlus {
 		else
 			tableService.addObject(selectedResource, user, table.getKey(),
 					new AsyncCallback<Boolean>() {
+
 						@Override
 						public void onFailure(Throwable caught) {
 							GWT.log("Failed to share selected resource: ",
@@ -709,110 +250,14 @@ public class MyObjectsWindow extends WindowPlus {
 								Info.display("Share resource",
 										"Resource could not be shared.");
 						}
+
 					});
 	}
-
-	private void deleteAllComments(final Bookmark b) {
-		for (final BaseModel bm : commentStore.getModels()) {
-			if (bm.get("author").equals(TablePlus.getUser().getEmail())) {
-				bookmarkService.deleteComment(bm.get("key").toString(),
-						new AsyncCallback<Boolean>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GWT.log("Unable to delete comment", caught);
-								Info.display("Error",
-										"Unable to delete comment.");
-							}
-
-							@Override
-							public void onSuccess(Boolean result) {
-								commentStore.remove(bm);
-								loadGridComments(b);
-							}
-						});
-			}
-		}
-	}
-
-	private FormPanel newComment(final Bookmark b) {
-		final FormPanel panel = new FormPanel();
-		FormData formData = new FormData("-20");
-		panel.setHeading("New Comment from " + TablePlus.getUser().getEmail());
-		panel.setFrame(true);
-		panel.setWidth(385);
-
-		panel.setLabelWidth(110);
-
-		radio1 = new Radio();
-		radio1.setBoxLabel("Public");
-		radio1.setValue(true);
-
-		Radio radio2 = new Radio();
-		radio2.setBoxLabel("Private");
-
-		RadioGroup radioGroup = new RadioGroup();
-		radioGroup.setFieldLabel("Comment Visibility");
-		radioGroup.add(radio1);
-		radioGroup.add(radio2);
-		panel.add(radioGroup);
-
-		final TextArea comment = new TextArea();
-		comment.setHeight(35);
-		comment.setPreventScrollbars(true);
-		comment.setFieldLabel("New Comment");
-		comment.setAllowBlank(false);
-		panel.add(comment, formData);
-
-		Button saveButton = new Button("Save");
-		panel.addButton(saveButton);
-		Button cancelButton = new Button("Cancel");
-		panel.addButton(cancelButton);
-		saveButton.setStyleAttribute("padding-left", "35px");
-		panel.setButtonAlign(HorizontalAlignment.CENTER);
-		FormButtonBinding binding = new FormButtonBinding(panel);
-		binding.addButton(saveButton);
-		cancelButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				rebuildCommentView(b);
-			}
-		});
-		saveButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				Comment c;
-				if (radio1.getValue())
-					c = new Comment(comment.getValue(), TablePlus.getUser()
-							.getEmail());
-				else
-					c = new Comment(comment.getValue(), TablePlus.getUser()
-							.getEmail(), VisibilityType.PRIVATE);
-				addComment(b, c);
-				comment.clear();
-				rebuildCommentView(b);
-			}
-		});
-		return panel;
-	}
-
-	public void addComment(final Bookmark b, Comment c) {
-		bookmarkService.addComment(b.getKey(), c, new AsyncCallback<Boolean>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GWT.log("Failed to post comment: ", caught);
-				Info.display("Error", "Failed to post comment.");
-			}
-
-			@Override
-			public void onSuccess(Boolean result) {
-				GWT.log("Successfully posted comment ");
-				Info.display("Success", "Successfully posted comment ");
-				loadGridComments(b);
-			}
-		});
-		commentItem.enable();
-	}
-
+	
+	/**
+	 * Builds the new bookmark input panel
+	 * @return The built panel
+	 */
 	private FormPanel buildPanel() {
 		final FormPanel panel = new FormPanel();
 		panel.setLayoutData(Orientation.HORIZONTAL);
@@ -881,7 +326,6 @@ public class MyObjectsWindow extends WindowPlus {
 				mainContainer.add(grid);
 				loadButton.enable();
 				addButton.enable();
-				// filterButton.enable();
 				mainContainer.layout();
 			}
 		});
@@ -907,44 +351,37 @@ public class MyObjectsWindow extends WindowPlus {
 				comment.clear();
 				annotation.clear();
 				tag.clear();
-				shareBookmark(bookmark);
 			}
 		});
 		return panel;
 	}
 
 	private ColumnModel getColumnModel() {
-		ColumnConfig title = new ColumnConfig("title", "Title", 70);
+		ColumnConfig icon = new ColumnConfig("icon", "", 32);
+		icon.setSortable(false);
+		icon.setResizable(false);
+		icon.setRenderer(new GridCellRenderer<BaseModel>() {
+			@Override
+			public Object render(BaseModel model, String property,
+					ColumnData config, int rowIndex, int colIndex,
+					ListStore<BaseModel> store, Grid<BaseModel> grid) {
+				config.style = "background: url(/personal/desktop/icons/"
+						+ model.get("img") + ") no-repeat center !important;";
+				return null;
+			}
+		});
+		
+		ColumnConfig name = new ColumnConfig("title", "Title", 70);
 		final ColumnConfig url = new ColumnConfig("url", "Url", 160);
 		ColumnConfig legend = new ColumnConfig("legend", "Legend", 120);
-		ColumnConfig comment = new ColumnConfig("comment", "Comment", 55);
+		ColumnConfig comment = new ColumnConfig("comment", "Comments", 55);
 		ColumnConfig tag = new ColumnConfig("tag", "Tag", 70);
 		ColumnConfig annotation = new ColumnConfig("annotation", "Annotation",
 				65);
-		ColumnConfig go = new ColumnConfig("go", "Open", 55);
-		GridCellRenderer<BaseModel> buttonRenderer = new GridCellRenderer<BaseModel>() {
-			public Object render(final BaseModel model, String property,
-					ColumnData config, final int rowIndex, final int colIndex,
-					ListStore<BaseModel> store, Grid<BaseModel> grid) {
-
-				Button goButton = new Button("Go");
-				goButton.setWidth(45);
-				goButton.setToolTip(new ToolTipConfig(
-						"Open resource in new tab"));
-				goButton.setIcon(IconHelper.createStyle("go"));
-				goButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-					public void componentSelected(ButtonEvent ce) {
-						Window.open(model.get("url").toString(), "",
-								"left=100,top=100,width=600,height=400,menubar,toolbar,resizable");
-					}
-				});
-				return goButton;
-			}
-		};
-		go.setRenderer(buttonRenderer);
+		
 		List<ColumnConfig> config = new ArrayList<ColumnConfig>();
-		config.add(go);
-		config.add(title);
+		config.add(icon);
+		config.add(name);
 		config.add(url);
 		config.add(legend);
 		config.add(comment);
@@ -954,39 +391,16 @@ public class MyObjectsWindow extends WindowPlus {
 		return new ColumnModel(config);
 	}
 
-	private void fillGrid(List<Resource> bookmarks) {
-		allTags = new ArrayList<String>();
-		for (final Resource bookmark : bookmarks) {
-			// allTags.addAll(bookmark.getTag());
+	private void fillGrid(List<Resource> objects) {
+		for (final Resource object : objects) {
 			final BaseModel model = new BaseModel();
-			model.set("key", bookmark.getID());
-			model.set("title", bookmark.getName());
-			model.set("url", bookmark.getURI());
-			// model.set("legend", bookmark.getLegend());
-			bookmarkService.getComments(bookmark.getID(),
-					new AsyncCallback<List<Comment>>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GWT.log("Unable to load the comment's number",
-									caught);
-							Info.display("Error",
-									"Unable to load the comment's number.");
-							unmask();
-						}
-
-						@Override
-						public void onSuccess(List<Comment> result) {
-							model.set("comment", result.size());
-							unmask();
-						}
-					});
-			// model.set("tag", bookmark.getTag());
-			// model.set("annotation", bookmark.getAnnotationNumber());
+			model.set("icon", "");
+			model.set("img", object.getIcon());
+			model.set("key", object.getID());
+			model.set("title", object.getName());
+			model.set("url", object.getURI());
 			objectsStore.add(model);
 		}
 		contextMenu.setEnabled(objectsStore.getCount() > 0);
-		// TablePlus.getDesktop().setAllTags(allTags);
-		// if (TablePlus.getDesktop().getAllTags().size() == 0)
-		// filterButton.disable();
 	}
 }
