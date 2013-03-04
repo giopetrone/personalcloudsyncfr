@@ -4,7 +4,7 @@
  */
 package org.unito.client;
 
-import com.google.gwt.user.client.Window;
+import com.bradrydzewski.gwt.calendar.client.Appointment;
 import com.google.gwt.user.client.rpc.IsSerializable;
 import java.util.ArrayList;
 
@@ -27,6 +27,7 @@ public class Task implements IsSerializable {
     private ArrayList<String> after = new ArrayList();
     private ArrayList<Interval> intervals = new ArrayList();
     private ArrayList<UiUser> users = new ArrayList();
+    private Appointment appo;
 
     public String toRequest(boolean tasco) {
         String ret = "";
@@ -109,6 +110,7 @@ public class Task implements IsSerializable {
         if (lastEndHour >= 0) {
             this.lastEndHour = lastEndHour;
         }
+        appo = new AppointmentBuilder().riempi(this);
     }
 
     public String toString() {
@@ -156,6 +158,7 @@ public class Task implements IsSerializable {
                 this.users.add(uu);
             }
         }
+        appo = new AppointmentBuilder().riempi(this);
         //   Window.alert(this.toString());
     }
     
@@ -404,5 +407,19 @@ public class Task implements IsSerializable {
      */
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    /**
+     * @return the appo
+     */
+    public Appointment getAppo() {
+        return appo;
+    }
+
+    /**
+     * @param appo the appo to set
+     */
+    public void setAppo(Appointment appo) {
+        this.appo = appo;
     }
 }

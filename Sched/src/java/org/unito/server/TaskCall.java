@@ -7,12 +7,12 @@ package org.unito.server;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.unito.client.Interval;
 
 import org.unito.client.Task;
 import org.unito.client.TaskGroup;
@@ -41,6 +41,7 @@ public class TaskCall {
         System.err.println("in dorequest task=" + taskName + "\n" + "tasknet=" + taskNet + "\n" + "mu=" + mu + "\n" + "mode=" + mode + "\n" + "user=" + user + "\n");
         String pr = new Request(iTask, taskName, taskNet, mu, mode, user).toServerString();
         System.err.println("in dorequest request=\n" + pr);
+        System.err.println("Ora di inizio=\n" + new Date());
         try {
             DefaultHttpClient httpClient = new DefaultHttpClient();
             String req = "http://localhost:3000/modstn/" + mu + taskNet;
@@ -58,6 +59,7 @@ public class TaskCall {
             }
             //  System.out.println("risposta=\n");
             //  response.getEntity().writeTo(System.out);
+             System.err.println("Ora di fine torta=\n" + new Date());
             InputStream is = response.getEntity().getContent();
             /*
              * OLD: ArrayList<org.unito.client.Interval> arra =
@@ -72,6 +74,7 @@ public class TaskCall {
                 // call Scheduler with result from constraint solver
                 TaskGroup ret1 = new TaskCall().doConstraints(ret, "start", "new", modalita);
                 System.out.println("dopo gianluca e doConstraints");
+                  System.err.println("Ora di fine =\n" + new Date());
                 return ret1;
             } else {  // taskNet.equals("tasknet")
                 return ret;

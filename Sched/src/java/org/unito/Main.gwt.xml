@@ -4,10 +4,22 @@
 
 <module>
     <inherits name="com.google.gwt.user.User"/>
-
+   
     <!--inherits name="com.extjs.gxt.ui.GXT"-->
+      <inherits name='com.google.gwt.user.theme.standard.Standard'/>
+
+  <!-- Other module inherits                                      -->
+  <!-- Specify the app entry point class.                         -->
+ 
+  <inherits name='com.allen_sauer.gwt.dnd.gwt-dnd'/>
+  <inherits name='com.bradrydzewski.gwt.calendar.Calendar' />
+  <inherits name='com.bradrydzewski.gwt.calendar.theme.google.Google' />
     
-    <stylesheet src='Sched.css'/>
+    
+    
+    
+    
+    <stylesheet src='SchedQQ.css'/>
     <!-- Inherit the default GWT style sheet. You can change -->
     <!-- the theme of your GWT application by uncommenting -->
     <!-- any one of the following lines. -->
@@ -17,5 +29,6 @@
 
     <entry-point class="org.unito.client.MainEntryPoint"/>
 
+     <collapse-all-properties />
     <!-- Do not define servlets here, use web.xml -->
 </module>

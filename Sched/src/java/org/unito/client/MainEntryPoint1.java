@@ -18,17 +18,14 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Main entry point.
  *
  * @author marino
  */
-public class MainEntryPoint implements EntryPoint {
+public class MainEntryPoint1 implements EntryPoint {
 
-    public static MainEntryPoint current;
-    GoogleCalendarPanel googleCalendarP;
     Button moveButton;
     final FlexTable taskTable = new FlexTable();
     final FlexTable taskDefTable = new FlexTable();
@@ -63,7 +60,7 @@ public class MainEntryPoint implements EntryPoint {
     /**
      * Creates a new instance of MainEntryPoint
      */
-    public MainEntryPoint() {
+    public MainEntryPoint1() {
     }
 
     /**
@@ -100,7 +97,6 @@ public class MainEntryPoint implements EntryPoint {
     FlexTable ore = new FlexTable();
 
     public void onModuleLoad() {
-        current = this;
         setTimers();
         RootPanel.get().addStyleName("gwt-root");
         TaskGroup.addTaskGroup();
@@ -110,42 +106,39 @@ public class MainEntryPoint implements EntryPoint {
         RootPanel.get().add(rigaTop());
         //     Window.alert("pippo1");
         iniziaTable(taskTable, TaskGroup.current(), false, false);
-        //  ora dialogo  VerticalPanel pannVertTask = pannelloTask();
-        // ora dialogo HorizontalPanel buttonPanel = pannelloBottoni();
+        VerticalPanel pannVertTask = pannelloTask();
+        HorizontalPanel buttonPanel = pannelloBottoni();
         VerticalPanel pannVertSched = pannelloScheduler();
 
         iniziaUtenti(userTable);
         iniziaLegenda(legendaTable);
         // layout creation
-      /* ora in dialogo: VerticalPanel utentiLegenda = new VerticalPanel();
-         utentiLegenda.setSpacing(10);
-         utentiLegenda.add(userTable);
-         utentiLegenda.add(legendaTable); */
+        VerticalPanel utentiLegenda = new VerticalPanel();
+        utentiLegenda.setSpacing(10);
+        utentiLegenda.add(userTable);
+        utentiLegenda.add(legendaTable);
 
         HorizontalPanel weekUser = new HorizontalPanel();
 
-
-        if (false) {
-            weekUser.add(iniziaOre());
+        weekUser.add(iniziaOre());
+        if (true) {
             weekUser.add(taskTable);
         } else {
-            googleCalendarP = new GoogleCalendarPanel();
-            weekUser.add(googleCalendarP);
-    // messo alla fine delle inizializzazioni        googleCalendarP.setAppt(filterUsers(TaskGroup.current()),false);
+            weekUser.add(new GoogleCalendarPanel());
         }
         /*
          * FlexTable.CellFormatter form = taskTable.getCellFormatter(); Element
          * el = form.getElement(1,1); int hh = el.getClientHeight();
          * Window.alert("altezza= : "+ hh);
          */
-        // ora in un dialogo:    weekUser.add(utentiLegenda);
+        weekUser.add(utentiLegenda);
         RootPanel.get().add(weekUser);
         HorizontalPanel taskSched = new HorizontalPanel();
         //    taskSched.setSpacing(5);
-        // ora dialogo   taskSched.add(pannVertTask);
+        taskSched.add(pannVertTask);
         taskSched.add(pannVertSched);
         RootPanel.get().add(taskSched);
-        // ora dialogo  RootPanel.get().add(buttonPanel);
+        RootPanel.get().add(buttonPanel);
         if (true || modalita.equals("normale")) {
             RootPanel.get().add(lblServerReply);
         }
@@ -153,112 +146,19 @@ public class MainEntryPoint implements EntryPoint {
             String[] us = {"marino", "liliana"};
             selectAllUsers(us);
         }
-        if (true){
-            googleCalendarP.setAppt(filterUsers(TaskGroup.current()),false);
-        }
     }
-    
+
     private HorizontalPanel rigaTop() {
         HorizontalPanel uroz = new HorizontalPanel();
-        uroz.addStyleName("styleBottoniTop");
         dateLabel.addStyleName("labella");
-        // ora calendario widget   uroz.add(dateLabel);
+        uroz.add(dateLabel);
         Label spazio = new Label("         ");
         spazio.setWidth("100px");
         uroz.add(spazio);
-        uroz.setHeight("50px");
         uroz.add(new Label(" You are logged as:"));
         //  uroz.add(userName);
         userName = iniziaPartecipanti(true);
         uroz.add(userName);
-
-        uroz.add(spazio);
-        final Button butUs = new Button("Users");
-        uroz.add(butUs);
-        butUs.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                final DialogBox d = new DialogBox();
-                VerticalPanel utentiLegenda = new VerticalPanel();
-                utentiLegenda.setSpacing(10);
-                utentiLegenda.add(userTable);
-                //    utentiLegenda.add(legendaTable);
-                final Button butOK = new Button("OK");
-                utentiLegenda.add(butOK);
-                butOK.addClickHandler(new ClickHandler() {
-                    public void onClick(ClickEvent event) {
-                        d.hide();
-                    }
-                });
-                d.setWidget(utentiLegenda);
-                d.center();
-            }
-        });
-
-        final Button butLe = new Button("Legenda");
-        uroz.add(butLe);
-        butLe.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                final DialogBox d = new DialogBox();
-                VerticalPanel utentiLegenda = new VerticalPanel();
-                utentiLegenda.setSpacing(10);
-                //      utentiLegenda.add(userTable);
-                utentiLegenda.add(legendaTable);
-                final Button butOK = new Button("OK");
-                utentiLegenda.add(butOK);
-                butOK.addClickHandler(new ClickHandler() {
-                    public void onClick(ClickEvent event) {
-                        d.hide();
-                    }
-                });
-                d.setWidget(utentiLegenda);
-                d.center();
-            }
-        });
-
-        final Button showListButton = new Button("Show full task list");
-        uroz.add(showListButton);
-        showListButton.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                DialogBox dlg = new MyDialog("Specification of all tasks", null, "alltasks");
-                dialoghi.add(dlg);
-                dlg.center();
-            }
-        });
-
-        uroz.add(spazio);
-        uroz.add(spazio);
-
-        final Button butTa = new Button("Manage Task");
-        uroz.add(butTa);
-        butTa
-        .addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-               dialogoTask();
-            }
-        });
-
-        final Button schedule1Button = new Button("Schedule early tasks first ");
-        uroz.add(schedule1Button);
-        schedule1Button.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                // Window.alert("bottonr cliccato size " + TaskGroup.current().getTasks().size());
-
-                getService().schedule(new ViaVai(TaskGroup.current()), "start", "new", modalita, callbackTask);
-                // getService().schedule(new TaskGroup(), "start", callbackTask);
-                //   getService().myMethod("mar", prova);
-
-            }
-        });
-        final Button schedule2Button = new Button("Schedule urgent tasks first");
-        uroz.add(schedule2Button);
-        schedule2Button.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                getService().schedule(new ViaVai(TaskGroup.current()), "end", "new", modalita, callbackTask);
-
-            }
-        });
-
-
         final Button but = new Button(modalita.equals("normale") ? "Cambia a Modalita' Test" : "Cambia a Modalita' normale");
         but.addClickHandler(new ClickHandler() {
             public void onClick(ClickEvent event) {
@@ -273,50 +173,47 @@ public class MainEntryPoint implements EntryPoint {
                 }
             }
         });
-
-        uroz.add(spazio);
         uroz.add(spazio);
         uroz.add(but);
-
         return uroz;
     }
 
     private VerticalPanel pannelloScheduler() {
         VerticalPanel retPanel = new VerticalPanel();
-        /*  retPanel.setBorderWidth(1);
-         retPanel.setSpacing(30);
-         retPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
-         final Button schedule1Button = new Button("Schedule early tasks first ");
-         retPanel.add(schedule1Button);
-         schedule1Button.addClickHandler(new ClickHandler() {
-         public void onClick(ClickEvent event) {
-         // Window.alert("bottonr cliccato size " + TaskGroup.current().getTasks().size());
+        retPanel.setBorderWidth(1);
+        retPanel.setSpacing(30);
+        retPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+        final Button schedule1Button = new Button("Schedule early tasks first ");
+        retPanel.add(schedule1Button);
+        schedule1Button.addClickHandler(new ClickHandler() {
+            public void onClick(ClickEvent event) {
+                // Window.alert("bottonr cliccato size " + TaskGroup.current().getTasks().size());
 
-         getService().schedule(new ViaVai(TaskGroup.current()), "start", "new", modalita, callbackTask);
-         // getService().schedule(new TaskGroup(), "start", callbackTask);
-         //   getService().myMethod("mar", prova);
+                getService().schedule(new ViaVai(TaskGroup.current()), "start", "new", modalita, callbackTask);
+                // getService().schedule(new TaskGroup(), "start", callbackTask);
+                //   getService().myMethod("mar", prova);
 
-         }
-         });
-         final Button schedule2Button = new Button("Schedule urgent tasks first");
-         retPanel.add(schedule2Button);
-         schedule2Button.addClickHandler(new ClickHandler() {
-         public void onClick(ClickEvent event) {
-         getService().schedule(new ViaVai(TaskGroup.current()), "end", "new", modalita, callbackTask);
+            }
+        });
+        final Button schedule2Button = new Button("Schedule urgent tasks first");
+        retPanel.add(schedule2Button);
+        schedule2Button.addClickHandler(new ClickHandler() {
+            public void onClick(ClickEvent event) {
+                getService().schedule(new ViaVai(TaskGroup.current()), "end", "new", modalita, callbackTask);
 
-         }
-         });
-         final Button showListButton = new Button("Show full task list");
-         retPanel.add(showListButton);
-         showListButton.addClickHandler(new ClickHandler() {
-         public void onClick(ClickEvent event) {
+            }
+        });
+        final Button showListButton = new Button("Show full task list");
+        retPanel.add(showListButton);
+        showListButton.addClickHandler(new ClickHandler() {
+            public void onClick(ClickEvent event) {
 
 
-         DialogBox dlg = new MyDialog("Specification of all tasks", null, "alltasks");
-         dialoghi.add(dlg);
-         dlg.center();
-         }
-         });*/
+                DialogBox dlg = new MyDialog("Specification of all tasks", null, "alltasks");
+                dialoghi.add(dlg);
+                dlg.center();
+            }
+        });
         return retPanel;
     }
 
@@ -419,7 +316,7 @@ public class MainEntryPoint implements EntryPoint {
         return retPanel;
     }
 
-    private HorizontalPanel pannelloBottoniOrg() {
+    private HorizontalPanel pannelloBottoni() {
         HorizontalPanel retPanel = new HorizontalPanel();
         retPanel.setBorderWidth(1);
         final Button addButton = new Button("Add Task");
@@ -439,9 +336,7 @@ public class MainEntryPoint implements EntryPoint {
                     Window.alert(msg);
                     return;
                 }
-                Task tat = new Task(tName.getText(), vStart, vEnd, tDuration.getText(), tBefore.getText(), tAfter.getText(), vSched, tUsers.getText(), cOverlap.getValue(), tDescription.getText());
-
-                int sch = TaskGroup.addScheduleTask(tat);
+                int sch = TaskGroup.addScheduleTaskOrg(tName.getText(), vStart, vEnd, tDuration.getText(), tBefore.getText(), tAfter.getText(), vSched, tUsers.getText(), cOverlap.getValue(), tDescription.getText());
                 if (sch == -1) {
                     if (modalita.equals("test")) {
                         Window.alert("Task " + tName.getText() + " cannot be scheduled. You can receive suggestions for scheduling problematic tasks by pressing button \"Where can I place the task?\"");
@@ -453,7 +348,6 @@ public class MainEntryPoint implements EntryPoint {
                 riempi(taskTable, false, TaskGroup.current());
                 updateText(tName.getText());
                 updateTasks(taskDefTable);
-                googleCalendarP.addAppt(tat);
             }
         });
         final Button changeButton = new Button("Change Task");
@@ -505,7 +399,7 @@ public class MainEntryPoint implements EntryPoint {
         moveButton.addClickHandler(new ClickHandler() {
             public void onClick(ClickEvent event) {
                 //  if (selectedUser() != null) {
-                String tName = MainEntryPoint.this.tName.getText();
+                String tName = MainEntryPoint1.this.tName.getText();
                 if (TaskGroup.exists(tName)) {
                     getService().scheduleRequest(new ViaVai(TaskGroup.current()), tName, "startintervals", "mu/", "move", selectedUser(!TaskGroup.isSingle(tName)), modalita, callbackTaskSuggest);
 
@@ -520,7 +414,7 @@ public class MainEntryPoint implements EntryPoint {
         retPanel.add(insertButton);
         insertButton.addClickHandler(new ClickHandler() {
             public void onClick(ClickEvent event) {
-                final String tName = MainEntryPoint.this.tName.getText();
+                final String tName = MainEntryPoint1.this.tName.getText();
                 if (TaskGroup.exists(tName) && selectedUser(true) != null) {
                     getService().scheduleRequest(new ViaVai(TaskGroup.current()), tName, "startintervals", multiUser, "insert", selectedUser(true), modalita, callbackTaskSuggest);
                 } else {
@@ -533,7 +427,7 @@ public class MainEntryPoint implements EntryPoint {
         retPanel.add(moveNetButton);
         moveNetButton.addClickHandler(new ClickHandler() {
             public void onClick(ClickEvent event) {
-                final String tName = MainEntryPoint.this.tName.getText();
+                final String tName = MainEntryPoint1.this.tName.getText();
                 if (TaskGroup.exists(tName) && selectedUser(true) != null) {
                     TaskGroup.current().setChoiceForTask(tName);
                     getService().scheduleRequest(new ViaVai(TaskGroup.current()), tName, "tasknet", multiUser, "move", selectedUser(true), modalita, callbackTaskSuggest);
@@ -547,7 +441,7 @@ public class MainEntryPoint implements EntryPoint {
         retPanel.add(insertNetButton);
         insertNetButton.addClickHandler(new ClickHandler() {
             public void onClick(ClickEvent event) {
-                final String tName = MainEntryPoint.this.tName.getText();
+                final String tName = MainEntryPoint1.this.tName.getText();
                 if (TaskGroup.exists(tName) && selectedUser(true) != null) {
                     TaskGroup.current().setChoiceForTask(tName);
                     getService().scheduleRequest(new ViaVai(TaskGroup.current()), tName, "tasknet", multiUser, "insert", selectedUser(true), modalita, callbackTaskSuggest);
@@ -561,7 +455,7 @@ public class MainEntryPoint implements EntryPoint {
         muButton.addClickHandler(new ClickHandler() {
             public void onClick(ClickEvent event) {
                 if (selectedUser(true) != null) {
-                    final String tName = MainEntryPoint.this.tName.getText();
+                    final String tName = MainEntryPoint1.this.tName.getText();
                     if (TaskGroup.exists(tName)) {
                         // INUTILE??     TaskGroup.current().setChoiceForTask(tName);
                         getService().scheduleRequest(new ViaVai(TaskGroup.current()), tName, "startintervals", "mu/", "move", selectedUser(true), modalita, callbackTaskSuggest);
@@ -590,156 +484,6 @@ public class MainEntryPoint implements EntryPoint {
                 TaskGroup.esempioLili();
                 riempi(taskTable, false, TaskGroup.current());
                 updateTasks(taskDefTable);
-            }
-        });
-        return retPanel;
-    }
-
-    private HorizontalPanel pannelloBottoni1() {
-        HorizontalPanel retPanel = new HorizontalPanel();
-        retPanel.setBorderWidth(1);
-        final Button addButton = new Button("Add");
-        retPanel.add(addButton);
-       
-        addButton.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                if (TaskGroup.current().get(tName.getText()) != null) {
-                    Window.alert("task already existent: " + tName.getText());
-                    return;
-                }
-                //  Window.alert("giornoSelezionato: " + dayStart.getSelectedIndex());
-                String vStart = stringVal(dayStart, timeStart, 0);
-                String vEnd = stringVal(dayEnd, timeEnd, -1);
-                String vSched = stringVal(daySchedule, timeSchedule, 0);
-                String msg = TaskGroup.checkTask(tName.getText(), vStart, vEnd, tDuration.getText(), tBefore.getText(), tAfter.getText(), vSched, tUsers.getText(), cOverlap.getValue());
-                if (!msg.equals("")) {
-                    Window.alert(msg);
-                    return;
-                }
-                Task tat = new Task(tName.getText(), vStart, vEnd, tDuration.getText(), tBefore.getText(), tAfter.getText(), vSched, tUsers.getText(), cOverlap.getValue(), tDescription.getText());
-                int sch = TaskGroup.addScheduleTask(tat);
-                if (sch == -1) {
-                    if (modalita.equals("test")) {
-                        Window.alert("Task " + tName.getText() + " cannot be scheduled. You can receive suggestions for scheduling problematic tasks by pressing button \"Where can I place the task?\"");
-                    } else {
-                        Window.alert("Task " + tName.getText() + " cannot be scheduled. You should manually modify your calendar in order to reserve a time slot for this task, if possible");
-                    }
-                    return;
-                }
-                riempi(taskTable, false, TaskGroup.current());
-                updateText(tName.getText());
-                updateTasks(taskDefTable);
-                googleCalendarP.addAppt(tat);
-            }
-        });
-        final Button changeButton = new Button("Change");
-        retPanel.add(changeButton);
-        final String vecchio = tName.getText();
-        changeButton.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                String vStart = stringVal(dayStart, timeStart, 0);
-                String vEnd = stringVal(dayEnd, timeEnd, -1);
-                String vSched = stringVal(daySchedule, timeSchedule, 0);
-                String msg = TaskGroup.checkTask(tName.getText(), vStart, vEnd, tDuration.getText(), tBefore.getText(), tAfter.getText(), vSched, tUsers.getText(), cOverlap.getValue());
-                if (!msg.equals("")) {
-                    Window.alert(msg);
-                }
-                Task old = TaskGroup.get(vecchio);
-                Task tat = new Task(tName.getText(), vStart, vEnd, tDuration.getText(), tBefore.getText(), tAfter.getText(), vSched, tUsers.getText(), cOverlap.getValue(), tDescription.getText());
-                msg = TaskGroup.change(tat);
-                if (!msg.equals("")) {
-                    Window.alert(msg);
-                }
-                //      Window.alert("add task "+ Task.get(tName.getText()).toString());
-                // INUTILE???     TaskGroup.current().setSchedule(tat);
-                riempi(taskTable, false, TaskGroup.current());
-                updateText(tName.getText());
-                updateTasks(taskDefTable);
-                googleCalendarP.removeAppt(old);
-                googleCalendarP.addAppt(tat);
-            }
-        });
-        final Button removeButton = new Button("Remove");
-        retPanel.add(removeButton);
-        removeButton.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                getService().removeTask(tName.getText(), prova);
-                TaskGroup.remove(tName.getText());
-                riempi(taskTable, false, TaskGroup.current());
-                updateText("");
-                updateTasks(taskDefTable);
-            }
-        });
-        final Button clearButton = new Button("Clear");
-        retPanel.add(clearButton);
-        clearButton.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                updateText("");
-            }
-        });
-        return retPanel;
-    }
-
-    private HorizontalPanel pannelloBottoni2() {
-        HorizontalPanel retPanel = new HorizontalPanel();
-        retPanel.setBorderWidth(1);
-        moveButton = new Button("Where can I place the task? ");
-        if (!modalita.equals("test")) {
-            moveButton.setEnabled(false);
-        }
-        retPanel.add(moveButton);
-        moveButton.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                //  if (selectedUser() != null) {
-                String tName = MainEntryPoint.this.tName.getText();
-                if (TaskGroup.exists(tName)) {
-                    getService().scheduleRequest(new ViaVai(TaskGroup.current()), tName, "startintervals", "mu/", "move", selectedUser(!TaskGroup.isSingle(tName)), modalita, callbackTaskSuggest);
-
-                    //   getService().scheduleRequest(new ViaVai(TaskGroup.current()), tName, "startintervals", multiUser, "move", "" /* RIMOSSO: selectedUser()*/, callbackTaskSuggest);
-                } else {
-                    Window.alert("task NOT found:" + tName);
-                }
-            }
-        });
-        final Button insertButton = new Button("Insert(startIntervals)");
-        insertButton.setEnabled(false);
-        retPanel.add(insertButton);
-        insertButton.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                final String tName = MainEntryPoint.this.tName.getText();
-                if (TaskGroup.exists(tName) && selectedUser(true) != null) {
-                    getService().scheduleRequest(new ViaVai(TaskGroup.current()), tName, "startintervals", multiUser, "insert", selectedUser(true), modalita, callbackTaskSuggest);
-                } else {
-                    Window.alert("task=NOT found:" + tName);
-                }
-            }
-        });
-        final Button moveNetButton = new Button("move(taskNet) ");
-        moveNetButton.setEnabled(false);
-        retPanel.add(moveNetButton);
-        moveNetButton.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                final String tName = MainEntryPoint.this.tName.getText();
-                if (TaskGroup.exists(tName) && selectedUser(true) != null) {
-                    TaskGroup.current().setChoiceForTask(tName);
-                    getService().scheduleRequest(new ViaVai(TaskGroup.current()), tName, "tasknet", multiUser, "move", selectedUser(true), modalita, callbackTaskSuggest);
-                } else {
-                    Window.alert("task=NOT found:" + tName);
-                }
-            }
-        });
-        final Button insertNetButton = new Button("Insert(taskNet)");
-        insertNetButton.setEnabled(false);
-        retPanel.add(insertNetButton);
-        insertNetButton.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                final String tName = MainEntryPoint.this.tName.getText();
-                if (TaskGroup.exists(tName) && selectedUser(true) != null) {
-                    TaskGroup.current().setChoiceForTask(tName);
-                    getService().scheduleRequest(new ViaVai(TaskGroup.current()), tName, "tasknet", multiUser, "insert", selectedUser(true), modalita, callbackTaskSuggest);
-                } else {
-                    Window.alert("task=NOT found:" + tName);
-                }
             }
         });
         return retPanel;
@@ -875,7 +619,7 @@ public class MainEntryPoint implements EntryPoint {
 
     }
 
-    public void updateText(String s) {
+    private void updateText(String s) {
         if (!s.equals("")) {
             Task ta = TaskGroup.get(s);
             tName.setText(ta.getName());
@@ -942,9 +686,6 @@ public class MainEntryPoint implements EntryPoint {
     }
 
     private void riempi(FlexTable t, boolean showPossibleSchedules, TaskGroup tg) {
-        if (true){
-          //  googleCalendarP.setAppt(tg.getTasks()); // prova col nuovo Widget
-        }
         //Window.alert("rimepi00:");
         FlexTable.CellFormatter form = t.getCellFormatter();
         ArrayList<String>[] nomiCaselle = TaskGroup.nomiCaselle(tg);
@@ -1016,7 +757,7 @@ public class MainEntryPoint implements EntryPoint {
                 for (UiUser us : uu) {
                     Label l = new Label("");
                     l.setSize("10px", "22px");
-                    l.setStyleName(us.getStyle());
+                 //google    l.setStyleName(us.getStyle());
                     oriz.add(l);
                 }
             }
@@ -1031,7 +772,7 @@ public class MainEntryPoint implements EntryPoint {
             for (UiUser ui : uuu) {
                 Label l = new Label("");
                 l.setSize("10px", "22px");
-                l.setStyleName(ui.getStyle());
+         //google        l.setStyleName(ui.getStyle());
                 oriz.add(l);
             }
         }
@@ -1086,7 +827,7 @@ public class MainEntryPoint implements EntryPoint {
             for (UiUser ui : uuu) {
                 Label l = new Label("");
                 l.setSize("10px", "22px");
-                l.setStyleName(ui.getStyle());
+         //google        l.setStyleName(ui.getStyle());
                 oriz.add(l);
             }
         } else {
@@ -1094,7 +835,7 @@ public class MainEntryPoint implements EntryPoint {
             for (UiUser ui : thisBox) {
                 Label l = new Label("");
                 l.setSize("10px", "22px");
-                l.setStyleName(ui.getStyle());
+          //google       l.setStyleName(ui.getStyle());
                 oriz.add(l);
             }
         }
@@ -1398,7 +1139,7 @@ public class MainEntryPoint implements EntryPoint {
         for (UiUser u : ids) {
             t.setText(index, 0, u.getId());
             t.setWidget(index, 1, new CheckBox());
-            form.addStyleName(index, 0, u.getStyle());
+    //google         form.addStyleName(index, 0, u.getStyle());
             index++;
         }
 
@@ -1424,7 +1165,6 @@ public class MainEntryPoint implements EntryPoint {
                         }
                     }
                     riempi(taskTable, false, TaskGroup.current());
-                    googleCalendarP.setAppt(filterUsers(TaskGroup.current()),true);  // nuovo per google
                 }
             }
         });
@@ -1642,38 +1382,5 @@ public class MainEntryPoint implements EntryPoint {
         public void setOffsetY(int offsetY) {
             this.offsetY = offsetY;
         }
-    }
-
-    public void dialogoTask() {
-
-        final DialogBox d = new DialogBox(false, false);
-        VerticalPanel pannVertTask = pannelloTask();
-        pannVertTask.add(pannelloBottoni1());
-        pannVertTask.add(pannelloBottoni2());
-        final Button butOK = new Button("CANCEL");
-        pannVertTask.add(butOK);
-        butOK.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                d.hide();
-            }
-        });
-        d.setWidget(pannVertTask);
-        d.center();
-    }
-    
-    private List<Task> filterUsers(TaskGroup tas){
-        List< Task> ret = new ArrayList();
-        if (usersToShow.isEmpty()) {
-            Window.alert("no users to show");
-        }
-        for (Task t : tas.getTasks()){
-            for (UiUser u : t.getUsers()) {
-                if (usersToShow.contains(u.getId())) {
-                    ret.add(t);
-                    break;
-                }
-            }
-        }
-        return ret;
     }
 }
