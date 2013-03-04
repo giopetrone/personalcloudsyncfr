@@ -98,9 +98,16 @@ public class TaskGroup implements IsSerializable {
         setSchedule(t.getName(), sta);
         return sta;
     }
-
-    public static int addScheduleTask(String name, String firstStartHour, String lastEndHour, String duration, String before, String after, String schedule, String users, boolean overlap, String description) {
+    
+  public static int addScheduleTaskOrg(String name, String firstStartHour, String lastEndHour, String duration, String before, String after, String schedule, String users, boolean overlap, String description) {
         Task tat = new Task(name, firstStartHour, lastEndHour, duration, before, after, schedule, users, overlap, description);
+        TaskGroup.add(tat);
+        //  Window.alert("lastendhour="+lastEndHour);
+        int sched = TaskGroup.current().setSchedule(tat);
+        return sched;
+    }
+  
+    public static int addScheduleTask(Task tat) {
         TaskGroup.add(tat);
         //  Window.alert("lastendhour="+lastEndHour);
         int sched = TaskGroup.current().setSchedule(tat);
@@ -617,24 +624,37 @@ public class TaskGroup implements IsSerializable {
         task.setDescription("Teach Programming");
         tg.addScheduledTask(task, 1, 3);
 
-        task = new Task("Sviluppo SW/1", 3, 5, 2);
+        task = new Task("BUSY7", 1, 5, 4);
+        task.addUser(UiUser.find("prof.Rossi"));
+        task.setDescription("Do not disturb");
+        tg.addScheduledTask(task, 1, 5);
+        
+        
+        task = new Task("SW/1", 3, 5, 2);
         task.addUser(UiUser.find("gianluca"));
         task.setDescription("Teach Software development");
         tg.addScheduledTask(task, 3, 5);
-        task = new Task("Saggio danza", 8, 11, 3);
+        task = new Task("Baseball", 8, 11, 3);
         task.addUser(UiUser.find("gianluca"));
-        task.setDescription("daughter attends Saggio danza");
+        task.setDescription("son attends Baseball");
         tg.addScheduledTask(task, 8, 11);
         // Tuesday
-        task = new Task("Sviluppo SW/2", 13, 15, 2);
+        task = new Task("SW/2", 13, 15, 2);
         task.addUser(UiUser.find("gianluca"));
         task.setDescription("Teach Software development");
         tg.addScheduledTask(task, 13, 15);
         task = new Task("CCS", 15, 17, 2);
         task.addUser(UiUser.find("gianluca"));
+        task.addUser(UiUser.find("prof.Rossi"));
         task.setDescription("University staff meeting");
         tg.addScheduledTask(task, 15, 17);
-        task = new Task("Palestra", 22, 24, 2);
+        
+        task = new Task("BUSY6", 19, 21, 2);
+        task.addUser(UiUser.find("prof.Rossi"));
+        task.setDescription("University staff meeting");
+        tg.addScheduledTask(task, 19, 21);
+        
+        task = new Task("Gym", 22, 24, 2);
         task.addUser(UiUser.find("gianluca"));
         task.setDescription("Teach Software development");
         tg.addScheduledTask(task, 22, 24);
@@ -647,33 +667,33 @@ public class TaskGroup implements IsSerializable {
         task.addUser(UiUser.find("gianluca"));
         task.setDescription("Teach Programming");
         tg.addScheduledTask(task, 27, 29);
-        task = new Task("Ricevimento st.", 30, 59, 2);
+        task = new Task("Tutoring", 30, 59, 2);
         task.addUser(UiUser.find("gianluca"));
         task.setDescription("Teach Programming");
         tg.addScheduledTask(task, 30, 32);
-        task = new Task("Visita dr. Neri", 30, 35, 2);
+        task = new Task("Meet dr. Neri", 30, 35, 2);
         task.addUser(UiUser.find("gianluca"));
         task.setDescription("See doctor");
         tg.addScheduledTask(task, 33, 35);
         // Thursday
         // NUOVO  
-        task = new Task("Anagrafe", 36, 40, 1);
+        task = new Task("Attorney", 36, 40, 1);
         task.addUser(UiUser.find("gianluca"));
         task.setDescription("get Dcouments");
         tg.addScheduledTask(task, 36, 37);
-        task = new Task("Sviluppo SW/3", 37, 39, 2);
+        task = new Task("SW/3", 37, 39, 2);
         task.addUser(UiUser.find("gianluca"));
         task.setDescription("Teach Software development");
         tg.addScheduledTask(task, 37, 39);
-        task = new Task("Tesista Ugo", 36, 54, 1);
+        task = new Task("Thesist Ugo", 36, 54, 1);
         task.addUser(UiUser.find("gianluca"));
         task.setDescription("Thesist meeting");
         tg.addScheduledTask(task, 39, 40);
-        task = new Task("Tesista Ida", 36, 54, 1);
+        task = new Task("Thesist Ida", 36, 54, 1);
         task.addUser(UiUser.find("gianluca"));
         task.setDescription("Thesist meeting");
         tg.addScheduledTask(task, 40, 41);
-        task = new Task("Idraulico", 30, 47, 3);
+        task = new Task("Plumber", 30, 47, 3);
         task.addUser(UiUser.find("gianluca"));
         task.setDescription("Plumber");
         tg.addScheduledTask(task, 43, 46);
@@ -684,6 +704,7 @@ public class TaskGroup implements IsSerializable {
         tg.addScheduledTask(task, 49, 51);
         task = new Task("CDD", 54, 57, 3);
         task.addUser(UiUser.find("gianluca"));
+        task.addUser(UiUser.find("prof.Rossi"));
         task.setDescription("University staff meeting");
         tg.addScheduledTask(task, 54, 57);
 

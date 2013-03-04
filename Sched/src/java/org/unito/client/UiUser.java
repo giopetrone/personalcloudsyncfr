@@ -4,7 +4,7 @@
  */
 package org.unito.client;
 
-import com.google.gwt.user.client.Window;
+import com.bradrydzewski.gwt.calendar.client.AppointmentStyle;
 import com.google.gwt.user.client.rpc.IsSerializable;
 import java.util.ArrayList;
 
@@ -29,6 +29,7 @@ public class UiUser implements IsSerializable {
     }
     private String id;
     private String style = "styleUser";
+    private AppointmentStyle styleInt;
     private double weight = 1.0;
     private static ArrayList<UiUser> users = new ArrayList();
 
@@ -37,12 +38,18 @@ public class UiUser implements IsSerializable {
         this.weight = 0.0;
         addUser(this);
     }
-
+/*
     public static void addUser(UiUser u) {
         u.setStyle("styleUser" + (users.size() + 1));
         users.add(u);
     }
-
+*/
+     public static void addUser(UiUser u) {
+        u.setStyleInt(AppointmentBuilder.GOOGLE_STYLES[users.size()]);
+        u.setStyle(AppointmentBuilder.GOOGLE_STYLES_STRING[users.size()]);
+        users.add(u);
+    }
+     
     public UiUser(String name, double weight) {
         this.id = name;
         this.weight = weight;
@@ -124,4 +131,17 @@ public class UiUser implements IsSerializable {
     public void setStyle(String style) {
         this.style = style;
     }
+      
+    public void setStyleInt(AppointmentStyle styleInt) {
+        this.styleInt = styleInt;
+    }
+
+    /**
+     * @return the styleInt
+     */
+    public AppointmentStyle getStyleInt() {
+        return styleInt;
+    }
+
+    
 }

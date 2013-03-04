@@ -14,6 +14,7 @@
     display: block;
     background-color: #DDD0FF;
     color: black;
+    border-radius: 6px;
 }
 
 .gwt-DialogBox {
@@ -50,10 +51,12 @@
 
 .gwt-ButtonSmall{
     font-size: 12px;
+    border-radius: 6px;
 }
 
 .gwt-Button{
     font-weight: bold;
+    border-radius: 6px;
 }
 
 .overlapping{
@@ -64,7 +67,10 @@
     border:2px solid #228B22;
 
 }
+.styleBottoniTop{
+    border:3px solid #FF0000;
 
+}
 .styleUnused{
     background-color: #F0F0F0;
 
@@ -90,7 +96,8 @@
 }
 
 .styleSeriousConflict {
-    border:2px solid #990000;
+    border:2px solid #000000;
+    border-radius: 6px;
 }
 
 .style1{
@@ -156,7 +163,7 @@
 }
 
 .styleUser5{
-    background-color: #0000FF;
+    background-color: #3399FF ;
 
 }
 
