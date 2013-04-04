@@ -1,0 +1,2 @@
+serviceClass: com.google.android.gcm.demo.server.client.GreetingService
+path: D0DAE43B87D82411913A11709D39FF71.gwt.rpc
