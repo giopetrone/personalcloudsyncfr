@@ -1,0 +1,3 @@
+# Module gcmdemo4
+# RPC service class, partial path of RPC policy file
+com.google.android.gcm.demo.server.client.GreetingService, D0DAE43B87D82411913A11709D39FF71.gwt.rpc

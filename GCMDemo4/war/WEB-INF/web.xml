@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.5" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee                http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+
+  <!-- Servlets -->
+  
+  <servlet>
+      <servlet-name>proxygcm</servlet-name>
+      <servlet-class>com.google.android.gcm.demo.server.server.ProxyGCM</servlet-class>
+  </servlet>
+   
+  <servlet-mapping>
+    <servlet-name>proxygcm</servlet-name>
+    <url-pattern>/gcmdemo4/proxy</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>greetServlet</servlet-name>
+    <servlet-class>com.google.android.gcm.demo.server.server.GreetingServiceImpl</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>greetServlet</servlet-name>
+    <url-pattern>/gcmdemo4/greet</url-pattern>
+  </servlet-mapping>
+  
+     <servlet>
+    <servlet-name>homeservlet</servlet-name>
+    <servlet-class> com.google.android.gcm.demo.server.server.HomeServlet </servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>homeservlet</servlet-name>
+    <url-pattern>/gcmdemo4/home</url-pattern>
+  </servlet-mapping>
+  
+   <listener>
+    <listener-class>
+     				com.google.android.gcm.demo.server.server.ApiKeyInitializer
+    </listener-class>
+  </listener>
+
+  <servlet>
+    <servlet-name>registerservlet</servlet-name>
+    <servlet-class>
+      				com.google.android.gcm.demo.server.server.RegisterServlet
+    </servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>registerservlet</servlet-name>
+    <url-pattern>/gcmdemo4/register</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>unregisterservlet</servlet-name>
+    <servlet-class>
+      com.google.android.gcm.demo.server.server.UnregisterServlet
+    </servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>unregisterservlet</servlet-name>
+    <url-pattern>/gcmdemo4/unregister</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>sendallmessagesservlet</servlet-name>
+    <servlet-class>
+      com.google.android.gcm.demo.server.server.SendAllMessagesServlet
+    </servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>sendallmessagesservlet</servlet-name>
+    <url-pattern>/gcmdemo4/sendAll</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>sendmessageservlet</servlet-name>
+    <servlet-class>
+     com.google.android.gcm.demo.server.server.SendMessageServlet
+    </servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>sendmessageservlet</servlet-name>
+    <url-pattern>/gcmdemo4/send</url-pattern>
+  </servlet-mapping>
+
+
+  
+  <!-- Default page to serve -->
+  <welcome-file-list>
+    <welcome-file>GCMDemo4.html</welcome-file>
+  </welcome-file-list>
+
+  <servlet>
+    <servlet-name>SystemServiceServlet</servlet-name>
+    <servlet-class>com.google.api.server.spi.SystemServiceServlet</servlet-class>
+    <init-param>
+      <param-name>services</param-name>
+      <param-value/>
+    </init-param>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>SystemServiceServlet</servlet-name>
+    <url-pattern>/_ah/spi/*</url-pattern>
+  </servlet-mapping>
+  
+ 
+    
+
+</web-app>
