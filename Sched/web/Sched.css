@@ -10,6 +10,30 @@
    TODO customize this sample style
    Syntax recommendation http://www.w3.org/TR/REC-CSS2/
 */
+
+#demo .gwt-cal{
+    background-color: violet;
+        border: 10px solid orange;
+}
+#demo  * gwt-cal{
+    background-color: violet;
+        border: 10px solid yellow;
+}
+#demo .gwt-cal{
+    background-color: violet;
+        border: 10px solid purple;
+}
+
+#demo .gwt-cal .working-hours {
+        background: #FFF;
+}
+
+
+#demo{
+    background-color: green;
+        border: 10px solid red;
+}
+
 .gwt-root {
     display: block;
     background-color: #DDD0FF;
@@ -68,7 +92,7 @@
 
 }
 .styleBottoniTop{
-    border:3px solid #FF0000;
+    border:3px solid #00FF00;
 
 }
 .styleUnused{

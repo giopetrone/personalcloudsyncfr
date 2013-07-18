@@ -32,11 +32,13 @@ public class AppointmentBuilder {
      * the &quot;Google&quot; theme.
      */
     public static final AppointmentStyle[] GOOGLE_STYLES =
-            new AppointmentStyle[]{AppointmentStyle.GREEN, AppointmentStyle.BLUE,
-        AppointmentStyle.LIGHT_GREEN, AppointmentStyle.BLUE_GREY,AppointmentStyle.LIGHT_BLUE,AppointmentStyle.LIGHT_PURPLE};
+            new AppointmentStyle[]{AppointmentStyle.GREY,AppointmentStyle.LIGHT_BROWN,
+                AppointmentStyle.BLUE, AppointmentStyle.BLUE_GREY,AppointmentStyle.LIGHT_BLUE,
+                AppointmentStyle.LIGHT_PURPLE,AppointmentStyle.YELLOW_GREEN,
+        AppointmentStyle.LIGHT_GREEN};
   
         public static final String [] GOOGLE_STYLES_STRING ={
-            "GREEN","BLUE","LIGHT_GREEN","BLUE_GREY","LIGHT_BLUE","LIGHT_PURPLE"};
+            "GREY","LIGHT_BROWN","BLUE","BLUE_GREY","LIGHT_BLUE","LIGHT_PURPLE","YELLOW_GREEN","LIGHT_GREEN"};
  /**
      * The available styles that can be applied to appointments when using the
      * &quot;iCal&quot; theme.
@@ -196,7 +198,7 @@ public class AppointmentBuilder {
         Date end = (Date) start.clone();
         end.setMinutes(start.getMinutes() + t.getDuration() * 60);
 
-        AppointmentStyle style = GOOGLE_STYLES[Random.nextInt(GOOGLE_STYLES.length)];
+     //   AppointmentStyle style = GOOGLE_STYLES[Random.nextInt(GOOGLE_STYLES.length)];
         Appointment appt = new Appointment();
         appt.setStart(start);
         appt.setEnd(end);
@@ -204,7 +206,13 @@ public class AppointmentBuilder {
         appt.setTitle(t.getName());
        
         appt.setDescription(t.getDescription());
-        appt.setStyle(style);
+        AppointmentStyle style = t.getStyle();
+        if (style != null) {
+            appt.setStyle(style);
+        } else {
+           
+            appt.setStyle(AppointmentStyle.GREY);
+        }
         appt.setLocation("office");
         int attendees = Random.nextInt(EMAIL.length) + 1;
         for (int i = 0; i < attendees; i++) {

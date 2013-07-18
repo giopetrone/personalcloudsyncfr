@@ -124,7 +124,7 @@ public class MainEntryPoint1 implements EntryPoint {
         if (true) {
             weekUser.add(taskTable);
         } else {
-            weekUser.add(new GoogleCalendarPanel());
+            weekUser.add(new GoogleCalendarPanel(true));
         }
         /*
          * FlexTable.CellFormatter form = taskTable.getCellFormatter(); Element
@@ -336,8 +336,8 @@ public class MainEntryPoint1 implements EntryPoint {
                     Window.alert(msg);
                     return;
                 }
-                int sch = TaskGroup.addScheduleTaskOrg(tName.getText(), vStart, vEnd, tDuration.getText(), tBefore.getText(), tAfter.getText(), vSched, tUsers.getText(), cOverlap.getValue(), tDescription.getText());
-                if (sch == -1) {
+                int sch = TaskGroup.addScheduleTaskOrg(tName.getText(), vStart, vEnd, tDuration.getText(), tBefore.getText(), tAfter.getText(), vSched, tUsers.getText(), cOverlap.getValue(), tDescription.getText(),1);
+                if (sch == -1) { 
                     if (modalita.equals("test")) {
                         Window.alert("Task " + tName.getText() + " cannot be scheduled. You can receive suggestions for scheduling problematic tasks by pressing button \"Where can I place the task?\"");
                     } else {
@@ -361,7 +361,7 @@ public class MainEntryPoint1 implements EntryPoint {
                 if (!msg.equals("")) {
                     Window.alert(msg);
                 }
-                Task tat = new Task(tName.getText(), vStart, vEnd, tDuration.getText(), tBefore.getText(), tAfter.getText(), vSched, tUsers.getText(), cOverlap.getValue(), tDescription.getText());
+                Task tat = new Task(tName.getText(), vStart, vEnd, tDuration.getText(), tBefore.getText(), tAfter.getText(), vSched, tUsers.getText(), cOverlap.getValue(), tDescription.getText(),1);
                 msg = TaskGroup.change(tat);
                 if (!msg.equals("")) {
                     Window.alert(msg);

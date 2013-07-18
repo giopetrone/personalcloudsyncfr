@@ -19,6 +19,8 @@ import com.bradrydzewski.gwt.calendar.client.event.DateRequestEvent;
 import com.bradrydzewski.gwt.calendar.client.event.DateRequestHandler;
 import com.bradrydzewski.gwt.calendar.client.event.DeleteEvent;
 import com.bradrydzewski.gwt.calendar.client.event.DeleteHandler;
+import com.bradrydzewski.gwt.calendar.client.event.MouseOverEvent;
+import com.bradrydzewski.gwt.calendar.client.event.MouseOverHandler;
 import com.bradrydzewski.gwt.calendar.client.event.TimeBlockClickEvent;
 import com.bradrydzewski.gwt.calendar.client.event.UpdateEvent;
 import com.bradrydzewski.gwt.calendar.client.event.UpdateHandler;
@@ -26,6 +28,7 @@ import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+
 import com.google.gwt.event.logical.shared.OpenEvent;
 import com.google.gwt.event.logical.shared.OpenHandler;
 import com.google.gwt.event.logical.shared.ResizeEvent;
@@ -40,6 +43,7 @@ import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.DecoratedPopupPanel;
 import com.google.gwt.user.client.ui.DecoratedTabBar;
 import com.google.gwt.user.client.ui.DecoratorPanel;
 import com.google.gwt.user.client.ui.DialogBox;
@@ -64,13 +68,16 @@ public class GoogleCalendarPanel extends FlowPanel {
     private DecoratorPanel datePickerDecorator = new DecoratorPanel();
     private DecoratedTabBar calendarViewsTabBar = new DecoratedTabBar();
     private CalendarSettings settings = new CalendarSettings();
+    static int newAppIndex = 1;
 
-    public GoogleCalendarPanel() {
+    public GoogleCalendarPanel(boolean picker) {
 
         // style this element as absolute position
         DOM.setStyleAttribute(this.getElement(), "position", "absolute");
-        //   DOM.setStyleAttribute(this.getElement(), "top", "20px");
-        DOM.setStyleAttribute(this.getElement(), "top", "50px");
+        // DOM.setStyleAttribute(this.getElement(), "top", "20px");
+        if (picker) {
+            DOM.setStyleAttribute(this.getElement(), "top", "50px");
+        }
         DOM.setStyleAttribute(this.getElement(), "left", "0px");
 
         configureCalendar();
@@ -106,7 +113,9 @@ public class GoogleCalendarPanel extends FlowPanel {
         topPanel.add(calendarViewsTabBar);
         topPanel.setStyleName("daysTabBar");
         leftPanel.setStyleName("leftPanel");
+
         leftPanel.add(datePickerDecorator);
+
 
         datePickerDecorator.add(datePicker);
         dayViewDecorator.add(calendar);
@@ -114,15 +123,24 @@ public class GoogleCalendarPanel extends FlowPanel {
         layoutTable.setWidth("99%");
         layoutTable.setCellPadding(0);
         layoutTable.setCellSpacing(0);
-        layoutTable.setText(0, 0, "");
-        layoutTable.setWidget(0, 1, topPanel);
-        layoutTable.setWidget(1, 1, dayViewDecorator);
-        layoutTable.setWidget(1, 0, leftPanel);
+
+        if (picker) {
+            layoutTable.setText(0, 0, "");
+            layoutTable.setWidget(0, 1, topPanel);
+
+            layoutTable.setWidget(1, 1, dayViewDecorator);
+
+            layoutTable.setWidget(1, 0, leftPanel);
+        } else {
+            layoutTable.setWidget(0, 0, dayViewDecorator);
+        }
         layoutTable.getCellFormatter().setVerticalAlignment(1, 0,
                 HasVerticalAlignment.ALIGN_TOP);
         layoutTable.getCellFormatter().setVerticalAlignment(1, 1,
                 HasVerticalAlignment.ALIGN_TOP);
-        layoutTable.getCellFormatter().setWidth(1, 0, "50px");
+        if (picker) {
+            layoutTable.getCellFormatter().setWidth(1, 0, "50px");
+        }
         add(layoutTable);
 
         // window events to handle resizing
@@ -163,6 +181,21 @@ public class GoogleCalendarPanel extends FlowPanel {
         calendar.setSettings(settings);
         //calendar.setView(Calendar.DAY_VIEW);
         calendar.setWidth("100%");
+
+        calendar.addSelectionHandler(new SelectionHandler<Appointment>() {
+            @Override
+            public void onSelection(SelectionEvent<Appointment> event) {
+                Appointment aa = event.getSelectedItem();
+                //  Window.alert("selezionato: " + event.getSelectedItem().getTitle());
+                aa.setStyle(AppointmentStyle.BLUE);
+                Element el = DOM.getElementById(aa.getId());
+                //  Window.alert("el1="+el);
+                el = DOM.getElementById(aa.getTitle());
+                //   Window.alert("el2="+el);
+                // DOM.setStyleAttribute(aa.getElement(), "position", "absolute");
+
+            }
+        });
         calendar.addDeleteHandler(new DeleteHandler<Appointment>() {
             public void onDelete(DeleteEvent<Appointment> event) {
 //            	boolean commit = true;
@@ -173,6 +206,8 @@ public class GoogleCalendarPanel extends FlowPanel {
                 if (!commit) {
                     event.setCancelled(true);
                     System.out.println("Cancelled Appointment deletion");
+                } else {
+                    MainEntryPoint.current.removeTask(event.getTarget().getTitle());
                 }
             }
         });
@@ -185,13 +220,18 @@ public class GoogleCalendarPanel extends FlowPanel {
                 if (!commit) {
                     event.setCancelled(true);
                     System.out.println("Cancelled Appointment update");
+                } else {
+                    Appointment ap = event.getTarget();
+                    MainEntryPoint.current.updateTask(ap);
                 }
             }
         });
         calendar.addOpenHandler(new OpenHandler<Appointment>() {
             public void onOpen(OpenEvent<Appointment> event) {
                 if (true) {
-                    MainEntryPoint.current.dialogoTask();
+                    MainEntryPoint.current.updateText(event.getTarget().getTitle());
+                  //   Window.alert("OPEN");
+                    MainEntryPoint.current.dialogoTask(null,-1);
                 } else {
                     final DialogBox dialogBox =
                             createCalendaryEventDialogBox(event);
@@ -204,16 +244,42 @@ public class GoogleCalendarPanel extends FlowPanel {
         });
         calendar.addCreateHandler(new CreateHandler<Appointment>() {
             public void onCreate(CreateEvent<Appointment> event) {
-                boolean commit = Window
-                        .confirm("Are you sure you want to create a new appointment");
-                if (!commit) {
-                    event.setCancelled(true);
-                    System.out.println("Cancelled Appointment creation");
-                } else {
-                    Appointment app = event.getTarget();
-                    app.setTitle("New Appointment");
-                    calendar.addAppointment(app);
-                }
+
+                /*   boolean commit = Window
+                 .confirm("Are you sure you want to create a new appointment");
+                 if (!commit) {
+                 event.setCancelled(true);
+                 System.out.println("Cancelled Appointment creation");
+                 } else {*/
+                //  MainEntryPoint.current.updateText("New Appointment");
+                Appointment ap = event.getTarget();
+                Date ad = ap.getStart();
+                Date now = new Date();
+                int or = ad.getHours() - 8;
+                int schedule = (ad.getDate() - now.getDate()) * 12 + or;
+              //  Window.alert("sched: "+schedule);
+                MainEntryPoint.current.dialogoTask("New Appointment"+ newAppIndex++, schedule);
+                /*   Window.alert("sciopa");
+                 Appointment app = event.getTarget();
+                 app.setTitle("New Appointment");
+                 calendar.addAppointment(app);*/
+                //   }
+            }
+        });
+        final DecoratedPopupPanel appointmentPopup = new DecoratedPopupPanel(true);
+        appointmentPopup.setAutoHideEnabled(true);
+
+        calendar.addMouseOverHandler(new MouseOverHandler<Appointment>() {
+            @Override
+            public void onMouseOver(MouseOverEvent<Appointment> event) {
+                Element element = (Element) event.getElement();
+                String ute = TaskGroup.get(event.getTarget().getTitle()).getUsersAsString();
+                appointmentPopup.setWidget(new HTML(ute));
+
+                int left = element.getAbsoluteLeft() + 10;
+                int top = element.getAbsoluteTop() + 10;
+                appointmentPopup.setPopupPosition(left, top);
+                appointmentPopup.show();
             }
         });
 
@@ -420,14 +486,19 @@ public class GoogleCalendarPanel extends FlowPanel {
         }
     };
 
-    public void setAppt(List<Task> appts, boolean clear) {
-        if (clear){
+    public void setAppt(List<Task> appts, boolean clear, Task selectedTask) {
+        if (clear) {
             calendar.clearAppointments();
         }
         for (Task a : appts) {
+            a.updateAppo();
+            // do not add task with same schedule
+            if (selectedTask != null && selectedTask.getSchedule() == a.getFirstStartHour()) {
+                continue;
+            }
             calendar.addAppointment(a.getAppo());
         }
-
+        calendar.doLayout();
     }
 
     public void addAppt(Task app) {
@@ -436,11 +507,25 @@ public class GoogleCalendarPanel extends FlowPanel {
         calendar.addAppointment(app.getAppo());
 
     }
-    
+
     public void removeAppt(Task app) {
         // calendar.clearAppointments();
 
         calendar.removeAppointment(app.getAppo());
 
+    }
+
+    public void setOra() {
+        calendar.setDays(7);
+        calendar.scrollToHour(7);
+        calendar.doLayout();
+    }
+
+    public Appointment getSelectedApp() {
+        return calendar.getSelectedAppointment();
+    }
+
+    public void selectTask(Task t) {
+        t.getAppo().setStyle(AppointmentStyle.BLUE);
     }
 }

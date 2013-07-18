@@ -5,6 +5,7 @@
 package org.unito.client;
 
 import com.bradrydzewski.gwt.calendar.client.AppointmentStyle;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.IsSerializable;
 import java.util.ArrayList;
 
@@ -32,54 +33,94 @@ public class UiUser implements IsSerializable {
     private AppointmentStyle styleInt;
     private double weight = 1.0;
     private static ArrayList<UiUser> users = new ArrayList();
+   // private static UiUser Anonymous = null;
 
     public UiUser() {
         this.id = "anonymous";
         this.weight = 0.0;
-        addUser(this);
+        addUser(this, false);
     }
-/*
-    public static void addUser(UiUser u) {
-        u.setStyle("styleUser" + (users.size() + 1));
-        users.add(u);
-    }
-*/
+    /*
      public static void addUser(UiUser u) {
-        u.setStyleInt(AppointmentBuilder.GOOGLE_STYLES[users.size()]);
-        u.setStyle(AppointmentBuilder.GOOGLE_STYLES_STRING[users.size()]);
+     u.setStyle("styleUser" + (users.size() + 1));
+     users.add(u);
+     }
+     */
+
+    public static void addUser(UiUser u, boolean dostyle) {
+        if (trovato(u.getId()) != null) {
+            return;
+        }
+        if (dostyle) {
+            int sti = users.size() + 1;
+            if (AppointmentBuilder.GOOGLE_STYLES.length < sti) {
+                //  Window.alert("too few styles:");
+                sti = 0;
+            }
+            //   Window.alert("sti,i "+sti+" "+ AppointmentBuilder.GOOGLE_STYLES[sti]);
+            u.setStyleInt(AppointmentBuilder.GOOGLE_STYLES[sti]);
+            u.setStyle(AppointmentBuilder.GOOGLE_STYLES_STRING[sti]);
+        }
         users.add(u);
     }
-     
-    public UiUser(String name, double weight) {
+
+    public UiUser(String name, AppointmentStyle style) {
+        this.id = name;
+        this.styleInt = style;
+    }
+
+    public static void addSpecialUsersAA() {
+        UiUser fre = new UiUser("Free", AppointmentStyle.GREEN);
+        users.add(fre);
+        fre = new UiUser("Busy1", AppointmentStyle.YELLOW);
+        users.add(fre);
+        fre = new UiUser("Busy2", AppointmentStyle.RED_ORANGE);
+        users.add(fre);
+        fre = new UiUser("Busy3", AppointmentStyle.RED);
+        users.add(fre);
+    }
+
+    public UiUser(String name, double weight, boolean dostyle) {
         this.id = name;
         this.weight = weight;
-        addUser(this);
+        addUser(this, dostyle);
     }
 
-    public UiUser(String name) {
+    public UiUser(String name, boolean dostyle) {
         this.id = name;
-         addUser(this);
+        addUser(this, dostyle);
     }
 
-    public static UiUser find(String us) {
-        try {
+    public static UiUser getFreeUser() {
+        return find("Free");
+    }
+
+    public static UiUser trovato(String us) {
         for (UiUser u : getUsers()) {
             if (u.id.equals(us)) {
                 return u;
             }
         }
-        throw new Exception("buu");
-      //  Window.alert("User not found: "+us);
-        } catch (Exception ex){ex.printStackTrace();}
         return null;
+    }
+     
+    public static UiUser find(String us) {
+        for (UiUser u : getUsers()) {
+            if (u.id.equals(us)) {
+                return u;
+            }
+        }
+      //  Window.alert("UIuser not found: " + us);
+        return null; //Anonymous;
     }
 
     public static void createUsers() {
-        new UiUser("liliana");
-        new UiUser("giovanna");
-        new UiUser("gianluca");
-        new UiUser("marino");
-        new UiUser("prof.Rossi", 10.0);
+        new UiUser("liliana", true);
+        new UiUser("giovanna", true);
+        new UiUser("gianluca", true);
+        new UiUser("marino", true);
+        new UiUser("prof.Rossi", 10.0, true);
+      //  Anonymous = new UiUser("Anonymous", false);
     }
 
     public static ArrayList<String> getUserIds() {
@@ -131,7 +172,7 @@ public class UiUser implements IsSerializable {
     public void setStyle(String style) {
         this.style = style;
     }
-      
+
     public void setStyleInt(AppointmentStyle styleInt) {
         this.styleInt = styleInt;
     }
@@ -142,6 +183,4 @@ public class UiUser implements IsSerializable {
     public AppointmentStyle getStyleInt() {
         return styleInt;
     }
-
-    
 }
