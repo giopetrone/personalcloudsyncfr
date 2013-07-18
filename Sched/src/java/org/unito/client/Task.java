@@ -5,8 +5,11 @@
 package org.unito.client;
 
 import com.bradrydzewski.gwt.calendar.client.Appointment;
+import com.bradrydzewski.gwt.calendar.client.AppointmentStyle;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.IsSerializable;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  *
@@ -14,6 +17,7 @@ import java.util.ArrayList;
  */
 public class Task implements IsSerializable {
 
+    private AppointmentStyle style = null;
     private String name;
     private String description;
     private int firstStartHour = 0;
@@ -28,12 +32,15 @@ public class Task implements IsSerializable {
     private ArrayList<Interval> intervals = new ArrayList();
     private ArrayList<UiUser> users = new ArrayList();
     private Appointment appo;
+    private Importance importance = Importance.M;
 
     public String toRequest(boolean tasco) {
         String ret = "";
         if (tasco) {
             ret += "<task name=\"";
             ret += getName();
+            ret += "\" imp=\"";
+            ret += getImportance();
             ret += "\" dur=\"";
             ret += getDuration();
             ret += "\" end=\"";
@@ -75,14 +82,53 @@ public class Task implements IsSerializable {
         return after;
     }
 
+    public Task toSpecial(Interval inte, AppointmentStyle style) {
+        if (style == null){
+            String impatto = inte.impatto();
+            if (impatto.equals("L")){
+                style = AppointmentStyle.GREEN;
+            } else  if (impatto.equals("M")){
+                style = AppointmentStyle.YELLOW;
+            } else if (impatto.equals("H")){
+                style = AppointmentStyle.ORANGE;
+            } else {
+                style = AppointmentStyle.GREY;
+            }
+        }
+        Task ret = new Task(name, inte != null ? inte.getMin() : firstStartHour, inte != null ? inte.getMax() : lastEndHour, duration);
+        ret.setStyle(style);
+        ret.updateAppo();
+        return ret;
+    }
+
+    public AppointmentStyle getStyle() {
+        if (style != null) {
+            return style;
+        }
+        // se un solo utente stile suo
+        if (users.size() == 1) {
+            UiUser u = users.get(0);
+            return u.getStyleInt();
+        }
+        return null;
+    }
+
     public ArrayList<UiUser> getUsers() {
         return users;
     }
-    
+
+    public String getUsersAsString() {
+        String ret = "";
+        for (UiUser u : users) {
+            ret += u.getId() + ", ";
+        }
+        return ret.substring(0, ret.length() - 2);
+    }
+
     public boolean oneUser() {
         return users.size() <= 1;
     }
-     
+
     public int getOfficialSchedule() {
         return TaskGroup.current().getOfficialSchedule(getName());
     }
@@ -113,14 +159,19 @@ public class Task implements IsSerializable {
         appo = new AppointmentBuilder().riempi(this);
     }
 
-    public String toString() {
-        return "name: " + getName() + " start: " + getFirstStartHour() + " end: " + getLastEndHour() + "duration: " + getDuration() + "schedule: " + getSchedule();
+    public void aggiorna() {
+        appo = new AppointmentBuilder().riempi(this);
     }
 
-    public Task(String name, String firstStartHour, String lastEndHour, String duration, String before, String after, String schedule, String users, boolean overlap, String description) {
+    public String toString() {
+        return "name: " + getName() + " start: " + getFirstStartHour() + " end: " + getLastEndHour() + "duration: " + getDuration() + "schedule: " + getSchedule() +" priority: "+ importance;
+    }
+
+    public Task(String name, String firstStartHour, String lastEndHour, String duration, String before, String after, String schedule, String users, boolean overlap, String description, int priority) {
         this.name = name;
         this.description = description;
         this.overlap = overlap;
+        this.importance = priority == 0? Importance.L : priority==1? Importance.M : Importance.H;
         this.duration = Integer.parseInt(duration);
         if (Integer.parseInt(firstStartHour) >= 0) {
             this.firstStartHour = Integer.parseInt(firstStartHour);
@@ -161,10 +212,10 @@ public class Task implements IsSerializable {
         appo = new AppointmentBuilder().riempi(this);
         //   Window.alert(this.toString());
     }
-    
+
     public boolean okToStart(int time) {
-        return time >= firstStartHour &&
-                time + duration <= lastEndHour;
+        return time >= firstStartHour
+                && time + duration <= lastEndHour;
     }
 
     public boolean concurrent(Task t2) {
@@ -173,7 +224,7 @@ public class Task implements IsSerializable {
 
     public boolean disJoint(Task t2) {
         // if two tasks have no common users, they can be concurrent
-        if (t2 == this){
+        if (t2 == this) {
             return false;
         }
         for (UiUser u1 : users) {
@@ -187,13 +238,13 @@ public class Task implements IsSerializable {
     }
 
     /*
-    public int getStartHour() {
-    return startHour;
-    }
+     public int getStartHour() {
+     return startHour;
+     }
 
-    public int getEndHour() {
-    return startHour + duration;
-    }
+     public int getEndHour() {
+     return startHour + duration;
+     }
      */
     public int getDuration() {
         return duration;
@@ -216,24 +267,24 @@ public class Task implements IsSerializable {
     }
 
     /*   public void setStartHour(int startHour) {
-    this.startHour = startHour;
-    }
+     this.startHour = startHour;
+     }
 
-    public int getstartHourDay() {
-    return startHour % giornata;
-    }
+     public int getstartHourDay() {
+     return startHour % giornata;
+     }
 
-    public int getEndHourDay() {
-    return (startHour + duration) % giornata;
-    }
+     public int getEndHourDay() {
+     return (startHour + duration) % giornata;
+     }
 
-    public int getStartDay() {
-    return startHour / giornata;
-    }
+     public int getStartDay() {
+     return startHour / giornata;
+     }
 
-    public int getEndDay() {
-    return (startHour + duration) / giornata;
-    }
+     public int getEndDay() {
+     return (startHour + duration) / giornata;
+     }
      */
     public String getName() {
         return name;
@@ -421,5 +472,47 @@ public class Task implements IsSerializable {
      */
     public void setAppo(Appointment appo) {
         this.appo = appo;
+    }
+
+    public void updateAppo() {
+        AppointmentStyle style = getStyle();
+        // Window.alert("updateAppo users="+users.size());
+        if (style != null) {
+            appo.setStyle(style);
+        } else {
+            appo.setStyle(AppointmentStyle.GREY);
+        }
+    }
+
+    public void aggiornamento() {
+        // scheduliamo sempre usando come ora 0 le 8 di mattina,
+        // l'ultima sono le 20
+        // non si puo' usare GregorianClandar sul client!!!
+        Date now = new Date();
+        Date ad = appo.getStart();
+        int or = ad.getHours() - 8;
+        schedule = (ad.getDay() - now.getDay()) * 12 + or;
+        Window.alert("schedule dopo drop =" + now.toString() + " " + ad.toString() + " " + schedule);
+    }
+
+    /**
+     * @param style the style to set
+     */
+    public void setStyle(AppointmentStyle style) {
+        this.style = style;
+    }
+
+    /**
+     * @return the importance
+     */
+    public Importance getImportance() {
+        return importance;
+    }
+
+    /**
+     * @param importance the importance to set
+     */
+    public void setImportance(Importance importance) {
+        this.importance = importance;
     }
 }

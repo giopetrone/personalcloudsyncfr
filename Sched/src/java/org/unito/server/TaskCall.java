@@ -45,7 +45,7 @@ public class TaskCall {
         try {
             DefaultHttpClient httpClient = new DefaultHttpClient();
             String req = "http://localhost:3000/modstn/" + mu + taskNet;
-            System.err.println("in dorequest url=" + req + "\n");
+            System.out.println("in dorequest url=" + req + "\n");
             HttpPost postRequest = new HttpPost(req);
 
             //   "http://localhost:3000/modstn/startintervals");   oppure "tasknet"
@@ -59,7 +59,7 @@ public class TaskCall {
             }
             //  System.out.println("risposta=\n");
             //  response.getEntity().writeTo(System.out);
-             System.err.println("Ora di fine torta=\n" + new Date());
+            System.err.println("Ora di fine torta=\n" + new Date());
             InputStream is = response.getEntity().getContent();
             /*
              * OLD: ArrayList<org.unito.client.Interval> arra =
@@ -74,7 +74,7 @@ public class TaskCall {
                 // call Scheduler with result from constraint solver
                 TaskGroup ret1 = new TaskCall().doConstraints(ret, "start", "new", modalita);
                 System.out.println("dopo gianluca e doConstraints");
-                  System.err.println("Ora di fine =\n" + new Date());
+                System.err.println("Ora di fine =\n" + new Date());
                 return ret1;
             } else {  // taskNet.equals("tasknet")
                 return ret;
@@ -161,16 +161,16 @@ public class TaskCall {
         ArrayList<String> taskNames = new ArrayList<String>();
         System.err.println("in doit tasks size=" + taskGroup.getTasks().size());
         // messo ora fuori dal loop
-         createUsers(taskGroup);
+        createUsers(taskGroup);
         if (mode.equals("schedule")) {
-  //          ArrayList<Interval> scheds = taskGroup.getCurrSchedule();
+            //          ArrayList<Interval> scheds = taskGroup.getCurrSchedule();
             int scheU = taskGroup.getOfficialSchedule("Tesista Ugo");
-            System.err.println("in doit sche dfor ugo:"+scheU);
+            System.err.println("in doit sche dfor ugo:" + scheU);
             for (Task t : taskGroup.getTasks()) {
                 int sche = taskGroup.getOfficialSchedule(t.getName());
-                System.err.println("task, sched "+ t.getName() + " "+ sche);
-                if (sche == -1){
-                    System.out.println("uso vincoli per task: "+t.getName());
+                System.err.println("task, sched " + t.getName() + " " + sche);
+                if (sche == -1) {
+                    System.out.println("uso vincoli per task: " + t.getName());
                 }
                 if (sche == -1) {
                     // usa limiti originali
@@ -187,7 +187,7 @@ public class TaskCall {
         } else {
             for (Task t : taskGroup.getTasks()) {
                 ts.addTask(t.getName(), t.getMinStartHour(), t.getMaxEndHour(), t.getMinStartHour(), t.getMaxEndHour(), t.getDuration());
-            //    createUsers(taskGroup); // forse fuori dal loop?
+                //    createUsers(taskGroup); // forse fuori dal loop?
                 for (UiUser u : t.getUsers()) {
                     ts.addActorToTask(t.getName(), User.find(u.getId()));
                 }

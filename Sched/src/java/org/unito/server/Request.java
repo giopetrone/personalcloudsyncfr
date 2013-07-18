@@ -87,6 +87,9 @@ public class Request {
             ret += actionString2;
             ret += action;
             ret += actionString3;
+            if (taskNet.equals("sched")){  //aggiungi intervallo prescelto per un task
+                ret += choice.toRequestSchedule();
+            }
         } else {
             ret += actionString1;
             ret += task;
@@ -122,6 +125,7 @@ public class Request {
                 if (sta == 0) {
                     // means that the task has no valid schedule
                     System.err.println("WARNING: task" + t.getName() + " has schedule == 0    !!");
+                  //  sta = 1;
                 }
                 ret += "<stask name=\"" + t.getName() + "\" start=\"" + sta + "\" />\n";
             }

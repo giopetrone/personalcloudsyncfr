@@ -4,6 +4,8 @@
  */
 package org.unito.client;
 
+import com.bradrydzewski.gwt.calendar.client.Appointment;
+import com.bradrydzewski.gwt.calendar.client.AppointmentStyle;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.IsSerializable;
 import java.util.ArrayList;
@@ -53,11 +55,13 @@ public class TaskGroup implements IsSerializable {
             tasks.add(taski[i]);
         }
         Interval[] currScheduli = via.getCurrSchedule();
+
         for (int i = 0; i < currScheduli.length; i++) {
             globalSchedule.add(currScheduli[i]);
             //  Window.alert("Sc=hed= "+ currScheduli[i].getMin());
         }
         Interval[] taskScheduli = via.getTaskSchedule();
+
         for (int i = 0; i < taskScheduli.length; i++) {
             taskSchedule.add(taskScheduli[i]);
         }
@@ -98,15 +102,15 @@ public class TaskGroup implements IsSerializable {
         setSchedule(t.getName(), sta);
         return sta;
     }
-    
-  public static int addScheduleTaskOrg(String name, String firstStartHour, String lastEndHour, String duration, String before, String after, String schedule, String users, boolean overlap, String description) {
-        Task tat = new Task(name, firstStartHour, lastEndHour, duration, before, after, schedule, users, overlap, description);
+
+    public static int addScheduleTaskOrg(String name, String firstStartHour, String lastEndHour, String duration, String before, String after, String schedule, String users, boolean overlap, String description,int pri) {
+        Task tat = new Task(name, firstStartHour, lastEndHour, duration, before, after, schedule, users, overlap, description, pri);
         TaskGroup.add(tat);
         //  Window.alert("lastendhour="+lastEndHour);
         int sched = TaskGroup.current().setSchedule(tat);
         return sched;
     }
-  
+
     public static int addScheduleTask(Task tat) {
         TaskGroup.add(tat);
         //  Window.alert("lastendhour="+lastEndHour);
@@ -432,6 +436,80 @@ public class TaskGroup implements IsSerializable {
         return ret;
     }
 
+    public static ArrayList<Task> stiliCaselleGoo(boolean showAvailability, TaskGroup fonte) {
+        ArrayList<String>[] ret = new ArrayList[oreLavoro];
+        ArrayList<Task> ita = new ArrayList();
+        for (int i = 0; i < oreLavoro; i++) {
+            ret[i] = new ArrayList();
+        }
+        //   String stam = "";
+        //     Window.alert("1");
+        if (showAvailability) {
+            if (fonte.taskSchedule == null) {
+                Window.alert("in stilicaselle, fonte.taskSchedule == null!!");
+            }
+            //   Window.alert("1.1");
+            if (fonte.taskSchedule.isEmpty()) { // empty --> no solutions
+                //     Window.alert("1.2");
+                Task lui = fonte.getI(fonte.getSelectedTask());
+                Window.alert("1.3");
+                ita.add(lui.toSpecial(null, AppointmentStyle.RED));
+                //      Window.alert("2");
+               /* for (int i = lui.getFirstStartHour(); i < lui.getLastEndHour(); i++) {
+                 ret[i].add("styleConflict");
+                 }*/
+            } else {
+              //  Window.alert("stil1 intervalli size= " + fonte.taskSchedule.size());
+              //  int q = 0;
+                //    Window.alert("3");
+                for (Interval inte : fonte.taskSchedule) {
+                    //     Window.alert("stilinte:" + q++);
+                    if (inte.getName() == null) {
+                        Window.alert("stilicaselleGoo, inte.getName() == null");
+                    }
+                    Task ta = fonte.get(inte.getName());
+                    if (ta == null) {
+                        Window.alert("stilicasellegoo2, task"+ inte.getName() + " missingin tasks");
+                    }
+                    if (inte.getMin() == inte.getMax()) {
+                        Window.alert("stilicaselle: limiti == !!! " + ta.getName() + " " + inte.getMin());
+                    }
+                    /**
+                     * nuovo per google
+                     */
+                    //  Window.alert(fonte.taskSchedule.size()+" " + ta.getName() + " " + inte.getMin()+ " "+ inte.getMax());
+                    ita.add(ta.toSpecial(inte, null));
+                    /* fine nuovo */
+                }
+
+                // fill also current task positions , to be discussed.
+                Task tat = fonte.getI(fonte.getSelectedTask());
+                if (tat == null) {
+                    Window.alert("null4");
+                }
+                //     Window.alert("taskfonte=" + tat);
+                int ende = tat.getOfficialSchedule() + tat.getDuration();
+                if (tat.getOfficialSchedule() == -1) {
+                    //    Window.alert("schedule == -1 for: "+ tat.getName());
+                } else {
+
+                    for (int k = tat.getOfficialSchedule(); k < ende; k++) {
+                        if (ret[k].isEmpty()) {
+                            ret[k].add("styleAvailable");
+                        }
+                    }
+                }
+            }
+        }
+        for (int i = 0; i < oreLavoro; i++) {
+            if (ret[i].isEmpty()) {
+                ret[i].add("styleUnused");
+            }
+        }
+        //  Window.alert("4:lun"+ita.size());
+        return ita;
+    }
+
     public TaskGroup fissaUnoPulisci(TaskGroup tg, int time) {
         // create a taskgroup with all the tasks fixed in their
         // current time slots, including the selected task.
@@ -518,6 +596,17 @@ public class TaskGroup implements IsSerializable {
         return null;
     }
 
+    public Task getFromAp(Appointment apa) {
+        for (Task t : tasks) {
+            Window.alert("nomi"+apa.getTitle()+" "+ t.getName()+ t.getAppo()+ " "+ apa);
+            if (t.getAppo() == apa) {
+                return t;
+            }
+        }
+        Window.alert("not found task" + apa);
+        return null;
+    }
+
     public static Task get(String name) {
         for (Task t : current().tasks) {
             if (t.getName().equals(name)) {
@@ -598,11 +687,16 @@ public class TaskGroup implements IsSerializable {
         Task task = new Task("T1", 0, 10, 4);
         task.addUser(UiUser.find("liliana"));
         task.addUser(UiUser.find("marino"));
-        task.setDescription("discuss artcile");
+        task.setDescription("discuss article");
         tg.addScheduledTask(task, 6, 10);
-
+ 
+        task = new Task("T4", 28, 40, 4);
+        task.addUser(UiUser.find("gianluca"));
+        task.setDescription("occupato1");
+        tg.addScheduledTask(task, 36, 40);
+        
         task = new Task("T2", 24, 40, 2);
-        task.addUser(UiUser.find("balbo"));
+        task.addUser(UiUser.find("prof.Rossi"));
         task.setDescription("meeting with CSI");
         tg.addScheduledTask(task, 24, 26);
 
@@ -610,7 +704,7 @@ public class TaskGroup implements IsSerializable {
         task.addUser(UiUser.find("gianluca"));
         task.setDescription("analyze constraint solver");
         tg.addScheduledTask(task, 36, 40);
-        //   Window.alert("corrente in esempio"+ current().tasks);
+        
     }
 
     public static void esempioTest() {
@@ -628,8 +722,8 @@ public class TaskGroup implements IsSerializable {
         task.addUser(UiUser.find("prof.Rossi"));
         task.setDescription("Do not disturb");
         tg.addScheduledTask(task, 1, 5);
-        
-        
+
+
         task = new Task("SW/1", 3, 5, 2);
         task.addUser(UiUser.find("gianluca"));
         task.setDescription("Teach Software development");
@@ -648,12 +742,12 @@ public class TaskGroup implements IsSerializable {
         task.addUser(UiUser.find("prof.Rossi"));
         task.setDescription("University staff meeting");
         tg.addScheduledTask(task, 15, 17);
-        
+
         task = new Task("BUSY6", 19, 21, 2);
         task.addUser(UiUser.find("prof.Rossi"));
         task.setDescription("University staff meeting");
         tg.addScheduledTask(task, 19, 21);
-        
+
         task = new Task("Gym", 22, 24, 2);
         task.addUser(UiUser.find("gianluca"));
         task.setDescription("Teach Software development");
@@ -727,6 +821,12 @@ public class TaskGroup implements IsSerializable {
         task.setDescription("Do not disturb!");
         tg.addScheduledTask(task, 41, 44);
 
+        //  ora U1 per ora marino
+         task = new Task("M1", 54, 56, 2);
+         task.addUser(UiUser.find("marino"));
+         task.setDescription("busy");
+         tg.addScheduledTask(task, 54, 56);
+         
         //  ora marino
         //  task = new Task("BUSY5", 12, 17, 5);
         //  task.addUser(UiUser.find("marino"));
