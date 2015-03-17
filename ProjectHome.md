@@ -1,0 +1,1 @@
+prototype of a Personal Cloud, web-based collaboration environment
